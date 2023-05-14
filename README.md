@@ -9,8 +9,8 @@ learning for how to develop something specific (like getting a file hash). Just 
 Usage Example:
 ```C#
 	using System;
-	using APIROOT; // This is the default namespace for the basic API.
-	using static APIROOT.MAINAPI; // This accesses the static class MAINAPI , which is the class that contain most of the functions.
+	using ROOT; // This is the default namespace for the basic functions.
+	using static ROOT.MAIN; // This accesses the static class MAINAPI , which is the class that contain most of the functions.
 
 	namespace ANamespace
 	{
@@ -54,6 +54,9 @@ The project includes operations related to:
 - Cabinet Archives (Possibly by using Windows.Win32).
 - Other Archiving formats (Not still confirmed).
 - Extension methods on Save/Load file dialogs.
+
+#### Documentation
+The Documentantion explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
 
 #### Contribution
 Anyone can contribute to this Project.
