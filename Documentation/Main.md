@@ -4,10 +4,10 @@ This is the usage documentation for using the MDCFR Library.
 
  The Library is based on the logic of using full descriptive names in functions , so that these can be remembered by the developer.
 ## Index
-- 1> The [ROOT](http://github.com/mdcdi1315/mdcframework/Documentation/ROOT.md) Namespace.
-- 2> The [ExternalArchivingMethods](http://github.com/mdcdi1315/mdcframework/Documentation/ExtArch.md) Namespace.
-- 3> The [ExternalHashCaculators](http://github.com/mdcdi1315/mdcframework/Documentation/ExtHashCac.md) Namespace.
-- 4> The [ExtrenalCryptographicMethods](http://github.com/mdcdi1315/mdcframework/Documentation/ExtCrypt.md) Namespace.
-- 5> The [HTTPLIB](http://github.com/mdcdi1315/mdcframework/Documentation/httplib.md) Namespace.
+- 1> The [ROOT](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ROOT.md) Namespace.
+- 2> The [ExternalArchivingMethods](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ExtArch.md) Namespace.
+- 3> The [ExternalHashCaculators](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ExtHashCac.md) Namespace.
+- 4> The [ExtrenalCryptographicMethods](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ExtCrypt.md) Namespace.
+- 5> The [HTTPLIB](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/httplib.md) Namespace.
 
 
