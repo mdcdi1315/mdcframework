@@ -63,7 +63,7 @@ However , other contributor not approved by me is not allowed to add new feature
 For any considerations , ideas or a question relating to the Project can be submitted to the Project's tab "Discussions".
 Any questions relating bugs can be posted as a new Issue and marking them as 'Question'.
 
-#### Source code used int he Project (Licenses for all the used code , among with the Project's one.):
+#### Source code used in the Project (Licenses for all the used code , among with the Project's one.):
 - Http Library: https://github.com/j6mes/httplib .
 - Zstandard archive format repo at https://github.com/facebook/zstd .
 - xxhash non-cryptographic hash algorithm at https://github.com/Cyan4973/xxhash .
