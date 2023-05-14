@@ -1,0 +1,4 @@
+// The Double backslash specifies a COMMENT.
+// This project advocates the package Microsoft.Windows.CsWin32 which is still in test phase.
+// The below line specifies that all functions derived from Cabinet.dll should be added.
+Cabinet.*

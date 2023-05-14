@@ -1,0 +1,111 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<ItemGroup>
+		<Reference Include="System.Data.DataSetExtensions" />
+		<Reference Include=".\Imports\PresentationFramework.dll" />
+		<Reference Include=".\Imports\Microsoft.VisualBasic.dll" />
+		<Reference Include=".\Imports\System.Windows.Forms.dll" />
+		<Reference Include=".\Imports\System.IO.Compression.dll" />
+		<Reference Include=".\Imports\System.IO.Compression.FileSystem.dll" />
+	</ItemGroup>
+	
+  <PropertyGroup>
+    <!-- Set To True if you need to import DLL's. Useful enough.-->
+  	<ImportProjectExtensionTargets>True</ImportProjectExtensionTargets>
+	<!-- Do not add the netX.X folder. Pass the contents immediately to /bin/debug.-->
+	<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+	<!-- Instruct DOTNET.exe to use the Release configuration even in publish method , even if supplied an another value.-->
+	<!-- Supply False if your project is still in test phase.-->
+	<PublishRelease>True</PublishRelease>
+	<!-- Instruct MSBUILD to force-copy all the None Update elements.-->
+	<!-- This Element is a division of EnableDefaultItems , which only controls the None elements.-->
+	<EnableDefaultNoneItems>True</EnableDefaultNoneItems>
+	<!-- By using the below option , MSBUILD builds better your source code. -->
+	<UseAppHost>True</UseAppHost>
+	<!-- Make sure to use all the None Update , Compile elements and generate them to the Output Directory.-->
+	<EnableDefaultItems>True</EnableDefaultItems>
+	<!-- Becuase we want multitargeting, we must exclude the items we don't require. Comment the below line to enable the default excludes. -->
+	<DefaultItemExcludesInProjectFolder>*.csproj;*.vbproj;*.vb;*.cs;*.txt;*.cmd</DefaultItemExcludesInProjectFolder>
+	<!-- Corrects dependency errors. -->
+	<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+	<!-- Generate the assembly of the project. Valid Strings: Exe , Library -->
+    <OutputType>Library</OutputType>
+	<!-- Pass the folder namespace. Will be used as a helper.-->
+    <RootNamespace>MDCFR</RootNamespace>
+	<!-- Provide the .NET Framework to run it.-->
+    <TargetFramework>net48</TargetFramework>
+	<!-- Provide the Version of the Executable. -->
+	<FileVersion>1.5.4.8</FileVersion>
+	<!-- Provide the Company name-->
+	<Company>(c) MDCDI1315. https://github.com/mdcdi1315/mdcframework</Company>
+	<!-- Provide the Authors Namespace. If need to be defined a lot , array them as a comma seperated list.-->
+	<Authors>MDS13363LA</Authors>
+	<!-- Supply the Supported OS Version. If less than the defined , cannot be run. -->
+	<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+	<!-- Define the abstract title that will be shown when hovering the mouse over the .NET file.-->
+	<AssemblyTitle>.NET Application Development Framework</AssemblyTitle>
+	<!-- File Abstract Description -->
+	<Description>Portable Application Development Framework</Description>
+	<!-- Copyright Information -->
+	<Copyright>(c) MDCDI1315. All Rights Reserved.</Copyright>
+	<!-- AssemblyVersion: Provide the .NET Framework versions that this executable can call execute or run other assemblies.. -->
+	<AssemblyVersion>4.4.0.0</AssemblyVersion>
+  </PropertyGroup>
+  <ItemGroup>
+	<Compile Include=".\MDCFR-DEFAULT.cs" />
+	<Compile Include=".\MDCFR-EXTERNALHASHESDIG.cs" />
+	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS.cs" />
+	<Compile Include=".\MDCFR-EXTERNALCRYPTOGRAPHY.cs" />
+	<Compile Include=".\MDCFR-HTTPLIB.cs" />
+	<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.206-beta">
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.vbproj'">
+	<!-- This is only needed when MSBuild loads an VBPROJ. -->
+
+	<!-- Correct Error Dependencies. Leave it as it is.-->
+	<VBRuntime>Default</VBRuntime>
+	<!-- Enable Background and Continuous Garbage collection because VB leaves a lot of unused objects while executing...-->
+	<ConcurrentGarbageCollection>True</ConcurrentGarbageCollection>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+	<!-- This is only needed when MSBuild loads an CSPROJ. -->
+	
+	<!-- Force using the C# Version 10. You can specify here whatever you need every time; -->
+	<LangVersion>10</LangVersion>
+  </PropertyGroup>
+
+	<!--MSBUILD Targets overrides -->
+  <Target Name="Init_N" BeforeTargets="BeforeBuild">
+	<Message Importance="High" Text="Initiating Build..." />
+	<Message Importance="High" Text="Configuration Used: $(Configuration)" />
+	<Message Importance="High" Text="Will be built on platform: $(Platform)" />
+	<Message Importance="High" Text="Will be built on OS: $(OS)" />
+  </Target>
+  
+  <Target Name="End_N1" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries... (For publishing)" />
+	<Exec Command="@&quot;.\macros.cmd&quot; &quot;$(OutputPath)&quot; -publish" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+  
+  <Target Name="End_N2" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Windows_NT'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
+	<Exec Command="@&quot;.\macros.cmd&quot; &quot;$(OutputPath)&quot;" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+	
+  <Target Name="End_N3" AfterTargets="Publish" Condition="'$(OS)' == 'Unix'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries... (For publishing)" />
+	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot; -publish" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+	
+  <Target Name="End_N4" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Unix'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
+	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot;" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+
+</Project>
