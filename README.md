@@ -63,10 +63,11 @@ However , other contributor not approved by me is not allowed to add new feature
 For any considerations , ideas or a question relating to the Project can be submitted to the Project's tab "Discussions".
 Any questions relating bugs can be posted as a new Issue and marking them as 'Question'.
 
-#### Source code used in the Project (Licenses for all the used code , among with the Project's one.):
+#### Source code used in the Project (Licenses for all the used code , among with the Project's one , are located to LICENSE file):
 - Http Library: https://github.com/j6mes/httplib .
 - Zstandard archive format repo at https://github.com/facebook/zstd .
 - xxhash non-cryptographic hash algorithm at https://github.com/Cyan4973/xxhash .
 - CRC Implementation by nullfx at https://github.com/nullfx/NullFX.CRC .
 - DES and Triple DES Implementations by zeyadetman at http://github.com/zeyadetman/Computer-Security-Algorithms .
 - Blake2s Checksum by sparkdustjoe at https://github.com/SparkDustJoe/Blake2 .
+
