@@ -13,12 +13,12 @@ using System.IO.Compression;
 using System.Runtime.InteropServices;
 
 
-namespace APIROOT 
+namespace ROOT 
 {
 	// A Collection Namespace which includes Microsoft's Managed code.
     // Many methods here , however , are controlled and built by me at all.
 	
-	public class MAINAPI 
+	public class MAIN 
 	{
 
 
