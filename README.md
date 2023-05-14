@@ -5,6 +5,26 @@ MDC (Called __MDCFR__) is a .NET Application Development Library which aims to i
 ## Detailed Description
 This .NET Library (__MDCFR__ called) contains anything needed to start and develop easily .NET applications without
 learning for how to develop something specific (like getting a file hash). Just Code!!
+Usage Example:
+```C#
+	
+	using System;
+	using APIROOT;
+	using static APIROOT.MAINAPI;
+
+	namespace ANamespace
+	{
+		internal class Program
+		{
+			public void Main(System.String[] args)
+			{
+				IntuitiveConsoleText.InfoText("Welcome!!!"); // This is like: "INFO: Welcome!!!" with a gray foreground and a black background.
+				WriteConsoleText("Start your next .NET Application development using MDCFR!!!"); // This just writes to console any kind of message.
+				HaltApplicationThread(320); // This stops the application's thread (Halts the application) for the time given. Counted in milliseconds.
+			}
+		}
+	}
+```
 
 ## The Project History
 This Project was developed for a need to develop easily .NET Applications , and started as of my own idea.
