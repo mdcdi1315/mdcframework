@@ -15,22 +15,38 @@ using System.Runtime.InteropServices;
 
 namespace ROOT 
 {
-	// A Collection Namespace which includes Microsoft's Managed code.
+    // A Collection Namespace which includes Microsoft's Managed code.
     // Many methods here , however , are controlled and built by me at all.
-	
-	public class MAIN 
+
+    public class MAIN 
 	{
 
 
-#if NETFRAMEWORK
+#if NET472_OR_GREATER
 
-		// Since that the functions that use this class can run only on .NET framework , 
-		// this is also exisiting only on .NET framework.
-		public class FileDialogsReturner
+		// Found that the File Dialogs work the same even when 
+		// these run under .NET Standard.
+		// Weird that they work the same , though.
+		public class DialogsReturner
 		{
 			private string ERC;
 			private string FNM;
 			private string FNMFP;
+			private FileDialogType FT;
+			private System.String FTD;
+
+			public enum FileDialogType : System.Int32
+			{
+				CreateFile = 0,
+				LoadFile = 2,
+				DirSelect = 4
+			}
+
+			public FileDialogType DialogType
+			{ 
+				get { return FT; } 
+				set { FT = value; }
+			}
 			
 			public string ErrorCode
 			{
@@ -41,13 +57,40 @@ namespace ROOT
 			public string FileNameOnly
 			{
 				get { return FNM; }
-				set { FNM = value; }
+				set 
+				{
+                    if (FT == FileDialogType.DirSelect)
+                    {
+                        throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
+                    }
+                    FNM = value; 
+				}
 			}
 			
 			public string FileNameFullPath
 			{
 				get { return FNMFP; }
-				set { FNMFP = value; }
+				set 
+				{
+                    if (FT == FileDialogType.DirSelect)
+                    {
+                        throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
+                    }
+                    FNMFP = value; 
+				}
+			}
+
+			public System.String DirPath
+			{
+				get { return FTD; }
+				set 
+				{
+					if (FT != FileDialogType.DirSelect)
+					{
+						throw new InvalidOperationException("Not allowed to set the Directory Path when the dialog is initialised for files!!");
+					}
+					FTD = value;
+				}
 			}
 		}
 
@@ -260,7 +303,6 @@ namespace ROOT
 			}
 			return true;
 		}
-		
 		
 		public static System.Boolean MoveFilesOrDirs(System.String SourcePath , System.String DestPath)
 		{
@@ -483,9 +525,7 @@ namespace ROOT
 			}
 		}
 
-#if NETFRAMEWORK
-
-		// The below code excerpts can run only on .NET framework.
+#if NET472_OR_GREATER
 
 		public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , 
         System.Windows.Forms.MessageBoxButtons MessageButton = 0 , 
@@ -513,12 +553,142 @@ namespace ROOT
 			}
 		}
 		
-		
-		public static FileDialogsReturner CreateLoadDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
+		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle , System.String DirToPresent)
+		{
+            DialogsReturner EDOut = new DialogsReturner();
+			EDOut.DialogType = DialogsReturner.FileDialogType.LoadFile;
+			if (System.String.IsNullOrEmpty(DirToPresent))
+			{
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+			if (DirExists(DirToPresent) == false)
+			{
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.OpenFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.Multiselect = false;
+			FLD.InitialDirectory = DirToPresent;
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle , System.String DirToPresent)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(DirToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (DirExists(DirToPresent) == false)
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            FLD.InitialDirectory = DirToPresent;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
 		System.String FileDialogWindowTitle)
 		{
-			FileDialogsReturner EDOut = new FileDialogsReturner();
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+			DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.LoadFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
 			{
 				EDOut.ErrorCode = "Error";
 				return EDOut;
@@ -533,8 +703,8 @@ namespace ROOT
 				EDOut.ErrorCode = "Error";
 				return EDOut;
 			}
-			
-			var FLD = new Microsoft.Win32.OpenFileDialog();
+
+            var FLD = new Microsoft.Win32.OpenFileDialog();
 			
 			FLD.Title = FileDialogWindowTitle;
             FLD.DefaultExt = FileExtensionToPresent;
@@ -567,11 +737,12 @@ namespace ROOT
 			}
 		}
 		
-		public static FileDialogsReturner CreateSaveDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
 		System.String FileDialogWindowTitle)
 		{
-			FileDialogsReturner EDOut = new FileDialogsReturner();
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+			DialogsReturner EDOut = new DialogsReturner();
+			EDOut.DialogType = DialogsReturner.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
 			{
 				EDOut.ErrorCode = "Error";
 				return EDOut;
@@ -620,8 +791,39 @@ namespace ROOT
 			}
 		}
 
+		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
+		{
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.DirSelect;
+            if (System.String.IsNullOrEmpty(DialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+			var FLD = new System.Windows.Forms.FolderBrowserDialog();
+			// Settings for the FolderBrowserDialog.
+			FLD.ShowNewFolderButton = true;
+			FLD.Description = DialogWindowTitle;
+			FLD.RootFolder = DirToPresent;
+
+            DialogResult REST = FLD.ShowDialog();
+
+            if (REST == DialogResult.OK)
+            {
+				EDOut.DirPath = FLD.SelectedPath;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
 #endif
-		public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
+        public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
 		{
 			System.Threading.Thread.Sleep(TimeoutEpoch);
 		}
@@ -1652,7 +1854,198 @@ namespace ROOT
 			#pragma warning restore CS0219
 		}
 	}
-	
+
+    /*
+     *	This is a simple console progress bar. 
+     * Had you ever wanted to represent to console a progress of an action?
+     * Now you can with this easy-to-use and simple class.
+     * Note that you must create a new thread for this class so as to execute the actions required.
+     * Usage
+     * 
+     * Create a new variable that represents this class with one of the available constructors.
+     * then , make a new thread like this:
+     * \\ System.Threading.Thread ClassThread = new Thread(new ThreadStart(ClassInitalisator.Invoke));
+     * which will register the thread. Be noted that the thread must only be invoked by the Invoke() function.
+     * Use then the ClassThread.Start();
+     * to show the progress bar to the user.
+     * use then each time ClassThread.UpdateProgress(); to update the progress indicator specified by the step given.
+     * This will finished when the value presented is equal or more to the stop barrier(Which of this case is the end)
+     * But this class has many , many other features ,like changing the progress message at executing time ,
+     * breaking the bar before it ends , and setting the min/max values allowed and the step , which is also allowed to be
+     * a negative number.
+     *
+     * I have also here an function example , which defines and controls the message itself.
+     * using ROOT;
+     * 
+     * public static void Test()
+       {
+           SimpleProgressBar CB = new SimpleProgressBar();
+           System.Threading.Thread FG = new System.Threading.Thread(new System.Threading.ThreadStart(CB.Invoke));
+           CB.ProgressChar = '@';
+           CB.ProgressStep = 1;
+           CB.ProgressEndValue = 100;
+           FG.Start();
+           while (CB.Ended == false)
+           {
+               CB.UpdateProgress();
+               System.Threading.Thread.Sleep(88);
+           }
+           System.Threading.Thread.Sleep(480);
+           System.Console.WriteLine("Ended.");
+           FG = null;
+           CB = null;
+       }
+    */
+
+    public class SimpleProgressBar
+    {
+        private System.String Progr = "Completed";
+        private System.String Progm = "";
+        private System.Char Progc = '.';
+        private System.Boolean _Ended = false;
+        private System.Int32 stp = 1;
+        private System.Int32 iterator = 0;
+        private System.Int32 start = 0;
+        private System.Int32 end = 100;
+
+        private event System.EventHandler<ProgressChangedArgs> ChangeProgress;
+
+        public System.String ProgressMessage
+        {
+            get { return Progr; }
+            set
+            { if (System.String.IsNullOrEmpty(value)) { throw new System.ArgumentException("Illegal , not allowed to be null."); } else { Progr = value; } }
+        }
+
+        public SimpleProgressBar() { }
+
+        public SimpleProgressBar(System.Int32 Start, System.Int32 Step, System.Int32 End)
+        {
+            if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); }
+            if (Start >= End) { throw new System.ArgumentException("It is not allowed the Start value to be more than the ending value."); }
+            start = Start;
+            stp = Step;
+            end = End;
+        }
+
+        public SimpleProgressBar(System.String progressMessage, System.Int32 Start, System.Int32 Step, System.Int32 End)
+        {
+            if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); }
+            if (Start >= End) { throw new System.ArgumentException("It is not allowed the Start value to be more than the ending value."); }
+            if (System.String.IsNullOrEmpty(progressMessage)) { throw new System.ArgumentException("The progressMessage is null."); }
+            Progr = progressMessage;
+            start = Start;
+            stp = Step;
+            end = End;
+        }
+
+        public SimpleProgressBar(System.Int32 Step, System.Int32 End) { if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); } else { stp = Step; end = End; } }
+
+        public SimpleProgressBar(System.String progressMessage, System.Int32 Step, System.Int32 End)
+        {
+            if (End > 300) { throw new System.ArgumentException("It is not allowed this value to be more than 300."); }
+            if (System.String.IsNullOrEmpty(progressMessage)) { throw new System.ArgumentException("The progressMessage is null."); }
+            Progr = progressMessage;
+            stp = Step;
+            end = End;
+        }
+
+        private class ProgressChangedArgs : System.EventArgs
+        {
+            private System.Int32 changedto;
+            private System.Boolean ch = false;
+
+            public System.Boolean Changed
+            {
+                get { return ch; }
+                set { ch = value; }
+            }
+
+            public System.Int32 ChangedValueTo
+            {
+                get { return changedto; }
+                set { changedto = value; }
+            }
+
+            public ProgressChangedArgs(System.Int32 ChangedValue)
+            {
+                Changed = true;
+                changedto = ChangedValue;
+            }
+        }
+
+        public System.Char ProgressChar
+        {
+            get { return Progc; }
+            set
+            {
+                System.Char[] InvalidChars = new System.Char[] { '\a', '\b', '\\', '\'', '\"', '\r', '\n', '\0' };
+                for (System.Int32 D = 0; D < InvalidChars.Length; D++)
+                {
+                    if (InvalidChars[D] == value) { throw new System.ArgumentException("The character is illegal."); }
+                }
+                Progc = value;
+            }
+        }
+
+        public System.Int32 ProgressStep
+        {
+            get { return stp; }
+            set { stp = value; }
+        }
+
+        public System.Int32 ProgressEndValue
+        {
+            get { return end; }
+            set { if (value > 300) { throw new System.ArgumentException("It is not allowed this value to be more than 300."); } else { end = value; } }
+        }
+
+        public System.Int32 ProgressStartValue
+        {
+            get { return start; }
+            set { if (value >= end) { throw new System.ArgumentException("It is not allowed this value to be more than the ending value."); } }
+        }
+
+        public void UpdateMessageString(System.String Message)
+        {
+            if (System.String.IsNullOrEmpty(Message)) { throw new System.ArgumentException("The Message is null."); }
+            Progr = Message;
+            System.Console.Write($"{Progr}: {iterator}% [{Progm}]\r");
+        }
+
+        public System.Boolean Ended { get { return _Ended; } set { _Ended = value; } }
+
+        public void UpdateProgress()
+        {
+            if (_Ended == false)
+            {
+                ProgressChangedArgs DFV = new ProgressChangedArgs(iterator += stp);
+                Progm += Progc;
+                this.ChangeProgress?.Invoke(null, DFV);
+            }
+        }
+
+        private void ChangeBar(System.Object sender, ProgressChangedArgs e)
+        {
+            System.Console.Write($"{Progr}: {e.ChangedValueTo}% [{Progm}] \r");
+        }
+
+        public void Invoke()
+        {
+            this.ChangeProgress += ChangeBar;
+            iterator = start;
+            System.Console.Write($"{Progr}: {iterator}% [{Progm}]\r");
+            do
+            {
+                if (iterator >= end) { _Ended = true; }
+                System.Threading.Thread.Sleep(80);
+            } while (_Ended == false);
+            this.ChangeProgress -= ChangeBar;
+            this.ChangeProgress = null;
+            System.Console.WriteLine("\nCompleted.");
+            return;
+        }
+    }
 }
 
 namespace ExternalHashCaculators

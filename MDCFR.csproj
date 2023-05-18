@@ -35,7 +35,7 @@
 	<!-- Provide the .NET Framework to run it.-->
     <TargetFramework>net48</TargetFramework>
 	<!-- Provide the Version of the Executable. -->
-	<FileVersion>1.5.4.8</FileVersion>
+	<FileVersion>1.5.4.9</FileVersion>
 	<!-- Provide the Company name-->
 	<Company>(c) MDCDI1315. https://github.com/mdcdi1315/mdcframework</Company>
 	<!-- Provide the Authors Namespace. If need to be defined a lot , array them as a comma seperated list.-->
