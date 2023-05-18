@@ -12,8 +12,8 @@ The _MAIN_ Class contains static methods that assist a programmer develop quickl
 The Classes nested inside this one are:
   
  1. The IntuitiveConsoleText class , which shows a message to a console formatted and colored properly.
- 2. _(.NET Framework only)_ The FileDialogsReturner class , which is a storage class used when one of the 
- file dialogs is invoked.
+ 2. _(.NET Framework and Windows Desktop builds only)_ The DialogsReturner class , which is a storage class used when one of the 
+ file/directory dialogs is invoked.
 
 ### Methods:
 The Methods nested inside this one are (Sorted alphabetically):
@@ -102,17 +102,24 @@ This function will create the specified file in the specified path. Then , it wi
   
 #### 8. The CreateLoadDialog:
 ~~~C#
-public static MAIN.FileDialogsReturner CreateLoadDialog(System.String FileFilterOfWin32 , System.String FileExtensionToPresent ,System.String FileDialogWindowTitle)
+public static MAIN.DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32 , System.String FileExtensionToPresent ,System.String FileDialogWindowTitle)
+public static MAIN.DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32 , System.String FileExtensionToPresent ,System.String FileDialogWindowTitle , System.String DirToPresent)
 ~~~
-___NOTICE___!!! This function is available only for _.NET Framework_ builds!!!
- This function displays to the User to select and load a file.
+___NOTICE___!!! This function is available only for _.NET Framework_ and __Windows Desktop__ builds!!!
+
+ This function prompts the User to select and load a file.
 
   __Parameters__: 
   1. `System.String FileFilterOfWin32`: The file filter to use for limiting the search (It is an array of `';'`-seperated strings).
   2. `System.String FileExtensionToPresent`: The default file extension to present when the `FileFilterOfWin32` has more than two entries.
   3. `System.String FileDialogWindowTitle`: The title of the window that it is presented.
+
+  __Overloads__:
+  There is also an overloaded function which takes the below extra argument:
   
-  __Returns__: a new `ROOT.MAIN.FileDialogsReturner` instance.
+  `System.String DirToPresent`: The directory which this dialog must be opened to.
+  
+  __Returns__: a new `ROOT.MAIN.DialogsReturner` instance.
 
   __Example__: make a file filter , invoke the function and get the values.
   ~~~C#
@@ -121,7 +128,7 @@ ___NOTICE___!!! This function is available only for _.NET Framework_ builds!!!
     string File_Filter = "Text Documents|*.txt;Zip Archives|*.zip;Settings Text Document|settings.txt";
     string FileExt = ".txt";
     string title = "Open the File...";
-    FileDialogsReturner DialogResult = CreateLoadDialog(File_Filter , FileExt , title);
+    DialogsReturner DialogResult = CreateLoadDialog(File_Filter , FileExt , title);
     WriteConsoleText("The File Name is " + DialogResult.FileName);
     WriteConsoleText("The File Full path is " + DialogResult.FileNameFullPath);
     WriteConsoleText("Error Detected: " + DialogResult.ErrorCode);
@@ -196,3 +203,143 @@ This function reads the specified file and gets the specified hash algorithm dig
       5. `"MD5"`
 
  __Returns__: the specified hash of that file; otherwise , the "Error" string.
+
+#### 16. The GetADirDialog:
+~~~C#
+public static MAIN.DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
+public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle , System.String AlternateDir)
+~~~
+___NOTICE___!!! This function is available only for _.NET Framework_ and __Windows Desktop__ builds!!!
+
+ This function prompts the User to select a specified directory.
+ 
+ __Parameters__:
+ 1. `System.Environment.SpecialFolder DirToPresent`: The Directory to start the prompt instance.
+  
+  The values are located [here](https://learn.microsoft.com/dotnet/api/system.environment.specialfolder?view=netframework-4.7.2).
+ 2. `System.String DialogWindowTitle`: The title to show to the dialog.
+ 
+ __Returns__:
+ A new `MAIN.DialogsReturner` instance.
+ 
+ __Overloads__:
+ There is also an overloaded function which takes the below extra argument:
+ 
+ `System.String AlternateDir`: The path to a start directory , if the `DirToPresent` is set to 'MyComputer'.
+ 
+ #### 17.The GetANewFilesystemInfo:
+ ~~~C#
+ public static System.IO.FileSystemInfo[] GetANewFileSystemInfo(System.String Path)
+ ~~~
+ This function gets a new `System.IO.FileSystemInfo` array which can be used to enumerate files and directories.
+ 
+  __Parameters__:
+  1. `System.String Path`: An existing directory path.
+
+  __Returns__:
+  A new `System.IO.FileSystemInfo[]` if it succeeded; otherwise , `null`.
+  
+  __Example__:
+  ~~~C#
+    using System;
+    using System.IO;
+    
+    FileSystemInfo[] Array = GetANewFileSystemInfo("C:\\files");
+    foreach(System.IO.FileSystemInfo FSI in Array)
+    {
+       //The below statement tests if the object took from the array is a file.
+       if (FSI is System.IO.FileInfo) {Console.WriteLine("File: " + FSI.FullName);}
+       //The below statement tests if the object took from the array is a directory.
+       if (FSI is System.IO.DirectoryInfo) {Console.WriteLine("Directory: " + FSI.FullName);}
+    }
+    /* 
+     * This will display output like the following:
+     * Directory: C:\files\mdcframework
+     * File: C:\files\mdcframework\README.md
+     * File: C:\files\mdcframework\LICENSE
+     * File: C:\files\mdcframework\MDCFR.csproj
+     * File: C:\files\mdcframework\MDCFR.sln
+    */
+  ~~~
+ 
+ #### 18. The GetAStringFromTheUser:
+ ~~~C#
+ public static System.String GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
+ ~~~
+ This function is an exact implementation of the [`Microsoft.VisualBasic.Interaction.InputBox`](https://learn.microsoft.com/dotnet/api/microsoft.visualbasic.interaction.inputbox?view=netframework-4.7.2),
+ which is imported here if you want to use it , but it is not needed to reference the `Microsoft.VisualBasic` DLL.
+ 
+  __Parameters__:
+  1. `System.String Prompt`: This is the prompt message shown to the user.
+  2. `System.String Title`: The title of this window.
+  3. `System.String DefaultResponse`: The default answer to the prompt. Can be `null` , suggesting that there is not a default answer.
+  
+  __Returns__:
+  The string as an answer taken from the user; otherwise , `null` if it cancelled or returned an empty string.
+  
+ #### 19. The GetContentsFromFile:
+ ~~~C#
+ public static System.String GetContentsFromFile(System.IO.FileStream FileStreamObject)
+ ~~~
+ This function gets all the contents of a `System.IO.FileStream` object with Read permissions at least , and 
+ gets it's contents as a `System.String`.
+ 
+  __Parameters__:
+  1. `System.IO.FileStreamObject`: The file object to get the data from. __Remember__ that the object must be active and it must have at least Read permissions.
+  
+  __Returns__:
+  A `System.String` containing all the read data; if any of the above situations are not met or an error detected , then returns `null`.
+  
+#### 19. The GetContentsFromStreamReader:
+~~~C#
+[System.ObsoleteAttribute("GetFileContentsFromStreamReader method has been replaced with the GetContentsFromFile function , which performs better at performance level." +
+"You should notice that sometime this function will be removed without prior notice.", false)]
+public static System.String GetFileContentsFromStreamReader(System.IO.StreamReader FileStream)
+~~~
+ This function gets all the contents of a `System.IO.StreamReader` object with Read permissions at least , and 
+ gets it's contents as a `System.String`.
+ ___NOTICE___: This function is deprecated and have limitations on usage; Use instead the `MAIN.GetContentsFromFile` function instead.
+ 
+ __Parameters__:
+ 1. `System.IO.StreamReader FileStream`: The file object to get the data from. __Remember__ that the object must be active and it must have at least Read permissions.
+ 
+ __Returns__:
+  A `System.String` containing all the read data; if any of the above situations are not met or an error detected , then returns `null`.
+  
+#### 20. The GetPathEnvironmentVar:
+~~~C#
+public static System.String[] GetPathEnvironmentVar()
+~~~
+This function returns an array of folder paths , which are conventions for easily accessing executables and scripts.
+
+ __Parameters__: This method does not accept any parameters.
+ 
+ __Returns__: A new `System.String[]` containing the folder paths; otherwise , `null`.
+ 
+#### 21. The GetRuntimeVersion:
+~~~C#
+public static System.String GetRuntimeVersion()
+~~~
+This function returns the specified runtime version. For informational purposes only.
+
+ __Parameters__: This method does not accept any parameters.
+ 
+ __Returns__: The `System.String` describing the runtime version.
+ 
+#### 22. The GetVBRuntimeInfo: 
+~~~C#
+public static System.String GetVBRuntimeInfo()
+~~~
+This function gets the version of the currently loaded assembly `Microsoft.VisualBasic`. For informational purposes only.
+
+ __Parameters__: This method does not accept any parameters.
+ 
+ __Returns__: The `System.String` describing the `Microsoft.VisualBasic` assembly version.
+ 
+ #### 23. The HaltApplicationThread:
+ ~~~C#
+ public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
+ ~~~
+ 
+
+ 
