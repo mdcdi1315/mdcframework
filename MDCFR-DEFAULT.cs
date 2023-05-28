@@ -11,14 +11,16 @@ using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-
+using Windows.Win32.Storage.Compression;
+using System.Runtime.CompilerServices;
+using System.Linq.Expressions;
 
 namespace ROOT 
 {
     // A Collection Namespace which includes Microsoft's Managed code.
     // Many methods here , however , are controlled and built by me at all.
 
-    public class MAIN 
+    public static class MAIN 
 	{
 
 
@@ -791,7 +793,116 @@ namespace ROOT
 			}
 		}
 
-		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
+        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle , System.Boolean FileMustExist , System.String DirToPresent)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = FileMustExist;
+			FLD.InitialDirectory = DirToPresent;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle , System.Boolean FileMustExist)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = FileMustExist;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
 		{
             DialogsReturner EDOut = new DialogsReturner();
             EDOut.DialogType = DialogsReturner.FileDialogType.DirSelect;
@@ -822,13 +933,49 @@ namespace ROOT
             }
         }
 
+        public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle ,System.String AlternateDir)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = DialogsReturner.FileDialogType.DirSelect;
+            if (System.String.IsNullOrEmpty(DialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new System.Windows.Forms.FolderBrowserDialog();
+            // Settings for the FolderBrowserDialog.
+            FLD.ShowNewFolderButton = true;
+            FLD.Description = DialogWindowTitle;
+            FLD.RootFolder = DirToPresent;
+            if (DirToPresent == Environment.SpecialFolder.MyComputer)
+            {
+				//Because the above returns the MyComputer directory , which is a virtual one , we can make use of it and pass a custom directory instead.
+				EDOut.DirPath = AlternateDir;
+            }
+
+            DialogResult REST = FLD.ShowDialog();
+
+            if (REST == DialogResult.OK)
+            {
+                EDOut.DirPath = FLD.SelectedPath;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
 #endif
         public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
 		{
 			System.Threading.Thread.Sleep(TimeoutEpoch);
 		}
-		
-		/*
+
+        /*
 		private static void WriteProcessDataToConsole(System.Object sender , System.Diagnostics.DataReceivedEventArgs DataObject)
 		{
 			System.ConsoleColor FORE , BACK;
@@ -872,7 +1019,74 @@ namespace ROOT
 		}
 		*/
 
-		public static System.Int32 LaunchProcess(System.String PathOfExecToRun ,System.String CommandLineArgs = " " , 
+        public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
+        System.Boolean ImplicitSearch, System.Boolean WaitToClose)
+		{
+            System.Int32 ExitCode = 0;
+            System.String FinalFilePath = "Error";
+            /*
+			 Here the ImplcitSearch variable is being evaluated.
+             ImplicitSearch Argument Usage: 
+             ImplicitSearch instructs the function to treat the filename as a valid one.
+             How this happens? When you explicitly do not provide a full path , the System asumes that the file 
+             is located to the current working directory. and if not existing , a Win32Handle exception will be thrown.
+             However , when setting the value to True(It is a Bool) , the function will behave exactly as the Cmd.exe does
+             (That is , supplying the path to the known paths.) and will auto-search the file from the Path environment 
+             variable. 
+             Notice: When Using the Implicit Searcher , make sure that the filepath is not a full one , otherwise it will fail.
+			*/
+            if (ImplicitSearch == false)
+            {
+                if (!FileExists(PathOfExecToRun))
+                {
+                    return -8;
+                }
+                FinalFilePath = PathOfExecToRun;
+            }
+            else
+            {
+                foreach (System.String T in GetPathEnvironmentVar())
+                {
+                    if (FileExists(T + "\\" + PathOfExecToRun))
+                    {
+                        FinalFilePath = T + "\\" + PathOfExecToRun;
+                        break;
+                    }
+                }
+                if (FinalFilePath == "Error")
+                {
+                    return -8;
+                }
+            }
+			System.Diagnostics.Process FRM = new System.Diagnostics.Process();
+            FRM.StartInfo.UseShellExecute = true;
+            FRM.StartInfo.FileName = FinalFilePath;
+            FRM.StartInfo.Arguments = CommandLineArgs;
+            try { FRM.Start(); }
+            catch (System.ComponentModel.Win32Exception)
+            {
+                FRM = null;
+                return -10337880;
+            }
+            catch (System.Exception)
+            {
+                FRM = null;
+                return -10337881;
+            }
+            if (WaitToClose)
+            {
+                FRM.WaitForExit();
+                if (FRM.HasExited)
+                {
+                    ExitCode = FRM.ExitCode;
+                }
+            }
+            FRM = null;
+            return ExitCode;
+        }
+
+
+        public static System.Int32 LaunchProcess(System.String PathOfExecToRun ,System.String CommandLineArgs = " " , 
         System.Boolean ImplicitSearch = false ,System.Boolean WaitToClose = false ,System.Boolean RunAtNativeConsole = false , 
 		System.Boolean HideExternalConsole = true)
 		{
@@ -2340,7 +2554,7 @@ namespace ExternalArchivingMethods
 			return true;
 		}
 	}
-	
+
 	// System.IO.FileStream DM = System.IO.File.OpenRead(@".\ZSEX.zst");
 	// System.IO.FileStream VA = System.IO.File.OpenWrite(@".\Out.txt");
 	// System.Console.WriteLine(ZstandardArchives.DecompressFileStreams(DM , VA));
@@ -2348,65 +2562,94 @@ namespace ExternalArchivingMethods
 	// VA.Dispose();
 	// DM.Close();
 	// DM.Dispose();
-	
-	
-	
-	//public class Cabinets
-	//{
-	//	public static System.Boolean CompressAsFileStreams(System.IO.FileStream Inputfile, System.IO.FileStream ArchiveFile)
-	//	{
-	//		if (Inputfile.CanRead == false) {return false;}
-	//		if (Inputfile.Length < 10) {return false;}
-	//		if (ArchiveFile.CanWrite == false) {return false;}
-	//		if (ArchiveFile.Length > 0) {return false;}
-	//		nint? FH;
-	//		if (Windows.Win32.PInvoke.CreateCompressor(Windows.Win32.Storage.Compression.COMPRESS_ALGORITHM.COMPRESS_ALGORITHM_MSZIP 
-	//		, null ,out FH) == false) 
-	//		{
-	//			System.Console.WriteLine("Error");
-	//			FH = null;
-	//			return false;
-	//		}
-	//		System.Runtime.InteropServices.SafeHandle SH = new System.Runtime.InteropServices.SafeHandle(FH , true);
-	//		FH = null;
-	//		System.Byte[] FSI = new System.Byte[Inputfile.Length];
-	//		try
-	//		{
-	//			Inputfile.Read(FSI , 0 , System.Convert.ToInt32(Inputfile.Length));
-	//		}
-	//		catch (System.Exception)
-	//		{
-	//			SH = null;
-	//			FSI = null;
-	//			return false;
-	//		}
-	//		System.Byte[] FSO = new System.Byte[Inputfile.Length + 38];
-	//		System.Int32 CmpData = 0;
-	//		if (Windows.Win32.PInvoke.Compress(SH , FSI , FSI.Length , FSO , FSO.Length , CmpData) == false)
-	//		{
-	//			SH = null;
-	//			FSI = null;
-	//			FSO = null;
-	//			return false;
-	//		}
-	//		else
-	//		{
-	//			SH = null;
-	//			FSI = null;
-	//		}
-	//		try
-	//		{
-	//			ArchiveFile.Write(FSO , 0 , CmpData);
-	//		}
-	//		catch (System.Exception)
-	//		{
-	//			return false;
-	//		}
-	//		finally 
-	//		{
-	//			FSO = null;
-	//		}
-	//		return true;
-	//	}
-	//}
+
+	/*
+	public class Cabinets
+	{
+		// BE CAREFUL!! IT IS VERY THEORITICAL , A WAY IS NOT FOUND YET.
+		public unsafe static System.Boolean CompressAsFileStreams(System.IO.FileStream Inputfile, System.IO.FileStream ArchiveFile)
+		{
+			if (Inputfile.CanRead == false) { return false; }
+			if (Inputfile.Length < 10) { return false; }
+			if (ArchiveFile.CanWrite == false) { return false; }
+			if (ArchiveFile.Length > 0) { return false; }
+			var SYD = (Inputfile.SafeFileHandle).DangerousGetHandle();
+			var SDD = (ArchiveFile.SafeFileHandle).DangerousGetHandle();
+			System.IntPtr DSA = new System.IntPtr(5);
+			System.Boolean OK = false;
+			COMPRESS_ALLOCATION_ROUTINES DS = new COMPRESS_ALLOCATION_ROUTINES();
+			Windows.Win32.Storage.Compression.COMPRESSOR_HANDLE GDC = new COMPRESSOR_HANDLE(DSA);
+			Windows.Win32.PInvoke.Compress(GDC , SYD.ToPointer() ,(nuint) (Inputfile.Length) , SDD.ToPointer() , (nuint) (Inputfile.Length + 1320) , out nuint DA);
+			System.Console.WriteLine(GDC.ToString());
+			//if (OK) { return true; } else { return false; }
+			return true;
+		}
+	}
+	*/
+
+    /*
+      #r ".\bin\Release\MDCFR.dll"
+      using ExternalArchivingMethods;
+	  Cabinets.CompressAsFileStreams()
+     */
+
+    /*
+	public class Cabinets
+	{
+		public static System.Boolean CompressAsFileStreams(System.IO.FileStream Inputfile, System.IO.FileStream ArchiveFile)
+		{
+			if (Inputfile.CanRead == false) {return false;}
+			if (Inputfile.Length < 10) {return false;}
+			if (ArchiveFile.CanWrite == false) {return false;}
+			if (ArchiveFile.Length > 0) {return false;}
+			nint? FH;
+			if (Windows.Win32.PInvoke.CreateCompressor(Windows.Win32.Storage.Compression.COMPRESS_ALGORITHM.COMPRESS_ALGORITHM_MSZIP 
+			, null ,out FH) == false) 
+			{
+				System.Console.WriteLine("Error");
+				FH = null;
+				return false;
+			}
+			System.Runtime.InteropServices.SafeHandle SH = new System.Runtime.InteropServices.SafeHandle(FH , true);
+			FH = null;
+			System.Byte[] FSI = new System.Byte[Inputfile.Length];
+			try
+			{
+				Inputfile.Read(FSI , 0 , System.Convert.ToInt32(Inputfile.Length));
+			}
+			catch (System.Exception)
+			{
+				SH = null;
+				FSI = null;
+				return false;
+			}
+			System.Byte[] FSO = new System.Byte[Inputfile.Length + 38];
+			System.Int32 CmpData = 0;
+			if (Windows.Win32.PInvoke.Compress(SH , FSI , FSI.Length , FSO , FSO.Length , CmpData) == false)
+			{
+				SH = null;
+				FSI = null;
+				FSO = null;
+				return false;
+			}
+			else
+			{
+				SH = null;
+				FSI = null;
+			}
+			try
+			{
+				ArchiveFile.Write(FSO , 0 , CmpData);
+			}
+			catch (System.Exception)
+			{
+				return false;
+			}
+			finally 
+			{
+				FSO = null;
+			}
+			return true;
+		}
+	} */
 }
