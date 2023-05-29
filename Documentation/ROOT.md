@@ -207,17 +207,22 @@ This function reads the specified file and gets the specified hash algorithm dig
 #### 16. The GetADirDialog:
 ~~~C#
 public static MAIN.DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
-public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle , System.String AlternateDir)
+public static MAIN.DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle , System.String AlternateDir)
 ~~~
-___NOTICE___!!! This function is available only for _.NET Framework_ and __Windows Desktop__ builds!!!
+___NOTICE___!!! This function is available only for __.NET Framework__ and __Windows Desktop__ builds!!!
 
  This function prompts the User to select a specified directory.
  
  __Parameters__:
  1. `System.Environment.SpecialFolder DirToPresent`: The Directory to start the prompt instance.
   
-  The values are located [here](https://learn.microsoft.com/dotnet/api/system.environment.specialfolder?view=netframework-4.7.2).
+  The values are located [here](http://learn.microsoft.com/dotnet/api/system.environment.specialfolder?view=netframework-4.7.2).
+  
  2. `System.String DialogWindowTitle`: The title to show to the dialog.
+
+ __Overloads__:
+ 1. `System.String AlternateDir`: You can specify any directory path to this argument , provided that the `DirToPresent`
+ argument is specified to `System.Environment.SpecialFolder.MyComputer`
  
  __Returns__:
  A new `MAIN.DialogsReturner` instance.
@@ -227,7 +232,7 @@ ___NOTICE___!!! This function is available only for _.NET Framework_ and __Windo
  
  `System.String AlternateDir`: The path to a start directory , if the `DirToPresent` is set to 'MyComputer'.
  
- #### 17.The GetANewFilesystemInfo:
+ #### 17.The GetANewFileSystemInfo:
  ~~~C#
  public static System.IO.FileSystemInfo[] GetANewFileSystemInfo(System.String Path)
  ~~~
@@ -340,6 +345,96 @@ This function gets the version of the currently loaded assembly `Microsoft.Visua
  ~~~C#
  public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
  ~~~
+ This Function stops the aplication thread (Or any that this command is run under) for the 
+ miliseconds specified.
  
+  __Parameters__:
+  1. `System.Int32 TimeoutEpoch`: The Timeout time specified. Maximum value that it accepts is [here](http://learn.microsoft.com/dotnet/api/System.Int32.MaxValue?view=netframework-4.7.2).
 
+  __Returns__:
+  This function is declared as `void` , so it does not return nothing. That it does is to stop only the application thread for the time specified.
+  
+#### 24. The LaunchProcess:
+~~~C#
+public static System.Int32 LaunchProcess(System.String PathOfExecToRun , System.String CommandLineArgs , System.Boolean ImplicitSearch , System.Boolean WaitToClose)
+public static System.Int32 LaunchProcess(System.String PathOfExecToRun , System.String CommandLineArgs = " " , System.Boolean ImplicitSearch = false , System.Boolean WaitToClose = false, System.Boolean RunAtNativeConsole = false , System.Boolean HideExternalConsole = true)
+~~~
+This function opens and runs a process with the defined arguments and settings.
+The function uses the Machine's Shell Context , and __NOT__ the .NET Context. 
+
+ __Parameters__:
+ 1. `System.String PathOfExecToRun`: The Path of the executable to open. 
+ 2. `System.String CommandLineArgs`: The Command-Line arguments to specify. If you do not need , just pass `null` or an empty string with a space `" "`.
+ 3. `System.Boolean ImplicitSearch`: This determines whether the executable must be found using guessing; that means that it acts like a cmd.exe window when passing a command.
+ 4. `System.Boolean WaitToClose`: This determines if the function should wait the child application to exit so as to complete. Also returns the exit code.
  
+ __Overloads__:
+ 1. `System.Boolean RunAtNativeConsole = false`: This runs the executable either at the executable that this function called or to a new Process context.
+ 2. `System.Boolean HideExternalConsole = true`: This will hide the external console if the called app uses one. However , this is used only when `RunAtNAtiveConsole` is `false`.
+ 
+ __Returns__:
+ An `System.Int32` number , which returns:
+ 
+ 1. `-8` if the path or the app supplied is a non-existent one.
+ 2. `-10337880` if the process for this environment is illegal (i.e. wrong executable architecture).
+ 3. `-10337881` for a generic error.
+ 4. Or , if sucessfull , `0` , and if the `WaitToClose` parameter is set to `true` , then the exit code of the child process.
+ 
+ __Example__:
+ ~~~C#
+ // Call a process using the guessing system.
+ using ROOT;
+ using static ROOT.MAIN;
+ 
+ // ..
+     MAIN.LaunchProcess("cmd.exe" , "/c Echo." , true , false);
+     /* The above statement will launch cmd.exe with the argument /c Echo. , and the guessing system will be used. 
+      * The below one will do the same , but without the guessing system.
+     */
+     MAIN.LaunchProcess("C:\\Windows\\System32\\cmd.exe" , "/c Echo." , false , false);
+ // ..
+ ~~~
+ 
+#### 25. The MoveFilesOrDirs:
+~~~C#
+public static System.Boolean MoveFilesOrDirs(System.String SourceFilePath , System.String DestPath)
+~~~
+This function moves a file or directory , depending by the `SourceFilePath` and `DestPath` parameters.
+__NOTE__: When moving files , the filename with the path is required at both arguments , like: `C:\\Files\\Start.cmd`.
+
+ __Parameters__:
+ 1. `System.String SourceFilePath`: The source file or directory that will be moved.
+ 2. `System.String DestPath`: The new file or directory that will be moved to.
+
+ __Returns__:
+ if moving was sucessfull , then `true`; otherwise , `false`.
+
+#### 26. The NewMessageBoxToUser:
+~~~C#
+public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , System.Windows.Forms.MessageBoxButtons MessageButton = MessageBoxButtons.OK , System.Windows.Forms.MessageBoxIcon MessageIcon = MessageBoxIcon.None)
+~~~
+This function shows a new Message Box window to user and prompts him to do an action , based on the buttons selected.
+
+ __Parameters__:
+ 1. `System.String MessageString`: The message to show. Can have multiple lines and feed characters.
+ 2. `System.String Title`: The window's title of this message.
+ 3. `System.Windows.Forms.MessageBoxButtons MessageButton = MessageBoxButtons.OK`: This selects the buttons that will exist as options to do in that window.
+ 4. `System.Windows.Forms.MessageBoxIcon MessageIcon = MessageBoxIcon.None`: This selects and a icon too to show among with the message.
+ 
+ The valid values for the button and icon selection are [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxbuttons?view=netframework-4.7.2) and [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxicon?view=netframework-4.7.2) , respectively.
+ 
+ __Returns__:
+ An `System.Int32` value , which indicates that:
+ 1. `1` when 'OK' button pressed.
+ 2. `2` when 'Cancel' button pressed.
+ 3. `3` when 'Abort' button pressed.
+ 4. `4` when 'Retry' button pressed.
+ 5. `5` when 'Ignore' button pressed.
+ 6. `6` when 'Yes' button pressed.
+ 7. `7` when 'No' button pressed.
+ 8. `0` indicates an error or the [System.Windows.Forms](http://learn.microsoft.com/dotnet/api/system.windows.forms?view=netframework-4.7.2) DLL version deprecation.
+ 
+#### 27. The OSFramework:
+~~~C#
+public static System.String 
+~~~
