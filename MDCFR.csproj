@@ -52,6 +52,7 @@
 	<Copyright>(c) MDCDI1315. All Rights Reserved.</Copyright>
 	<!-- AssemblyVersion: Provide the .NET Framework versions that this executable can call execute or run other assemblies.. -->
 	<AssemblyVersion>4.4.0.0</AssemblyVersion>
+	<GenerateResourceUsePreserializedResources>True</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <ItemGroup>
 	<Compile Include=".\MDCFR-DEFAULT.cs" />
@@ -65,15 +66,14 @@
 	  <AutoGen>True</AutoGen>
 	  <DependentUpon>Resources.resx</DependentUpon>
 	</Compile>
+	<EmbeddedResource Update="Properties\Resources.resx">
+	  <Generator>ResXFileCodeGenerator</Generator>
+	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+	</EmbeddedResource>
+	<Folder Include="Resources\" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Update="Properties\Resources.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
+    <PackageReference Include="System.Resources.Extensions" Version="4.7.1" />
   </ItemGroup>
   <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.vbproj'">
 	<!-- This is only needed when MSBuild loads an VBPROJ. -->
