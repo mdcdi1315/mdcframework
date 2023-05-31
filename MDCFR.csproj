@@ -35,9 +35,9 @@
 	<!-- Provide the .NET Framework to run it.-->
     <TargetFramework>net48</TargetFramework>
 	<!-- Provide the Version of the Executable. -->
-	<FileVersion>1.5.4.91</FileVersion>
+	<FileVersion>1.5.4.92</FileVersion>
 	<ProductVersion>1.5.4.9</ProductVersion>
-	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	<!-- Provide the Company name-->
 	<Company>(c) MDCDI1315. https://github.com/mdcdi1315/mdcframework</Company>
 	<!-- Provide the Authors Namespace. If need to be defined a lot , array them as a comma seperated list.-->
@@ -60,9 +60,20 @@
 	<Compile Include=".\MDCFR-EXTERNALCRYPTOGRAPHY.cs" />
 	<Compile Include=".\MDCFR-HTTPLIB.cs" />
 	<Compile Include=".\MDCFR-PROPS.cs" />
-	<PackageReference Include="Microsoft.Windows.CsWin32" Version="0.2.206-beta">
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
+	<Compile Include="Properties\Resources.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>Resources.resx</DependentUpon>
+	</Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Update="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
   </ItemGroup>
   <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.vbproj'">
 	<!-- This is only needed when MSBuild loads an VBPROJ. -->

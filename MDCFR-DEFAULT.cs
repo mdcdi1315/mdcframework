@@ -2,27 +2,21 @@
 
 // Global namespaces
 using System;
+using System.Drawing;
 using System.IO;
-using System.Text;
-using Windows.Win32;
-using Microsoft.Win32;
-using System.Security;
-using System.Windows.Forms;
-using Microsoft.VisualBasic;
 using System.IO.Compression;
-using System.Runtime.InteropServices;
-using Windows.Win32.Storage.Compression;
-using System.Runtime.CompilerServices;
-using System.Linq.Expressions;
+using System.Windows.Forms;
 
-namespace ROOT 
+namespace ROOT
 {
     // A Collection Namespace which includes Microsoft's Managed code.
     // Many methods here , however , are controlled and built by me at all.
 
+	/// <summary>
+	/// Contains a lot and different static methods for different usages.
+	/// </summary>
     public static class MAIN 
 	{
-
 
 #if NET472_OR_GREATER
 
@@ -1376,11 +1370,11 @@ namespace ROOT
 	}
 	
 	namespace CryptographicOperations
-	{
-		// A Collection Namespace of encrypting and decrypting files.
+    {
+        // A Collection Namespace of encrypting and decrypting files.
         // For now (At the time of writing this code) , only UTF-8 is supported.
-		
-		public class AESEncryption : System.IDisposable
+
+        public class AESEncryption : System.IDisposable
 		{
 			// Cryptographic Operations Class.
 			private System.Byte[] _EncryptionKey_;
@@ -1732,10 +1726,10 @@ namespace ROOT
 	}
 	
 	namespace Archives
-	{
-		// A Collection Namespace for making and extracting archives.
-		
-		public class GZipArchives
+    {
+        // A Collection Namespace for making and extracting archives.
+
+        public class GZipArchives
 		{
           /* A Class that abstracts the GZIP archive format.
              USAGE NOTE: You can only add one file per archive each time.
@@ -2111,6 +2105,9 @@ namespace ROOT
        }
     */
 
+	/// <summary>
+	/// A simple and to-the-point console progress bar class.
+	/// </summary>
     public class SimpleProgressBar
     {
         private System.String Progr = "Completed";
@@ -2260,13 +2257,619 @@ namespace ROOT
             return;
         }
     }
+	
+	namespace IntuitiveInteraction
+	{
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> that hold valid icon images allowed be shown when the class 
+		/// <see cref="IntuitiveMessageBox"/> is invoked.
+        /// </summary>
+        public enum IconSelection : System.Int32
+        {
+            None = 0,
+            Error = 1,
+            Info = 2,
+            Info2 = 3,
+            Warning = 4,
+            Notice = 5,
+            InvalidOperation = 6,
+            Question = 7
+        }
+
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> that keeps valid button patterns for returning the button selected.
+        /// </summary>
+		/// <remarks>This is used only with the class <see cref="IntuitiveMessageBox"/>.</remarks>
+        public enum ButtonSelection : System.Int32
+        {
+            OK = 0,
+            YesNo = 1,
+            OKCancel = 2,
+            AbortRetry = 3,
+            RetryCancel = 4,
+            IgnoreCancel = 5,
+            YesNoCancel = 6,
+            YesNoRetry = 7,
+            YesCancelAbort = 8
+        }
+
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> that returns which button pressed or presents an error.
+        /// </summary>
+        public enum ButtonReturned : System.Int32
+        {
+			Error = 0,
+            OK = 1,
+            Cancel = 2,
+            Yes = 3,
+            No = 4,
+            Retry = 5,
+            Abort = 6,
+            Ignore = 7,
+            NotAnAnswer = Error | Cancel
+        }
+
+        /// <summary>
+        /// A class that extends the default <see cref="Microsoft.VisualBasic.Interaction.InputBox"/> method.
+        /// </summary>
+        public class GetAStringFromTheUser : System.IDisposable
+        {
+            private Form Menu = new();
+            private Button Button1 = new Button();
+            private Button Button2 = new Button();
+            private Label Label1 = new Label();
+            private TextBox TextBox1 = new TextBox();
+            private System.String Prompt_msg;
+            private System.String Title_msg;
+            private System.String Default_msg;
+            private ButtonReturned _RET = 0;
+            private System.String Value;
+
+            private event System.EventHandler HANDLE;
+
+            /// <summary>
+            /// Constructor Option 1: Define the settings at any time you would like. Do not forget to invoke the dialog using the <see cref="Invoke"/> function.
+            /// </summary>
+            public GetAStringFromTheUser() { }
+
+            /// <summary>
+            /// Constructor Option 2: Define the arguments required at once , run the dialog and then dispose it.
+            /// </summary>
+            /// <param name="Prompt">A message prompting the User what he should type inside the input box.</param>
+            /// <param name="Title">The dialog's title.</param>
+            /// <param name="DefaultResponse">The default response or an example of the data to be provided by the User.</param>
+            public GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
+            {
+                Prompt_msg = Prompt;
+                Title_msg = Title;
+                Default_msg = DefaultResponse;
+                HANDLE += Button_click;
+                Initiate();
+                HANDLE -= Button_click;
+                this.Dispose();
+            }
+
+            /// <summary>
+            /// Disposes all the <see cref="System.Windows.Forms.Form"/> memebers used to make this dialog.
+            /// </summary>
+            public void Dispose()
+            {
+                if (HANDLE != null) { HANDLE -= Button_click; HANDLE = null; }
+                TextBox1.Dispose();
+                Label1.Dispose();
+                Button1.Dispose();
+                Button2.Dispose();
+                Menu.Dispose();
+            }
+
+            /// <summary>
+            /// A message prompting the User what he should type inside the input box.
+            /// </summary>
+            public System.String Prompt
+            {
+                set { Prompt_msg = value; }
+            }
+
+            /// <summary>
+            /// The window's title.
+            /// </summary>
+            public System.String Title
+            {
+                set { Title_msg = value; }
+            }
+
+            /// <summary>
+            /// Invokes the User Input Box. Use it when you have used the parameterless constructor.
+            /// </summary>
+            public void Invoke()
+            {
+                HANDLE += Button_click;
+                Initiate();
+                HANDLE -= Button_click;
+                this.Dispose();
+            }
+
+            /// <summary>
+            /// The default response or an example of the data to be provided by the User.
+            /// </summary>
+            public System.String DefaultResponse
+            {
+                set { Default_msg = value; }
+            }
+
+            /// <summary>
+            /// Returns the button pressed. 
+            ///  -> 0 indicates an system error or the user used the 'X' (Close Window) button.
+            ///  -> 2 indicates that the User supplied an option and then he pressed the 'OK' button.
+            ///  -> 4 indicates that the User did or not gave an answer , but he canceled the action.
+            /// </summary>
+            public ButtonReturned ButtonClicked
+            {
+                get { return _RET; }
+            }
+
+            /// <summary>
+            /// Returns a <see cref="System.Boolean" /> value indicating that the User has supplied a value and pressed the 'OK' button.
+            /// </summary>
+            public System.Boolean Success
+            {
+                get { if (_RET == ButtonReturned.NotAnAnswer) { return false; } else { return true; } }
+            }
+
+            /// <summary>
+            /// Returns the value given by the User. It's type is a <see cref="System.String"/>.
+            /// </summary>
+            public System.String ValueReturned
+            {
+                get { if (_RET != ButtonReturned.Error) { return Value; } else { return null; } }
+            }
+
+            private protected void Button_click(System.Object sender, System.EventArgs e)
+            {
+                Menu.Close();
+                if (sender == Button1)
+                {
+                    Value = TextBox1.Text;
+                    _RET = ButtonReturned.OK;
+                }
+                if (sender == Button2)
+                {
+                    _RET = ButtonReturned.Cancel;
+                }
+                return;
+            }
+
+            private protected void Initiate()
+            {
+                Label1.SuspendLayout();
+                Button1.SuspendLayout();
+                Button2.SuspendLayout();
+                TextBox1.SuspendLayout();
+                Label1.BorderStyle = BorderStyle.None;
+                Label1.UseMnemonic = true;
+                Label1.AutoSize = true;
+                Label1.Text = Prompt_msg;
+                Label1.Location = new System.Drawing.Point(14, 25);
+                Label1.Size = new System.Drawing.Size(180, 110);
+                Button1.Location = new Point(260, 22);
+                Button1.Size = new Size(65, 24);
+                Button1.Text = "OK";
+                Button2.Location = new Point(Button1.Location.X, Button1.Location.Y + Button1.Height + 9);
+                Button2.Size = Button1.Size;
+                Button2.Text = "Cancel";
+                Button1.Click += HANDLE;
+                Button2.Click += HANDLE;
+                System.Char[] FindNL_S = Label1.Text.ToCharArray();
+                // The last value for vertical padding.
+                System.Int32 CH = 0;
+                for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++)
+                {
+                    // The required padding for Microsoft Sans Serif is now 16?.
+                    if (FindNL_S[DI] == '\n') { CH += 16; }
+                }
+                FindNL_S = null;
+                TextBox1.Location = new Point(11, (Label1.Height + CH) - 17);
+                TextBox1.Size = new Size(330, 14);
+                TextBox1.Text = Default_msg;
+                TextBox1.BorderStyle = BorderStyle.Fixed3D;
+                TextBox1.ReadOnly = false;
+                TextBox1.BackColor = Color.LightGray;
+                TextBox1.Multiline = false;
+                TextBox1.ResumeLayout();
+                TextBox1.Invalidate();
+                Label1.ResumeLayout();
+                Button1.ResumeLayout();
+                Button2.ResumeLayout();
+                Menu.FormBorderStyle = FormBorderStyle.FixedDialog;
+                Menu.StartPosition = FormStartPosition.CenterScreen;
+                Menu.Text = Title_msg;
+                Menu.MinimizeBox = false;
+                Menu.MaximizeBox = false;
+                Menu.TopMost = true;
+                Menu.ShowInTaskbar = false;
+                // All the redrawings are only valid for Microsoft Sans Serif font!!!
+                Menu.Font = new Font("Microsoft Sans Serif", (System.Single)9.10, FontStyle.Regular, GraphicsUnit.Point);
+                Menu.Size = new System.Drawing.Size(TextBox1.Location.X + TextBox1.Size.Width + 28, TextBox1.Location.Y + TextBox1.Size.Height + 42);
+                Menu.Controls.Add(TextBox1);
+                Menu.Controls.Add(Label1);
+                Menu.Controls.Add(Button1);
+                Menu.Controls.Add(Button2);
+                Menu.ShowDialog();
+            }
+        }
+
+        /// <summary>
+        /// A class that extends the <see cref="System.Windows.Forms.MessageBox"/> class by adding it new features.
+        /// </summary>
+        /// <remarks>Do not expect that it will be as fast as the <see cref="MessageBox"/>; This is made on managed code. </remarks>
+        public class IntuitiveMessageBox : System.IDisposable
+        {
+            private System.String _MSG;
+            private System.Windows.Forms.Label Label1 = new();
+            private System.Windows.Forms.Label Label2 = new();
+            private System.Drawing.Image Image1 = null;
+            private System.Windows.Forms.PictureBox PictureBox1 = new();
+            private Form Menu = new Form();
+            private System.Windows.Forms.Button Button1 = new();
+            private System.Windows.Forms.Button Button2 = new();
+            private System.Windows.Forms.Button Button3 = new();
+            private System.String _TITLE;
+            private ButtonReturned BTR;
+            private ButtonSelection BSL;
+            private IconSelection SELI;
+
+            private event System.EventHandler ButtonHandle;
+
+            public IntuitiveMessageBox(System.String Message, System.String Title, ButtonSelection Buttons, IconSelection Ic)
+            {
+                ButtonHandle += Button_Click;
+                _MSG = Message;
+                _TITLE = Title;
+                BSL = Buttons;
+                SELI = Ic;
+                MakeAndInitDialog(Buttons, Ic);
+                this.Dispose();
+                ButtonHandle -= Button_Click;
+            }
+
+            public IntuitiveMessageBox(System.String Message, System.String Title)
+            {
+                ButtonHandle += Button_Click;
+                _MSG = Message;
+                _TITLE = Title;
+            }
+
+            public void Dispose()
+            {
+                if (ButtonHandle != null) { ButtonHandle -= Button_Click; }
+                Label1.Dispose();
+                Label2.Dispose();
+                if (Image1 != null) { Image1.Dispose(); }
+                PictureBox1.Dispose();
+                Button1.Dispose();
+                Button2.Dispose();
+                Button3.Dispose();
+                Menu.Dispose();
+                System.GC.Collect(3, System.GCCollectionMode.Forced, true);
+            }
+
+            public System.String Message
+            {
+                get { return _MSG; }
+                set { _MSG = value; }
+            }
+
+            public ButtonSelection ButtonsToShow
+            {
+                get { return BSL; }
+                set { BSL = value; }
+            }
+
+            public IconSelection IconToShow
+            {
+                get { return SELI; }
+                set { SELI = value; }
+            }
+
+            public System.String Title
+            {
+                get { return _TITLE; }
+                set { _TITLE = value; }
+            }
+
+            public ButtonReturned ButtonSelected
+            {
+                get { return BTR; }
+            }
+
+            private protected void Button_Click(System.Object sender, System.EventArgs e)
+            {
+                Menu.Close();
+                if (BSL == 0)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 1; }
+                }
+                if (BSL == (ButtonSelection) 1)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 4; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 3; }
+                }
+                if (BSL == (ButtonSelection) 2)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 2; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 1; }
+                }
+                if (BSL == (ButtonSelection) 3)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 5; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 6; }
+                }
+                if (BSL == (ButtonSelection) 4)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 5; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 2; }
+                }
+                if (BSL == (ButtonSelection) 5)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 7; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 2; }
+                }
+                if (BSL == (ButtonSelection) 6)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 2; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 4; }
+                    if (sender == Button3) { BTR = (ButtonReturned) 3; }
+                }
+                if (BSL == (ButtonSelection) 7)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned) 5; }
+                    if (sender == Button2) { BTR = (ButtonReturned) 4; }
+                    if (sender == Button3) { BTR = (ButtonReturned) 3; }
+                }
+                if (BSL == (ButtonSelection) 8)
+                {
+                    if (sender == Button1) { BTR = (ButtonReturned)6; }
+                    if (sender == Button2) { BTR = (ButtonReturned)2; }
+                    if (sender == Button3) { BTR = (ButtonReturned)3; }
+                }
+                return;
+            }
+
+            public void InvokeInstance()
+            {
+                MakeAndInitDialog(BSL, SELI);
+                ButtonHandle -= Button_Click;
+                this.Dispose();
+            }
+
+            private protected void MakeAndInitDialog(ButtonSelection Butt, IconSelection Icon)
+            {
+                // The below statements select the appropriate image to be shown each time.
+                // Although that these are icons , 
+                if (Icon == (IconSelection)1) { Image1 = MDCFR.Properties.Resources.Error.ToBitmap(); }
+                if (Icon == (IconSelection)2) { Image1 = MDCFR.Properties.Resources.Information.ToBitmap(); }
+                if (Icon == (IconSelection)3) { Image1 = MDCFR.Properties.Resources.Information2.ToBitmap(); }
+                if (Icon == (IconSelection)4) { Image1 = MDCFR.Properties.Resources.Warning.ToBitmap(); }
+                if (Icon == (IconSelection)5) { Image1 = MDCFR.Properties.Resources.Information.ToBitmap(); }
+                if (Icon == (IconSelection)6) { Image1 = MDCFR.Properties.Resources.InvalidOperation.ToBitmap(); }
+                if (Icon == (IconSelection)7) { Image1 = MDCFR.Properties.Resources.Question.ToBitmap(); }
+                if (Icon != 0)
+                {
+                    PictureBox1.SuspendLayout();
+                    PictureBox1.AutoSize = true;
+                    PictureBox1.Size = new System.Drawing.Size(38, 38);
+                    PictureBox1.Image = Image1;
+                    PictureBox1.SizeMode = PictureBoxSizeMode.StretchImage;
+                    PictureBox1.Location = new System.Drawing.Point(26, 22);
+                    PictureBox1.ResumeLayout();
+                }
+                PictureBox1.PerformLayout();
+                Label1.SuspendLayout();
+                Label1.BorderStyle = BorderStyle.None;
+                Label1.UseMnemonic = true;
+                Label1.AutoSize = true;
+                Label1.Text = _MSG;
+                Label1.AutoEllipsis = false;
+                if (Icon != 0)
+                {
+                    Label1.Location = new System.Drawing.Point((PictureBox1.Width + PictureBox1.Location.X) + 25, PictureBox1.Location.Y);
+                }
+                else
+                {
+                    Label1.Location = new System.Drawing.Point(26, 22);
+                }
+                // By default , the Size value is not updated when the Label is even resized , as set by AutoSize.
+                // To fix that , we will get the label's text , we will convert it to an array of System.Char , and then
+                // will check out if there are any newline characters. If there are , the location of the last label and buttons will be padded up
+                // accordingly. Additionally , neither the Width value is updated.
+                // To Implement that , it will use a check mechanism while checking for paddings and will enable it to also
+                //  resize that value too. <--
+                System.Char[] FindNL_S = Label1.Text.ToCharArray();
+                // The last value for vertical padding.
+                System.Int32 CH = 0;
+                // The Last value for horizontal padding.
+                System.Int32 CW = 0;
+                // Check flag for horizontal padding.
+                System.Boolean CWC = false;
+                // A temporary value that will compare if the temporary one is larger than the other.
+                System.Int32 CWCM = 0;
+                for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++)
+                {
+                    // The required padding for Microsoft Sans Serif is 15.
+                    if (FindNL_S[DI] == '\n') { CH += 15; CWC = true; } else { CWCM += 5; }
+                    if (CWC) { if (CWCM > CW) { CW = CWCM; CWCM = 0; CWC = false; } }
+                    if (DI == FindNL_S.Length) { if (CWCM > CW) { CW = CWCM; } }
+                }
+                CWCM = 0;
+                FindNL_S = null;
+                // -->
+                Label1.ResumeLayout();
+                Label1.Refresh();
+                Label2.SuspendLayout();
+                Label2.Text = "";
+                // These nested loops draw the label color to the appropriate distances defined by Label2.Width.
+                // (that's why it is drawing spaces , for the background like the normal modal Windows Message Box has.)
+                for (System.Int32 NB = 0; NB < 3; NB++)
+                {
+                    for (System.Int32 ITR = 0; ITR < (Label2.Location.X + CW); ITR++)
+                    {
+                        Label2.Text += " ";
+                    }
+                    Label2.Text += "\n";
+                }
+                Label2.BorderStyle = BorderStyle.None;
+                Label2.AutoSize = true;
+                Label2.BackColor = System.Drawing.Color.Gray;
+                Label2.Location = new System.Drawing.Point(0, Label1.Location.Y + CH + 40);
+                CH = 0;
+                Label2.ResumeLayout();
+                Button1.SuspendLayout();
+                Button2.SuspendLayout();
+                Button3.SuspendLayout();
+                Button1.Location = new System.Drawing.Point(Label1.Location.X + CW - 18, Label2.Location.Y + 10);
+                Button1.Size = new System.Drawing.Size(65, 20);
+                Button2.Location = new System.Drawing.Point(Button1.Left - 75, Button1.Top);
+                Button2.Size = Button1.Size;
+                Button3.Location = new System.Drawing.Point(Button2.Left - 75, Button1.Top);
+                Button3.Size = Button1.Size;
+                Label2.Size = new System.Drawing.Size(Label2.Location.X + CW, 60);
+                // Selection workflow; These statements select which buttons are shown , and determine the dialog.
+                if (Butt == 0)
+                {
+                    Button1.Text = "OK";
+                    Button1.Visible = true;
+                    Button2.Visible = false;
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button1);
+                    Button1.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 1)
+                {
+                    Button1.Text = "No";
+                    Button2.Text = "Yes";
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button2);
+                    Menu.Controls.Add(Button1);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 2)
+                {
+                    Button1.Text = "Cancel";
+                    Button2.Text = "OK";
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button1);
+                    Menu.Controls.Add(Button2);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 3)
+                {
+                    Button1.Text = "Retry";
+                    Button2.Text = "Abort";
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button1);
+                    Menu.Controls.Add(Button2);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 4)
+                {
+                    Button1.Text = "Retry";
+                    Button2.Text = "Cancel";
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button1);
+                    Menu.Controls.Add(Button2);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 5)
+                {
+                    Button1.Text = "Ignore";
+                    Button2.Text = "Cancel";
+                    Button3.Visible = false;
+                    Menu.Controls.Add(Button1);
+                    Menu.Controls.Add(Button2);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 6)
+                {
+                    Button1.Text = "Cancel";
+                    Button2.Text = "No";
+                    Button3.Text = "Yes";
+                    Menu.Controls.Add(Button3);
+                    Menu.Controls.Add(Button2);
+                    Menu.Controls.Add(Button1);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                    Button3.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection) 7)
+                {
+                    Button1.Text = "Retry";
+                    Button2.Text = "No";
+                    Button3.Text = "Yes";
+                    Menu.Controls.Add(Button3);
+                    Menu.Controls.Add(Button2);
+                    Menu.Controls.Add(Button1);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                    Button3.Click += ButtonHandle;
+                }
+                if (Butt == (ButtonSelection)8)
+                {
+                    Button1.Text = "Abort";
+                    Button2.Text = "Cancel";
+                    Button3.Text = "Yes";
+                    Menu.Controls.Add(Button3);
+                    Menu.Controls.Add(Button2);
+                    Menu.Controls.Add(Button1);
+                    Button1.Click += ButtonHandle;
+                    Button2.Click += ButtonHandle;
+                    Button3.Click += ButtonHandle;
+                }
+                Button1.ResumeLayout();
+                Button2.ResumeLayout();
+                Button3.ResumeLayout();
+                Menu.FormBorderStyle = FormBorderStyle.FixedDialog;
+                Menu.StartPosition = FormStartPosition.CenterScreen;
+                Menu.Text = _TITLE;
+                Menu.MinimizeBox = false;
+                Menu.MaximizeBox = false;
+                Menu.TopMost = true;
+                Menu.ShowInTaskbar = false;
+                // All the redrawings are only valid for Microsoft Sans Serif font!!!
+                Menu.Font = new Font("Microsoft Sans Serif", (System.Single)8.25, FontStyle.Regular, GraphicsUnit.Point);
+                Menu.Size = new System.Drawing.Size(Label1.Location.X + CW + 85, Label2.Location.Y + Label2.Height + 20);
+                Menu.Controls.Add(Label1);
+                Menu.Controls.Add(Label2);
+                if (Icon != 0)
+                {
+                    Menu.Controls.Add(PictureBox1);
+                }
+                if (Icon == (IconSelection)1) { System.Media.SystemSounds.Hand.Play(); }
+                if (Icon == (IconSelection)4) { System.Media.SystemSounds.Asterisk.Play(); }
+                if (Icon == (IconSelection)5) { System.Media.SystemSounds.Question.Play(); }
+                if (Icon == (IconSelection)6) { System.Media.SystemSounds.Hand.Play(); }
+                if (Icon == (IconSelection)7) { System.Media.SystemSounds.Question.Play(); }
+                Menu.ShowDialog();
+            }
+
+        }
+    }
 }
 
 namespace ExternalHashCaculators
 {
-	// A Collection Namespace for computing hash values from external generated libraries.
-	
-	public class XXHash
+    //A Collection Namespace for computing hash values from external generated libraries.
+
+	/// <summary>
+	/// xxHash is a fast non-cryptographic hash digest. This is a wrapper for the unmanaged library.
+	/// Note that you can run this only on AMD64 machines and you must have the library where the 
+	/// application's current directory is.
+	/// </summary>
+    public class XXHash
 	{
 		// xxHash Hash caculator system.
         // It is a fast , non-cryptographic algorithm , as described from Cyan4973.
@@ -2276,11 +2879,8 @@ namespace ExternalHashCaculators
 		private static System.Boolean _CheckDLLVer()
 		{
 			if (!(System.IO.File.Exists(@".\xxhash.dll"))) {return false;}
-			if (System.Environment.ExpandEnvironmentVariables("%PROCESSOR_ARCHITECTURE%") != "AMD64") 
-			{
-				if (System.Environment.ExpandEnvironmentVariables("%PROCESSOR_ARCHITEW6432%") != "AMD64") {return false;}
-			}
-			if (XXHASHMETHODS.XXH_versionNumber() < 00801) 
+            if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
+            if (XXHASHMETHODS.XXH_versionNumber() < 00801) 
 			{
 				return false;
 			}
@@ -2302,6 +2902,11 @@ namespace ExternalHashCaculators
 			public static extern System.Int32 XXH_versionNumber();
 		}
 		
+		/// <summary>
+		/// Computes a file hash by using the XXH32 function.
+		/// </summary>
+		/// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+		/// <returns>A caculated xxHash32 value written as an hexadecimal <see cref="System.String"/>.</returns>
 		public static System.String xxHash_32(System.IO.FileStream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
@@ -2320,8 +2925,14 @@ namespace ExternalHashCaculators
 			FBM = null;
 			return EFR.ToString("x2");
 		}
-		
-		public static System.String xxHash_64(System.IO.FileStream FileStream)
+
+        /// <summary>
+        /// Computes a file hash by using the XXH64 function.
+        /// </summary>
+        /// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+        /// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
+		/// <remarks>This function performs well only on AMD64 machines; it's performance is degraded when working on IA32.</remarks>
+        public static System.String xxHash_64(System.IO.FileStream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
 			if (FileStream.Length < 20) {return "Error";}
@@ -2346,9 +2957,9 @@ namespace ExternalHashCaculators
 
 namespace ExternalArchivingMethods
 {
-	// A Collection Namespace for making archives outside Microsoft's managed code.
-	
-	public class ZstandardArchives
+    // A Collection Namespace for making archives outside Microsoft's managed code.
+
+    public class ZstandardArchives
 	{
 		// Yes , this patch adds (Patch Version 1.5.4.0) the Zstandard Archive format.
 		// The runtime algorithm is built from the GitHub tree , version 1.5.2.0.
@@ -2369,11 +2980,8 @@ namespace ExternalArchivingMethods
 			{
 				return false;
 			}
-			if (System.Environment.ExpandEnvironmentVariables("%PROCESSOR_ARCHITECTURE%") != "AMD64")
-			{
-				if (System.Environment.ExpandEnvironmentVariables("%PROCESSOR_ARCHITEW6432%") != "AMD64") {return false;}
-			}
-			if (ZSTD.ZSTD_versionNumber() < 10502)
+            if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
+            if (ZSTD.ZSTD_versionNumber() < 10502)
 			{
 				return false;
 			}
@@ -2398,6 +3006,7 @@ namespace ExternalArchivingMethods
 		
 		private sealed class ZSTD
 		{
+			// Proper API Calls defined in this class. DO NOT Modify.
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
 			public static extern System.Int32 ZSTD_compress(System.Byte[] dst ,System.Int32 dstCapacity , 
 			System.Byte[] src ,System.Int32 srcCapacity ,ZSTDCMPLevel compressionLevel);
@@ -2562,94 +3171,4 @@ namespace ExternalArchivingMethods
 	// VA.Dispose();
 	// DM.Close();
 	// DM.Dispose();
-
-	/*
-	public class Cabinets
-	{
-		// BE CAREFUL!! IT IS VERY THEORITICAL , A WAY IS NOT FOUND YET.
-		public unsafe static System.Boolean CompressAsFileStreams(System.IO.FileStream Inputfile, System.IO.FileStream ArchiveFile)
-		{
-			if (Inputfile.CanRead == false) { return false; }
-			if (Inputfile.Length < 10) { return false; }
-			if (ArchiveFile.CanWrite == false) { return false; }
-			if (ArchiveFile.Length > 0) { return false; }
-			var SYD = (Inputfile.SafeFileHandle).DangerousGetHandle();
-			var SDD = (ArchiveFile.SafeFileHandle).DangerousGetHandle();
-			System.IntPtr DSA = new System.IntPtr(5);
-			System.Boolean OK = false;
-			COMPRESS_ALLOCATION_ROUTINES DS = new COMPRESS_ALLOCATION_ROUTINES();
-			Windows.Win32.Storage.Compression.COMPRESSOR_HANDLE GDC = new COMPRESSOR_HANDLE(DSA);
-			Windows.Win32.PInvoke.Compress(GDC , SYD.ToPointer() ,(nuint) (Inputfile.Length) , SDD.ToPointer() , (nuint) (Inputfile.Length + 1320) , out nuint DA);
-			System.Console.WriteLine(GDC.ToString());
-			//if (OK) { return true; } else { return false; }
-			return true;
-		}
-	}
-	*/
-
-    /*
-      #r ".\bin\Release\MDCFR.dll"
-      using ExternalArchivingMethods;
-	  Cabinets.CompressAsFileStreams()
-     */
-
-    /*
-	public class Cabinets
-	{
-		public static System.Boolean CompressAsFileStreams(System.IO.FileStream Inputfile, System.IO.FileStream ArchiveFile)
-		{
-			if (Inputfile.CanRead == false) {return false;}
-			if (Inputfile.Length < 10) {return false;}
-			if (ArchiveFile.CanWrite == false) {return false;}
-			if (ArchiveFile.Length > 0) {return false;}
-			nint? FH;
-			if (Windows.Win32.PInvoke.CreateCompressor(Windows.Win32.Storage.Compression.COMPRESS_ALGORITHM.COMPRESS_ALGORITHM_MSZIP 
-			, null ,out FH) == false) 
-			{
-				System.Console.WriteLine("Error");
-				FH = null;
-				return false;
-			}
-			System.Runtime.InteropServices.SafeHandle SH = new System.Runtime.InteropServices.SafeHandle(FH , true);
-			FH = null;
-			System.Byte[] FSI = new System.Byte[Inputfile.Length];
-			try
-			{
-				Inputfile.Read(FSI , 0 , System.Convert.ToInt32(Inputfile.Length));
-			}
-			catch (System.Exception)
-			{
-				SH = null;
-				FSI = null;
-				return false;
-			}
-			System.Byte[] FSO = new System.Byte[Inputfile.Length + 38];
-			System.Int32 CmpData = 0;
-			if (Windows.Win32.PInvoke.Compress(SH , FSI , FSI.Length , FSO , FSO.Length , CmpData) == false)
-			{
-				SH = null;
-				FSI = null;
-				FSO = null;
-				return false;
-			}
-			else
-			{
-				SH = null;
-				FSI = null;
-			}
-			try
-			{
-				ArchiveFile.Write(FSO , 0 , CmpData);
-			}
-			catch (System.Exception)
-			{
-				return false;
-			}
-			finally 
-			{
-				FSO = null;
-			}
-			return true;
-		}
-	} */
 }
