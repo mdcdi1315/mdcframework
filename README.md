@@ -51,9 +51,7 @@ The project includes operations related to:
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
 
 #### New Features that might be added:
-- Cabinet Archives (Possibly by using Windows.Win32).
 - Other Archiving formats (Not still confirmed).
-- Extension methods on Save/Load file dialogs.
 
 #### Documentation
 The Documentantion explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
