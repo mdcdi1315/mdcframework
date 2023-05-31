@@ -10,19 +10,19 @@ Usage Example:
 ```C#
 	using System;
 	using ROOT; // This is the default namespace for the basic functions.
-	using static ROOT.MAIN; // This accesses the static class MAINAPI , which is the class that contain most of the functions.
+	using static ROOT.MAIN; // This accesses the static class MAIN , which is the class that contain most of the functions.
 
 	namespace ANamespace
 	{
-		internal class Program
-		{
-			public void Main(System.String[] args)
-			{
-				IntuitiveConsoleText.InfoText("Welcome!!!"); // This is like: "INFO: Welcome!!!" with a gray foreground and a black background.
-				WriteConsoleText("Start your next .NET Application development using MDCFR!!!"); // This just writes to console any kind of message.
-				HaltApplicationThread(320); // This stops the application's thread (Halts the application) for the time given. Counted in milliseconds.
-			}
-		}
+	  internal class Program
+	  {
+	      public void Main(System.String[] args)
+	      {
+		IntuitiveConsoleText.InfoText("Welcome!!!"); // This is like: "INFO: Welcome!!!" with a gray foreground and a black background.
+		WriteConsoleText("Start your next .NET Application development using MDCFR!!!"); // This just writes to console any kind of message.
+		HaltApplicationThread(320); // This stops the application's thread (Halts the application) for the time given. Counted in milliseconds.
+	      }
+	   }
 	}
 ```
 
