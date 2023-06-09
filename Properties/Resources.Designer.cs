@@ -61,6 +61,26 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Char similar to .
+        /// </summary>
+        internal static char ANSIENCODING_CR {
+            get {
+                object obj = ResourceManager.GetObject("ANSIENCODING_CR", resourceCulture);
+                return ((char)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Char similar to .
+        /// </summary>
+        internal static char ANSIENCODING_LF {
+            get {
+                object obj = ResourceManager.GetObject("ANSIENCODING_LF", resourceCulture);
+                return ((char)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Error {

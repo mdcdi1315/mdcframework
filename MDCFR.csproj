@@ -6,7 +6,6 @@
 		<Reference Include=".\Imports\Microsoft.VisualBasic.dll" />
 		<Reference Include=".\Imports\System.Windows.Forms.dll" />
 		<Reference Include=".\Imports\System.IO.Compression.dll" />
-		<Reference Include=".\Imports\System.IO.Compression.FileSystem.dll" />
 	</ItemGroup>
 	
   <PropertyGroup>
@@ -34,24 +33,11 @@
     <RootNamespace>MDCFR</RootNamespace>
 	<!-- Provide the .NET Framework to run it.-->
     <TargetFramework>net48</TargetFramework>
-	<!-- Provide the Version of the Executable. -->
-	<FileVersion>1.5.4.92</FileVersion>
-	<ProductVersion>1.5.4.9</ProductVersion>
-	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
-	<!-- Provide the Company name-->
-	<Company>(c) MDCDI1315. https://github.com/mdcdi1315/mdcframework</Company>
-	<!-- Provide the Authors Namespace. If need to be defined a lot , array them as a comma seperated list.-->
-	<Authors>MDS13363LA</Authors>
 	<!-- Supply the Supported OS Version. If less than the defined , cannot be run. -->
 	<SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
-	<!-- Define the abstract title that will be shown when hovering the mouse over the .NET file.-->
-	<AssemblyTitle>.NET Application Development Framework</AssemblyTitle>
-	<!-- File Abstract Description -->
-	<Description>Portable Application Development Framework</Description>
-	<!-- Copyright Information -->
-	<Copyright>(c) MDCDI1315. All Rights Reserved.</Copyright>
 	<!-- AssemblyVersion: Provide the .NET Framework versions that this executable can call execute or run other assemblies.. -->
 	<AssemblyVersion>4.4.0.0</AssemblyVersion>
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>  
 	<GenerateResourceUsePreserializedResources>True</GenerateResourceUsePreserializedResources>
   </PropertyGroup>
   <ItemGroup>
@@ -71,9 +57,7 @@
 	  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
 	</EmbeddedResource>
 	<Folder Include="Resources\" />
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Resources.Extensions" Version="4.7.1" />
+	<PackageReference Include="System.Resources.Extensions" Version="4.7.1" />
   </ItemGroup>
   <PropertyGroup Condition="'$(MSBuildProjectExtension)' == '.vbproj'">
 	<!-- This is only needed when MSBuild loads an VBPROJ. -->

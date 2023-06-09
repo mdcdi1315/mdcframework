@@ -37,7 +37,7 @@ in the initial built project.
  
  You can compile it either using the command `dotnet` or using the bundled Visual Studio Solution.
  
- __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit machines and cannot be used in any other machine architecture.
+ __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit machines and cannot be used in any other machine architectures.
 
 ## What it includes?
 The project includes operations related to:
@@ -49,11 +49,6 @@ The project includes operations related to:
  
    __NOTE__: Zstandard archiving is only avaliable as a wrapper with limited functionality.
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
-
-#### New Features that might be added:
-- Cabinet Archives (Possibly by using Windows.Win32).
-- Other Archiving formats (Not still confirmed).
-- Extension methods on Save/Load file dialogs.
 
 #### Documentation
 The Documentantion explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
@@ -67,10 +62,11 @@ For any considerations , ideas or a question relating to the Project can be subm
 Any questions relating bugs can be posted as a new Issue and marking them as 'Question'.
 
 #### Source code used in the Project (Licenses for all the used code , among with the Project's one , are located to LICENSE file):
-- Http Library: https://github.com/j6mes/httplib .
-- Zstandard archive format repo at https://github.com/facebook/zstd .
-- xxhash non-cryptographic hash algorithm at https://github.com/Cyan4973/xxhash .
-- CRC Implementation by nullfx at https://github.com/nullfx/NullFX.CRC .
+- Http Library: http://github.com/j6mes/httplib .
+- Zstandard archive format repo at http://github.com/facebook/zstd .
+- xxhash non-cryptographic hash algorithm at http://github.com/Cyan4973/xxhash .
+- CRC Implementation by nullfx at http://github.com/nullfx/NullFX.CRC .
 - DES and Triple DES Implementations by zeyadetman at http://github.com/zeyadetman/Computer-Security-Algorithms .
-- Blake2s Checksum by sparkdustjoe at https://github.com/SparkDustJoe/Blake2 .
-
+- Blake2s Checksum by sparkdustjoe at http://github.com/SparkDustJoe/Blake2 .
+- Cabinet Support by .NET Foundation (Taken from the WiX Toolset) at http://github.com/wixtoolset/wix .
+- Snappy Compression and Decompression native library by Kintaro at http://github.com/Kintaro/SnappySharp.

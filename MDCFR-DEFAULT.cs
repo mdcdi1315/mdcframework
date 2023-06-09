@@ -1,11 +1,17 @@
-// Easy API For Any Executable Building need.
+// An All-In-One framework abstracting the most important classes that are used in .NET
+// that are more easily and more consistently to be used.
+// The framework was designed to host many different operations , with the last goal 
+// to be everything accessible for everyone.
 
 // Global namespaces
+using ROOT;
 using System;
-using System.Drawing;
 using System.IO;
-using System.IO.Compression;
+using System.Drawing;
 using System.Windows.Forms;
+using System.IO.Compression;
+using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 namespace ROOT
 {
@@ -20,10 +26,16 @@ namespace ROOT
 
 #if NET472_OR_GREATER
 
-		// Found that the File Dialogs work the same even when 
-		// these run under .NET Standard.
-		// Weird that they work the same , though.
-		public class DialogsReturner
+        // Found that the File Dialogs work the same even when 
+        // these run under .NET Standard.
+        // Weird that they work the same , though.
+
+        /// <summary>
+        /// A storage class used by the file/dir dialogs to access the paths given (Full and name only) , the dialog type ran and if there was an error.		
+        /// </summary>
+        /// <remarks>This class is used only by several functions in the MAIN class. It is not allowed to override this class.</remarks>
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public class DialogsReturner
 		{
 			private string ERC;
 			private string FNM;
@@ -92,6 +104,11 @@ namespace ROOT
 
 #endif
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
+
 		public static class IntuitiveConsoleText
 		{
 			public static void InfoText(System.String Text)
@@ -143,15 +160,20 @@ namespace ROOT
 			}
 			
 		}
+
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static void EmitBeepSound() { Microsoft.VisualBasic.Interaction.Beep(); }
 		
-		public static void EmitBeepSound()
+		public static void WriteConsoleText(System.String Text) { System.Console.WriteLine(Text); }
+
+		public static void WriteConsoleText(System.Char[] Text) 
 		{
-			Microsoft.VisualBasic.Interaction.Beep();
-		}
-		
-		public static void WriteConsoleText(System.String Text)
-		{
-			System.Console.WriteLine(@Text);
+			System.String Result = null;
+			for (System.Int32 D = 0; D < Text.Length; D++)
+			{
+				Result += Text[D];
+			}
+			System.Console.WriteLine(Result);
 		}
 		
 		public static void WriteCustomColoredText(System.String Message , System.ConsoleColor ForegroundColor , System.ConsoleColor BackgroundColor)
@@ -176,17 +198,14 @@ namespace ROOT
 
 #if NET472_OR_GREATER
 
-        public static System.String GetRuntimeVersion()
-        { return System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion(); }
+        public static System.String GetRuntimeVersion() { return System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion(); }
 
         public static System.Boolean CheckIfStartedFromSpecifiedOS(System.Runtime.InteropServices.OSPlatform OSP)
         { return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSP); }
 
-        public static System.String OSInformation()
-		{ return System.Runtime.InteropServices.RuntimeInformation.OSDescription; }
+        public static System.String OSInformation() { return System.Runtime.InteropServices.RuntimeInformation.OSDescription; }
 
-		public static System.String OSFramework()
-		{return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; }
+		public static System.String OSFramework() {return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; }
 
 		public static System.String OSProcessorArchitecture()
 		{
@@ -236,6 +255,7 @@ namespace ROOT
 			return Result;
         }
 
+		[Notice("GetAStringFromTheUser" , "GetAStringFromTheUserNew")]
 		public static System.String GetAStringFromTheUser(System.String Prompt, 
 		System.String Title, System.String DefaultResponse)
 		{
@@ -249,18 +269,20 @@ namespace ROOT
 				return RETVAL;
 			}
 		}
-		
-		public static System.Boolean FileExists(System.String Path)
+
+		public static System.String GetAStringFromTheUserNew(System.String Prompt,
+        System.String Title, System.String DefaultResponse)
 		{
-			if (System.IO.File.Exists(@Path))
+			IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt ,Title , DefaultResponse);
+			switch (DZ.ButtonClicked) 
 			{
-				return true;
-			}
-			else 
-			{
-				return false;
+				case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer: return null;
+				default: return DZ.ValueReturned;
 			}
 		}
+
+
+        public static System.Boolean FileExists(System.String Path) { if (System.IO.File.Exists(Path)) { return true; } else { return false; } }
 		
 		public static System.Boolean DirExists(System.String Path)
 		{
@@ -391,7 +413,7 @@ namespace ROOT
 
 		public static void AppendNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
-            System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents + System.Environment.NewLine);
+            System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents);
 			try
 			{
 				FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
@@ -406,19 +428,68 @@ namespace ROOT
 			FileStreamObject.Read(EMS , 0 , System.Convert.ToInt32(FileStreamObject.Length));
             return new System.Text.UTF8Encoding(true).GetString(EMS);
 		}
-		
-		public static System.String GetACryptographyHashForAFile(System.String PathOfFile , System.String HashToSelect = "SHA1")
+
+        /// <summary>
+        /// This method gets a cryptography hash for the selected file with the selected algorithm.
+        /// </summary>
+        /// <param name="PathOfFile">The path to the file you want it's hash.</param>
+        /// <param name="HashToSelect">The hash algorithm to select. Consult the <see cref="HashDigestSelection"/> <see cref="System.Enum"/>
+        /// for more information.
+        /// </param>
+        /// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
+		/// otherwise , the <see cref="System.String" /> <code>"Error"</code>. </returns>
+        public static System.String GetACryptographyHashForAFile(System.String PathOfFile, 
+			HashDigestSelection HashToSelect)
 		{
-			System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
-			if (Initialiser == null)
+			System.Byte[] Contents = null;
+			using System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
 			{
-				return "Error";
+                if (Initialiser == null)
+                {
+                    return "Error";
+                }
+                Initialiser.Read(Contents , 0 , Contents.Length);
 			}
-			System.String File = GetContentsFromFile(Initialiser);
-			Initialiser.Close();
-			Initialiser.Dispose();
-			Initialiser = null;
-			var RDI = new System.Text.ASCIIEncoding();
+            System.Security.Cryptography.HashAlgorithm EDI;
+			switch (HashToSelect) 
+			{
+				case HashDigestSelection.SHA1: EDI = new System.Security.Cryptography.SHA1Managed(); break;
+				case HashDigestSelection.SHA256: EDI = new System.Security.Cryptography.SHA256Managed(); break;
+				case HashDigestSelection.SHA384: EDI = new System.Security.Cryptography.SHA384Managed(); break;
+				case HashDigestSelection.SHA512: EDI = new System.Security.Cryptography.SHA512Managed(); break;
+				case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
+				default:
+                    WriteConsoleText($"Error - Option {HashToSelect} Is Invalid!!!");
+                    return "Error";
+            }
+			System.Byte[] RSS = EDI.ComputeHash(Contents);
+            EDI.Dispose();
+            System.String Result = null;
+            for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++)
+            {
+                Result += RSS[ITER].ToString("x2");
+            }
+            return Result;
+        }
+
+        /// <summary>
+        /// This method gets a cryptography hash for the selected file with the selected algorithm.
+        /// </summary>
+        /// <param name="PathOfFile">The path to the file you want it's hash.</param>
+        /// <param name="HashToSelect">The hash algorithm to select. Valid Values: <code>"SHA1" , "SHA256" , "SHA384" , "SHA512" , "MD5"</code></param>
+        /// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
+		/// otherwise , the <see cref="System.String" /> <code>"Error"</code>. </returns>
+        public static System.String GetACryptographyHashForAFile(System.String PathOfFile , System.String HashToSelect)
+		{
+            System.Byte[] Contents = null;
+            using System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
+            {
+                if (Initialiser == null)
+                {
+                    return "Error";
+                }
+                Initialiser.Read(Contents, 0, Contents.Length);
+            }
 			System.Security.Cryptography.HashAlgorithm EDI;
 			switch (HashToSelect)
 			{
@@ -441,10 +512,8 @@ namespace ROOT
 					WriteConsoleText("Error - Option " + HashToSelect + " Is Invalid!!!");
                     return "Error";
 			}
-			System.Byte[] RSS = EDI.ComputeHash(RDI.GetBytes(File));
+			System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
-            RDI = null;
-            File = null;
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++)
 			{
@@ -469,18 +538,8 @@ namespace ROOT
 		
 		public static System.Boolean DeleteAFile(System.String Path)
 		{
-			if (! FileExists(Path))
-			{
-				return false;
-			}
-			try
-			{
-				System.IO.File.Delete(Path);
-			}
-			catch (System.Exception)
-			{
-				return false;
-			}
+			if (! FileExists(Path)) {return false;}
+			try { System.IO.File.Delete(Path); } catch (System.Exception) { return false; }
 			return true;
 		}
 
@@ -523,7 +582,16 @@ namespace ROOT
 
 #if NET472_OR_GREATER
 
-		public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , 
+        /// <summary>
+        /// This shows the default Windows Message box on the screen.
+        /// </summary>
+        /// <param name="MessageString">The text for the message to show.</param>
+        /// <param name="Title">The window's title.</param>
+        /// <param name="MessageButton">The button(s) to show as options in the message box.</param>
+        /// <param name="MessageIcon">The icon to show as a prompt in the message box.</param>
+        /// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , 
         System.Windows.Forms.MessageBoxButtons MessageButton = 0 , 
         System.Windows.Forms.MessageBoxIcon MessageIcon = 0)
 		{
@@ -548,8 +616,36 @@ namespace ROOT
                     return 0;
 			}
 		}
-		
-		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+
+        /// <summary>
+        /// This is a modified Windows Message box made by me.
+		/// To customize the options and for more information , consult the <see cref="IntuitiveInteraction.IntuitiveMessageBox"/> class.
+        /// </summary>
+        /// <param name="MessageString">The text for the message to show.</param>
+        /// <param name="Title">The window's title.</param>
+        /// <param name="MessageButton">The button(s) to show as options in the message box.</param>
+        /// <param name="MessageIcon">The icon to show as a prompt in the message box.</param>
+        /// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
+		[SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title, 
+			ROOT.IntuitiveInteraction.ButtonSelection MessageButton , ROOT.IntuitiveInteraction.IconSelection IconToSelect)
+		{
+			ROOT.IntuitiveInteraction.IntuitiveMessageBox DX = new(MessageString , Title , MessageButton , IconToSelect);
+			switch (DX.ButtonSelected)
+			{
+				case ROOT.IntuitiveInteraction.ButtonReturned.OK: return 1;
+				case ROOT.IntuitiveInteraction.ButtonReturned.Cancel: return 2;
+				case ROOT.IntuitiveInteraction.ButtonReturned.Abort: return 3;
+				case ROOT.IntuitiveInteraction.ButtonReturned.Retry: return 4;
+				case ROOT.IntuitiveInteraction.ButtonReturned.Ignore: return 5;
+				case ROOT.IntuitiveInteraction.ButtonReturned.Yes: return 6;
+				case ROOT.IntuitiveInteraction.ButtonReturned.No: return 7;
+				default: return 0;
+			}
+        }
+
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
         System.String FileDialogWindowTitle , System.String DirToPresent)
 		{
             DialogsReturner EDOut = new DialogsReturner();
@@ -614,6 +710,7 @@ namespace ROOT
             }
         }
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
         System.String FileDialogWindowTitle , System.String DirToPresent)
         {
@@ -679,6 +776,7 @@ namespace ROOT
             }
         }
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
 		System.String FileDialogWindowTitle)
 		{
@@ -732,8 +830,9 @@ namespace ROOT
 				return EDOut;
 			}
 		}
-		
-		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
+
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
 		System.String FileDialogWindowTitle)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
@@ -787,6 +886,7 @@ namespace ROOT
 			}
 		}
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
         System.String FileDialogWindowTitle , System.Boolean FileMustExist , System.String DirToPresent)
         {
@@ -842,6 +942,7 @@ namespace ROOT
             }
         }
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
         System.String FileDialogWindowTitle , System.Boolean FileMustExist)
         {
@@ -896,6 +997,7 @@ namespace ROOT
             }
         }
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
 		{
             DialogsReturner EDOut = new DialogsReturner();
@@ -927,6 +1029,7 @@ namespace ROOT
             }
         }
 
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle ,System.String AlternateDir)
         {
             DialogsReturner EDOut = new DialogsReturner();
@@ -964,55 +1067,9 @@ namespace ROOT
         }
 
 #endif
-        public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
-		{
-			System.Threading.Thread.Sleep(TimeoutEpoch);
-		}
+        public static void HaltApplicationThread(System.Int32 TimeoutEpoch) { System.Threading.Thread.Sleep(TimeoutEpoch); }
 
-        /*
-		private static void WriteProcessDataToConsole(System.Object sender , System.Diagnostics.DataReceivedEventArgs DataObject)
-		{
-			System.ConsoleColor FORE , BACK;
-			FORE = System.Console.ForegroundColor;
-			BACK = System.Console.BackgroundColor;
-			System.Console.ForegroundColor = System.ConsoleColor.Gray;
-			System.Console.BackgroundColor = System.ConsoleColor.Black;
-			if (!System.String.IsNullOrEmpty(DataObject.Data)) 
-			{
-				if (DataObject.Data.IndexOf('\n') != -1) 
-				{
-					System.Console.Write(@"INFO: " + DataObject.Data);
-				} else if (DataObject.Data.IndexOf('\n') == -1)
-				{
-					System.Console.WriteLine(@"INFO: " + DataObject.Data);
-				}
-			}
-			System.Console.ForegroundColor = FORE;
-			System.Console.BackgroundColor = BACK;
-		}
-		
-		private static void WriteErrorProcessDataToConsole(System.Object sender , System.Diagnostics.DataReceivedEventArgs DataObject)
-		{
-			System.ConsoleColor FORE , BACK;
-			FORE = System.Console.ForegroundColor;
-			BACK = System.Console.BackgroundColor;
-			System.Console.ForegroundColor = System.ConsoleColor.Red;
-			System.Console.BackgroundColor = System.ConsoleColor.Black;
-			if (!System.String.IsNullOrEmpty(DataObject.Data)) 
-			{
-				if (DataObject.Data.IndexOf('\n') != -1) 
-				{
-					System.Console.Write(@"ERROR: " + DataObject.Data);
-				} else if (DataObject.Data.IndexOf('\n') == -1)
-				{
-					System.Console.WriteLine(@"ERROR: " + DataObject.Data);
-				}
-			}
-			System.Console.ForegroundColor = FORE;
-			System.Console.BackgroundColor = BACK;
-		}
-		*/
-
+		[SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
         System.Boolean ImplicitSearch, System.Boolean WaitToClose)
 		{
@@ -1079,11 +1136,14 @@ namespace ROOT
             return ExitCode;
         }
 
-
-        public static System.Int32 LaunchProcess(System.String PathOfExecToRun ,System.String CommandLineArgs = " " , 
-        System.Boolean ImplicitSearch = false ,System.Boolean WaitToClose = false ,System.Boolean RunAtNativeConsole = false , 
-		System.Boolean HideExternalConsole = true)
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public static System.Int32 LaunchProcess(System.String PathOfExecToRun ,System.String CommandLineArgs , 
+        System.Boolean ImplicitSearch ,System.Boolean WaitToClose ,System.Boolean? RunAtNativeConsole , 
+		System.Boolean? HideExternalConsole)
 		{
+			if (RunAtNativeConsole == null) { RunAtNativeConsole = false; }
+			if (HideExternalConsole == null) { HideExternalConsole = true; }
+			if (CommandLineArgs == null) { CommandLineArgs = " "; }
 			System.Int32 ExitCode = 0;
 			System.String FinalFilePath = "Error";
 			/*
@@ -1155,7 +1215,10 @@ namespace ROOT
 			return ExitCode;
 		}
 		
-		
+		/// <summary>
+		/// Gets the %PATH% environment variable of this instance.
+		/// </summary>
+		/// <returns>The <see cref="System.String"/>[] of the directory paths found in the variable.</returns>
 		public static System.String[] GetPathEnvironmentVar()
 		{
 			try
@@ -1170,25 +1233,200 @@ namespace ROOT
 		}
 		
 	}
-	
-	public class RegEditor : System.IDisposable
+
+	/// <summary>
+	/// An enumeration of values which help the function to properly select the algorithm requested.
+	/// </summary>
+	public enum HashDigestSelection
+	{
+		Default_None = 0,
+		RSVD_0 = 1, RSVD_1 = 2,
+		RSVD_2 = 3, RSVD_3 = 4,
+		/// <summary>
+		/// The SHA1 Digest will be used.
+		/// </summary>
+		/// <remarks>Microsoft has detected that the algorithm produces the same result in slightly different files.
+		/// If your case is the integrity , you should use then the <see cref="HashDigestSelection.SHA256"/> or a better algorithm.</remarks>
+		SHA1 = 5,
+        /// <summary>
+        /// The SHA256 Digest will be used.
+        /// </summary>
+        SHA256 = 6,
+        /// <summary>
+        /// The SHA384 Digest will be used.
+        /// </summary>
+        SHA384 = 7,
+        /// <summary>
+        /// The SHA512 Digest will be used.
+        /// </summary>
+        SHA512 = 8,
+        /// <summary>
+        /// The MD5 Digest will be used.
+        /// </summary>
+        MD5 = 9
+	}
+
+	public enum RegTypes
+	{
+		ERROR = 0,
+		RSVD_0 = 1,
+		RSVD_1 = 2,
+		RSVD_2 = 3,
+		RSVD_3 = 4,
+		RSVD_4 = 5,
+	    String = 6,
+		ExpandString = 7,
+		QuadWord = 8,
+		DoubleWord = 9
+	}
+
+	/// <summary>
+	/// The <see cref="RegEditor"/> instance class functions result after executing.
+	/// </summary>
+	public enum RegFunctionResult
+	{
+		/// <summary>
+		/// Generic error.
+		/// </summary>
+		Error = 0,
+		RSVD_0 = 1,
+		RSVD_1 = 2,
+		/// <summary>
+		/// Incorrect Registry Path.
+		/// </summary>
+		/// <remarks>This is mostly returned when the path is incorrect or it is an registry error.</remarks>
+		Misdefinition_Error = 3,
+		/// <summary>
+		/// The Root Key provided is invalid.
+		/// </summary>
+		InvalidRootKey = 4,
+		/// <summary>
+		/// Sucessfull execution.
+		/// </summary>
+		Success = 5
+	}
+
+	/// <summary>
+	/// Valid root paths for the <see cref="RegEditor"/> to modify or create new values.
+	/// </summary>
+	public enum RegRootKeyValues
+	{
+		/// <summary>
+		/// Reserved property for indicating a custom or unusuable root key.
+		/// </summary>
+		Inabsolute = 0,
+		RSVD_0 = 1,
+		RSVD_1 = 2,
+		HKLM = 3,
+		HKCU = 4,
+		HKCC = 5,
+        HKPD = 6,
+        HKU = 7,
+		HKCR = 8,
+        /// <summary>
+        /// This provides the path to the Local Machine.
+        /// </summary>
+        LocalMachine = HKLM,
+        /// <summary>
+        /// This is the root path of the current user.
+        /// </summary>
+        CurrentUser = HKCU,
+        /// <summary>
+        /// This is the root path of the Current Config key.
+        /// </summary>
+        /// <remarks>This property is deprecated on the registry; use it with caution.</remarks>
+        CurrentConfig = HKCC,
+        /// <summary>
+        /// This is the root path of the Performance Data key.
+        /// </summary>
+        /// <remarks>This property is deprecated on the registry; use it with caution.</remarks>
+        PerfData = HKPD,
+        /// <summary>
+        /// This is the root path of the Users Data key.
+        /// </summary>
+        UsersStore = HKU,
+        /// <summary>
+        /// This is the root path of the Classes Data Root key.
+        /// </summary>
+        CurrentClassesRoot = HKCR
+	}
+
+    [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+    public class RegEditor : System.IDisposable
 	{
 		private System.String _RootKey_;
 		private System.String _SubKey_;
 		private System.Boolean _DIAG_;
 		
-		public System.String RootKey
+		/// <summary>
+		/// The Registry Root Key. It accepts only specific values.
+		/// </summary>
+		public RegRootKeyValues RootKey
 		{
-			get { return _RootKey_; }
-			set { _RootKey_ = value; }
+			get
+			{
+				switch (_RootKey_) 
+				{
+					case "HKEY_LOCAL_MACHINE":  return RegRootKeyValues.HKLM;
+                    case "HKEY_CURRENT_USER": return RegRootKeyValues.HKCU;
+                    case "HKEY_CURRENT_CONFIG": return RegRootKeyValues.HKCC;
+                    case "HKEY_PERFORMANCE_DATA": return RegRootKeyValues.HKPD;
+                    case "HKEY_USERS": return RegRootKeyValues.HKU;
+                    case "HKEY_CLASSES_ROOT": return RegRootKeyValues.HKCR;
+					default: return RegRootKeyValues.Inabsolute;
+                }
+			}
+			set 
+			{
+				switch (value)
+				{
+					case RegRootKeyValues.HKLM: _RootKey_ = "HKEY_LOCAL_MACHINE"; break;
+					case RegRootKeyValues.HKCU: _RootKey_ = "HKEY_CURRENT_USER"; break;
+					case RegRootKeyValues.HKCC: _RootKey_ = "HKEY_CURRENT_CONFIG"; break;
+					case RegRootKeyValues.HKPD: _RootKey_ = "HKEY_PERFORMANCE_DATA"; break;
+					case RegRootKeyValues.HKU: _RootKey_ = "HKEY_USERS"; break;
+					case RegRootKeyValues.HKCR: _RootKey_ = "HKEY_CLASSES_ROOT"; break;
+                }
+			}
 		}
 		
+		/// <summary>
+		/// The Registry sub-root key. Can be nested the one on the another.
+		/// </summary>
 		public System.String SubKey
 		{
 			get { return _SubKey_; }
-			set { _SubKey_ = value; }
+			set { if (System.String.IsNullOrEmpty(value) == false) { _SubKey_ = value; } }
 		}
 		
+		/// <summary>
+		/// The default , classical and parameterless constructor.
+		/// </summary>
+		/// <remarks>You must set the required Registry Paths by the respective properties.</remarks>
+		public RegEditor() { }
+
+		/// <summary>
+		/// Constructor which can be used to set the required Registry Paths on initialisation.
+		/// </summary>
+		/// <param name="KeyValue">One of the valid Root Keys. See the <see cref="RegRootKeyValues"/> <see cref="System.Enum"/> for more information. </param>
+		/// <param name="SubKey"></param>
+		public RegEditor(RegRootKeyValues KeyValue , System.String SubKey)
+		{
+            switch (KeyValue)
+            {
+                case RegRootKeyValues.HKLM: _RootKey_ = "HKEY_LOCAL_MACHINE"; break;
+                case RegRootKeyValues.HKCU: _RootKey_ = "HKEY_CURRENT_USER"; break;
+                case RegRootKeyValues.HKCC: _RootKey_ = "HKEY_CURRENT_CONFIG"; break;
+                case RegRootKeyValues.HKPD: _RootKey_ = "HKEY_PERFORMANCE_DATA"; break;
+                case RegRootKeyValues.HKU: _RootKey_ = "HKEY_USERS"; break;
+                case RegRootKeyValues.HKCR: _RootKey_ = "HKEY_CLASSES_ROOT"; break;
+            }
+            if (System.String.IsNullOrEmpty(SubKey) == false) { _SubKey_ = SubKey; }
+        }
+
+		/// <summary>
+		/// Enable the Console Diagnostic debugging.
+		/// </summary>
 		public System.Boolean DiagnosticMessages
 		{
 			set { _DIAG_ = value; }
@@ -1196,7 +1434,7 @@ namespace ROOT
 		
 		private System.Boolean _CheckPredefinedProperties()
 		{
-			if ((! System.String.IsNullOrEmpty(_RootKey_)) && (! System.String.IsNullOrEmpty(_SubKey_)))
+			if ((System.String.IsNullOrEmpty(_RootKey_) == false) && (System.String.IsNullOrEmpty(_SubKey_) == false))
 			{
 				return true;
 			}
@@ -1206,6 +1444,11 @@ namespace ROOT
 			}
 		}
 		
+		/// <summary>
+		/// Gets the specified value from the key provided.
+		/// </summary>
+		/// <param name="VariableRegistryMember">The value name to retrieve the value data.</param>
+		/// <returns>If it succeeded , a new <see cref="System.Object"/> instance containing the data; Otherwise , a <see cref="System.String"/> explaining the error.</returns>
 		public System.Object GetEntry(System.String VariableRegistryMember)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember))
@@ -1217,7 +1460,7 @@ namespace ROOT
 				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
 				return "UNDEF_ERR";
 			}
-			System.Object RegEntry = Microsoft.Win32.Registry.GetValue(_RootKey_ + @"\" + _SubKey_ , VariableRegistryMember , "_ER_C_");
+			System.Object RegEntry = Microsoft.Win32.Registry.GetValue($"{_RootKey_}\\{_SubKey_}" , VariableRegistryMember , "_ER_C_");
 			if (System.Convert.ToString(RegEntry) == "_ER_C_")
 			{
 				return "Error";
@@ -1246,41 +1489,40 @@ namespace ROOT
 			}
 		}
 		
-		public System.String SetEntry(System.String VariableRegistryMember,System.String RegistryType,System.Object RegistryData)
+		/// <summary>
+		/// Sets or creates the specified value.
+		/// </summary>
+		/// <param name="VariableRegistryMember">The value name whose data will be modified.</param>
+		/// <param name="RegistryType">The value type that this value will have. Consult the <see cref="RegTypes"/> <see cref="System.Enum"/> for more information.</param>
+		/// <param name="RegistryData">The new data that will be saved on the value; The type is depending upon the <paramref name="RegistryType"/> parameter.</param>
+		/// <returns>A new <see cref="RegFunctionResult"/> <see cref="System.Enum"/> explaining if it succeeded.</returns>
+		public RegFunctionResult SetEntry(System.String VariableRegistryMember,RegTypes RegistryType,System.Object RegistryData)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember))
 			{
-				return "Error";
+				return RegFunctionResult.Error;
 			}
 			if (! _CheckPredefinedProperties())
 			{
 				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
-				return "UNDEF_ERR";
+				return RegFunctionResult.Misdefinition_Error;
 			}
 			if (RegistryData == null)
 			{
-				if (_DIAG_) {System.Console.WriteLine("ERROR: 'System.Null' value detected in RegistryData object. Maybe invalid definition?"); }
-				return "Error";
+				if (_DIAG_) {System.Console.WriteLine("ERROR: 'null' value detected in RegistryData object. Maybe invalid definition?"); }
+				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryValueKind RegType_;
-			if (System.String.IsNullOrEmpty(RegistryType))
-			{
-				if (_DIAG_)
-				{
-					System.Console.WriteLine("WARNING: Undefined registry item type. Assuming Value as it is a 'String' .");
-				    System.Console.WriteLine("INFO: Allowed Values: String , ExpandString , QWord , DWord .");
-				}
-				RegType_ = Microsoft.Win32.RegistryValueKind.String;
-			} else if (RegistryType == "String")
+			if (RegistryType == RegTypes.String)
 			{
 				RegType_ = Microsoft.Win32.RegistryValueKind.String;
-			} else if (RegistryType == "ExpandString")
+			} else if (RegistryType == RegTypes.ExpandString)
 			{
 				RegType_ = Microsoft.Win32.RegistryValueKind.ExpandString;
-			} else if (RegistryType == "QWord")
+			} else if (RegistryType == RegTypes.QuadWord)
 			{
 				RegType_ = Microsoft.Win32.RegistryValueKind.QWord;
-			} else if (RegistryType == "DWord")
+			} else if (RegistryType == RegTypes.DoubleWord)
 			{
 				RegType_ = Microsoft.Win32.RegistryValueKind.DWord;
 			}
@@ -1288,36 +1530,41 @@ namespace ROOT
 			{
 				if (_DIAG_)
 				{
-					System.Console.WriteLine("ERROR: Unknown registry value type argument in the object creator was given: " + RegistryType);
+					System.Console.WriteLine($"ERROR: Unknown registry value type argument in the object creator was given: {RegistryType}");
 				}
-				return "Error";
+				return RegFunctionResult.InvalidRootKey;
 			}
 			try
 			{
-				Microsoft.Win32.Registry.SetValue(_RootKey_ + @"\" + _SubKey_ , VariableRegistryMember , RegistryData , RegType_);
+				Microsoft.Win32.Registry.SetValue($"{_RootKey_}\\{_SubKey_}" , VariableRegistryMember , RegistryData , RegType_);
 			}
 			catch (System.Exception EX)
 			{
 				if (_DIAG_)
 				{
-					System.Console.WriteLine("ERROR: Could not create key " + VariableRegistryMember + " . Invalid name maybe?");
-				    System.Console.WriteLine("Error Raw Data: " + EX.ToString());
+					System.Console.WriteLine($"ERROR: Could not create key {VariableRegistryMember} . Invalid name maybe?");
+				    System.Console.WriteLine($"Error Raw Data: {EX}");
 				}
-				return "Error";
+				return RegFunctionResult.Error;
 			}
-			return "Sucessfull";
+			return RegFunctionResult.Success;
 		}
-		
-		public System.String DeleteEntry(System.String VariableRegistryMember)
+
+        /// <summary>
+        /// Deletes the specified value from the registry.
+        /// </summary>
+        /// <param name="VariableRegistryMember">The value which will be deleted.</param>
+        /// <returns>A new <see cref="RegFunctionResult"/> <see cref="System.Enum"/> explaining if it succeeded.</returns>
+        public RegFunctionResult DeleteEntry(System.String VariableRegistryMember)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember))
 			{
-				return "Error";
+				return RegFunctionResult.Error;
 			}
 			if (! _CheckPredefinedProperties())
 			{
 				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
-				return "UNDEF_ERR";
+				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryKey ValueDelete;
 			switch (_RootKey_)
@@ -1346,18 +1593,21 @@ namespace ROOT
 						System.Console.WriteLine("Error - Registry root key could not be get. Incorrect Root Key Detected.");
                         System.Console.WriteLine("Error while getting the root key: Root Key " + _RootKey_ + "Is invalid.");
 					}
-					return "UNDEF_ERR";
+					return RegFunctionResult.Misdefinition_Error;
 			}
 			if (System.Convert.ToString(ValueDelete.GetValue(VariableRegistryMember , "_DNE_")) == "_DNE_")
 			{
 				ValueDelete.Close();
-				return "Error";
+				return RegFunctionResult.Error;
 			}
 			ValueDelete.DeleteValue(VariableRegistryMember);
 			ValueDelete.Close();
-			return "Sucessfull";
+			return RegFunctionResult.Success;
 		}
-	
+		
+		/// <summary>
+		/// Use this Dispose method to clear up the current key that the class is working on and make it possible to set a new path to work on.
+		/// </summary>
 		public void Dispose() {DisposeRes();}
 
 		private protected void DisposeRes()
@@ -1368,62 +1618,73 @@ namespace ROOT
             _DIAG_ = false;
 		}
 	}
-	
+
 	namespace CryptographicOperations
-    {
+	{
         // A Collection Namespace of encrypting and decrypting files.
         // For now (At the time of writing this code) , only UTF-8 is supported.
+
+        public class KeyGenTable
+        {
+            private System.String ERC;
+            private System.Byte[] _IV_;
+            private System.Byte[] _EK_;
+            private System.Int32 EMF_;
+
+            public System.String ErrorCode
+            {
+                get { return ERC; }
+                set { ERC = value; }
+            }
+
+			public System.Boolean CallerErroredOut
+			{
+				get 
+				{
+					if (ERC == null) { return false; } else {
+						if (ERC == "Error")
+						{ return true; } else { return false; }
+					}
+				}
+			}
+
+            public System.Byte[] Key
+            {
+                get { return _EK_; }
+                set { _EK_ = value; }
+            }
+
+            public System.Byte[] IV
+            {
+                get { return _IV_; }
+                set { _IV_ = value; }
+            }
+
+            public System.Int32 KeyLengthInBits
+            {
+                get { return EMF_; }
+                set { EMF_ = value; }
+            }
+        }
 
         public class AESEncryption : System.IDisposable
 		{
 			// Cryptographic Operations Class.
 			private System.Byte[] _EncryptionKey_;
-            private System.Byte[] _InitVec_;
-            private System.Security.Cryptography.AesCng CNGBaseObject = new System.Security.Cryptography.AesCng();
-			
+			private System.Byte[] _InitVec_;
+			private System.Security.Cryptography.AesCng CNGBaseObject = new System.Security.Cryptography.AesCng();
+
 			public System.Byte[] EncryptionKey
 			{
 				set { _EncryptionKey_ = value; }
 			}
-			
+
 			public System.Byte[] IV
 			{
 				set { _InitVec_ = value; }
 			}
-			
-			public class KeyGenTable
-			{
-				private System.String ERC;
-				private System.Byte[] _IV_;
-				private System.Byte[] _EK_;
-				private System.Int32 EMF_;
-				
-				public System.String ErrorCode
-				{
-					get { return ERC; }
-					set { ERC = value; }
-				}
-				
-				public System.Byte[] Key
-				{
-					get { return _EK_; }
-					set { _EK_ = value; }
-				}
-				
-				public System.Byte[] IV
-				{
-					get { return _IV_; }
-					set { _IV_ = value; }
-				}
-				
-				public System.Int32 KeyLengthInBits
-				{
-					get { return EMF_; }
-					set { EMF_ = value; }
-				}
-			}
-			
-			public static KeyGenTable MakeNewKeyAndInitVector() 
+
+			public static KeyGenTable MakeNewKeyAndInitVector()
 			{
 				System.Security.Cryptography.AesCng RETM;
 				KeyGenTable RDM = new KeyGenTable();
@@ -1437,12 +1698,12 @@ namespace ROOT
 					return RDM;
 				}
 				RDM.ErrorCode = "OK";
-                RDM.IV = RETM.IV;
-                RDM.Key = RETM.Key;
-                RDM.KeyLengthInBits = RETM.KeySize;
-                return RDM;
+				RDM.IV = RETM.IV;
+				RDM.Key = RETM.Key;
+				RDM.KeyLengthInBits = RETM.KeySize;
+				return RDM;
 			}
-			
+
 			private System.Boolean _CheckPredefinedProperties()
 			{
 				if ((_EncryptionKey_ is null) || (_InitVec_ is null))
@@ -1455,7 +1716,7 @@ namespace ROOT
 				}
 				return false;
 			}
-			
+
 			public System.Byte[] EncryptSpecifiedData(System.String PlainText)
 			{
 				if (System.String.IsNullOrEmpty(PlainText))
@@ -1475,9 +1736,9 @@ namespace ROOT
 				System.Byte[] EncryptedArray;
 				using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream())
 				{
-					using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR , ENC_2 , System.Security.Cryptography.CryptoStreamMode.Write))
+					using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Write))
 					{
-						using (System.IO.StreamWriter SDM = new System.IO.StreamWriter(CryptStrEnc , System.Text.Encoding.UTF8))
+						using (System.IO.StreamWriter SDM = new System.IO.StreamWriter(CryptStrEnc, System.Text.Encoding.UTF8))
 						{
 							SDM.Write(PlainText);
 						}
@@ -1486,7 +1747,7 @@ namespace ROOT
 				}
 				return EncryptedArray;
 			}
-			
+
 			public System.Byte[] EncryptSpecifiedDataForFiles(System.IO.FileStream UnderlyingStream)
 			{
 				if (!(UnderlyingStream is System.IO.FileStream) || (UnderlyingStream.CanRead == false))
@@ -1498,7 +1759,7 @@ namespace ROOT
 					return null;
 				}
 				System.Byte[] ByteArray = new System.Byte[UnderlyingStream.Length];
-				UnderlyingStream.Read(ByteArray , 0 , System.Convert.ToInt32(UnderlyingStream.Length));
+				UnderlyingStream.Read(ByteArray, 0, System.Convert.ToInt32(UnderlyingStream.Length));
 				System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
 				ENC_1.Key = _EncryptionKey_;
 				ENC_1.IV = _InitVec_;
@@ -1508,25 +1769,25 @@ namespace ROOT
 				System.Byte[] EncryptedArray;
 				using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream())
 				{
-					using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR , ENC_2 , System.Security.Cryptography.CryptoStreamMode.Write))
+					using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Write))
 					{
-						using (System.IO.BinaryWriter SDM = new System.IO.BinaryWriter(CryptStrEnc , System.Text.Encoding.UTF8))
+						using (System.IO.BinaryWriter SDM = new System.IO.BinaryWriter(CryptStrEnc, System.Text.Encoding.UTF8))
 						{
-							SDM.Write(ByteArray , 0 , ByteArray.Length);
+							SDM.Write(ByteArray, 0, ByteArray.Length);
 						}
 						EncryptedArray = MSSSR.ToArray();
 					}
 				}
 				return EncryptedArray;
 			}
-			
+
 			public System.String DecryptSpecifiedData(System.Byte[] EncryptedArray)
 			{
 				if ((EncryptedArray is null) || (EncryptedArray.Length <= 0))
 				{
 					return null;
 				}
-				if (_CheckPredefinedProperties()) {return null;}
+				if (_CheckPredefinedProperties()) { return null; }
 				System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
 				ENC_1.Key = _EncryptionKey_;
 				ENC_1.IV = _InitVec_;
@@ -1536,9 +1797,9 @@ namespace ROOT
 				System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateDecryptor();
 				using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream(EncryptedArray))
 				{
-					using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR , ENC_2 , System.Security.Cryptography.CryptoStreamMode.Read))
+					using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Read))
 					{
-						using (System.IO.StreamReader SDE = new System.IO.StreamReader(DCryptStrEnc , System.Text.Encoding.UTF8))
+						using (System.IO.StreamReader SDE = new System.IO.StreamReader(DCryptStrEnc, System.Text.Encoding.UTF8))
 						{
 							StringToReturn = SDE.ReadToEnd();
 						}
@@ -1546,11 +1807,11 @@ namespace ROOT
 				}
 				return StringToReturn;
 			}
-			
+
 			public System.String DecryptSpecifiedDataForFiles(System.IO.FileStream EncasingStream)
 			{
-				if (EncasingStream.CanRead == false) {return null;}
-				if (_CheckPredefinedProperties()) {return null;}
+				if (EncasingStream.CanRead == false) { return null; }
+				if (_CheckPredefinedProperties()) { return null; }
 				System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
 				ENC_1.Key = _EncryptionKey_;
 				ENC_1.IV = _InitVec_;
@@ -1558,16 +1819,16 @@ namespace ROOT
 				ENC_1.Mode = System.Security.Cryptography.CipherMode.CBC;
 				System.String FinalString = null;
 				System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateDecryptor();
-				using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(EncasingStream , ENC_2 , System.Security.Cryptography.CryptoStreamMode.Read))
+				using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(EncasingStream, ENC_2, System.Security.Cryptography.CryptoStreamMode.Read))
 				{
-					using (System.IO.StreamReader SDE = new System.IO.StreamReader(DCryptStrEnc , System.Text.Encoding.UTF8))
+					using (System.IO.StreamReader SDE = new System.IO.StreamReader(DCryptStrEnc, System.Text.Encoding.UTF8))
 					{
 						FinalString = SDE.ReadToEnd();
 					}
 				}
 				return FinalString;
 			}
-			
+
 			public static System.String ConvertTextKeyOrIvToString(System.Byte[] ByteValue)
 			{
 				if ((ByteValue is null) || (ByteValue.Length <= 0))
@@ -1576,18 +1837,18 @@ namespace ROOT
 				}
 				try
 				{
-					return System.Convert.ToBase64String(ByteValue , 0 , ByteValue.Length , 0);
+					return System.Convert.ToBase64String(ByteValue, 0, ByteValue.Length, 0);
 				}
 				catch (System.Exception)
 				{
 					return null;
 				}
 			}
-			
-			public static System.Byte[] ConvertTextKeyOrIvFromStringToByteArray(System.String StringValue) 
+
+			public static System.Byte[] ConvertTextKeyOrIvFromStringToByteArray(System.String StringValue)
 			{
-				if (System.String.IsNullOrEmpty(StringValue)) {return null;}
-				try 
+				if (System.String.IsNullOrEmpty(StringValue)) { return null; }
+				try
 				{
 					return System.Convert.FromBase64String(StringValue);
 				}
@@ -1596,12 +1857,12 @@ namespace ROOT
 					return null;
 				}
 			}
-			
+
 			public void Dispose()
 			{
 				DISPMETHOD();
 			}
-			
+
 			private protected void DISPMETHOD()
 			{
 				_EncryptionKey_ = null;
@@ -1611,92 +1872,91 @@ namespace ROOT
 				#pragma warning restore CS0219
 			}
 		}
-		
-		
+
 		public class EDAFile
 		{
-			
+
 			public class EncryptionContext
 			{
 				private System.String _ERC_;
 				private System.Byte[] _KEY_;
 				private System.Byte[] _IV_;
-				
+
 				public System.String ErrorCode
 				{
-					get {return _ERC_;}
-					set {_ERC_ = value;}
+					get { return _ERC_; }
+					set { _ERC_ = value; }
 				}
-				
+
 				public System.Byte[] KeyUsed
 				{
-					get {return _KEY_;}
-					set {_KEY_ = value;}
+					get { return _KEY_; }
+					set { _KEY_ = value; }
 				}
-				
+
 				public System.Byte[] InitVectorUsed
 				{
-					get {return _IV_;}
-					set { _IV_ = value;}
+					get { return _IV_; }
+					set { _IV_ = value; }
 				}
 			}
-			
-			public static EncryptionContext EncryptAFile(System.String FilePath ,System.String FileOutputPath = "") 
+
+			public static EncryptionContext EncryptAFile(System.String FilePath, System.String FileOutputPath = "")
 			{
-				if (!(System.IO.File.Exists(FilePath))) {return null;}
+				if (!(System.IO.File.Exists(FilePath))) { return null; }
 				if (System.String.IsNullOrEmpty(FileOutputPath))
 				{
 					FileOutputPath = (FilePath).Remove(FilePath.IndexOf(".")) + "_ENCRYPTED_" + (FilePath).Substring(FilePath.IndexOf("."));
 				}
 				EncryptionContext DMF = new EncryptionContext();
 				AESEncryption MDA = new AESEncryption();
-				AESEncryption.KeyGenTable MAKER = AESEncryption.MakeNewKeyAndInitVector();
+				KeyGenTable MAKER = AESEncryption.MakeNewKeyAndInitVector();
 				if (MAKER.ErrorCode == "Error")
 				{
 					DMF.ErrorCode = "Error";
 					return DMF;
 				}
 				MDA.EncryptionKey = MAKER.Key;
-                MDA.IV = MAKER.IV;
+				MDA.IV = MAKER.IV;
 				try
 				{
-					using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath , System.IO.FileMode.Open))
+					using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath, System.IO.FileMode.Open))
 					{
 						using (System.IO.FileStream MNH = System.IO.File.OpenWrite(FileOutputPath))
 						{
 							System.Byte[] FLL = MDA.EncryptSpecifiedDataForFiles(MDR);
-							MNH.Write(FLL , 0 , System.Convert.ToInt32(FLL.Length));
+							MNH.Write(FLL, 0, System.Convert.ToInt32(FLL.Length));
 						}
 					}
 				}
 				catch (System.Exception EX)
 				{
 					System.Console.WriteLine(EX.Message);
-                    DMF.ErrorCode = "Error";
-                    return DMF;
+					DMF.ErrorCode = "Error";
+					return DMF;
 				}
 				MDA.Dispose();
 				DMF.KeyUsed = MAKER.Key;
 				DMF.InitVectorUsed = MAKER.IV;
 				return DMF;
 			}
-			
-			public static void DecryptAFile(System.String FilePath ,System.Byte[] Key , 
-            System.Byte[] IV ,System.String FileOutputPath = "")
+
+			public static void DecryptAFile(System.String FilePath, System.Byte[] Key,
+			System.Byte[] IV, System.String FileOutputPath = "")
 			{
-				if (!(System.IO.File.Exists(FilePath))) {return;}
-				if ((Key is null) || (IV is null)) {return;}
-				if ((Key.Length <= 0) || (IV.Length <= 0)) {return;}
+				if (!(System.IO.File.Exists(FilePath))) { return; }
+				if ((Key is null) || (IV is null)) { return; }
+				if ((Key.Length <= 0) || (IV.Length <= 0)) { return; }
 				if (System.String.IsNullOrEmpty(FileOutputPath))
 				{
 					FileOutputPath = (FilePath).Remove(FilePath.IndexOf(".")) + "_UNENCRYPTED_" + (FilePath).Substring(FilePath.IndexOf("."));
 				}
 				AESEncryption MDA = new AESEncryption();
 				MDA.EncryptionKey = Key;
-                MDA.IV = IV;
+				MDA.IV = IV;
 				try
 				{
-					using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath , System.IO.FileMode.Open))
+					using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath, System.IO.FileMode.Open))
 					{
 						using (System.IO.StreamWriter MNH = new System.IO.StreamWriter(System.IO.File.OpenWrite(FileOutputPath)))
 						{
@@ -1712,7 +1972,7 @@ namespace ROOT
 				MDA.Dispose();
 				return;
 			}
-			
+
 			// Executable code examples for encrypting and unencrypting files:
 			// Executable code starts here: <--
 			/// EDAFile.EncryptionContext RDF = EDAFile.EncryptAFile("E:\winrt\base.h" , "E:\IMAGES\winrtbase_h.Encrypted")
@@ -1722,9 +1982,9 @@ namespace ROOT
 			// To Access that API , use APIFR.CryptographicOperations.AESEncryption .
 			// More instructions on how to do such security conversions can be found in our Developing Website.
 		}
-		
+
 	}
-	
+
 	namespace Archives
     {
         // A Collection Namespace for making and extracting archives.
@@ -2021,14 +2281,154 @@ namespace ROOT
 			}
 			
 		}
-		
+
+        [SupportedOS(SupportedOSAttributePlatforms.Windows)]
+        public class Cabinets
+		{
+			public static System.Boolean CompressFromDirectory(System.String DirToCapture , System.String OutputArchivePath)
+			{ 
+				if (! System.IO.Directory.Exists(DirToCapture)) { return false; }
+				try
+				{
+					ExternalArchivingMethods.Cabinets.CabInfo CI = new(OutputArchivePath);
+					System.IO.FileSystemInfo[] FileArray = MAIN.GetANewFileSystemInfo(DirToCapture);
+					IList<System.String> FLT = new List<System.String>();
+					foreach (System.IO.FileSystemInfo FI in FileArray)
+					{
+						if (FI is System.IO.FileInfo) { FLT.Add(FI.Name); }
+					}
+					CI.PackFiles(DirToCapture, FLT, FLT);
+					CI.Refresh();
+				} catch (System.Exception EX) 
+				{
+					System.Console.WriteLine(EX.Message);
+					return false;
+				}
+				return true;
+			}
+
+			public static System.Boolean DecompressFromArchive(System.String DestDir , System.String ArchiveFile)
+			{
+				if (! System.IO.Directory.Exists(DestDir)) { return false; }
+				if (! System.IO.File.Exists(ArchiveFile)) { return false; }
+				try
+				{
+					ExternalArchivingMethods.Cabinets.CabInfo CI = new(ArchiveFile);
+					CI.Unpack(DestDir);
+				} catch (System.Exception EX) 
+				{
+					System.Console.WriteLine(EX.Message);
+					return false;
+				}
+				return true;
+			}
+
+			public static System.Boolean AddAFileToCabinet(System.String FilePath ,  System.String CabinetFile)
+			{
+                if (! System.IO.File.Exists(CabinetFile)) { return false; }
+                if (! System.IO.File.Exists(FilePath)) { return false; }
+				try 
+				{
+					System.IO.FileInfo FI = new System.IO.FileInfo(FilePath);
+					IList<System.String> IL = new List<System.String>();
+					IL.Add(FI.Name);
+					ExternalArchivingMethods.Cabinets.CabInfo CI = new (CabinetFile);
+					CI.PackFiles(FI.DirectoryName ,IL , IL);
+				} catch (System.Exception EX) 
+				{
+					System.Console.WriteLine(EX.Message);
+					return false;
+				}
+				return true;
+            }
+
+		}
 	}
 	
+	/// <summary>
+	/// This is used to mark an function when it is used to generate a warning that will be deprecated.
+	/// </summary>
+	internal class NoticeAttribute : System.Attribute
+	{
+		public NoticeAttribute(System.String FunctionName) 
+		{
+			MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
+				" for usage and will be obsoleted in the next release. Use instead the other one recommended.",
+				ConsoleColor.Red, ConsoleColor.Black);
+		}
+
+		public NoticeAttribute(System.String FunctionName , System.String Recommended)
+		{
+            MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
+                $" for usage and will be obsoleted in the next release. Use instead the {Recommended} function.",
+                ConsoleColor.Red, ConsoleColor.Black);
+        }
+
+		public override string ToString() 
+		{
+			return "#NOTICEATTRIBUTE#";
+		}
+	}
+
+	/// <summary>
+	/// The Eumeration Values which describe in which platform the marked method can run.
+	/// </summary>
+	internal enum SupportedOSAttributePlatforms : System.Int32
+	{
+		Windows = 2 , OSX = 3, Linux = 4
+	}
+
+	/// <summary>
+	/// This marks a method or class that can only be run in a specific platform. This does not yet work as expected , so you cannot use this class yet.
+	/// </summary>
+	/// <remarks>If the platform is not the one specified , then it throws a new <see cref="PlatformNotSupportedException"/>. </remarks>
+	/// <seealso cref="SupportedOSAttributePlatforms"/>
+	[AttributeUsage(AttributeTargets.All, Inherited = false, AllowMultiple = true)]
+	internal class SupportedOSAttribute : System.Attribute
+	{
+		private Func<SupportedOSAttributePlatforms,System.String> DI = ((DD) => GETPLATFORM(DD));
+
+		private static System.String GETPLATFORM(SupportedOSAttributePlatforms OSA)
+		{
+            System.Runtime.InteropServices.OSPlatform FinalPlatformSelection;
+            switch (OSA)
+            {
+                case SupportedOSAttributePlatforms.Windows: FinalPlatformSelection = OSPlatform.Windows; break;
+                case SupportedOSAttributePlatforms.Linux: FinalPlatformSelection = OSPlatform.Linux; break;
+                case SupportedOSAttributePlatforms.OSX: FinalPlatformSelection = OSPlatform.OSX; break;
+            }
+            if (System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(FinalPlatformSelection) == false)
+            {
+                throw new System.PlatformNotSupportedException("This method , function , class or namespace cannot be executed" +
+                $" on this type of platform: {Environment.OSVersion.Platform}");
+            }
+			return "Executed";
+        }
+
+		/// <summary>
+		/// The default class constructor.
+		/// </summary>
+		/// <param name="OSPlatformRequired">The Platform <see cref="SupportedOSAttributePlatforms"/> by the developer that the code can run to.</param>
+		/// <exception cref="System.PlatformNotSupportedException">It is thrown when the current running platform is not the one provided.</exception>
+        public SupportedOSAttribute(SupportedOSAttributePlatforms OSPlatformRequired)
+		{
+			DI(OSPlatformRequired);
+        }
+
+        public override System.String ToString() { return "#SUPPORTEDOSATTRIBUTE#"; }
+    }
+
+	/// <summary>
+	/// Calculates an estimated time required , for example , the time needed to execute a code excerpt.
+	/// </summary>
 	public class TimeCaculator : System.IDisposable
 	{
 		private System.DateTime _TimeEl_;
 		private System.Boolean _Init_ = false;
 		
+		/// <summary>
+		/// Use this method to clear and start counting.
+		/// </summary>
 		public void Init()
 		{
 			if (_Init_ == true) {return;}
@@ -2037,9 +2437,13 @@ namespace ROOT
 			return;
 		}
 		
+		/// <summary>
+		/// Stop the counting and calculate the elapsed time.
+		/// </summary>
+		/// <returns>The time counted to milliseconds.</returns>
 		public System.Int32 CaculateTime()
 		{
-			if (!(_Init_)) {return -1;}
+			if (_Init_ == false) {return -1;}
 			try
 			{
 				_Init_ = false;
@@ -2052,6 +2456,9 @@ namespace ROOT
 			}
 		}
 		
+		/// <summary>
+		/// Use the Dispose method to clear up the values so as to prepare it again to count up.
+		/// </summary>
 		public void Dispose() {DisposeResources();}
 		
 		private protected void DisposeResources()
@@ -2121,6 +2528,9 @@ namespace ROOT
 
         private event System.EventHandler<ProgressChangedArgs> ChangeProgress;
 
+		/// <summary>
+		/// Change the Progress bar message.
+		/// </summary>
         public System.String ProgressMessage
         {
             get { return Progr; }
@@ -2128,8 +2538,18 @@ namespace ROOT
             { if (System.String.IsNullOrEmpty(value)) { throw new System.ArgumentException("Illegal , not allowed to be null."); } else { Progr = value; } }
         }
 
+		/// <summary>
+		/// Constructor option 1: Define the arguments via the properties and run the bar when you need it.
+		/// </summary>
         public SimpleProgressBar() { }
 
+		/// <summary>
+		/// Constructor option 2: Define the start , stop and end values.
+		/// </summary>
+		/// <param name="Start">From which number the bar should start counting.</param>
+		/// <param name="Step">The step to use for the bar. Can be also a negative <see cref="System.Int32"/>.</param>
+		/// <param name="End">At what number the bar will be stopped.</param>
+		/// <exception cref="System.ArgumentException">This is thrown in two cases: 1: The End value is bigger than 300 and the Start value is bigger that the End one.</exception>
         public SimpleProgressBar(System.Int32 Start, System.Int32 Step, System.Int32 End)
         {
             if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); }
@@ -2139,6 +2559,14 @@ namespace ROOT
             end = End;
         }
 
+        /// <summary>
+        /// Constructor option 3: Define the initial progress message , start , stop and end values.
+        /// </summary>
+        /// <param name="progressMessage">The Initial progress message prompt.</param>
+        /// <param name="Start">From which number the bar should start counting.</param>
+        /// <param name="Step">The step to use for the bar. Can be also a negative <see cref="System.Int32"/>.</param>
+        /// <param name="End">At what number the bar will be stopped.</param>
+        /// <exception cref="System.ArgumentException">This is thrown in two cases: 1: The End value is bigger than 300 and the Start value is bigger that the End one.</exception>
         public SimpleProgressBar(System.String progressMessage, System.Int32 Start, System.Int32 Step, System.Int32 End)
         {
             if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); }
@@ -2150,8 +2578,21 @@ namespace ROOT
             end = End;
         }
 
+        /// <summary>
+        /// Constructor option 4: Define only the Step and End values.
+        /// </summary>
+        /// <param name="Step">The step to use for the bar. Can be also a negative <see cref="System.Int32"/>.</param>
+        /// <param name="End">At what number the bar will be stopped.</param>
+        /// <exception cref="System.ArgumentException">This is thrown in two cases: 1: The End value is bigger than 300 and the Start value is bigger that the End one.</exception>
         public SimpleProgressBar(System.Int32 Step, System.Int32 End) { if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); } else { stp = Step; end = End; } }
 
+        /// <summary>
+        /// Constructor option 5: Define only the progress message , Step and End values.
+        /// </summary>
+        /// <param name="progressMessage">The Initial progress message prompt.</param>
+		/// <param name="Step">The step to use for the bar. Can be also a negative <see cref="System.Int32"/>.</param>
+        /// <param name="End">At what number the bar will be stopped.</param>
+        /// <exception cref="System.ArgumentException">This is thrown in two cases: 1: The End value is bigger than 300 and the Start value is bigger that the End one.</exception>
         public SimpleProgressBar(System.String progressMessage, System.Int32 Step, System.Int32 End)
         {
             if (End > 300) { throw new System.ArgumentException("It is not allowed this value to be more than 300."); }
@@ -2185,6 +2626,9 @@ namespace ROOT
             }
         }
 
+		/// <summary>
+		/// The Progress char that will be used inside the bar ([...])
+		/// </summary>
         public System.Char ProgressChar
         {
             get { return Progc; }
@@ -2199,24 +2643,38 @@ namespace ROOT
             }
         }
 
+		/// <summary>
+		/// This defines the step to use when the bar number will be changed. Can be also a negative <see cref="System.Int32"/> .
+		/// </summary>
         public System.Int32 ProgressStep
         {
             get { return stp; }
             set { stp = value; }
         }
 
+		/// <summary>
+		/// This defines the value that the progress bar will end to.
+		/// </summary>
         public System.Int32 ProgressEndValue
         {
             get { return end; }
             set { if (value > 300) { throw new System.ArgumentException("It is not allowed this value to be more than 300."); } else { end = value; } }
         }
 
+		/// <summary>
+		/// From which number the bar will start counting.
+		/// </summary>
         public System.Int32 ProgressStartValue
         {
             get { return start; }
             set { if (value >= end) { throw new System.ArgumentException("It is not allowed this value to be more than the ending value."); } }
         }
 
+		/// <summary>
+		/// This updates the message bar string while being executed.
+		/// </summary>
+		/// <param name="Message">The message to replace the current one.</param>
+		/// <exception cref="System.ArgumentException">When the <paramref name="Message"/> is <code>null</code>.</exception>
         public void UpdateMessageString(System.String Message)
         {
             if (System.String.IsNullOrEmpty(Message)) { throw new System.ArgumentException("The Message is null."); }
@@ -2224,8 +2682,14 @@ namespace ROOT
             System.Console.Write($"{Progr}: {iterator}% [{Progm}]\r");
         }
 
+		/// <summary>
+		/// Indicates if the bar was executed. Use it to close the running thread.
+		/// </summary>
         public System.Boolean Ended { get { return _Ended; } set { _Ended = value; } }
 
+		/// <summary>
+		/// Update the progress by the defined step.
+		/// </summary>
         public void UpdateProgress()
         {
             if (_Ended == false)
@@ -2241,6 +2705,9 @@ namespace ROOT
             System.Console.Write($"{Progr}: {e.ChangedValueTo}% [{Progm}] \r");
         }
 
+		/// <summary>
+		/// The function which starts up the Console Bar. This should only be used in a new <see cref="System.Threading.ThreadStart"/> delegate.
+		/// </summary>
         public void Invoke()
         {
             this.ChangeProgress += ChangeBar;
@@ -2294,7 +2761,7 @@ namespace ROOT
         }
 
         /// <summary>
-        /// An enumeration of <see cref="System.Int32" /> that returns which button pressed or presents an error.
+        /// An enumeration of <see cref="System.Int32" /> values which indicates which button pressed or presents an error.
         /// </summary>
         public enum ButtonReturned : System.Int32
         {
@@ -2312,6 +2779,7 @@ namespace ROOT
         /// <summary>
         /// A class that extends the default <see cref="Microsoft.VisualBasic.Interaction.InputBox"/> method.
         /// </summary>
+		[SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public class GetAStringFromTheUser : System.IDisposable
         {
             private Form Menu = new();
@@ -2328,8 +2796,9 @@ namespace ROOT
             private event System.EventHandler HANDLE;
 
             /// <summary>
-            /// Constructor Option 1: Define the settings at any time you would like. Do not forget to invoke the dialog using the <see cref="Invoke"/> function.
+            /// Constructor Option 1: Define the settings at any time you would like.
             /// </summary>
+			/// <remarks>Do not forget to invoke the dialog using the <see cref="Invoke"/> function.</remarks>
             public GetAStringFromTheUser() { }
 
             /// <summary>
@@ -2350,7 +2819,7 @@ namespace ROOT
             }
 
             /// <summary>
-            /// Disposes all the <see cref="System.Windows.Forms.Form"/> memebers used to make this dialog.
+            /// Disposes all the <see cref="System.Windows.Forms.Form"/> members used to make this dialog.
             /// </summary>
             public void Dispose()
             {
@@ -2502,6 +2971,7 @@ namespace ROOT
         /// A class that extends the <see cref="System.Windows.Forms.MessageBox"/> class by adding it new features.
         /// </summary>
         /// <remarks>Do not expect that it will be as fast as the <see cref="MessageBox"/>; This is made on managed code. </remarks>
+		[SupportedOS(SupportedOSAttributePlatforms.Windows)]
         public class IntuitiveMessageBox : System.IDisposable
         {
             private System.String _MSG;
@@ -2520,6 +2990,13 @@ namespace ROOT
 
             private event System.EventHandler ButtonHandle;
 
+			/// <summary>
+			/// Constructor Option 1:  Define all the arguments at once , run the dialog and dispose the class.
+			/// </summary>
+			/// <param name="Message">The text of the information to show to the user.</param>
+			/// <param name="Title">The message box title to show.</param>
+			/// <param name="Buttons">The buttons that will be shown to the User.</param>
+			/// <param name="Ic">The Icon that will be shown to the user. Can also be <see cref="IconSelection.None"/>.</param>
             public IntuitiveMessageBox(System.String Message, System.String Title, ButtonSelection Buttons, IconSelection Ic)
             {
                 ButtonHandle += Button_Click;
@@ -2532,6 +3009,19 @@ namespace ROOT
                 ButtonHandle -= Button_Click;
             }
 
+			/// <summary>
+			/// Constructor Option 2: Define the properties instead and run the dialog whenever you want.
+			/// </summary>
+			/// <remarks>Do not forget to invoke the window using the <see cref="InvokeInstance"/> function.</remarks>
+			public IntuitiveMessageBox() { ButtonHandle += Button_Click; }
+
+            /// <summary>
+            /// Constructor Option 3: Define the Message and the Title properties , do any other settings you want 
+            /// and run the dialog whenever you want.
+            /// </summary>
+            /// <param name="Message">The text of the information to show to the user.</param>
+            /// <param name="Title">The message box title to show.</param>
+			/// <remarks>Do not forget to invoke the window using the <see cref="InvokeInstance"/> function.</remarks>
             public IntuitiveMessageBox(System.String Message, System.String Title)
             {
                 ButtonHandle += Button_Click;
@@ -2539,6 +3029,10 @@ namespace ROOT
                 _TITLE = Title;
             }
 
+			/// <summary>
+			/// The Dispose function clears up the resources used by the Message Box and then invalidates the class.
+			/// </summary>
+			/// <remarks>This function also implements the <see cref="System.IDisposable"/> interface.</remarks>
             public void Dispose()
             {
                 if (ButtonHandle != null) { ButtonHandle -= Button_Click; }
@@ -2553,30 +3047,45 @@ namespace ROOT
                 System.GC.Collect(3, System.GCCollectionMode.Forced, true);
             }
 
+            /// <summary>
+            /// The text of the information to show to the user.
+            /// </summary>
             public System.String Message
             {
                 get { return _MSG; }
                 set { _MSG = value; }
             }
 
+            /// <summary>
+            /// The buttons that will be shown to the User.
+            /// </summary>
             public ButtonSelection ButtonsToShow
             {
                 get { return BSL; }
                 set { BSL = value; }
             }
 
+            /// <summary>
+            /// The Icon that will be shown to the user. Can also be <see cref="IconSelection.None"/>.
+            /// </summary>
             public IconSelection IconToShow
             {
                 get { return SELI; }
                 set { SELI = value; }
             }
 
+            /// <summary>
+            /// The message box title to show.
+            /// </summary>
             public System.String Title
             {
                 get { return _TITLE; }
                 set { _TITLE = value; }
             }
 
+			/// <summary>
+			/// Returns the button selected by the User. It's value is one of the <see cref="ButtonReturned"/> <see cref="System.Enum"/> values.
+			/// </summary>
             public ButtonReturned ButtonSelected
             {
                 get { return BTR; }
@@ -2635,6 +3144,10 @@ namespace ROOT
                 return;
             }
 
+			/// <summary>
+			/// Invokes the Message Box based on the current settings done by the User.
+			/// </summary>
+			/// <remarks>Do not forget to dispose the class by using the <see cref="Dispose"/> function.</remarks>
             public void InvokeInstance()
             {
                 MakeAndInitDialog(BSL, SELI);
@@ -2864,11 +3377,12 @@ namespace ExternalHashCaculators
 {
     //A Collection Namespace for computing hash values from external generated libraries.
 
-	/// <summary>
-	/// xxHash is a fast non-cryptographic hash digest. This is a wrapper for the unmanaged library.
-	/// Note that you can run this only on AMD64 machines and you must have the library where the 
-	/// application's current directory is.
-	/// </summary>
+    /// <summary>
+    /// xxHash is a fast non-cryptographic hash digest. This is a wrapper for the unmanaged library.
+    /// Note that you can run this only on AMD64 machines and you must have the library where the 
+    /// application's current directory is.
+    /// </summary>
+    [SupportedOS(SupportedOSAttributePlatforms.Windows)]
     public class XXHash
 	{
 		// xxHash Hash caculator system.
@@ -2959,6 +3473,7 @@ namespace ExternalArchivingMethods
 {
     // A Collection Namespace for making archives outside Microsoft's managed code.
 
+    [SupportedOS(SupportedOSAttributePlatforms.Windows)]
     public class ZstandardArchives
 	{
 		// Yes , this patch adds (Patch Version 1.5.4.0) the Zstandard Archive format.
