@@ -436,5 +436,100 @@ This function shows a new Message Box window to user and prompts him to do an ac
  
 #### 27. The OSFramework:
 ~~~C#
-public static System.String 
+public static System.String OSFramework()
 ~~~
+This function displays information about the OS Current Framework that the application called this function runs on.
+(For informational purposes only.)
+
+__Returns__: An System.String value which contains the current OS Framework information.
+
+#### 28. The OSInformation:
+~~~C#
+public static System.String OSInformation()
+~~~
+This function displays information about the OS that the application called this function runs on.
+(For informational purposes only.)
+
+__Returns__: An System.String value which contains the current OS information.
+
+#### 29. The OSProcessorArchitecture:
+~~~C#
+public static System.String OSProcessorArchitecture()
+~~~
+This function gets information about the OS Processor Architecture that the application called this function runs on.
+
+ __Returns__: This function can return the below strings:
+1. `"AMD64"` for 64-bit Unicode machines.
+2. `"x86"` for 32-bit Unicode machines.
+3. `"ARM"` for ARM machines.
+4. `"ARM64"` for ARM 64-bit machines.
+5. `"Error"` if an error was found or the processor architecture could not be determined by the OS.
+
+#### 30: The PassNewcontentsToFile:
+~~~C#
+public static void PassNewContentsToFile(System.String Contents , System.IO.FileStream FileStreamObject)
+~~~
+This function writes the string data to an alive System.IO.FileStream object , which 
+represents a file that is opened by the system.
+
+ __Parameters__:
+
+1. `System.String Contents`: The string data to pass to the file. Be noted that any existing data will be deleted.
+2. `System.IO.FileStream FileStreamObject`: The alive file object to write the data to.
+
+__Returns__: The function is declared as `void` , so it does not return something.
+
+#### 31. The ProcessArchitecture:
+~~~C#
+public static System.String ProcessArchitecture()
+~~~
+This function returns the application's compiled architecture string.
+
+ __Returns__: This function can return the below strings:
+1. `"AMD64"` for 64-bit Unicode machines.
+2. `"x86"` for 32-bit Unicode machines.
+3. `"ARM"` for ARM machines.
+4. `"ARM64"` for ARM 64-bit machines.
+5. `"Error"` if an error was found or the application's compiled architecture could not be determined by the OS.
+
+#### 32. The ReadAFile:
+~~~C#
+[System.ObsoleteAttribute("ReadAFile method has been replaced with the ReadAFileUsingFileStream function , which performs better at performance level." +
+"You should notice that sometime this function will be removed without prior notice." , false)]
+public static System.IO.StreamReader ReadAFile(System.String Path)
+~~~
+This function will create a new `System.IO.StreamReader` instance for the file specified.
+
+__NOTICE__: This function is deprecated and in the next release , it will have the same functionality
+as the `ReadAFileUsingFileStream` one.
+
+ __Parameters__:
+1. `System.String Path`: The file path that this function will open. Can be a relative or a full path.
+
+ __Returns__: If the file is existing and all went good , will return a new `System.IO.StreamReader` instance; 
+ otherwise , `null`.
+
+#### 33. The ReadAFileUsingFileStream:
+~~~C#
+public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path)
+~~~
+This function will create a new `System.IO.FileStream` instance for the file specified.
+
+ __Parameters__:
+1. `System.String Path`: The file path that this function will open. Can be a relative or a full path.
+
+ __Returns__: If the file is existing and all went good , will return a new `System.IO.FileStream` instance; 
+ otherwise , `null`.
+
+#### 34. The RemoveDefinedChars:
+~~~C#
+public static System.String RemoveDefinedChars(System.String StringToClear , System.Char[] CharToClear)
+~~~
+This function will remove all the characters from the specified string and will return
+the result.
+
+ __Parameters__:
+1. `System.String StringToClear`: The String whose the charaters defined in the `CharToClear` will be removed.
+1. `System.Char[] CharToClear`: An array of characters to clear from the string. Can also be one chararcter in the array.
+
+ __Returns__: The string after the defined chararcters were removed; if an error was found , `null`.

@@ -4,7 +4,8 @@ MDC (Called __MDCFR__) is a .NET Application Development Library which aims to i
 
 ## Detailed Description
 This .NET Library (__MDCFR__ called) contains anything needed to start and develop easily .NET applications without
-learning for how to develop something specific (like getting a file hash). Just Code!!
+learning , finding or implementing something very specific in .NET . It is a single library which allows someone to easily
+include it in the project he works on. Additionally , it provides methods that everyone can use. Just Code ! 
 
 Usage Example:
 ```C#
@@ -29,8 +30,8 @@ Usage Example:
 ## The Project History
 This Project was developed for a need to develop easily .NET Applications , and started as of my own idea.
 The intention at the first place was not to post it on GitHub , but it is important to have some code 
-foundation to start your new .NET project. So , this repository contains all of the source code used
-in the initial built project.
+foundation to start your new .NET project. So , this repository contains all of the source code developed
+or included until now. The Library will be also updated with new features and bug fixes as the months come.
 
 ## Avaliable Platforms
  The Project is compiled as a Dynamic Link Library (DLL) and works on any platform (Not sure , but surely is compiled as MSIL).
@@ -43,9 +44,9 @@ in the initial built project.
 The project includes operations related to:
  - File Operations (Abstracting System.IO and System.IO.FileStream).
  - User Interaction (Showing a message to Windows , Getting or saving a file , etc.).
- - Registry editor (Not fully inplemented yet , causes problems) {Microsoft Windows Only!!!} .
+ - Registry editor (Now it is more accurate and stable , now is to be tested.) {Microsoft Windows Only!!!} .
  - Cryptography operations (Digests , AES(Implemented on my own using System.Security.Cryptography) , [DES](http://github.com/zeyadetman/Computer-Security-Algorithms) , etc.).
- - Archiving operations (Tar Archives , Zip Archives , GZip Archives and [Zstandard](https://github.com/facebook/zstd).)
+ - Archiving operations (Tar Archives , Zip Archives , GZip Archives  , [Zstandard](https://github.com/facebook/zstd) , Snappy and Brotli.)
  
    __NOTE__: Zstandard archiving is only avaliable as a wrapper with limited functionality.
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
@@ -62,11 +63,12 @@ For any considerations , ideas or a question relating to the Project can be subm
 Any questions relating bugs can be posted as a new Issue and marking them as 'Question'.
 
 #### Source code used in the Project (Licenses for all the used code , among with the Project's one , are located to LICENSE file):
-- Http Library: http://github.com/j6mes/httplib .
-- Zstandard archive format repo at http://github.com/facebook/zstd .
-- xxhash non-cryptographic hash algorithm at http://github.com/Cyan4973/xxhash .
+- Http Library by j6mes at http://github.com/j6mes/httplib .
+- Zstandard archive format repository (Implemented on my own as a wrapper for the library) at http://github.com/facebook/zstd .
+- xxhash non-cryptographic hash algorithm (Implemented on my own as a wrapper for the library) at http://github.com/Cyan4973/xxhash .
 - CRC Implementation by nullfx at http://github.com/nullfx/NullFX.CRC .
 - DES and Triple DES Implementations by zeyadetman at http://github.com/zeyadetman/Computer-Security-Algorithms .
 - Blake2s Checksum by sparkdustjoe at http://github.com/SparkDustJoe/Blake2 .
 - Cabinet Support by .NET Foundation (Taken from the WiX Toolset) at http://github.com/wixtoolset/wix .
-- Snappy Compression and Decompression native library by Kintaro at http://github.com/Kintaro/SnappySharp.
+- Snappy Compression and Decompression native library by brantburnett at http://github.com/brantburnett/Snappier .
+- A Full and exact implementation of Brotli archiving on C# (version is 0.6.0.) by master131 at http://github.com/master131/BrotliSharpLib .  

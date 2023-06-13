@@ -3,20 +3,191 @@
 // Second one: (Version 1.5.5.0) Cabinet Archives.
 // Third one: (Version 1.5.5.0) Snappy Archives.
 
+// Global Preprocessor definitions
+#define INTERNAL_NULLABLE_ATTRIBUTES
+
 // Global namespaces
 using System;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Buffers;
 using System.Security;
 using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
+using System.IO.Compression;
+using System.Buffers.Binary;
+using System.Threading.Tasks;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.RegularExpressions;
+//Global namespaces when the code is compiled to >= .NET 6 
+#if NET6_0_OR_GREATER
+	using System.Runtime.Intrinsics;
+	using System.Runtime.Intrinsics.X86;
+	using static System.Runtime.Intrinsics.X86.Ssse3;
+#endif
+
+//Code required when the Snappy Archiving is compiled < .NET 6 .
+#if !NET6_0_OR_GREATER
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+
+// ReSharper disable once CheckNamespace
+namespace System.Runtime.CompilerServices
+{
+    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
+    internal sealed class CallerArgumentExpressionAttribute : Attribute
+    {
+        public CallerArgumentExpressionAttribute(string parameterName)
+        {
+            ParameterName = parameterName;
+        }
+
+        public string ParameterName { get; }
+    }
+}
+#endif
+
+#if NETSTANDARD2_0 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NET45 || NET451 || NET452 || NET6 || NET461 || NET462 || NET47 || NET471 || NET472 || NET48
+
+// https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
+
+// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
+// ReSharper disable once CheckNamespace
+namespace System.Diagnostics.CodeAnalysis
+{
+    /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class AllowNullAttribute : Attribute { }
+
+    /// <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class DisallowNullAttribute : Attribute { }
+
+    /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class MaybeNullAttribute : Attribute { }
+
+    /// <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
+    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class NotNullAttribute : Attribute { }
+
+    /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
+    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class MaybeNullWhenAttribute : Attribute
+		{
+			/// <summary>Initializes the attribute with the specified return value condition.</summary>
+			/// <param name="returnValue">
+			/// The return value condition. If the method returns this value, the associated parameter may be null.
+			/// </param>
+			public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+
+			/// <summary>Gets the return value condition.</summary>
+			public bool ReturnValue { get; }
+		}
+
+    /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
+    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class NotNullWhenAttribute : Attribute
+		{
+			/// <summary>Initializes the attribute with the specified return value condition.</summary>
+			/// <param name="returnValue">
+			/// The return value condition. If the method returns this value, the associated parameter will not be null.
+			/// </param>
+			public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+
+			/// <summary>Gets the return value condition.</summary>
+			public bool ReturnValue { get; }
+		}
+
+    /// <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+	        public
+		#endif
+        sealed class NotNullIfNotNullAttribute : Attribute
+		{
+			/// <summary>Initializes the attribute with the associated parameter name.</summary>
+			/// <param name="parameterName">
+			/// The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+			/// </param>
+			public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
+
+			/// <summary>Gets the associated parameter name.</summary>
+			public string ParameterName { get; }
+		}
+
+    /// <summary>Applied to a method that will never return under any circumstance.</summary>
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class DoesNotReturnAttribute : Attribute { }
+
+    /// <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+		#if INTERNAL_NULLABLE_ATTRIBUTES
+			internal
+		#else
+			public
+		#endif
+        sealed class DoesNotReturnIfAttribute : Attribute
+		{
+			/// <summary>Initializes the attribute with the specified parameter value.</summary>
+			/// <param name="parameterValue">
+			/// The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+			/// the associated parameter matches this value.
+			/// </param>
+			public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
+
+			/// <summary>Gets the condition parameter value.</summary>
+			public bool ParameterValue { get; }
+		}
+}
+
+#endif
 
 namespace ExternalArchivingMethods
 {
@@ -104,14 +275,29 @@ namespace ExternalArchivingMethods
 		// Ends here: -->
 		
 		// ITarHeader.cs file: <--
+		/// <summary>
+		/// The Entry type that indicates the type of data saved to the Tar.
+		/// </summary>
 		public enum EntryType : byte
 		{
+			/// <summary>
+			/// The Entry is a file.
+			/// </summary>
 			File = 0,
 			FileObsolete = 0x30,
+			/// <summary>
+			/// The Entry is a hard-coded(strongly typed) link.
+			/// </summary>
 			HardLink = 0x31,
+			/// <summary>
+			/// The Entry is a symbolic link.
+			/// </summary>
 			SymLink = 0x32,
 			CharDevice = 0x33,
 			BlockDevice = 0x34,
+			/// <summary>
+			/// The Entry is a directory.
+			/// </summary>
 			Directory = 0x35,
 			Fifo = 0x36,
 		}
@@ -133,6 +319,9 @@ namespace ExternalArchivingMethods
 		
 		
 		// LegacyTarWriter.cs file: <--
+		/// <summary>
+		/// The Legacy Tar writer specified by it's original author. You should not use this class in your source code.
+		/// </summary>
 		public class LegacyTarWriter : IDisposable
 		{
 			private readonly Stream outStream;
@@ -330,6 +519,9 @@ namespace ExternalArchivingMethods
 		// Ends here: -->
 		
 		// TarException.cs file: <--
+		/// <summary>
+		/// It is a normal <see cref="System.Exception"/> that allows you to differentiate the the source of the exception (That is , the Tar Code) .
+		/// </summary>
 		public class TarException : Exception
 		{
 			public TarException(string message) : base(message)
@@ -532,7 +724,7 @@ namespace ExternalArchivingMethods
 		// TarReader.cs file: <--
 		
 		/// <summary>
-		/// Extract contents of a tar file represented by a stream for the TarReader constructor
+		/// Extract contents of a Tar file represented by a stream for the <see cref="TarReader"/> constructor
 		/// </summary>
 		public class TarReader
 		{
@@ -556,18 +748,18 @@ namespace ExternalArchivingMethods
 				get { return header; }
 			}
 
-			/// <summary>
-			/// Read all files from an archive to a directory. It creates some child directories to
-			/// reproduce a file structure from the archive.
-			/// </summary>
-			/// <param name="destDirectory">The out directory.</param>
-			/// 
-			/// CAUTION! This method is not safe. It's not tar-bomb proof. 
-			/// {see http://en.wikipedia.org/wiki/Tar_(file_format) }
-			/// If you are not sure about the source of an archive you extracting,
-			/// then use MoveNext and Read and handle paths like ".." and "../.." according
-			/// to your business logic.
-			public void ReadToEnd(string destDirectory)
+            /// <summary>
+            /// Read all files from an archive to a directory. It creates some child directories to
+            /// reproduce a file structure from the archive.
+            /// </summary>
+            /// <param name="destDirectory">The out directory.</param>
+            ///  <remarks>
+            /// CAUTION! This method is not safe. It's not tar-bomb proof. 
+            /// {see http://en.wikipedia.org/wiki/Tar_(file_format) }
+            /// If you are not sure about the source of an archive you extracting,
+            /// then use MoveNext and Read and handle paths like ".." and "../.." according
+            /// to your business logic. </remarks>
+            public void ReadToEnd(string destDirectory)
 			{
 				while (MoveNext(false))
 				{
@@ -671,12 +863,12 @@ namespace ExternalArchivingMethods
 			/// </summary>
 			/// <param name="skipData">Should be true if you want to read a header only, otherwise false</param>
 			/// <returns>false on End Of File otherwise true</returns>
-			/// 
+			/// <example>
 			/// Example:
 			/// while(MoveNext())
 			/// { 
 			///     Read(dataDestStream); 
-			/// }
+			/// } </example>
 			/// <seealso cref="Read(Stream)"/>
 			public bool MoveNext(bool skipData)
 			{
@@ -751,9 +943,15 @@ namespace ExternalArchivingMethods
 		// Ends here: -->
 		
 		// TarWriter.cs file: <--
+		/// <summary>
+		/// Add contents to Tar Archive and put them to the initialised Stream.
+		/// </summary>
 		public class TarWriter : LegacyTarWriter
 		{
-
+			/// <summary>
+			/// Initialise the <see cref="TarWriter"/> class using an alive <see cref="System.IO.Stream"/> .
+			/// </summary>
+			/// <param name="writeStream"></param>
 			public TarWriter(Stream writeStream) : base(writeStream)
 			{
 			}
@@ -791,7 +989,16 @@ namespace ExternalArchivingMethods
 				OutStream.Write(tarHeader.GetHeaderValue(), 0, tarHeader.HeaderSize);
 			}
 
-
+			/// <summary>
+			/// Write a new and specified entry to the Tar archive.
+			/// </summary>
+			/// <param name="name">The file name to get data from.</param>
+			/// <param name="dataSizeInBytes">The file's data size. Note: it is a <see cref="System.Int64"/> .</param>
+			/// <param name="userName">The User Name (any) that owns this file.</param>
+			/// <param name="groupName">The Group Name (any) that this file is grouped to. </param>
+			/// <param name="mode">The Compression mode used?</param>
+			/// <param name="lastModificationTime">A <see cref="System.DateTime"/> structure that indicates when the file was written in the last time.</param>
+			/// <param name="writeDelegate">A custom <see cref="WriteDataDelegate"/> which writes the specified data to the Tar. It is usually used to enable other compression algorithms.</param>
 			public virtual void Write(string name, long dataSizeInBytes, string userName, string groupName, int mode, DateTime lastModificationTime, WriteDataDelegate writeDelegate)
 			{
 				var writer = new DataWriter(OutStream,dataSizeInBytes);
@@ -804,7 +1011,17 @@ namespace ExternalArchivingMethods
 			}
 
 
-			public void Write(Stream data, long dataSizeInBytes, string fileName, string userId, string groupId, int mode,
+            /// <summary>
+            /// Write a new and specified entry to the Tar archive.
+            /// </summary>
+            /// <param name="data">The alive Stream to write data to.</param>
+            /// <param name="dataSizeInBytes">The <see cref="System.IO.Stream"/> data size. Note: it is a <see cref="System.Int64"/> .</param>
+            /// <param name="userId">The User Name (any) that owns this file.</param>
+            /// <param name="groupId">The Group Name (any) that this file is grouped to. </param>
+            /// <param name="mode">The Compression mode used?</param>
+            /// <param name="lastModificationTime">A <see cref="System.DateTime"/> structure that indicates when the file was written in the last time.</param>
+			/// <remarks>The data written are uncompressed; which means that you have to implement an algorithm to write the data in compressed format.</remarks>
+            public void Write(Stream data, long dataSizeInBytes, string fileName, string userId, string groupId, int mode,
 							  DateTime lastModificationTime)
 			{
 				WriteHeader(fileName,lastModificationTime,dataSizeInBytes,userId, groupId, mode);
@@ -865,7 +1082,7 @@ namespace ExternalArchivingMethods
 					{
 						if (value.Length > 255)
 						{
-							throw new TarException("UsTar fileName can not be longer thatn 255 chars");
+							throw new TarException("UsTar Filename can not be longer than 255 chars");
 						}
 						int position = value.Length - 100;
 
@@ -3900,7 +4117,6 @@ namespace ExternalArchivingMethods
 				}
 			}
 
-			[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 			private void CreateFci(long maxArchiveSize)
 			{
 				NativeMethods.FCI.CCAB ccab = new NativeMethods.FCI.CCAB();
@@ -4223,7 +4439,6 @@ namespace ExternalArchivingMethods
 			/// <param name="disposing">If true, the method has been called directly or indirectly by a user's code,
 			/// so managed and unmanaged resources will be disposed. If false, the method has been called by the 
 			/// runtime from inside the finalizer, and only unmanaged resources will be disposed.</param>
-			[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 			protected override void Dispose(bool disposing) 
 			{
 				try
@@ -4268,7 +4483,6 @@ namespace ExternalArchivingMethods
 				}
 			}
 
-			[SuppressMessage("Microsoft.Security", "CA2122:DoNotIndirectlyExposeMethodsWithLinkDemands")]
 			private void AddFile(
 				string name,
 				Stream stream,
@@ -6964,668 +7178,3575 @@ namespace ExternalArchivingMethods
 		}
 	}
 
-    namespace Snappys
-    {
-
-        public static class Api
+	namespace Snappys
+	{
+        /// <summary>
+        /// Routines for performing Snappy compression and decompression on raw data blocks using <see cref="Span{T}"/>.
+        /// These routines do not read or write any Snappy framing.
+        /// </summary>
+        public static class Snappy
         {
             /// <summary>
-            /// 	Constant max hash table bits.
+            /// For a given amount of input data, calculate the maximum potential size of the compressed output.
             /// </summary>
-            public const int MaxHashTableBits = 14;
-            /// <summary>
-            /// 	Constant max hash table size.
-            /// </summary>
-            public const int MaxHashTableSize = 1 << MaxHashTableBits;
+            /// <param name="inputLength">Length of the input data, in bytes.</param>
+            /// <returns>The maximum potential size of the compressed output.</returns>
+            /// <remarks>
+            /// This is useful for allocating a sufficient output buffer before calling <see cref="Compress"/>.
+            /// </remarks>
+            public static int GetMaxCompressedLength(int inputLength) =>
+                SnappierInterop.Helpers.MaxCompressedLength(inputLength);
 
-            public enum Status
+            /// <summary>
+            /// Compress a block of Snappy data.
+            /// </summary>
+            /// <param name="input">Data to compress.</param>
+            /// <param name="output">Buffer to receive the compressed data.</param>
+            /// <returns>Number of bytes written to <paramref name="output"/>.</returns>
+            /// <remarks>
+            /// The output buffer must be large enough to contain the compressed output.
+            /// </remarks>
+            public static int Compress(ReadOnlySpan<byte> input, Span<byte> output)
             {
-                OK = 0,
-                InvalidInput = 1,
-                BufferTooSmall = 2,
+                using var compressor = new SnappierInterop.SnappyCompressor();
+
+                return compressor.Compress(input, output);
             }
 
-            public static int Compress(Source source, Sink sink)
+            /// <summary>
+            /// Compress a block of Snappy data.
+            /// </summary>
+            /// <param name="input">Data to compress.</param>
+            /// <returns>An <see cref="IMemoryOwner{T}"/> with the decompressed data. The caller is responsible for disposing this object.</returns>
+            /// <remarks>
+            /// Failing to dispose of the returned <see cref="IMemoryOwner{T}"/> may result in memory leaks.
+            /// </remarks>
+            public static IMemoryOwner<byte> CompressToMemory(ReadOnlySpan<byte> input)
             {
+                byte[] buffer = ArrayPool<byte>.Shared.Rent(GetMaxCompressedLength(input.Length));
+
+                try
+                {
+                    int length = Compress(input, buffer);
+
+                    return new SnappierInterop.ByteArrayPoolMemoryOwner(buffer, length);
+                }
+                catch
+                {
+                    ArrayPool<byte>.Shared.Return(buffer);
+                    throw;
+                }
+            }
+
+            /// <summary>
+            /// Compress a block of Snappy data.
+            /// </summary>
+            /// <param name="input">Data to compress.</param>
+            /// <remarks>
+            /// The resulting byte array is allocated on the heap. If possible, <see cref="CompressToMemory"/> should
+            /// be used instead since it uses a shared buffer pool.
+            /// </remarks>
+            public static byte[] CompressToArray(ReadOnlySpan<byte> input)
+            {
+                using var buffer = CompressToMemory(input);
+                var bufferSpan = buffer.Memory.Span;
+
+                var result = new byte[bufferSpan.Length];
+                bufferSpan.CopyTo(result);
+                return result;
+            }
+
+            /// <summary>
+            /// Get the uncompressed data length from a compressed Snappy block.
+            /// </summary>
+            /// <param name="input">Compressed snappy block.</param>
+            /// <returns>The length of the uncompressed data in the block.</returns>
+            /// <exception cref="InvalidDataException">The data in <paramref name="input"/> has an invalid length.</exception>
+            /// <remarks>
+            /// This is useful for allocating a sufficient output buffer before calling <see cref="Decompress"/>.
+            /// </remarks>
+            public static int GetUncompressedLength(ReadOnlySpan<byte> input) =>
+                SnappierInterop.SnappyDecompressor.ReadUncompressedLength(input);
+
+            /// <summary>
+            /// Decompress a block of Snappy data. This must be an entire block.
+            /// </summary>
+            /// <param name="input">Data to decompress.</param>
+            /// <param name="output">Buffer to receive the decompressed data.</param>
+            /// <returns>Number of bytes written to <paramref name="output"/>.</returns>
+            /// <exception cref="InvalidDataException">Invalid Snappy block.</exception>
+            /// <exception cref="ArgumentException">Output buffer is too small.</exception>
+            public static int Decompress(ReadOnlySpan<byte> input, Span<byte> output)
+            {
+                using var decompressor = new SnappierInterop.SnappyDecompressor();
+
+                decompressor.Decompress(input);
+
+                if (!decompressor.AllDataDecompressed)
+                {
+                    SnappierInterop.ThrowHelper.ThrowInvalidDataException("Incomplete Snappy block.");
+                }
+
+                int read = decompressor.Read(output);
+
+                if (!decompressor.EndOfFile)
+                {
+                    SnappierInterop.ThrowHelper.ThrowArgumentException("Output buffer is too small.", nameof(output));
+                }
+
+                return read;
+            }
+
+            /// <summary>
+            /// Decompress a block of Snappy to a new memory buffer. This must be an entire block.
+            /// </summary>
+            /// <param name="input">Data to decompress.</param>
+            /// <returns>An <see cref="IMemoryOwner{T}"/> with the decompressed data. The caller is responsible for disposing this object.</returns>
+            /// <remarks>
+            /// Failing to dispose of the returned <see cref="IMemoryOwner{T}"/> may result in memory leaks.
+            /// </remarks>
+            public static IMemoryOwner<byte> DecompressToMemory(ReadOnlySpan<byte> input)
+            {
+                using var decompressor = new SnappierInterop.SnappyDecompressor();
+
+                decompressor.Decompress(input);
+
+                if (!decompressor.AllDataDecompressed)
+                {
+                    SnappierInterop.ThrowHelper.ThrowInvalidDataException("Incomplete Snappy block.");
+                }
+
+                return decompressor.ExtractData();
+            }
+
+            /// <summary>
+            /// Decompress a block of Snappy to a new byte array. This must be an entire block.
+            /// </summary>
+            /// <param name="input">Data to decompress.</param>
+            /// <returns>The decompressed data.</returns>
+            /// <remarks>
+            /// The resulting byte array is allocated on the heap. If possible, <see cref="DecompressToMemory"/> should
+            /// be used instead since it uses a shared buffer pool.
+            /// </remarks>
+            public static byte[] DecompressToArray(ReadOnlySpan<byte> input)
+            {
+                var length = GetUncompressedLength(input);
+
+                var result = new byte[length];
+
+                Decompress(input, result);
+
+                return result;
+            }
+        }
+
+		/// <summary>
+		/// Stream which supports compressing or decompressing data using the Snappy compression algorithm.
+		/// To decompress data, supply a stream to be read. To compress data, provide a stream to be written to.
+		/// </summary>
+		#nullable enable
+		#pragma warning disable CS8602
+		public sealed class SnappyStream : Stream
+        {
+            private const int DefaultBufferSize = 8192;
+
+            private Stream _stream;
+            private readonly CompressionMode _mode;
+            private readonly bool _leaveOpen;
+			private SnappierInterop.SnappyStreamDecompressor? _decompressor;
+            private SnappierInterop.SnappyStreamCompressor? _compressor;
+
+            private byte[]? _buffer = null;
+            private bool _wroteBytes;
+
+            /// <summary>
+            /// Create a stream which supports compressing or decompressing data using the Snappy compression algorithm.
+            /// To decompress data, supply a stream to be read. To compress data, provide a stream to be written to.
+            /// </summary>
+            /// <param name="stream">Source or destination stream.</param>
+            /// <param name="mode">Compression or decompression mode.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+            /// <exception cref="ArgumentException">Stream read/write capability doesn't match with <paramref name="mode"/>.</exception>
+            /// <exception cref="ArgumentOutOfRangeException">Invalid <paramref name="mode"/>.</exception>
+            /// <remarks>
+            /// The stream will be closed when the SnappyStream is closed.
+            /// </remarks>
+            public SnappyStream(Stream stream, CompressionMode mode)
+                : this(stream, mode, false)
+            {
+            }
+
+            /// <summary>
+            /// Create a stream which supports compressing or decompressing data using the Snappy compression algorithm.
+            /// To decompress data, supply a stream to be read. To compress data, provide a stream to be written to.
+            /// </summary>
+            /// <param name="stream">Source or destination stream.</param>
+            /// <param name="mode">Compression or decompression mode.</param>
+            /// <param name="leaveOpen">If true, close the stream when the SnappyStream is closed.</param>
+            /// <exception cref="ArgumentNullException"><paramref name="stream"/> is null.</exception>
+            /// <exception cref="ArgumentException">Stream read/write capability doesn't match with <paramref name="mode"/>.</exception>
+            /// <exception cref="ArgumentOutOfRangeException">Invalid <paramref name="mode"/>.</exception>
+            public SnappyStream(Stream stream, CompressionMode mode, bool leaveOpen)
+            {
+                SnappierInterop.ThrowHelper.ThrowIfNull(stream);
+                _stream = stream;
+                _mode = mode;
+                _leaveOpen = leaveOpen;
+
+                switch (mode)
+                {
+                    case CompressionMode.Decompress:
+                        if (!stream.CanRead)
+                        {
+                            SnappierInterop.ThrowHelper.ThrowArgumentException("Unreadable stream", nameof(stream));
+                        }
+
+                        _decompressor = new SnappierInterop.SnappyStreamDecompressor();
+
+                        break;
+
+                    case CompressionMode.Compress:
+                        if (!stream.CanWrite)
+                        {
+                            SnappierInterop.ThrowHelper.ThrowArgumentException("Unwritable stream", nameof(stream));
+                        }
+
+                        _compressor = new SnappierInterop.SnappyStreamCompressor();
+                        break;
+
+                    default:
+                        SnappierInterop.ThrowHelper.ThrowArgumentOutOfRangeException(nameof(mode), "Invalid mode");
+                        break;
+                }
+            }
+
+            /// <summary>
+            /// The base stream being read from or written to.
+            /// </summary>
+            public Stream BaseStream => _stream;
+
+            #region overrides
+
+            /// <inheritdoc />
+            public override bool CanRead => _mode == CompressionMode.Decompress && (_stream?.CanRead ?? false);
+
+            /// <inheritdoc />
+            public override bool CanWrite => _mode == CompressionMode.Compress && (_stream?.CanWrite ?? false);
+
+            /// <inheritdoc />
+            public override bool CanSeek => false;
+
+            /// <inheritdoc />
+            public override long Length
+            {
+                get
+                {
+                    SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+                    return 0;
+                }
+            }
+
+            /// <inheritdoc />
+            public override long Position
+            {
+                get
+                {
+                    SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+                    return 0;
+                }
+                // ReSharper disable once ValueParameterNotUsed
+                set => SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+            }
+
+            /// <inheritdoc />
+            public override void Flush()
+            {
+                EnsureNotDisposed();
+
+                if (_mode == CompressionMode.Compress && _wroteBytes)
+                {
+                    Debug.Assert(_compressor != null);
+                    _compressor.Flush(_stream);
+                }
+            }
+
+            /// <inheritdoc />
+            public override Task FlushAsync(CancellationToken cancellationToken)
+            {
+                EnsureNoActiveAsyncOperation();
+                EnsureNotDisposed();
+
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return Task.FromCanceled(cancellationToken);
+                }
+
+                if (_mode == CompressionMode.Compress && _wroteBytes)
+                {
+                    Debug.Assert(_compressor != null);
+                    return _compressor.FlushAsync(_stream, cancellationToken).AsTask();
+                }
+
+                return Task.CompletedTask;
+            }
+
+            /// <inheritdoc />
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                SnappierInterop.ThrowHelper.ThrowNotSupportedException();
                 return 0;
             }
 
-            public static bool GetUncompressedLength(Source source, ref int result)
+            /// <inheritdoc />
+            public override void SetLength(long value) => SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+
+            /// <inheritdoc />
+            public override int Read(byte[] buffer, int offset, int count) => ReadCore(buffer.AsSpan(offset, count));
+
+			#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+				/// <inheritdoc />
+				public override int Read(Span<byte> buffer) => ReadCore(buffer);
+			#endif 
+
+            private int ReadCore(Span<byte> buffer)
             {
-                SnappyDecompressor decompressor = new SnappyDecompressor(source);
-                return decompressor.ReadUncompressedLength(ref result);
-            }
+                EnsureDecompressionMode();
+                EnsureNotDisposed();
+                EnsureBufferInitialized();
 
-            public static int Compress(byte[] input, int inputLength, ref string output)
-            {
-                return 0;
-            }
+                int totalRead = 0;
 
-            public static bool Uncompress(byte[] compressed, int compressedLength, ref string uncompressed)
-            {
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// 	Byte array source.
-        /// </summary>
-        public class ByteArraySource : Source
-        {
-            /// <summary>
-            /// 	The left.
-            /// </summary>
-            private int left = 0;
-            /// <summary>
-            /// 	The pointer.
-            /// </summary>
-            private MemoryStream pointer = null;
-
-            /// <summary>
-            /// 	Initializes a new instance of the <see cref="SnappySharp.ByteArraySource"/> class.
-            /// </summary>
-            /// <param name='pointer'>
-            /// 	Pointer.
-            /// </param>
-            /// <param name='n'>
-            /// 	N.
-            /// </param>
-            public ByteArraySource(MemoryStream pointer, int n)
-            {
-                this.left = n;
-                this.pointer = pointer;
-            }
-
-            /// <summary>
-            /// 	Available this instance.
-            /// </summary>
-            public override int Available()
-            {
-                return this.left;
-            }
-
-            /// <summary>
-            /// 	Peek the specified length.
-            /// </summary>
-            /// <param name='length'>
-            /// 	Length.
-            /// </param>
-            public override MemoryStream Peek(ref int length)
-            {
-                length = this.left;
-                return this.pointer;
-            }
-
-            /// <summary>
-            /// 	Skip the specified n.
-            /// </summary>
-            /// <param name='n'>
-            /// 	N.
-            /// </param>
-            public override void Skip(int n)
-            {
-                this.left -= n;
-                this.pointer.Seek(n, SeekOrigin.Current);
-            }
-        }
-
-        public class ByteBuffer
-        {
-            public ByteBuffer()
-            {
-            }
-        }
-
-        /// <summary>
-        /// 	Sink.
-        /// </summary>
-        public abstract class Sink
-        {
-            /// <summary>
-            /// 	Gets the append buffer.
-            /// </summary>
-            /// <returns>
-            /// 	The append buffer.
-            /// </returns>
-            /// <param name='length'>
-            /// 	Length.
-            /// </param>
-            /// <param name='scratch'>
-            /// 	Scratch.
-            /// </param>
-            public virtual MemoryStream GetAppendBuffer(int length, MemoryStream scratch)
-            {
-                return scratch;
-            }
-
-            /// <summary>
-            /// 	Append the specified bytes and n.
-            /// </summary>
-            /// <param name='bytes'>
-            /// 	Bytes.
-            /// </param>
-            /// <param name='n'>
-            /// 	N.
-            /// </param>
-            public abstract void Append(MemoryStream bytes, int n);
-        }
-
-        /// <summary>
-        /// 	Snappy decompressor.
-        /// </summary>
-        internal class SnappyDecompressor
-        {
-            /// <summary>
-            /// 	The reader.
-            /// </summary>
-            private Source reader = null;
-            /// <summary>
-            /// 	The EOF marker.
-            /// </summary>
-            private bool eof = false;
-            /// <summary>
-            /// 	The internal pointer.
-            /// </summary>
-            private long internalPointer = 0;
-            /// <summary>
-            /// 	The internal pointer limit.
-            /// </summary>
-            private long internalPointerLimit = 0;
-            /// <summary>
-            /// 	The peeked.
-            /// </summary>
-            private int peeked = 0;
-
-            /// <summary>
-            /// 	Initializes a new instance of the <see cref="SnappySharp.SnappyDecompressor"/> class.
-            /// </summary>
-            /// <param name='reader'>
-            /// 	Reader.
-            /// </param>
-            public SnappyDecompressor(Source reader)
-            {
-                this.reader = reader;
-            }
-
-            /// <summary>
-            /// 	Sets a value indicating whether this <see cref="SnappySharp.SnappyDecompressor"/> is EOF.
-            /// </summary>
-            /// <value>
-            /// 	<c>true</c> if EOF; otherwise, <c>false</c>.
-            /// </value>
-            public bool Eof { get { return this.eof; } }
-
-            /// <summary>
-            /// 	Reads the length of the uncompressed.
-            /// </summary>
-            /// <returns>
-            /// 	The uncompressed length.
-            /// </returns>
-            /// <param name='result'>
-            /// 	If set to <c>true</c> result.
-            /// </param>
-            public bool ReadUncompressedLength(ref int result)
-            {
-                result = 0;
-                uint shift = 0;
-
+                Debug.Assert(_decompressor != null);
                 while (true)
                 {
-                    if (shift >= 32)
-                        return false;
-                    int n = 0;
-                    MemoryStream ip = reader.Peek(ref n);
+                    int bytesRead = _decompressor.Decompress(buffer.Slice(totalRead));
+                    totalRead += bytesRead;
 
-                    if (n == 0)
-                        return false;
-
-                    uint c = (uint)ip.ReadByte();
-                    reader.Skip(1);
-                    result |= (int)(c & 0x7Fu) << (int)shift;
-                    if (c < 128)
-                        break;
-                    shift += 7;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// 	Step the specified writer.
-            /// </summary>
-            /// <param name='writer'>
-            /// 	If set to <c>true</c> writer.
-            /// </param>
-            /// <typeparam name='Writer'>
-            /// 	The 1st type parameter.
-            /// </typeparam>
-            public bool Step(Writer.IWriter writer)
-            {
-                return true;
-            }
-
-            /// <summary>
-            /// 	Refills the tag.
-            /// </summary>
-            /// <returns>
-            /// 	The tag.
-            /// </returns>
-            public bool RefillTag()
-            {
-                long ip = this.internalPointer;
-
-                if (this.internalPointer == this.internalPointerLimit)
-                {
-                    int n = 0;
-                    this.reader.Skip(this.peeked);
-                    ip = this.reader.Peek(ref n).Position;
-                    this.peeked = n;
-
-                    if (n == 0)
+                    if (totalRead == buffer.Length)
                     {
-                        this.eof = true;
-                        return false;
+                        break;
                     }
-                    this.internalPointerLimit = ip + n;
+
+                    Debug.Assert(_buffer != null);
+					#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+						int bytes = _stream.Read(_buffer);
+					#else
+						int bytes = _stream.Read(_buffer, 0, _buffer.Length);
+					#endif
+                    if (bytes <= 0)
+                    {
+                        break;
+                    }
+                    else if (bytes > _buffer.Length)
+                    {
+                        SnappierInterop.ThrowHelper.ThrowInvalidDataException("Insufficient buffer");
+                    }
+
+                    _decompressor.SetInput(_buffer.AsMemory(0, bytes));
                 }
 
-                return true;
-            }
-        }
-
-        /// <summary>
-        /// 	Source.
-        /// </summary>
-        public abstract class Source
-        {
-            /// <summary>
-            /// 	Initializes a new instance of the <see cref="SnappySharp.Source"/> class.
-            /// </summary>
-            public Source()
-            {
+                return totalRead;
             }
 
-            /// <summary>
-            /// 	Available this instance.
-            /// </summary>
-            public abstract int Available();
-            /// <summary>
-            /// 	Peek the specified length.
-            /// </summary>
-            /// <param name='length'>
-            /// 	Length.
-            /// </param>
-            public abstract MemoryStream Peek(ref int length);
-            /// <summary>
-            /// 	Skip the specified n.
-            /// </summary>
-            /// <param name='n'>
-            /// 	N.
-            /// </param>
-            public abstract void Skip(int n);
-        }
+            /// <inheritdoc />
+            public override Task<int> ReadAsync(byte[] buffer, int offset, int count,
+                CancellationToken cancellationToken) =>
+                ReadAsyncCore(buffer.AsMemory(offset, count), cancellationToken).AsTask();
 
-        /// <summary>
-        /// 	Unchecked byte array sink.
-        /// </summary>
-        public class UncheckedByteArraySink : Sink
-        {
-            /// <summary>
-            /// 	The destination.
-            /// </summary>
-            MemoryStream destination = null;
+			#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+				/// <inheritdoc />
+				public override ValueTask<int> ReadAsync(Memory<byte> buffer, CancellationToken cancellationToken = new CancellationToken()) =>
+				    ReadAsyncCore(buffer, cancellationToken);
+			#endif
 
-            /// <summary>
-            /// 	Initializes a new instance of the <see cref="SnappySharp.UncheckedByteArraySink"/> class.
-            /// </summary>
-            /// <param name='dest'>
-            /// 	Destination.
-            /// </param>
-            public UncheckedByteArraySink(MemoryStream destination)
+            private ValueTask<int> ReadAsyncCore(Memory<byte> buffer, CancellationToken cancellationToken = new CancellationToken())
             {
-                this.destination = destination;
-            }
+                EnsureDecompressionMode();
+                EnsureNoActiveAsyncOperation();
+                EnsureNotDisposed();
 
-            /// <summary>
-            /// 	Gets the current destination.
-            /// </summary>
-            /// <value>
-            /// 	The current destination.
-            /// </value>
-            public MemoryStream CurrentDestination { get { return this.destination; } }
-
-            /// <summary>
-            /// 	Append the specified bytes and n.
-            /// </summary>
-            /// <param name='bytes'>
-            /// 	Bytes.
-            /// </param>
-            /// <param name='n'>
-            /// 	N.
-            /// </param>
-            public override void Append(MemoryStream bytes, int n)
-            {
-                if (bytes.Position != this.destination.Position)
+                if (cancellationToken.IsCancellationRequested)
                 {
-                    byte[] buffer = new byte[n];
-                    bytes.Read(buffer, 0, n);
-                    this.destination.Write(buffer, 0, n);
+                    return new ValueTask<int>(Task.FromCanceled<int>(cancellationToken));
                 }
-                this.destination.Seek(n, SeekOrigin.Current);
+
+                EnsureBufferInitialized();
+
+                bool cleanup = true;
+                AsyncOperationStarting();
+                try
+                {
+                    Debug.Assert(_decompressor != null);
+
+                    // Finish decompressing any bytes in the input buffer
+                    int bytesRead = 0, bytesReadIteration = -1;
+                    while (bytesRead < buffer.Length && bytesReadIteration != 0)
+                    {
+                        bytesReadIteration = _decompressor.Decompress(buffer.Span.Slice(bytesRead));
+                        bytesRead += bytesReadIteration;
+                    }
+
+                    if (bytesRead != 0)
+                    {
+                        // If decompression output buffer is not empty, return immediately.
+                        return new ValueTask<int>(bytesRead);
+                    }
+
+					#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+						ValueTask<int> readTask = _stream.ReadAsync(_buffer, cancellationToken);
+					#else
+						ValueTask<int> readTask = new(_stream.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken));
+					#endif
+                    cleanup = false;
+                    return FinishReadAsyncMemory(readTask, buffer, cancellationToken);
+                }
+                finally
+                {
+                    // if we haven't started any async work, decrement the counter to end the transaction
+                    if (cleanup)
+                    {
+                        AsyncOperationCompleting();
+                    }
+                }
+            }
+
+            private async ValueTask<int> FinishReadAsyncMemory(
+                ValueTask<int> readTask, Memory<byte> buffer, CancellationToken cancellationToken)
+            {
+                try
+                {
+                    Debug.Assert(_decompressor != null && _buffer != null);
+                    while (true)
+                    {
+                        int bytesRead = await readTask.ConfigureAwait(false);
+                        EnsureNotDisposed();
+
+                        if (bytesRead <= 0)
+                        {
+                            // This indicates the base stream has received EOF
+                            return 0;
+                        }
+                        else if (bytesRead > _buffer.Length)
+                        {
+                            // The stream is either malicious or poorly implemented and returned a number of
+                            // bytes larger than the buffer supplied to it.
+                            SnappierInterop.ThrowHelper.ThrowInvalidDataException("Insufficient buffer");
+                        }
+
+                        cancellationToken.ThrowIfCancellationRequested();
+
+                        // Feed the data from base stream into decompression engine
+                        _decompressor.SetInput(_buffer.AsMemory(0, bytesRead));
+
+                        // Finish inflating any bytes in the input buffer
+                        int inflatedBytes = 0, bytesReadIteration = -1;
+                        while (inflatedBytes < buffer.Length && bytesReadIteration != 0)
+                        {
+                            bytesReadIteration = _decompressor.Decompress(buffer.Span.Slice(inflatedBytes));
+                            inflatedBytes += bytesReadIteration;
+                        }
+
+                        if (inflatedBytes != 0)
+                        {
+                            // If decompression output buffer is not empty, return immediately.
+                            return inflatedBytes;
+                        }
+                        else
+                        {
+                            // We could have read in head information and didn't get any data.
+                            // Read from the base stream again.
+							#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+							    readTask = _stream.ReadAsync(_buffer, cancellationToken);
+							#else
+								readTask = new ValueTask<int>(_stream.ReadAsync(_buffer, 0, _buffer.Length, cancellationToken));
+							#endif
+                        }
+                    }
+                }
+                finally
+                {
+                    AsyncOperationCompleting();
+                }
+            }
+
+            /// <inheritdoc />
+            public override void Write(byte[] buffer, int offset, int count) =>
+                WriteCore(buffer.AsSpan(offset, count));
+
+			#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+				/// <inheritdoc />
+				public override void Write(ReadOnlySpan<byte> buffer) => WriteCore(buffer);
+			#endif 
+
+            private void WriteCore(ReadOnlySpan<byte> buffer)
+            {
+                EnsureCompressionMode();
+                EnsureNotDisposed();
+
+                Debug.Assert(_compressor != null);
+                _compressor.Write(buffer, _stream);
+
+                _wroteBytes = true;
+            }
+
+            /// <inheritdoc />
+            public override Task WriteAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken) =>
+                WriteAsyncCore(buffer.AsMemory(offset, count), cancellationToken).AsTask();
+
+			#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+				/// <inheritdoc />
+				public override ValueTask WriteAsync(ReadOnlyMemory<byte> buffer,
+					CancellationToken cancellationToken = default) =>
+					WriteAsyncCore(buffer, cancellationToken);
+			#endif 
+
+            private ValueTask WriteAsyncCore(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
+            {
+                EnsureCompressionMode();
+                EnsureNoActiveAsyncOperation();
+                EnsureNotDisposed();
+
+                return cancellationToken.IsCancellationRequested
+                    ? new ValueTask(Task.FromCanceled(cancellationToken))
+                    : WriteAsyncMemoryCore(buffer, cancellationToken);
+            }
+
+            private async ValueTask WriteAsyncMemoryCore(ReadOnlyMemory<byte> buffer, CancellationToken cancellationToken)
+            {
+                AsyncOperationStarting();
+                try
+                {
+                    Debug.Assert(_compressor != null);
+
+                    await _compressor.WriteAsync(buffer, _stream, cancellationToken).ConfigureAwait(false);
+
+                    _wroteBytes = true;
+                }
+                finally
+                {
+                    AsyncOperationCompleting();
+                }
+            }
+
+            // This is called by Dispose:
+            private void PurgeBuffers()
+            {
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (_stream == null || _mode != CompressionMode.Compress)
+                {
+                    return;
+                }
+
+                Debug.Assert(_compressor != null);
+                // Make sure to only "flush" when we actually had some input
+                if (_wroteBytes)
+                {
+                    Flush();
+                }
+            }
+
+            private ValueTask PurgeBuffersAsync()
+            {
+                // Same logic as PurgeBuffers, except with async counterparts.
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                if (_stream == null || _mode != CompressionMode.Compress)
+                {
+                    return default;
+                }
+
+                Debug.Assert(_compressor != null);
+                // Make sure to only "flush" when we actually had some input
+                if (_wroteBytes)
+                {
+                    return new ValueTask(FlushAsync());
+                }
+
+                return default;
+            }
+
+            /// <inheritdoc />
+            protected override void Dispose(bool disposing)
+            {
+                try
+                {
+                    PurgeBuffers();
+                }
+                finally
+                {
+                    // Stream.Close() may throw here (may or may not be due to the same error).
+                    // In this case, we still need to clean up internal resources, hence the inner finally blocks.
+                    try
+                    {
+                        if (disposing && !_leaveOpen)
+                            _stream?.Dispose();
+                    }
+                    finally
+                    {
+                        _stream = null!;
+
+                        try
+                        {
+                            _decompressor?.Dispose();
+                            _compressor?.Dispose();
+                        }
+                        finally
+                        {
+                            _decompressor = null;
+                            _compressor = null;
+
+                            byte[]? buffer = _buffer;
+                            if (buffer != null)
+                            {
+                                _buffer = null;
+                                if (!AsyncOperationIsActive)
+                                {
+                                    ArrayPool<byte>.Shared.Return(buffer);
+                                }
+                            }
+
+                            base.Dispose(disposing);
+                        }
+                    }
+                }
+            }
+
+			#if ! (NETFRAMEWORK || NETSTANDARD2_0)
+            /// <inheritdoc />
+            public override async ValueTask DisposeAsync()
+            {
+                // Same logic as Dispose(true), except with async counterparts.
+
+                try
+                {
+                    await PurgeBuffersAsync().ConfigureAwait(false);
+                }
+                finally
+                {
+
+                    // Stream.Close() may throw here (may or may not be due to the same error).
+                    // In this case, we still need to clean up internal resources, hence the inner finally blocks.
+                    Stream stream = _stream;
+                    _stream = null!;
+                    try
+                    {
+                        // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                        if (!_leaveOpen && stream != null)
+                        {
+                            await stream.DisposeAsync().ConfigureAwait(false);
+                        }
+                    }
+                    finally
+                    {
+                        try
+                        {
+                            _decompressor?.Dispose();
+                        }
+                        finally
+                        {
+                            _decompressor = null;
+
+                            byte[]? buffer = _buffer;
+                            if (buffer != null)
+                            {
+                                _buffer = null;
+                                if (!AsyncOperationIsActive)
+                                {
+                                    ArrayPool<byte>.Shared.Return(buffer);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+			#endif
+
+            #endregion
+
+            private void EnsureNotDisposed()
+            {
+                if (_stream == null)
+                {
+                    SnappierInterop.ThrowHelper.ThrowObjectDisposedException(nameof(SnappyStream));
+                }
+            }
+
+            private void EnsureDecompressionMode()
+            {
+                if (_mode != CompressionMode.Decompress)
+                {
+                    SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+                }
+            }
+
+            private void EnsureCompressionMode()
+            {
+                if (_mode != CompressionMode.Compress)
+                {
+                    SnappierInterop.ThrowHelper.ThrowNotSupportedException();
+                }
+            }
+
+            private void EnsureBufferInitialized()
+            {
+                _buffer ??= ArrayPool<byte>.Shared.Rent(DefaultBufferSize);
+            }
+
+            #region async controls
+
+            private int _activeAsyncOperation;
+            private bool AsyncOperationIsActive => _activeAsyncOperation != 0;
+
+            private void EnsureNoActiveAsyncOperation()
+            {
+                if (AsyncOperationIsActive)
+                {
+                    SnappierInterop.ThrowHelper.ThrowInvalidOperationException("Invalid begin call");
+                }
+            }
+
+            private void AsyncOperationStarting()
+            {
+                if (Interlocked.CompareExchange(ref _activeAsyncOperation, 1, 0) != 0)
+                {
+                    SnappierInterop.ThrowHelper.ThrowInvalidOperationException("Invalid begin call");
+                }
+            }
+
+            private void AsyncOperationCompleting()
+            {
+                int oldValue = Interlocked.CompareExchange(ref _activeAsyncOperation, 0, 1);
+                Debug.Assert(oldValue == 1, $"Expected {nameof(_activeAsyncOperation)} to be 1, got {oldValue}");
+            }
+
+            #endregion
+        }
+		#pragma warning restore CS8602
+		#nullable disable
+    }
+
+	#nullable enable
+    namespace SnappierInterop
+    {
+        /// <summary>
+        /// Wraps an inner byte array from <see cref="ArrayPool{T}.Shared"/>"/> with a limited length.
+        /// </summary>
+        /// <remarks>
+        /// We use this instead of the built-in <see cref="MemoryPool{T}"/> because we want to slice the array without
+        /// allocating another wrapping class on the heap.
+        /// </remarks>
+        internal sealed class ByteArrayPoolMemoryOwner : IMemoryOwner<byte>
+        {
+            private byte[]? _innerArray;
+
+            /// <inheritdoc />
+            public Memory<byte> Memory { get; private set; }
+
+            /// <summary>
+            /// Create an empty ByteArrayPoolMemoryOwner.
+            /// </summary>
+            public ByteArrayPoolMemoryOwner()
+            {
+                // _innerArray will be null and Memory will be a default empty Memory<byte>
             }
 
             /// <summary>
-            /// 	Gets the append buffer.
+            /// Given a byte array from <see cref="ArrayPool{T}.Shared"/>, create a ByteArrayPoolMemoryOwner
+            /// which wraps it until disposed and slices it to <paramref name="length"/>.
             /// </summary>
-            /// <returns>
-            /// 	The append buffer.
-            /// </returns>
-            /// <param name='length'>
-            /// 	Length.
-            /// </param>
-            /// <param name='scratch'>
-            /// 	Scratch.
-            /// </param>
-            public override MemoryStream GetAppendBuffer(int length, MemoryStream scratch)
+            /// <param name="innerArray">An array from the <see cref="ArrayPool{T}.Shared"/>.</param>
+            /// <param name="length">The length of the array to return from <see cref="Memory"/>.</param>
+            public ByteArrayPoolMemoryOwner(byte[] innerArray, int length)
             {
-                return this.destination;
+                ThrowHelper.ThrowIfNull(innerArray);
+
+                _innerArray = innerArray;
+                Memory = innerArray.AsMemory(0, length); // Also validates length
+            }
+
+            /// <inheritdoc />
+            public void Dispose()
+            {
+                byte[]? innerArray = _innerArray;
+                if (innerArray is not null)
+                {
+                    _innerArray = null;
+                    Memory = default;
+                    ArrayPool<byte>.Shared.Return(innerArray);
+                }
             }
         }
 
-        /// <summary>
-        /// 	Working memory.
-        /// </summary>
-        public class WorkingMemory
+        internal static class Constants
         {
-            /// <summary>
-            /// 	The short table.
-            /// </summary>
-            ushort[] shortTable = new ushort[1 << 10];
-            /// <summary>
-            /// 	The large table.
-            /// </summary>
-            ushort[] largeTable = null;
+            public enum ChunkType : byte
+            {
+                CompressedData = 0x00,
+                UncompressedData = 0x01,
+                SkippableChunk = 0x80, // If this bit is set, we can safely skip the chunk if unknown
+                Padding = 0xfe,
+                StreamIdentifier = 0xff
+            }
+
+            public const byte Literal = 0b00;
+            public const byte Copy1ByteOffset = 1; // 3 bit length + 3 bits of offset in opcode
+            public const byte Copy2ByteOffset = 2;
+            public const byte Copy4ByteOffset = 3;
+
+            public const int MaximumTagLength = 5;
+
+            public const int BlockLog = 16;
+            public const long BlockSize = 1 << BlockLog;
+            public const nint InputMarginBytes = 15;
 
             /// <summary>
-            /// 	Gets the hash table.
+            /// Data stored per entry in lookup table:
+            ///      Range   Bits-used       Description
+            ///      ------------------------------------
+            ///      1..64   0..7            Literal/copy length encoded in opcode byte
+            ///      0..7    8..10           Copy offset encoded in opcode byte / 256
+            ///      0..4    11..13          Extra bytes after opcode
+            ///
+            /// We use eight bits for the length even though 7 would have sufficed
+            /// because of efficiency reasons:
+            ///      (1) Extracting a byte is faster than a bit-field
+            ///      (2) It properly aligns copy offset so we do not need a &lt;&lt;8
             /// </summary>
-            /// <returns>
-            /// 	The hash table.
-            /// </returns>
-            /// <param name='inputSize'>
-            /// 	Input size.
-            /// </param>
-            /// <param name='tableSize'>
-            /// 	Table size.
-            /// </param>
-            public ushort[] GetHashTable(int inputSize, ref int tableSize)
+            public static readonly ushort[] CharTable =
             {
-                int htSize = 256;
-                while (htSize < inputSize)
-                    htSize <<= 1;
-                ushort[] table = null;
-                if (htSize < Api.MaxHashTableSize && htSize <= (1 << 10))
-                    table = this.shortTable;
+            0x0001, 0x0804, 0x1001, 0x2001, 0x0002, 0x0805, 0x1002, 0x2002,
+            0x0003, 0x0806, 0x1003, 0x2003, 0x0004, 0x0807, 0x1004, 0x2004,
+            0x0005, 0x0808, 0x1005, 0x2005, 0x0006, 0x0809, 0x1006, 0x2006,
+            0x0007, 0x080a, 0x1007, 0x2007, 0x0008, 0x080b, 0x1008, 0x2008,
+            0x0009, 0x0904, 0x1009, 0x2009, 0x000a, 0x0905, 0x100a, 0x200a,
+            0x000b, 0x0906, 0x100b, 0x200b, 0x000c, 0x0907, 0x100c, 0x200c,
+            0x000d, 0x0908, 0x100d, 0x200d, 0x000e, 0x0909, 0x100e, 0x200e,
+            0x000f, 0x090a, 0x100f, 0x200f, 0x0010, 0x090b, 0x1010, 0x2010,
+            0x0011, 0x0a04, 0x1011, 0x2011, 0x0012, 0x0a05, 0x1012, 0x2012,
+            0x0013, 0x0a06, 0x1013, 0x2013, 0x0014, 0x0a07, 0x1014, 0x2014,
+            0x0015, 0x0a08, 0x1015, 0x2015, 0x0016, 0x0a09, 0x1016, 0x2016,
+            0x0017, 0x0a0a, 0x1017, 0x2017, 0x0018, 0x0a0b, 0x1018, 0x2018,
+            0x0019, 0x0b04, 0x1019, 0x2019, 0x001a, 0x0b05, 0x101a, 0x201a,
+            0x001b, 0x0b06, 0x101b, 0x201b, 0x001c, 0x0b07, 0x101c, 0x201c,
+            0x001d, 0x0b08, 0x101d, 0x201d, 0x001e, 0x0b09, 0x101e, 0x201e,
+            0x001f, 0x0b0a, 0x101f, 0x201f, 0x0020, 0x0b0b, 0x1020, 0x2020,
+            0x0021, 0x0c04, 0x1021, 0x2021, 0x0022, 0x0c05, 0x1022, 0x2022,
+            0x0023, 0x0c06, 0x1023, 0x2023, 0x0024, 0x0c07, 0x1024, 0x2024,
+            0x0025, 0x0c08, 0x1025, 0x2025, 0x0026, 0x0c09, 0x1026, 0x2026,
+            0x0027, 0x0c0a, 0x1027, 0x2027, 0x0028, 0x0c0b, 0x1028, 0x2028,
+            0x0029, 0x0d04, 0x1029, 0x2029, 0x002a, 0x0d05, 0x102a, 0x202a,
+            0x002b, 0x0d06, 0x102b, 0x202b, 0x002c, 0x0d07, 0x102c, 0x202c,
+            0x002d, 0x0d08, 0x102d, 0x202d, 0x002e, 0x0d09, 0x102e, 0x202e,
+            0x002f, 0x0d0a, 0x102f, 0x202f, 0x0030, 0x0d0b, 0x1030, 0x2030,
+            0x0031, 0x0e04, 0x1031, 0x2031, 0x0032, 0x0e05, 0x1032, 0x2032,
+            0x0033, 0x0e06, 0x1033, 0x2033, 0x0034, 0x0e07, 0x1034, 0x2034,
+            0x0035, 0x0e08, 0x1035, 0x2035, 0x0036, 0x0e09, 0x1036, 0x2036,
+            0x0037, 0x0e0a, 0x1037, 0x2037, 0x0038, 0x0e0b, 0x1038, 0x2038,
+            0x0039, 0x0f04, 0x1039, 0x2039, 0x003a, 0x0f05, 0x103a, 0x203a,
+            0x003b, 0x0f06, 0x103b, 0x203b, 0x003c, 0x0f07, 0x103c, 0x203c,
+            0x0801, 0x0f08, 0x103d, 0x203d, 0x1001, 0x0f09, 0x103e, 0x203e,
+            0x1801, 0x0f0a, 0x103f, 0x203f, 0x2001, 0x0f0b, 0x1040, 0x2040
+        };
+        }
+
+        internal class CopyHelpers
+        {
+
+		#if NET6_0_OR_GREATER
+
+        // Raw bytes for PshufbFillPatterns. This syntax returns a ReadOnlySpan<byte> that references
+        // directly to the static data within the DLL. This is only supported with bytes due to things
+        // like byte-ordering on various architectures, so we can reference Vector128<byte> directly.
+        // It is however safe to convert to Vector128<byte> so we'll do that below with some casts
+        // that are elided by JIT.
+        private static ReadOnlySpan<byte> PshufbFillPatternsAsBytes => new byte[] {
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, // Never referenced, here for padding
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1,
+            0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0, 1, 2, 0,
+            0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3, 0, 1, 2, 3,
+            0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0, 1, 2, 3, 4, 0,
+            0, 1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0, 1, 2, 3,
+            0, 1, 2, 3, 4, 5, 6, 0, 1, 2, 3, 4, 5, 6, 0, 1
+        };
+
+        /// <summary>
+        /// This is a table of shuffle control masks that can be used as the source
+        /// operand for PSHUFB to permute the contents of the destination XMM register
+        /// into a repeating byte pattern.
+        /// </summary>
+        private static ReadOnlySpan<Vector128<byte>> PshufbFillPatterns
+        {
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get => MemoryMarshal.CreateReadOnlySpan(
+                reference: ref Unsafe.As<byte, Vector128<byte>>(ref MemoryMarshal.GetReference(PshufbFillPatternsAsBytes)),
+                length: 8);
+        }
+
+        /// <summary>
+        /// j * (16 / j) for all j from 0 to 7. 0 is not actually used.
+        /// </summary>
+        private static ReadOnlySpan<byte> PatternSizeTable => new byte[] {0, 16, 16, 15, 16, 15, 12, 14};
+
+
+#endif
+
+            /// <summary>
+            /// Copy [src, src+(opEnd-op)) to [op, (opEnd-op)) but faster than
+            /// IncrementalCopySlow. buf_limit is the address past the end of the writable
+            /// region of the buffer. May write past opEnd, but won't write past bufferEnd.
+            /// </summary>
+            /// <param name="source">Pointer to the source point in the buffer.</param>
+            /// <param name="op">Pointer to the destination point in the buffer.</param>
+            /// <param name="opEnd">Pointer to the end of the area to write in the buffer.</param>
+            /// <param name="bufferEnd">Pointer past the end of the buffer.</param>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void IncrementalCopy(ref byte source, ref byte op, ref byte opEnd, ref byte bufferEnd)
+            {
+                Debug.Assert(Unsafe.IsAddressLessThan(ref source, ref op));
+                Debug.Assert(!Unsafe.IsAddressGreaterThan(ref op, ref opEnd));
+                Debug.Assert(!Unsafe.IsAddressGreaterThan(ref opEnd, ref bufferEnd));
+                // NOTE: The copy tags use 3 or 6 bits to store the copy length, so len <= 64.
+                Debug.Assert(Unsafe.ByteOffset(ref op, ref opEnd) <= (nint)64);
+                // NOTE: In practice the compressor always emits len >= 4, so it is ok to
+                // assume that to optimize this function, but this is not guaranteed by the
+                // compression format, so we have to also handle len < 4 in case the input
+                // does not satisfy these conditions.
+
+                int patternSize = (int)Unsafe.ByteOffset(ref source, ref op);
+
+                if (patternSize < 8)
+                {
+				#if NET6_0_OR_GREATER
+                if (Ssse3.IsSupported) // SSSE3
+                {
+                    // Load the first eight bytes into an 128-bit XMM register, then use PSHUFB
+                    // to permute the register's contents in-place into a repeating sequence of
+                    // the first "pattern_size" bytes.
+                    // For example, suppose:
+                    //    src       == "abc"
+                    //    op        == op + 3
+                    // After _mm_shuffle_epi8(), "pattern" will have five copies of "abc"
+                    // followed by one byte of slop: abcabcabcabcabca.
+                    //
+                    // The non-SSE fallback implementation suffers from store-forwarding stalls
+                    // because its loads and stores partly overlap. By expanding the pattern
+                    // in-place, we avoid the penalty.
+
+                    if (!Unsafe.IsAddressGreaterThan(ref op, ref Unsafe.Subtract(ref bufferEnd, 16)))
+                    {
+                        Vector128<byte> shuffleMask = PshufbFillPatterns[patternSize];
+
+						#if NET7_0_OR_GREATER
+							Vector128<byte> srcPattern = Vector128.LoadUnsafe(ref source);
+						#else
+							Vector128<byte> srcPattern = Unsafe.ReadUnaligned<Vector128<byte>>(ref source);
+						#endif
+
+                        Vector128<byte> pattern = Shuffle(srcPattern, shuffleMask);
+
+                        // Get the new pattern size now that we've repeated it
+                        patternSize = PatternSizeTable[patternSize];
+
+                        // If we're getting to the very end of the buffer, don't overrun
+                        ref byte loopEnd = ref Unsafe.Subtract(ref bufferEnd, 15);
+                        if (Unsafe.IsAddressGreaterThan(ref loopEnd, ref opEnd))
+                        {
+                            loopEnd = ref opEnd;
+                        }
+
+                        while (Unsafe.IsAddressLessThan(ref op, ref loopEnd))
+                        {
+                            pattern.StoreUnsafe(ref op);
+                            op = ref Unsafe.Add(ref op, patternSize);
+                        }
+
+                        if (!Unsafe.IsAddressLessThan(ref op, ref opEnd))
+                        {
+                            return;
+                        }
+                    }
+
+                    IncrementalCopySlow(ref source, ref op, ref opEnd);
+                    return;
+                }
                 else
                 {
-                    if (this.largeTable == null)
-                        this.largeTable = new ushort[Api.MaxHashTableSize];
-                    table = this.largeTable;
+				#endif
+                    // No SSSE3 Fallback
+
+                    // If plenty of buffer space remains, expand the pattern to at least 8
+                    // bytes. The way the following loop is written, we need 8 bytes of buffer
+                    // space if pattern_size >= 4, 11 bytes if pattern_size is 1 or 3, and 10
+                    // bytes if pattern_size is 2.  Precisely encoding that is probably not
+                    // worthwhile; instead, invoke the slow path if we cannot write 11 bytes
+                    // (because 11 are required in the worst case).
+                    if (!Unsafe.IsAddressGreaterThan(ref op, ref Unsafe.Subtract(ref bufferEnd, 11)))
+                    {
+                        while (patternSize < 8)
+                        {
+                            UnalignedCopy64(in source, ref op);
+                            op = ref Unsafe.Add(ref op, patternSize);
+                            patternSize *= 2;
+                        }
+
+                        if (!Unsafe.IsAddressLessThan(ref op, ref opEnd))
+                        {
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        IncrementalCopySlow(ref source, ref op, ref opEnd);
+                        return;
+                    }
+					#if NET6_0_OR_GREATER
+					}
+					#endif
                 }
-                tableSize = htSize;
-                return table;
+
+                // ReSharper disable once ConditionIsAlwaysTrueOrFalse
+                Debug.Assert(patternSize >= 8);
+
+                // Copy 2x 8 bytes at a time. Because op - src can be < 16, a single
+                // UnalignedCopy128 might overwrite data in op. UnalignedCopy64 is safe
+                // because expanding the pattern to at least 8 bytes guarantees that
+                // op - src >= 8.
+                //
+                // Typically, the op_limit is the gating factor so try to simplify the loop
+                // based on that.
+                if (!Unsafe.IsAddressGreaterThan(ref opEnd, ref Unsafe.Subtract(ref bufferEnd, 16)))
+                {
+                    UnalignedCopy64(in source, ref op);
+                    UnalignedCopy64(in Unsafe.Add(ref source, 8), ref Unsafe.Add(ref op, 8));
+
+                    if (Unsafe.IsAddressLessThan(ref op, ref Unsafe.Subtract(ref opEnd, 16)))
+                    {
+                        UnalignedCopy64(in Unsafe.Add(ref source, 16), ref Unsafe.Add(ref op, 16));
+                        UnalignedCopy64(in Unsafe.Add(ref source, 24), ref Unsafe.Add(ref op, 24));
+                    }
+                    if (Unsafe.IsAddressLessThan(ref op, ref Unsafe.Subtract(ref opEnd, 32)))
+                    {
+                        UnalignedCopy64(in Unsafe.Add(ref source, 32), ref Unsafe.Add(ref op, 32));
+                        UnalignedCopy64(in Unsafe.Add(ref source, 40), ref Unsafe.Add(ref op, 40));
+                    }
+                    if (Unsafe.IsAddressLessThan(ref op, ref Unsafe.Subtract(ref opEnd, 48)))
+                    {
+                        UnalignedCopy64(in Unsafe.Add(ref source, 48), ref Unsafe.Add(ref op, 48));
+                        UnalignedCopy64(in Unsafe.Add(ref source, 56), ref Unsafe.Add(ref op, 56));
+                    }
+
+                    return;
+                }
+
+                // Fall back to doing as much as we can with the available slop in the
+                // buffer.
+
+                for (ref byte loopEnd = ref Unsafe.Subtract(ref bufferEnd, 16);
+                     Unsafe.IsAddressLessThan(ref op, ref loopEnd);
+                     op = ref Unsafe.Add(ref op, 16), source = ref Unsafe.Add(ref source, 16))
+                {
+                    UnalignedCopy64(in source, ref op);
+                    UnalignedCopy64(in Unsafe.Add(ref source, 8), ref Unsafe.Add(ref op, 8));
+                }
+
+                if (!Unsafe.IsAddressLessThan(ref op, ref opEnd))
+                {
+                    return;
+                }
+
+                // We only take this branch if we didn't have enough slop and we can do a
+                // single 8 byte copy.
+                if (!Unsafe.IsAddressGreaterThan(ref op, ref Unsafe.Subtract(ref bufferEnd, 8)))
+                {
+                    UnalignedCopy64(in source, ref op);
+                    source = ref Unsafe.Add(ref source, 8);
+                    op = ref Unsafe.Add(ref op, 8);
+                }
+
+                IncrementalCopySlow(ref source, ref op, ref opEnd);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void IncrementalCopySlow(ref byte source, ref byte op, ref byte opEnd)
+            {
+                while (Unsafe.IsAddressLessThan(ref op, ref opEnd))
+                {
+                    op = source;
+                    op = ref Unsafe.Add(ref op, 1);
+                    source = ref Unsafe.Add(ref source, 1);
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void UnalignedCopy64(in byte source, ref byte destination)
+            {
+                long tempStackVar = Unsafe.As<byte, long>(ref Unsafe.AsRef(source));
+                Unsafe.As<byte, long>(ref destination) = tempStackVar;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void UnalignedCopy128(in byte source, ref byte destination)
+            {
+                Guid tempStackVar = Unsafe.As<byte, Guid>(ref Unsafe.AsRef(source));
+                Unsafe.As<byte, Guid>(ref destination) = tempStackVar;
             }
         }
 
-        namespace Util
+        internal static class Crc32CAlgorithm
         {
-            /// <summary>
-            /// 	Some bit-manipulation functions.
-            /// </summary>
-            public static class Bits
+            #region static
+
+            private const uint Poly = 0x82F63B78u;
+
+            private static readonly uint[] Table;
+
+            static Crc32CAlgorithm()
             {
-                /// <summary>
-                /// 	Lookuptable for fast computation of NumberOfTrailingZeros
-                /// </summary>
-                private static readonly int[] lookup = new int[]
+                var table = new uint[16 * 256];
+                for (uint i = 0; i < 256; i++)
                 {
-                32, 0, 1, 26, 2, 23, 27, 0, 3, 16, 24, 30, 28, 11, 0, 13, 4, 7, 17,
-                0, 25, 22, 31, 15, 29, 10, 12, 6, 0, 21, 14, 9, 5, 20, 8, 19, 18
-                };
-
-                /// <summary>
-                /// 	The word mask.
-                /// </summary>
-                internal static readonly uint[] wordMask = new uint[]
-                {
-                0u, 0xFFu, 0xFFFFu, 0xFFFFFFu, 0xFFFFFFFFu
-                };
-
-                /// <summary>
-                /// 	Return floor(log2(n)) for positive integer n.  Returns -1 iff n == 0.
-                /// </summary>
-                /// <returns>
-                /// 	floor(log2(n))
-                /// </returns>
-                /// <param name='n'>
-                /// 	n
-                /// </param>
-                public static int Log2Floor(int n)
-                {
-                    return n == 0 ? -1 : 31 ^ NumberOfLeadingZeros(n);
+                    uint res = i;
+                    for (int t = 0; t < 16; t++)
+                    {
+                        for (int k = 0; k < 8; k++) res = (res & 1) == 1 ? Poly ^ (res >> 1) : (res >> 1);
+                        table[(t * 256) + i] = res;
+                    }
                 }
 
-                /// <summary>
-                /// Finds the LSB set non zero.
-                /// </summary>
-                /// <returns>
-                /// The LSB set non zero.
-                /// </returns>
-                /// <param name='n'>
-                /// N.
-                /// </param>
-                public static int FindLSBSetNonZero(int n)
+                Table = table;
+            }
+
+            #endregion
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static uint Compute(ReadOnlySpan<byte> source)
+            {
+                return Append(0, source);
+            }
+
+            public static uint Append(uint crc, ReadOnlySpan<byte> source)
+            {
+                uint crcLocal = uint.MaxValue ^ crc;
+
+				#if NET6_0_OR_GREATER
+            // If available on the current CPU, use ARM CRC32C intrinsic operations.
+            // The if Crc32 statements are optimized out by the JIT compiler based on CPU support.
+            if (Crc32.IsSupported)
+            {
+                if (Crc32.Arm64.IsSupported)
                 {
-                    return NumberOfTrailingZeros(n);
+                    while (source.Length >= 8)
+                    {
+                        crcLocal = Crc32.Arm64.ComputeCrc32C(crcLocal, MemoryMarshal.Read<ulong>(source));
+                        source = source.Slice(8);
+                    }
                 }
 
-                /// <summary>
-                /// Numbers the of trailing zeros.
-                /// </summary>
-                /// <returns>
-                /// The of trailing zeros.
-                /// </returns>
-                /// <param name='i'>
-                /// I.
-                /// </param>
-                private static int NumberOfTrailingZeros(int i)
+                // Process in 4-byte chunks
+                while (source.Length >= 4)
                 {
-                    return lookup[(i & -i) % 37];
+                    crcLocal = Crc32.ComputeCrc32C(crcLocal, MemoryMarshal.Read<uint>(source));
+                    source = source.Slice(4);
                 }
 
-                /// <summary>
-                /// Numbers the of leading zeros.
-                /// </summary>
-                /// <returns>
-                /// The of leading zeros.
-                /// </returns>
-                /// <param name='i'>
-                /// I.
-                /// </param>
-                private static int NumberOfLeadingZeros(int i)
+                // Process the remainder
+                int j = 0;
+                while (j < source.Length)
                 {
-                    // 32-bit word to reverse bit order
-                    int v = i;
-                    // swap odd and even bits
-                    v = ((v >> 1) & 0x55555555) | ((v & 0x55555555) << 1);
-                    // swap consecutive pairs
-                    v = ((v >> 2) & 0x33333333) | ((v & 0x33333333) << 2);
-                    // swap nibbles ... 
-                    v = ((v >> 4) & 0x0F0F0F0F) | ((v & 0x0F0F0F0F) << 4);
-                    // swap bytes
-                    v = ((v >> 8) & 0x00FF00FF) | ((v & 0x00FF00FF) << 8);
-                    // swap 2-byte long pairs
-                    v = (v >> 16) | (v << 16);
-                    return NumberOfTrailingZeros(v);
+                    crcLocal = Crc32.ComputeCrc32C(crcLocal, source[j++]);
+                }
+
+                return crcLocal ^ uint.MaxValue;
+            }
+
+            // If available on the current CPU, use Intel CRC32C intrinsic operations.
+            // The Sse42 if statements are optimized out by the JIT compiler based on CPU support.
+            else if (Sse42.IsSupported)
+            {
+                // Process in 8-byte chunks first if 64-bit
+                if (Sse42.X64.IsSupported)
+                {
+                    if (source.Length >= 8)
+                    {
+                        // work with a ulong local during the loop to reduce typecasts
+                        ulong crcLocalLong = crcLocal;
+
+                        while (source.Length >= 8)
+                        {
+                            crcLocalLong = Sse42.X64.Crc32(crcLocalLong, MemoryMarshal.Read<ulong>(source));
+                            source = source.Slice(8);
+                        }
+
+                        crcLocal = (uint) crcLocalLong;
+                    }
+                }
+
+                // Process in 4-byte chunks
+                while (source.Length >= 4)
+                {
+                    crcLocal = Sse42.Crc32(crcLocal, MemoryMarshal.Read<uint>(source));
+                    source = source.Slice(4);
+                }
+
+                // Process the remainder
+                int j = 0;
+                while (j < source.Length)
+                {
+                    crcLocal = Sse42.Crc32(crcLocal, source[j++]);
+                }
+
+                return crcLocal ^ uint.MaxValue;
+            }
+				#endif
+
+                uint[] table = Table;
+                while (source.Length >= 16)
+                {
+                    var a = table[(3 * 256) + source[12]]
+                            ^ table[(2 * 256) + source[13]]
+                            ^ table[(1 * 256) + source[14]]
+                            ^ table[(0 * 256) + source[15]];
+
+                    var b = table[(7 * 256) + source[8]]
+                            ^ table[(6 * 256) + source[9]]
+                            ^ table[(5 * 256) + source[10]]
+                            ^ table[(4 * 256) + source[11]];
+
+                    var c = table[(11 * 256) + source[4]]
+                            ^ table[(10 * 256) + source[5]]
+                            ^ table[(9 * 256) + source[6]]
+                            ^ table[(8 * 256) + source[7]];
+
+                    var d = table[(15 * 256) + ((byte)crcLocal ^ source[0])]
+                            ^ table[(14 * 256) + ((byte)(crcLocal >> 8) ^ source[1])]
+                            ^ table[(13 * 256) + ((byte)(crcLocal >> 16) ^ source[2])]
+                            ^ table[(12 * 256) + ((crcLocal >> 24) ^ source[3])];
+
+                    crcLocal = d ^ c ^ b ^ a;
+                    source = source.Slice(16);
+                }
+
+                for (int offset = 0; offset < source.Length; offset++)
+                {
+                    crcLocal = table[(byte)(crcLocal ^ source[offset])] ^ crcLocal >> 8;
+                }
+
+                return crcLocal ^ uint.MaxValue;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static uint ApplyMask(uint x) =>
+                unchecked(((x >> 15) | (x << 17)) + 0xa282ead8);
+        }
+
+        internal class HashTable : IDisposable
+        {
+            private const int MinHashTableBits = 8;
+            private const int MinHashTableSize = 1 << MinHashTableBits;
+
+            private const int MaxHashTableBits = 14;
+            private const int MaxHashTableSize = 1 << MaxHashTableBits;
+
+            private ushort[]? _buffer;
+
+            public void EnsureCapacity(int inputSize)
+            {
+                var maxFragmentSize = Math.Min(inputSize, (int)Constants.BlockSize);
+                var tableSize = CalculateTableSize(maxFragmentSize);
+
+                if (_buffer is null || tableSize < _buffer.Length)
+                {
+                    if (_buffer is not null)
+                    {
+                        ArrayPool<ushort>.Shared.Return(_buffer);
+                    }
+
+                    _buffer = ArrayPool<ushort>.Shared.Rent(tableSize);
+                }
+            }
+
+            public Span<ushort> GetHashTable(int fragmentSize)
+            {
+                if (_buffer is null)
+                {
+                    ThrowHelper.ThrowInvalidOperationException("Buffer not initialized");
+                }
+
+                int hashTableSize = CalculateTableSize(fragmentSize);
+                if (hashTableSize > _buffer.Length)
+                {
+                    ThrowHelper.ThrowInvalidOperationException("Insufficient buffer size");
+                }
+
+                Span<ushort> hashTable = _buffer.AsSpan(0, hashTableSize);
+                MemoryMarshal.AsBytes(hashTable).Fill(0);
+
+                return hashTable;
+            }
+
+            private int CalculateTableSize(int inputSize)
+            {
+                if (inputSize > MaxHashTableSize)
+                {
+                    return MaxHashTableSize;
+                }
+
+                if (inputSize < MinHashTableSize)
+                {
+                    return MinHashTableSize;
+                }
+
+                return 2 << Helpers.Log2Floor((uint)(inputSize - 1));
+            }
+
+            public void Dispose()
+            {
+                if (_buffer is not null)
+                {
+                    ArrayPool<ushort>.Shared.Return(_buffer);
+                    _buffer = null;
+                }
+            }
+
+            /// <summary>
+            /// Given a table of uint16_t whose size is mask / 2 + 1, return a pointer to the
+            /// relevant entry, if any, for the given bytes.  Any hash function will do,
+            /// but a good hash function reduces the number of collisions and thus yields
+            /// better compression for compressible input.
+            ///
+            /// REQUIRES: mask is 2 * (table_size - 1), and table_size is a power of two.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static ref ushort TableEntry(ref ushort table, uint bytes, uint mask)
+            {
+                // Our choice is quicker-and-dirtier than the typical hash function;
+                // empirically, that seems beneficial.  The upper bits of kMagic * bytes are a
+                // higher-quality hash than the lower bits, so when using kMagic * bytes we
+                // also shift right to get a higher-quality end result.  There's no similar
+                // issue with a CRC because all of the output bits of a CRC are equally good
+                // "hashes." So, a CPU instruction for CRC, if available, tends to be a good
+                // choice.
+
+                uint hash;
+
+				#if NET6_0_OR_GREATER
+				// We use mask as the second arg to the CRC function, as it's about to
+				// be used anyway; it'd be equally correct to use 0 or some constant.
+				// Mathematically, _mm_crc32_u32 (or similar) is a function of the
+				// xor of its arguments.
+
+				if (System.Runtime.Intrinsics.X86.Sse42.IsSupported)
+				{
+					hash = Sse42.Crc32(bytes, mask);
+
+				}
+				else if (System.Runtime.Intrinsics.Arm.Crc32.IsSupported)
+				{
+					hash = Crc32.ComputeCrc32C(bytes, mask);
+				}
+				else
+				#endif
+                {
+                    const uint kMagic = 0x1e35a7bd;
+                    hash = (kMagic * bytes) >> (31 - MaxHashTableBits);
+                }
+
+                return ref Unsafe.AddByteOffset(ref table, hash & mask);
+            }
+        }
+
+        internal static class Helpers
+        {
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int MaxCompressedLength(int sourceBytes)
+            {
+                // Compressed data can be defined as:
+                //    compressed := item* literal*
+                //    item       := literal* copy
+                //
+                // The trailing literal sequence has a space blowup of at most 62/60
+                // since a literal of length 60 needs one tag byte + one extra byte
+                // for length information.
+                //
+                // We also add one extra byte to the blowup to account for the use of
+                // "ref byte" pointers. The output index will be pushed one byte past
+                // the end of the output data, but for safety we need to ensure that
+                // it still points to an element in the buffer array.
+                //
+                // Item blowup is trickier to measure.  Suppose the "copy" op copies
+                // 4 bytes of data.  Because of a special check in the encoding code,
+                // we produce a 4-byte copy only if the offset is < 65536.  Therefore
+                // the copy op takes 3 bytes to encode, and this type of item leads
+                // to at most the 62/60 blowup for representing literals.
+                //
+                // Suppose the "copy" op copies 5 bytes of data.  If the offset is big
+                // enough, it will take 5 bytes to encode the copy op.  Therefore the
+                // worst case here is a one-byte literal followed by a five-byte copy.
+                // I.e., 6 bytes of input turn into 7 bytes of "compressed" data.
+                //
+                // This last factor dominates the blowup, so the final estimate is:
+
+                return 32 + sourceBytes + sourceBytes / 6 + 1;
+            }
+
+            private static ReadOnlySpan<byte> LeftShiftOverflowsMasks => new byte[]
+            {
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+            0x00, 0x80, 0xc0, 0xe0, 0xf0, 0xf8, 0xfc, 0xfe
+            };
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static bool LeftShiftOverflows(byte value, int shift) =>
+                (value & LeftShiftOverflowsMasks[shift]) != 0;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static uint ExtractLowBytes(uint value, int numBytes)
+            {
+                Debug.Assert(numBytes >= 0);
+                Debug.Assert(numBytes <= 4);
+
+#if NET6_0_OR_GREATER
+            if (Bmi2.IsSupported)
+            {
+                return Bmi2.ZeroHighBits(value, (uint)(numBytes * 8));
+            }
+            else
+            {
+                return value & ~(0xffffffff << (8 * numBytes));
+            }
+#else
+                return value & ~(0xffffffff << (8 * numBytes));
+#endif
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static uint UnsafeReadUInt32(ref byte ptr)
+            {
+                var result = Unsafe.ReadUnaligned<uint>(ref ptr);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    result = BinaryPrimitives.ReverseEndianness(result);
+                }
+
+                return result;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static ulong UnsafeReadUInt64(ref byte ptr)
+            {
+                var result = Unsafe.ReadUnaligned<ulong>(ref ptr);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    result = BinaryPrimitives.ReverseEndianness(result);
+                }
+
+                return result;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void UnsafeWriteUInt32(ref byte ptr, uint value)
+            {
+                if (!BitConverter.IsLittleEndian)
+                {
+                    value = BinaryPrimitives.ReverseEndianness(value);
+                }
+
+                Unsafe.WriteUnaligned(ref ptr, value);
+            }
+
+#if NET6_0
+
+        // Port of the method from .NET 7, but specific to bytes
+
+        /// <summary>Stores a vector at the given destination.</summary>
+        /// <param name="source">The vector that will be stored.</param>
+        /// <param name="destination">The destination at which <paramref name="source" /> will be stored.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void StoreUnsafe(this Vector128<byte> source, ref byte destination)
+        {
+            Unsafe.WriteUnaligned(ref destination, source);
+        }
+
+#endif
+
+#if !NET6_0_OR_GREATER
+
+            // Port from .NET 7 BitOperations of a faster fallback algorithm for .NET Standard since we don't have intrinsics
+            // or BitOperations. This is the same algorithm used by BitOperations.Log2 when hardware acceleration is unavailable.
+            // https://github.com/dotnet/runtime/blob/bee217ffbdd6b3ad60b0e1e17c6370f4bb618779/src/libraries/System.Private.CoreLib/src/System/Numerics/BitOperations.cs#L404
+
+            private static ReadOnlySpan<byte> Log2DeBruijn => new byte[32]
+            {
+            00, 09, 01, 10, 13, 21, 02, 29,
+            11, 14, 16, 18, 22, 25, 03, 30,
+            08, 12, 20, 28, 15, 17, 24, 07,
+            19, 27, 23, 06, 26, 05, 04, 31
+            };
+
+            /// <summary>
+            /// Returns the integer (floor) log of the specified value, base 2.
+            /// Note that by convention, input value 0 returns 0 since Log(0) is undefined.
+            /// Does not directly use any hardware intrinsics, nor does it incur branching.
+            /// </summary>
+            /// <param name="value">The value.</param>
+            private static int Log2SoftwareFallback(uint value)
+            {
+                // No AggressiveInlining due to large method size
+                // Has conventional contract 0->0 (Log(0) is undefined)
+
+                // Fill trailing zeros with ones, eg 00010010 becomes 00011111
+                value |= value >> 01;
+                value |= value >> 02;
+                value |= value >> 04;
+                value |= value >> 08;
+                value |= value >> 16;
+
+                // uint.MaxValue >> 27 is always in range [0 - 31] so we use Unsafe.AddByteOffset to avoid bounds check
+                return Unsafe.AddByteOffset(
+                    // Using deBruijn sequence, k=2, n=5 (2^5=32) : 0b_0000_0111_1100_0100_1010_1100_1101_1101u
+                    ref MemoryMarshal.GetReference(Log2DeBruijn),
+                    // uint|long -> IntPtr cast on 32-bit platforms does expensive overflow checks not needed here
+                    (IntPtr)(int)((value * 0x07C4ACDDu) >> 27));
+            }
+
+#endif
+
+            /// <summary>
+            /// Return floor(log2(n)) for positive integer n.  Returns -1 if n == 0.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int Log2Floor(uint n) =>
+                n == 0 ? -1 : Log2FloorNonZero(n);
+
+
+            /// <summary>
+            /// Return floor(log2(n)) for positive integer n.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int Log2FloorNonZero(uint n)
+            {
+                Debug.Assert(n != 0);
+
+#if NET6_0_OR_GREATER
+            return BitOperations.Log2(n);
+#else
+                return Log2SoftwareFallback(n);
+#endif
+            }
+
+            /// <summary>
+            /// Finds the index of the least significant non-zero bit.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int FindLsbSetNonZero(uint n)
+            {
+                Debug.Assert(n != 0);
+
+#if NET6_0_OR_GREATER
+            return BitOperations.TrailingZeroCount(n);
+#else
+                int rc = 31;
+                int shift = 1 << 4;
+
+                for (int i = 4; i >= 0; --i)
+                {
+                    uint x = n << shift;
+                    if (x != 0)
+                    {
+                        n = x;
+                        rc -= shift;
+                    }
+
+                    shift >>= 1;
+                }
+
+                return rc;
+#endif
+            }
+
+            /// <summary>
+            /// Finds the index of the least significant non-zero bit.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static int FindLsbSetNonZero(ulong n)
+            {
+                Debug.Assert(n != 0);
+
+#if NET6_0_OR_GREATER
+            return BitOperations.TrailingZeroCount(n);
+#else
+                uint bottomBits = unchecked((uint)n);
+                if (bottomBits == 0)
+                {
+                    return 32 + FindLsbSetNonZero(unchecked((uint)(n >> 32)));
+                }
+                else
+                {
+                    return FindLsbSetNonZero(bottomBits);
+                }
+#endif
+            }
+        }
+
+        /* ************************************************************
+         *
+         *    @author Couchbase <info@couchbase.com>
+         *    @copyright 2021 Couchbase, Inc.
+         *
+         *    Licensed under the Apache License, Version 2.0 (the "License");
+         *    you may not use this file except in compliance with the License.
+         *    You may obtain a copy of the License at
+         *
+         *        http://www.apache.org/licenses/LICENSE-2.0
+         *
+         *    Unless required by applicable law or agreed to in writing, software
+         *    distributed under the License is distributed on an "AS IS" BASIS,
+         *    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+         *    See the License for the specific language governing permissions and
+         *    limitations under the License.
+         *
+         * ************************************************************/
+
+        internal class SnappyCompressor : IDisposable
+        {
+            private HashTable? _workingMemory = new();
+
+            public int Compress(ReadOnlySpan<byte> input, Span<byte> output)
+            {
+                if (_workingMemory == null)
+                {
+                    ThrowHelper.ThrowObjectDisposedException(nameof(SnappyCompressor));
+                }
+
+                _workingMemory.EnsureCapacity(input.Length);
+
+                int bytesWritten = WriteUncompressedLength(output, input.Length);
+                output = output.Slice(bytesWritten);
+
+                while (input.Length > 0)
+                {
+                    var fragment = input.Slice(0, Math.Min(input.Length, (int)Constants.BlockSize));
+
+                    var hashTable = _workingMemory.GetHashTable(fragment.Length);
+
+                    var maxOutput = Helpers.MaxCompressedLength(fragment.Length);
+
+                    if (output.Length >= maxOutput)
+                    {
+                        var written = CompressFragment(fragment, output, hashTable);
+
+                        output = output.Slice(written);
+                        bytesWritten += written;
+                    }
+                    else
+                    {
+                        var scratch = ArrayPool<byte>.Shared.Rent(maxOutput);
+                        try
+                        {
+                            int written = CompressFragment(fragment, scratch.AsSpan(), hashTable);
+                            if (output.Length < written)
+                            {
+                                ThrowHelper.ThrowArgumentException("Insufficient output buffer", nameof(output));
+                            }
+
+                            scratch.AsSpan(0, written).CopyTo(output);
+                            output = output.Slice(written);
+                            bytesWritten += written;
+                        }
+                        finally
+                        {
+                            ArrayPool<byte>.Shared.Return(scratch);
+                        }
+                    }
+
+                    input = input.Slice(fragment.Length);
+                }
+
+                return bytesWritten;
+            }
+
+            public void Dispose()
+            {
+                _workingMemory?.Dispose();
+                _workingMemory = null;
+            }
+
+            private static int WriteUncompressedLength(Span<byte> output, int length)
+            {
+                const int b = 0b1000_0000;
+
+                unchecked
+                {
+                    if (length < (1 << 7))
+                    {
+                        output[0] = (byte)length;
+                        return 1;
+                    }
+                    else if (length < (1 << 14))
+                    {
+                        output[0] = (byte)(length | b);
+                        output[1] = (byte)(length >> 7);
+                        return 2;
+                    }
+                    else if (length < (1 << 21))
+                    {
+                        output[0] = (byte)(length | b);
+                        output[1] = (byte)((length >> 7) | b);
+                        output[2] = (byte)(length >> 14);
+                        return 3;
+                    }
+                    else if (length < (1 << 28))
+                    {
+                        output[0] = (byte)(length | b);
+                        output[1] = (byte)((length >> 7) | b);
+                        output[2] = (byte)((length >> 14) | b);
+                        output[3] = (byte)(length >> 21);
+                        return 4;
+                    }
+                    else
+                    {
+                        output[0] = (byte)(length | b);
+                        output[1] = (byte)((length >> 7) | b);
+                        output[2] = (byte)((length >> 14) | b);
+                        output[3] = (byte)((length >> 21) | b);
+                        output[4] = (byte)(length >> 28);
+                        return 5;
+                    }
+                }
+            }
+
+            #region CompressFragment
+
+            private static int CompressFragment(ReadOnlySpan<byte> input, Span<byte> output, Span<ushort> tableSpan)
+            {
+                unchecked
+                {
+                    Debug.Assert(input.Length <= Constants.BlockSize);
+                    Debug.Assert((tableSpan.Length & (tableSpan.Length - 1)) == 0); // table must be power of two
+
+                    uint mask = (uint)(2 * (tableSpan.Length - 1));
+
+                    ref byte inputStart = ref Unsafe.AsRef(in input[0]);
+                    ref byte inputEnd = ref Unsafe.Add(ref inputStart, input.Length);
+                    ref byte ip = ref inputStart;
+
+                    ref byte op = ref output[0];
+                    ref ushort table = ref tableSpan[0];
+
+                    if (input.Length >= Constants.InputMarginBytes)
+                    {
+                        ref byte ipLimit = ref Unsafe.Subtract(ref inputEnd, Constants.InputMarginBytes);
+
+                        for (uint preload = Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref ip, 1)); ;)
+                        {
+                            // Bytes in [nextEmit, ip) will be emitted as literal bytes.  Or
+                            // [nextEmit, ipEnd) after the main loop.
+                            ref byte nextEmit = ref ip;
+                            ip = ref Unsafe.Add(ref ip, 1);
+                            ulong data = Helpers.UnsafeReadUInt64(ref ip);
+
+                            // The body of this loop calls EmitLiteral once and then EmitCopy one or
+                            // more times.  (The exception is that when we're close to exhausting
+                            // the input we goto emit_remainder.)
+                            //
+                            // In the first iteration of this loop we're just starting, so
+                            // there's nothing to copy, so calling EmitLiteral once is
+                            // necessary.  And we only start a new iteration when the
+                            // current iteration has determined that a call to EmitLiteral will
+                            // precede the next call to EmitCopy (if any).
+                            //
+                            // Step 1: Scan forward in the input looking for a 4-byte-long match.
+                            // If we get close to exhausting the input then goto emit_remainder.
+                            //
+                            // Heuristic match skipping: If 32 bytes are scanned with no matches
+                            // found, start looking only at every other byte. If 32 more bytes are
+                            // scanned (or skipped), look at every third byte, etc.. When a match is
+                            // found, immediately go back to looking at every byte. This is a small
+                            // loss (~5% performance, ~0.1% density) for compressible data due to more
+                            // bookkeeping, but for non-compressible data (such as JPEG) it's a huge
+                            // win since the compressor quickly "realizes" the data is incompressible
+                            // and doesn't bother looking for matches everywhere.
+                            //
+                            // The "skip" variable keeps track of how many bytes there are since the
+                            // last match; dividing it by 32 (ie. right-shifting by five) gives the
+                            // number of bytes to move ahead for each iteration.
+                            int skip = 32;
+
+                            ref byte candidate = ref Unsafe.NullRef<byte>();
+                            if (Unsafe.ByteOffset(ref ip, ref ipLimit) >= (nint)16)
+                            {
+                                nint delta = Unsafe.ByteOffset(ref inputStart, ref ip);
+                                for (int j = 0; j < 16; j += 4)
+                                {
+                                    // Manually unroll this loop into chunks of 4
+
+                                    uint dword = j == 0 ? preload : (uint)data;
+                                    Debug.Assert(dword == Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref ip, j)));
+                                    ref ushort tableEntry = ref HashTable.TableEntry(ref table, dword, mask);
+                                    candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                    Debug.Assert(!Unsafe.IsAddressLessThan(ref candidate, ref inputStart));
+                                    Debug.Assert(Unsafe.IsAddressLessThan(ref candidate, ref Unsafe.Add(ref ip, j)));
+                                    tableEntry = (ushort)(delta + j);
+
+                                    if (Helpers.UnsafeReadUInt32(ref candidate) == dword)
+                                    {
+                                        op = (byte)(Constants.Literal | (j << 2));
+                                        CopyHelpers.UnalignedCopy128(in nextEmit, ref Unsafe.Add(ref op, 1));
+                                        ip = ref Unsafe.Add(ref ip, j);
+                                        op = ref Unsafe.Add(ref op, j + 2);
+                                        goto emit_match;
+                                    }
+
+                                    int i1 = j + 1;
+                                    dword = (uint)(data >> 8);
+                                    Debug.Assert(dword == Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref ip, i1)));
+                                    tableEntry = ref HashTable.TableEntry(ref table, dword, mask);
+                                    candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                    Debug.Assert(!Unsafe.IsAddressLessThan(ref candidate, ref inputStart));
+                                    Debug.Assert(Unsafe.IsAddressLessThan(ref candidate, ref Unsafe.Add(ref ip, i1)));
+                                    tableEntry = (ushort)(delta + i1);
+
+                                    if (Helpers.UnsafeReadUInt32(ref candidate) == dword)
+                                    {
+                                        op = (byte)(Constants.Literal | (i1 << 2));
+                                        CopyHelpers.UnalignedCopy128(in nextEmit, ref Unsafe.Add(ref op, 1));
+                                        ip = ref Unsafe.Add(ref ip, i1);
+                                        op = ref Unsafe.Add(ref op, i1 + 2);
+                                        goto emit_match;
+                                    }
+
+                                    int i2 = j + 2;
+                                    dword = (uint)(data >> 16);
+                                    Debug.Assert(dword == Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref ip, i2)));
+                                    tableEntry = ref HashTable.TableEntry(ref table, dword, mask);
+                                    candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                    Debug.Assert(!Unsafe.IsAddressLessThan(ref candidate, ref inputStart));
+                                    Debug.Assert(Unsafe.IsAddressLessThan(ref candidate, ref Unsafe.Add(ref ip, i2)));
+                                    tableEntry = (ushort)(delta + i2);
+
+                                    if (Helpers.UnsafeReadUInt32(ref candidate) == dword)
+                                    {
+                                        op = (byte)(Constants.Literal | (i2 << 2));
+                                        CopyHelpers.UnalignedCopy128(in nextEmit, ref Unsafe.Add(ref op, 1));
+                                        ip = ref Unsafe.Add(ref ip, i2);
+                                        op = ref Unsafe.Add(ref op, i2 + 2);
+                                        goto emit_match;
+                                    }
+
+                                    int i3 = j + 3;
+                                    dword = (uint)(data >> 24);
+                                    Debug.Assert(dword == Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref ip, i3)));
+                                    tableEntry = ref HashTable.TableEntry(ref table, dword, mask);
+                                    candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                    Debug.Assert(!Unsafe.IsAddressLessThan(ref candidate, ref inputStart));
+                                    Debug.Assert(Unsafe.IsAddressLessThan(ref candidate, ref Unsafe.Add(ref ip, i3)));
+                                    tableEntry = (ushort)(delta + i3);
+
+                                    if (Helpers.UnsafeReadUInt32(ref candidate) == dword)
+                                    {
+                                        op = (byte)(Constants.Literal | (i3 << 2));
+                                        CopyHelpers.UnalignedCopy128(in nextEmit, ref Unsafe.Add(ref op, 1));
+                                        ip = ref Unsafe.Add(ref ip, i3);
+                                        op = ref Unsafe.Add(ref op, i3 + 2);
+                                        goto emit_match;
+                                    }
+
+                                    data = Helpers.UnsafeReadUInt64(ref Unsafe.Add(ref ip, j + 4));
+                                }
+
+                                ip = ref Unsafe.Add(ref ip, 16);
+                                skip += 16;
+                            }
+
+                            while (true)
+                            {
+                                Debug.Assert((uint)data == Helpers.UnsafeReadUInt32(ref ip));
+                                ref ushort tableEntry = ref HashTable.TableEntry(ref table, (uint)data, mask);
+                                int bytesBetweenHashLookups = skip >> 5;
+                                skip += bytesBetweenHashLookups;
+
+                                ref byte nextIp = ref Unsafe.Add(ref ip, bytesBetweenHashLookups);
+                                if (Unsafe.IsAddressGreaterThan(ref nextIp, ref ipLimit))
+                                {
+                                    ip = ref nextEmit;
+                                    goto emit_remainder;
+                                }
+
+                                candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                Debug.Assert(!Unsafe.IsAddressLessThan(ref candidate, ref inputStart));
+                                Debug.Assert(Unsafe.IsAddressLessThan(ref candidate, ref ip));
+
+                                tableEntry = (ushort)Unsafe.ByteOffset(ref inputStart, ref ip);
+                                if ((uint)data == Helpers.UnsafeReadUInt32(ref candidate))
+                                {
+                                    break;
+                                }
+
+                                data = Helpers.UnsafeReadUInt32(ref nextIp);
+                                ip = ref nextIp;
+                            }
+
+                            // Step 2: A 4-byte match has been found.  We'll later see if more
+                            // than 4 bytes match.  But, prior to the match, input
+                            // bytes [next_emit, ip) are unmatched.  Emit them as "literal bytes."
+                            Debug.Assert(!Unsafe.IsAddressGreaterThan(ref Unsafe.Add(ref nextEmit, 16), ref inputEnd));
+                            op = ref EmitLiteralFast(ref op, ref nextEmit, (uint)Unsafe.ByteOffset(ref nextEmit, ref ip));
+
+                        // Step 3: Call EmitCopy, and then see if another EmitCopy could
+                        // be our next move.  Repeat until we find no match for the
+                        // input immediately after what was consumed by the last EmitCopy call.
+                        //
+                        // If we exit this loop normally then we need to call EmitLiteral next,
+                        // though we don't yet know how big the literal will be.  We handle that
+                        // by proceeding to the next iteration of the main loop.  We also can exit
+                        // this loop via goto if we get close to exhausting the input.
+
+                        emit_match:
+                            do
+                            {
+                                // We have a 4-byte match at ip, and no need to emit any
+                                // "literal bytes" prior to ip.
+                                ref byte emitBase = ref ip;
+
+                                var (matchLength, matchLengthLessThan8) =
+                                    FindMatchLength(ref Unsafe.Add(ref candidate, 4), ref Unsafe.Add(ref ip, 4), ref inputEnd, ref data);
+
+                                int matched = 4 + matchLength;
+                                ip = ref Unsafe.Add(ref ip, matched);
+
+                                nint offset = Unsafe.ByteOffset(ref candidate, ref emitBase);
+                                if (matchLengthLessThan8)
+                                {
+                                    op = ref EmitCopyLenLessThan12(ref op, offset, matched);
+                                }
+                                else
+                                {
+                                    op = ref EmitCopyLenGreaterThanOrEqualTo12(ref op, offset, matched);
+                                }
+
+                                if (!Unsafe.IsAddressLessThan(ref ip, ref ipLimit))
+                                {
+                                    goto emit_remainder;
+                                }
+
+                                // Expect 5 bytes to match
+                                Debug.Assert((data & 0xfffffffffful) ==
+                                             (Helpers.UnsafeReadUInt64(ref ip) & 0xfffffffffful));
+
+                                // We are now looking for a 4-byte match again.  We read
+                                // table[Hash(ip, mask)] for that.  To improve compression,
+                                // we also update table[Hash(ip - 1, mask)] and table[Hash(ip, mask)].
+                                HashTable.TableEntry(ref table, Helpers.UnsafeReadUInt32(ref Unsafe.Subtract(ref ip, 1)), mask) =
+                                    (ushort)(Unsafe.ByteOffset(ref inputStart, ref ip) - 1);
+                                ref ushort tableEntry = ref HashTable.TableEntry(ref table, (uint)data, mask);
+                                candidate = ref Unsafe.Add(ref inputStart, tableEntry);
+                                tableEntry = (ushort)Unsafe.ByteOffset(ref inputStart, ref ip);
+                            } while ((uint)data == Helpers.UnsafeReadUInt32(ref candidate));
+
+                            // Because the least significant 5 bytes matched, we can utilize data
+                            // for the next iteration.
+                            preload = (uint)(data >> 8);
+                        }
+                    }
+
+                emit_remainder:
+                    // Emit the remaining bytes as a literal
+                    if (Unsafe.IsAddressLessThan(ref ip, ref inputEnd))
+                    {
+                        op = ref EmitLiteralSlow(ref op, ref ip, (uint)Unsafe.ByteOffset(ref ip, ref inputEnd));
+                    }
+
+                    return (int)Unsafe.ByteOffset(ref output[0], ref op);
+                }
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitLiteralFast(ref byte op, ref byte literal, uint length)
+            {
+                Debug.Assert(length > 0);
+
+                if (length <= 16)
+                {
+                    uint n = length - 1;
+                    op = unchecked((byte)(Constants.Literal | (n << 2)));
+                    op = ref Unsafe.Add(ref op, 1);
+
+                    CopyHelpers.UnalignedCopy128(in literal, ref op);
+                    return ref Unsafe.Add(ref op, length);
+                }
+
+                return ref EmitLiteralSlow(ref op, ref literal, length);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitLiteralSlow(ref byte op, ref byte literal, uint length)
+            {
+                uint n = length - 1;
+                if (n < 60)
+                {
+                    op = unchecked((byte)(Constants.Literal | (n << 2)));
+                    op = ref Unsafe.Add(ref op, 1);
+                }
+                else
+                {
+                    int count = (Helpers.Log2Floor(n) >> 3) + 1;
+
+                    Debug.Assert(count >= 1);
+                    Debug.Assert(count <= 4);
+                    op = unchecked((byte)(Constants.Literal | ((59 + count) << 2)));
+                    op = ref Unsafe.Add(ref op, 1);
+
+                    // Encode in upcoming bytes.
+                    // Write 4 bytes, though we may care about only 1 of them. The output buffer
+                    // is guaranteed to have at least 3 more spaces left as 'len >= 61' holds
+                    // here and there is a std::memcpy() of size 'len' below.
+                    Helpers.UnsafeWriteUInt32(ref op, n);
+                    op = ref Unsafe.Add(ref op, count);
+                }
+
+                Unsafe.CopyBlockUnaligned(ref op, ref literal, length);
+                return ref Unsafe.Add(ref op, length);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitCopyAtMost64LenLessThan12(ref byte op, long offset, long length)
+            {
+                Debug.Assert(length <= 64);
+                Debug.Assert(length >= 4);
+                Debug.Assert(offset < 65536);
+                Debug.Assert(length < 12);
+
+                unchecked
+                {
+                    uint u = (uint)((length << 2) + (offset << 8));
+                    uint copy1 = (uint)(Constants.Copy1ByteOffset - (4 << 2) + ((offset >> 3) & 0xe0));
+                    uint copy2 = (uint)(Constants.Copy2ByteOffset - (1 << 2));
+
+                    // It turns out that offset < 2048 is a difficult to predict branch.
+                    // `perf record` shows this is the highest percentage of branch misses in
+                    // benchmarks. This code produces branch free code, the data dependency
+                    // chain that bottlenecks the throughput is so long that a few extra
+                    // instructions are completely free (IPC << 6 because of data deps).
+                    u += offset < 2048 ? copy1 : copy2;
+                    Helpers.UnsafeWriteUInt32(ref op, u);
+                }
+
+                return ref Unsafe.Add(ref op, offset < 2048 ? 2 : 3);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitCopyAtMost64LenGreaterThanOrEqualTo12(ref byte op, long offset, long length)
+            {
+                Debug.Assert(length <= 64);
+                Debug.Assert(length >= 4);
+                Debug.Assert(offset < 65536);
+                Debug.Assert(length >= 12);
+
+                // Write 4 bytes, though we only care about 3 of them.  The output buffer
+                // is required to have some slack, so the extra byte won't overrun it.
+                var u = unchecked((uint)(Constants.Copy2ByteOffset + ((length - 1) << 2) + (offset << 8)));
+                Helpers.UnsafeWriteUInt32(ref op, u);
+                return ref Unsafe.Add(ref op, 3);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitCopyLenLessThan12(ref byte op, long offset, long length)
+            {
+                Debug.Assert(length < 12);
+
+                return ref EmitCopyAtMost64LenLessThan12(ref op, offset, length);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static ref byte EmitCopyLenGreaterThanOrEqualTo12(ref byte op, long offset, long length)
+            {
+                Debug.Assert(length >= 12);
+
+                // A special case for len <= 64 might help, but so far measurements suggest
+                // it's in the noise.
+
+                // Emit 64 byte copies but make sure to keep at least four bytes reserved.
+                while (length >= 68)
+                {
+                    op = ref EmitCopyAtMost64LenGreaterThanOrEqualTo12(ref op, offset, 64);
+                    length -= 64;
+                }
+
+                // One or two copies will now finish the job.
+                if (length > 64)
+                {
+                    op = ref EmitCopyAtMost64LenGreaterThanOrEqualTo12(ref op, offset, 60);
+                    length -= 60;
+                }
+
+                // Emit remainder.
+                if (length < 12)
+                {
+                    op = ref EmitCopyAtMost64LenLessThan12(ref op, offset, length);
+                }
+                else
+                {
+                    op = ref EmitCopyAtMost64LenGreaterThanOrEqualTo12(ref op, offset, length);
+                }
+                return ref op;
+            }
+
+            /// <summary>
+            /// Find the largest n such that
+            ///
+            ///   s1[0,n-1] == s2[0,n-1]
+            ///   and n &lt;= (s2_limit - s2).
+            ///
+            /// Return (n, n &lt; 8).
+            /// Reads up to and including *s2_limit but not beyond.
+            /// Does not read *(s1 + (s2_limit - s2)) or beyond.
+            /// Requires that s2_limit &gt;= s2.
+            ///
+            /// In addition populate *data with the next 5 bytes from the end of the match.
+            /// This is only done if 8 bytes are available (s2_limit - s2 &gt;= 8). The point is
+            /// that on some arch's this can be done faster in this routine than subsequent
+            /// loading from s2 + n.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            internal static (int matchLength, bool matchLengthLessThan8) FindMatchLength(
+                ref byte s1, ref byte s2, ref byte s2Limit, ref ulong data)
+            {
+                Debug.Assert(!Unsafe.IsAddressLessThan(ref s2Limit, ref s2));
+
+                if (BitConverter.IsLittleEndian && IntPtr.Size == 8)
+                {
+                    // Special implementation for 64-bit little endian processors (i.e. Intel/AMD x64)
+                    return FindMatchLengthX64(ref s1, ref s2, ref s2Limit, ref data);
+                }
+
+                int matched = 0;
+
+                while (Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)4
+                       && Helpers.UnsafeReadUInt32(ref s2) == Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref s1, matched)))
+                {
+                    s2 = ref Unsafe.Add(ref s2, 4);
+                    matched += 4;
+                }
+
+                if (BitConverter.IsLittleEndian && Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)4)
+                {
+                    uint x = Helpers.UnsafeReadUInt32(ref s2) ^ Helpers.UnsafeReadUInt32(ref Unsafe.Add(ref s1, matched));
+                    int matchingBits = Helpers.FindLsbSetNonZero(x);
+                    matched += matchingBits >> 3;
+                    s2 = ref Unsafe.Add(ref s2, matchingBits >> 3);
+                }
+                else
+                {
+                    while (Unsafe.IsAddressLessThan(ref s2, ref s2Limit) && Unsafe.Add(ref s1, matched) == s2)
+                    {
+                        s2 = ref Unsafe.Add(ref s2, 1);
+                        ++matched;
+                    }
+                }
+
+                if (Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)8)
+                {
+                    data = Helpers.UnsafeReadUInt64(ref s2);
+                }
+
+                return (matched, matched < 8);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static (int matchLength, bool matchLengthLessThan8) FindMatchLengthX64(
+                ref byte s1, ref byte s2, ref byte s2Limit, ref ulong data)
+            {
+                nint matched = 0;
+
+                // This block isn't necessary for correctness; we could just start looping
+                // immediately.  As an optimization though, it is useful.  It creates some not
+                // uncommon code paths that determine, without extra effort, whether the match
+                // length is less than 8.
+                if (Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)16)
+                {
+                    ulong a1 = Helpers.UnsafeReadUInt64(ref s1);
+                    ulong a2 = Helpers.UnsafeReadUInt64(ref s2);
+
+                    if (a1 != a2)
+                    {
+                        ulong xorval = a1 ^ a2;
+                        int shift = Helpers.FindLsbSetNonZero(xorval);
+                        int matchedBytes = shift >> 3;
+
+                        ulong a3 = Helpers.UnsafeReadUInt64(ref Unsafe.Add(ref s2, 4));
+                        a2 = unchecked((uint)xorval) == 0 ? a3 : a2;
+
+                        data = a2 >> (shift & (3 * 8));
+                        return (matchedBytes, true);
+                    }
+                    else
+                    {
+                        matched = 8;
+                        s2 = ref Unsafe.Add(ref s2, 8);
+                    }
+                }
+
+                // Find out how long the match is. We loop over the data 64 bits at a
+                // time until we find a 64-bit block that doesn't match; then we find
+                // the first non-matching bit and use that to calculate the total
+                // length of the match.
+                while (Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)16)
+                {
+                    ulong a1 = Helpers.UnsafeReadUInt64(ref Unsafe.Add(ref s1, matched));
+                    ulong a2 = Helpers.UnsafeReadUInt64(ref s2);
+                    if (a1 == a2)
+                    {
+                        s2 = ref Unsafe.Add(ref s2, 8);
+                        matched += 8;
+                    }
+                    else
+                    {
+                        ulong xorval = a1 ^ a2;
+                        int shift = Helpers.FindLsbSetNonZero(xorval);
+                        int matchedBytes = shift >> 3;
+
+                        ulong a3 = Helpers.UnsafeReadUInt64(ref Unsafe.Add(ref s2, 4));
+                        a2 = unchecked((uint)xorval) == 0 ? a3 : a2;
+
+                        data = a2 >> (shift & (3 * 8));
+                        matched += matchedBytes;
+                        Debug.Assert(matched >= 8);
+                        return ((int)matched, false);
+                    }
+                }
+
+                while (Unsafe.IsAddressLessThan(ref s2, ref s2Limit))
+                {
+                    if (Unsafe.Add(ref s1, matched) == s2)
+                    {
+                        s2 = ref Unsafe.Add(ref s2, 1);
+                        matched++;
+                    }
+                    else
+                    {
+                        if (Unsafe.ByteOffset(ref s2, ref s2Limit) >= (nint)8)
+                        {
+                            data = Helpers.UnsafeReadUInt64(ref s2);
+                        }
+
+                        return ((int)matched, matched < 8);
+                    }
+                }
+
+                return ((int)matched, matched < 8);
+            }
+
+            #endregion
+        }
+
+        internal sealed class SnappyDecompressor : IDisposable
+        {
+            private byte[] _scratch = new byte[Constants.MaximumTagLength];
+            private uint _scratchLength = 0;
+
+            private int _remainingLiteral;
+
+            private int _uncompressedLengthShift;
+            private int _uncompressedLength;
+
+            public bool NeedMoreData => !AllDataDecompressed && UnreadBytes == 0;
+
+            /// <summary>
+            /// Decompress a portion of the input.
+            /// </summary>
+            /// <param name="input">Input to process.</param>
+            /// <returns>Number of bytes processed from the input.</returns>
+            /// <remarks>
+            /// The first call to this method after construction or after a call to <see cref="Reset"/> start at the
+            /// beginning of a new Snappy block, leading with the encoded block size. It may be called multiple times
+            /// as more data becomes available. <see cref="AllDataDecompressed"/> will be true once the entire block
+            /// has been processed.
+            /// </remarks>
+            public void Decompress(ReadOnlySpan<byte> input)
+            {
+                if (!ExpectedLength.HasValue)
+                {
+                    var readLength = ReadUncompressedLength(ref input);
+                    if (readLength.HasValue)
+                    {
+                        ExpectedLength = readLength.GetValueOrDefault();
+                    }
+                    else
+                    {
+                        // Not enough data yet to process the length
+                        return;
+                    }
+                }
+
+                // Process any input into the write buffer
+
+                if (input.Length > 0)
+                {
+                    if (_remainingLiteral > 0)
+                    {
+                        int toWrite = Math.Min(_remainingLiteral, input.Length);
+
+                        Append(input.Slice(0, toWrite));
+                        input = input.Slice(toWrite);
+                        _remainingLiteral -= toWrite;
+                    }
+
+                    if (!AllDataDecompressed && input.Length > 0)
+                    {
+                        DecompressAllTags(input);
+                    }
+                }
+            }
+
+            public void Reset()
+            {
+                _scratchLength = 0;
+                _remainingLiteral = 0;
+
+                _uncompressedLength = 0;
+                _uncompressedLengthShift = 0;
+
+                _lookbackPosition = 0;
+                _readPosition = 0;
+                ExpectedLength = null;
+            }
+
+            /// <summary>
+            /// Read the uncompressed length stored at the start of the compressed data.
+            /// </summary>
+            /// <param name="input">Input data, which should begin with the varint encoded uncompressed length.</param>
+            /// <returns>The length of the compressed data, or null if the length is not yet complete.</returns>
+            /// <remarks>
+            /// This variant is used when reading a stream, and will pause if there aren't enough bytes available
+            /// in the input. Subsequent calls with more data will resume processing.
+            /// </remarks>
+            private int? ReadUncompressedLength(ref ReadOnlySpan<byte> input)
+            {
+                int result = _uncompressedLength;
+                int shift = _uncompressedLengthShift;
+                bool foundEnd = false;
+
+                var i = 0;
+                while (input.Length > i)
+                {
+                    byte c = input[i];
+                    i += 1;
+
+                    int val = c & 0x7f;
+                    if (Helpers.LeftShiftOverflows((byte)val, shift))
+                    {
+                        ThrowHelper.ThrowInvalidOperationException("Invalid stream length");
+                    }
+
+                    result |= val << shift;
+
+                    if (c < 128)
+                    {
+                        foundEnd = true;
+                        break;
+                    }
+
+                    shift += 7;
+
+                    if (shift >= 32)
+                    {
+                        ThrowHelper.ThrowInvalidOperationException("Invalid stream length");
+                    }
+                }
+
+                input = input.Slice(i);
+                _uncompressedLength = result;
+                _uncompressedLengthShift = shift;
+
+                return foundEnd ? (int?)result : null;
+            }
+
+            /// <summary>
+            /// Read the uncompressed length stored at the start of the compressed data.
+            /// </summary>
+            /// <param name="input">Input data, which should begin with the varint encoded uncompressed length.</param>
+            /// <returns>The length of the uncompressed data.</returns>
+            /// <exception cref="InvalidDataException">Invalid stream length</exception>
+            public static int ReadUncompressedLength(ReadOnlySpan<byte> input)
+            {
+                int result = 0;
+                int shift = 0;
+                bool foundEnd = false;
+
+                var i = 0;
+                while (input.Length > 0)
+                {
+                    byte c = input[i];
+                    i += 1;
+
+                    int val = c & 0x7f;
+                    if (Helpers.LeftShiftOverflows((byte)val, shift))
+                    {
+                        ThrowHelper.ThrowInvalidDataException("Invalid stream length");
+                    }
+
+                    result |= val << shift;
+
+                    if (c < 128)
+                    {
+                        foundEnd = true;
+                        break;
+                    }
+
+                    shift += 7;
+
+                    if (shift >= 32)
+                    {
+                        ThrowHelper.ThrowInvalidDataException("Invalid stream length");
+                    }
+                }
+
+                if (!foundEnd)
+                {
+                    ThrowHelper.ThrowInvalidDataException("Invalid stream length");
+                }
+
+                return result;
+            }
+
+            internal void DecompressAllTags(ReadOnlySpan<byte> inputSpan)
+            {
+                // Put Constants.CharTable on the stack to simplify lookups within the loops below.
+                // Slicing with length 256 here allows the JIT compiler to recognize the size is greater than
+                // the size of the byte we're indexing with and optimize out range checks.
+                ReadOnlySpan<ushort> charTable = Constants.CharTable.AsSpan(0, 256);
+
+                unchecked
+                {
+                    ref byte input = ref Unsafe.AsRef(in inputSpan[0]);
+                    ref byte inputEnd = ref Unsafe.Add(ref input, inputSpan.Length);
+
+                    // Track the point in the input before which input is guaranteed to have at least Constants.MaxTagLength bytes left
+                    ref byte inputLimitMinMaxTagLength = ref Unsafe.Subtract(ref inputEnd, Math.Min(inputSpan.Length, Constants.MaximumTagLength - 1));
+
+                    ref byte buffer = ref _lookbackBuffer.Span[0];
+                    ref byte bufferEnd = ref Unsafe.Add(ref buffer, _lookbackBuffer.Length);
+                    ref byte op = ref Unsafe.Add(ref buffer, _lookbackPosition);
+
+                    // Get a reference to the first byte in the scratch buffer, we'll reuse this so that we don't repeat range checks every time
+                    ref byte scratch = ref _scratch[0];
+
+                    if (_scratchLength > 0)
+                    {
+                        // Have partial tag remaining from a previous decompress run
+                        // Get the combined tag in the scratch buffer, then run through
+                        // special case processing that gets the tag from the scratch buffer
+                        // and any literal data from the _input buffer
+
+                        // This is not a hot path, so it's more efficient to process this as a separate method
+                        // so that the stack size of this method is smaller and JIT can produce better results
+
+                        (uint inputUsed, uint bytesWritten) =
+                            DecompressTagFromScratch(ref input, ref inputEnd, ref op, ref buffer, ref bufferEnd, ref scratch);
+                        if (inputUsed == 0)
+                        {
+                            // There was insufficient data to read an entire tag. Some data was moved to scratch
+                            // but short circuit for another pass when we have more data.
+                            return;
+                        }
+
+                        input = ref Unsafe.Add(ref input, inputUsed);
+                        op = ref Unsafe.Add(ref op, bytesWritten);
+                    }
+
+                    if (!Unsafe.IsAddressLessThan(ref input, ref inputLimitMinMaxTagLength))
+                    {
+                        uint newScratchLength = RefillTag(ref input, ref inputEnd, ref scratch);
+                        if (newScratchLength == uint.MaxValue)
+                        {
+                            goto exit;
+                        }
+
+                        if (newScratchLength > 0)
+                        {
+                            // Data has been moved to the scratch buffer
+                            input = ref scratch;
+                            inputEnd = ref Unsafe.Add(ref input, newScratchLength);
+                            inputLimitMinMaxTagLength = ref Unsafe.Subtract(ref inputEnd,
+                                Math.Min(newScratchLength, Constants.MaximumTagLength - 1));
+                        }
+                    }
+
+                    uint preload = Helpers.UnsafeReadUInt32(ref input);
+
+                    while (true)
+                    {
+                        byte c = (byte)preload;
+                        input = ref Unsafe.Add(ref input, 1);
+
+                        if ((c & 0x03) == Constants.Literal)
+                        {
+                            nint literalLength = unchecked((c >> 2) + 1);
+
+                            if (TryFastAppend(ref op, ref bufferEnd, in input, Unsafe.ByteOffset(ref input, ref inputEnd), literalLength))
+                            {
+                                Debug.Assert(literalLength < 61);
+                                op = ref Unsafe.Add(ref op, literalLength);
+                                input = ref Unsafe.Add(ref input, literalLength);
+                                // NOTE: There is no RefillTag here, as TryFastAppend()
+                                // will not return true unless there's already at least five spare
+                                // bytes in addition to the literal.
+                                preload = Helpers.UnsafeReadUInt32(ref input);
+                                continue;
+                            }
+
+                            if (literalLength >= 61)
+                            {
+                                // Long literal.
+                                nint literalLengthLength = literalLength - 60;
+                                uint literalLengthTemp = Helpers.UnsafeReadUInt32(ref input);
+
+                                literalLength = (nint)Helpers.ExtractLowBytes(literalLengthTemp,
+                                    (int)literalLengthLength) + 1;
+
+                                input = ref Unsafe.Add(ref input, literalLengthLength);
+                            }
+
+                            nint inputRemaining = Unsafe.ByteOffset(ref input, ref inputEnd);
+                            if (inputRemaining < literalLength)
+                            {
+                                Append(ref op, ref bufferEnd, in input, inputRemaining);
+                                op = ref Unsafe.Add(ref op, inputRemaining);
+                                _remainingLiteral = (int)(literalLength - inputRemaining);
+                                goto exit;
+                            }
+                            else
+                            {
+                                Append(ref op, ref bufferEnd, in input, literalLength);
+                                op = ref Unsafe.Add(ref op, literalLength);
+                                input = ref Unsafe.Add(ref input, literalLength);
+
+                                if (!Unsafe.IsAddressLessThan(ref input, ref inputLimitMinMaxTagLength))
+                                {
+                                    uint newScratchLength = RefillTag(ref input, ref inputEnd, ref scratch);
+                                    if (newScratchLength == uint.MaxValue)
+                                    {
+                                        goto exit;
+                                    }
+
+                                    if (newScratchLength > 0)
+                                    {
+                                        // Data has been moved to the scratch buffer
+                                        input = ref scratch;
+                                        inputEnd = ref Unsafe.Add(ref input, newScratchLength);
+                                        inputLimitMinMaxTagLength = ref Unsafe.Subtract(ref inputEnd,
+                                            Math.Min(newScratchLength, Constants.MaximumTagLength - 1));
+
+                                    }
+                                }
+
+                                preload = Helpers.UnsafeReadUInt32(ref input);
+                            }
+                        }
+                        else
+                        {
+                            if ((c & 3) == Constants.Copy4ByteOffset)
+                            {
+                                uint copyOffset = Helpers.UnsafeReadUInt32(ref input);
+                                input = ref Unsafe.Add(ref input, 4);
+
+                                nint length = (c >> 2) + 1;
+                                AppendFromSelf(ref op, ref buffer, ref bufferEnd, copyOffset, length);
+                                op = ref Unsafe.Add(ref op, length);
+                            }
+                            else
+                            {
+                                ushort entry = charTable[c];
+
+                                // We don't use BitConverter to read because we might be reading past the end of the span
+                                // But we know that's safe because we'll be doing it in _scratch with extra data on the end.
+                                // This reduces this step by several operations
+                                preload = Helpers.UnsafeReadUInt32(ref input);
+
+                                uint trailer = Helpers.ExtractLowBytes(preload, c & 3);
+                                nint length = entry & 0xff;
+
+                                // copy_offset/256 is encoded in bits 8..10.  By just fetching
+                                // those bits, we get copy_offset (since the bit-field starts at
+                                // bit 8).
+                                uint copyOffset = (entry & 0x700u) + trailer;
+
+                                AppendFromSelf(ref op, ref buffer, ref bufferEnd, copyOffset, length);
+                                op = ref Unsafe.Add(ref op, length);
+
+                                input = ref Unsafe.Add(ref input, c & 3);
+
+                                // By using the result of the previous load we reduce the critical
+                                // dependency chain of ip to 4 cycles.
+                                preload >>= (c & 3) * 8;
+                                if (Unsafe.IsAddressLessThan(ref input, ref inputLimitMinMaxTagLength)) continue;
+                            }
+
+                            if (!Unsafe.IsAddressLessThan(ref input, ref inputLimitMinMaxTagLength))
+                            {
+                                uint newScratchLength = RefillTag(ref input, ref inputEnd, ref scratch);
+                                if (newScratchLength == uint.MaxValue)
+                                {
+                                    goto exit;
+                                }
+
+                                if (newScratchLength > 0)
+                                {
+                                    // Data has been moved to the scratch buffer
+                                    input = ref scratch;
+                                    inputEnd = ref Unsafe.Add(ref input, newScratchLength);
+                                    inputLimitMinMaxTagLength = ref Unsafe.Subtract(ref inputEnd,
+                                        Math.Min(newScratchLength, Constants.MaximumTagLength - 1));
+                                }
+                            }
+
+                            preload = Helpers.UnsafeReadUInt32(ref input);
+                        }
+                    }
+
+                exit:; // All input data is processed
+                    _lookbackPosition = (int)Unsafe.ByteOffset(ref buffer, ref op);
+                }
+            }
+
+            // Returns the amount of the input used, 0 indicates there was insufficient data.
+            // Some of the input may have been used if 0 is returned, but it isn't relevant because
+            // DecompressAllTags will short circuit.
+            private (uint inputUsed, uint bytesWritten) DecompressTagFromScratch(ref byte input, ref byte inputEnd, ref byte op,
+                ref byte buffer, ref byte bufferEnd, ref byte scratch)
+            {
+                // scratch will be the scratch buffer with only the tag if true is returned
+                uint inputUsed = RefillTagFromScratch(ref input, ref inputEnd, ref scratch);
+                if (inputUsed == 0)
+                {
+                    return (0, 0);
+                }
+                input = ref Unsafe.Add(ref input, inputUsed);
+
+                // No more scratch for next cycle, we have a full buffer we're about to use
+                _scratchLength = 0;
+
+                byte c = scratch;
+                scratch = ref Unsafe.Add(ref scratch, 1);
+
+                if ((c & 0x03) == Constants.Literal)
+                {
+                    uint literalLength = (uint)((c >> 2) + 1);
+                    if (literalLength >= 61)
+                    {
+                        // Long literal.
+                        uint literalLengthLength = literalLength - 60;
+                        uint literalLengthTemp = Helpers.UnsafeReadUInt32(ref scratch);
+
+                        literalLength = Helpers.ExtractLowBytes(literalLengthTemp,
+                            (int)literalLengthLength) + 1;
+                    }
+
+                    nint inputRemaining = Unsafe.ByteOffset(ref input, ref inputEnd);
+                    if (inputRemaining < literalLength)
+                    {
+                        Append(ref op, ref bufferEnd, in input, inputRemaining);
+                        _remainingLiteral = (int)(literalLength - inputRemaining);
+                        _lookbackPosition += (int)Unsafe.ByteOffset(ref buffer, ref op);
+
+                        // Insufficient data in this case as well, trigger a short circuit
+                        return (0, 0);
+                    }
+                    else
+                    {
+                        Append(ref op, ref bufferEnd, in input, (nint)literalLength);
+
+                        return (inputUsed + literalLength, literalLength);
+                    }
+                }
+                else if ((c & 3) == Constants.Copy4ByteOffset)
+                {
+                    uint copyOffset = Helpers.UnsafeReadUInt32(ref scratch);
+
+                    nint length = (c >> 2) + 1;
+
+                    AppendFromSelf(ref op, ref buffer, ref bufferEnd, copyOffset, length);
+
+                    return (inputUsed, (uint)length);
+                }
+                else
+                {
+                    ushort entry = Constants.CharTable[c];
+                    uint data = Helpers.UnsafeReadUInt32(ref scratch);
+
+                    uint trailer = Helpers.ExtractLowBytes(data, c & 3);
+                    nint length = entry & 0xff;
+
+                    // copy_offset/256 is encoded in bits 8..10.  By just fetching
+                    // those bits, we get copy_offset (since the bit-field starts at
+                    // bit 8).
+                    uint copyOffset = (entry & 0x700u) + trailer;
+
+                    AppendFromSelf(ref op, ref buffer, ref bufferEnd, copyOffset, length);
+
+                    return (inputUsed, (uint)length);
+                }
+            }
+
+            // Returns the amount of the input used, 0 indicates there was insufficient data.
+            // Some of the input may have been used if 0 is returned, but it isn't relevant because
+            // DecompressAllTags will short circuit.
+            private uint RefillTagFromScratch(ref byte input, ref byte inputEnd, ref byte scratch)
+            {
+                Debug.Assert(_scratchLength > 0);
+
+                if (!Unsafe.IsAddressLessThan(ref input, ref inputEnd))
+                {
+                    return 0;
+                }
+
+                // Read the tag character
+                uint entry = Constants.CharTable[scratch];
+                uint needed = (entry >> 11) + 1; // +1 byte for 'c'
+
+                uint toCopy = Math.Min((uint)Unsafe.ByteOffset(ref input, ref inputEnd), needed - _scratchLength);
+                Unsafe.CopyBlockUnaligned(ref Unsafe.Add(ref scratch, _scratchLength), ref input, toCopy);
+
+                _scratchLength += toCopy;
+
+                if (_scratchLength < needed)
+                {
+                    // Still insufficient
+                    return 0;
+                }
+
+                return toCopy;
+            }
+
+            // Returns 0 if there is sufficient data available in the input buffer for the next tag AND enough extra padding to
+            // safely read preload without overrunning the buffer.
+            //
+            // Returns uint.MaxValue if there is insufficient data and the decompression should stop until more data is available.
+            // In this case any dangling unused bytes will be moved to scratch and _scratchLength for the next iteration.
+            //
+            // Returns a small number if we have enough data for this tag but not enough to safely load preload without a buffer
+            // overrun. In this case, further reads should be from scratch with a length up to the returned number. Scratch will
+            // always have some extra bytes on the end so we don't risk buffer overruns.
+            private uint RefillTag(ref byte input, ref byte inputEnd, ref byte scratch)
+            {
+                if (!Unsafe.IsAddressLessThan(ref input, ref inputEnd))
+                {
+                    return uint.MaxValue;
+                }
+
+                // Read the tag character
+                uint entry = Constants.CharTable[input];
+                uint needed = (entry >> 11) + 1; // +1 byte for 'c'
+
+                uint inputLength = (uint)Unsafe.ByteOffset(ref input, ref inputEnd);
+                if (inputLength < needed)
+                {
+                    // Data is insufficient, copy to scratch
+                    Unsafe.CopyBlockUnaligned(ref scratch, ref input, inputLength);
+
+                    _scratchLength = inputLength;
+                    return uint.MaxValue;
+                }
+
+                if (inputLength < Constants.MaximumTagLength)
+                {
+                    // Have enough bytes, but copy to scratch so that we do not
+                    // read past end of input
+                    Unsafe.CopyBlockUnaligned(ref scratch, ref input, inputLength);
+
+                    return inputLength;
+                }
+
+                return 0;
+            }
+
+            #region Loopback Writer
+
+            private byte[]? _lookbackBufferArray;
+            private Memory<byte> _lookbackBuffer;
+            private int _lookbackPosition = 0;
+            private int _readPosition = 0;
+
+            private int? _expectedLength;
+            private int? ExpectedLength
+            {
+                get => _expectedLength;
+                set
+                {
+                    _expectedLength = value;
+
+                    if (value.HasValue && _lookbackBuffer.Length < value.GetValueOrDefault())
+                    {
+                        if (_lookbackBufferArray is not null)
+                        {
+                            ArrayPool<byte>.Shared.Return(_lookbackBufferArray);
+                        }
+
+                        _lookbackBufferArray = ArrayPool<byte>.Shared.Rent(value.GetValueOrDefault());
+                        _lookbackBuffer = _lookbackBufferArray.AsMemory(0, _lookbackBufferArray.Length);
+                    }
+                }
+            }
+
+            public int UnreadBytes
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => (int)_lookbackPosition - _readPosition;
+            }
+
+            public bool EndOfFile
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => ExpectedLength.HasValue && _readPosition >= ExpectedLength.GetValueOrDefault();
+            }
+
+            public bool AllDataDecompressed
+            {
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                get => ExpectedLength.HasValue && _lookbackPosition >= ExpectedLength.GetValueOrDefault();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void Append(ReadOnlySpan<byte> input)
+            {
+                ref readonly byte inputPtr = ref input[0];
+
+                var lookbackSpan = _lookbackBuffer.Span;
+                ref byte op = ref lookbackSpan[_lookbackPosition];
+
+                Append(ref op, ref Unsafe.Add(ref lookbackSpan[0], lookbackSpan.Length), in inputPtr, input.Length);
+                _lookbackPosition += input.Length;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static void Append(ref byte op, ref byte bufferEnd, in byte input, nint length)
+            {
+                if (length > Unsafe.ByteOffset(ref op, ref bufferEnd))
+                {
+                    ThrowHelper.ThrowInvalidDataException("Data too long");
+                }
+
+                Unsafe.CopyBlockUnaligned(ref op, ref Unsafe.AsRef(in input), (uint)length);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static bool TryFastAppend(ref byte op, ref byte bufferEnd, in byte input, nint available, nint length)
+            {
+                if (length <= 16 && available >= 16 + Constants.MaximumTagLength &&
+                    Unsafe.ByteOffset(ref op, ref bufferEnd) >= (nint)16)
+                {
+                    CopyHelpers.UnalignedCopy128(in input, ref op);
+                    return true;
+                }
+
+                return false;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static void AppendFromSelf(ref byte op, ref byte buffer, ref byte bufferEnd, uint copyOffset, nint length)
+            {
+                // ToInt64() ensures that this logic works correctly on x86 (with a slight perf hit on x86, though). This is because
+                // nint is only 32-bit on x86, so casting uint copyOffset to an nint for the comparison can result in a negative number with some
+                // forms of illegal data. This would then bypass the exception and cause unsafe memory access. Performing the comparison
+                // as a long ensures we have enough bits to not lose data. On 64-bit platforms this is effectively a no-op.
+                if (copyOffset == 0 || Unsafe.ByteOffset(ref buffer, ref op).ToInt64() < copyOffset)
+                {
+                    ThrowHelper.ThrowInvalidDataException("Invalid copy offset");
+                }
+
+                if (length > Unsafe.ByteOffset(ref op, ref bufferEnd))
+                {
+                    ThrowHelper.ThrowInvalidDataException("Data too long");
+                }
+
+                ref byte source = ref Unsafe.Subtract(ref op, copyOffset);
+                CopyHelpers.IncrementalCopy(ref source, ref op,
+                    ref Unsafe.Add(ref op, length), ref bufferEnd);
+            }
+
+            public int Read(Span<byte> destination)
+            {
+                var unreadBytes = UnreadBytes;
+                if (unreadBytes == 0)
+                {
+                    return 0;
+                }
+
+                if (unreadBytes >= destination.Length)
+                {
+                    _lookbackBuffer.Span.Slice(_readPosition, destination.Length).CopyTo(destination);
+                    _readPosition += destination.Length;
+                    return destination.Length;
+                }
+                else
+                {
+                    _lookbackBuffer.Span.Slice(_readPosition, unreadBytes).CopyTo(destination);
+                    _readPosition += unreadBytes;
+                    return unreadBytes;
+                }
+            }
+
+            /// <summary>
+            /// Extracts the data from from the block, returning a block of memory and resetting the block.
+            /// </summary>
+            /// <returns>An block of memory. Caller is responsible for disposing.</returns>
+            /// <remarks>
+            /// This provides a more efficient way to decompress an entire block in scenarios where the caller
+            /// wants an owned block of memory and isn't going to reuse the SnappyDecompressor. It avoids the
+            /// need to copy a block of memory calling <see cref="Read"/>.
+            /// </remarks>
+            public IMemoryOwner<byte> ExtractData()
+            {
+                byte[]? data = _lookbackBufferArray;
+                if (!ExpectedLength.HasValue)
+                {
+                    ThrowHelper.ThrowInvalidOperationException("No data present.");
+                }
+                else if (data is null || ExpectedLength.GetValueOrDefault() == 0)
+                {
+                    // Length was 0, so we've allocated nothing
+                    return new ByteArrayPoolMemoryOwner();
+                }
+
+                if (!AllDataDecompressed)
+                {
+                    ThrowHelper.ThrowInvalidOperationException("Block is not fully decompressed.");
+                }
+
+                // Build the return before we reset and clear ExpectedLength
+                var returnBuffer = new ByteArrayPoolMemoryOwner(data, ExpectedLength.GetValueOrDefault());
+
+                // Clear the buffer so we don't return it
+                _lookbackBufferArray = null;
+                _lookbackBuffer = default;
+
+                Reset();
+
+                return returnBuffer;
+            }
+
+            #endregion
+
+            #region Test Helpers
+
+            /// <summary>
+            /// Load some data into the output buffer, only used for testing.
+            /// </summary>
+            /// <param name="toWrite"></param>
+            internal void WriteToBufferForTest(ReadOnlySpan<byte> toWrite)
+            {
+                Append(toWrite);
+            }
+
+            /// <summary>
+            /// Load a byte array into _scratch, only used for testing.
+            /// </summary>
+            internal void LoadScratchForTest(byte[] newScratch, uint newScratchLength)
+            {
+                ThrowHelper.ThrowIfNull(newScratch);
+                _scratch = newScratch;
+                _scratchLength = newScratchLength;
+            }
+
+            /// <summary>
+            /// Only used for testing.
+            /// </summary>
+            internal void SetExpectedLengthForTest(int expectedLength)
+            {
+                ExpectedLength = expectedLength;
+            }
+
+            #endregion
+
+            public void Dispose()
+            {
+                if (_lookbackBufferArray is not null)
+                {
+                    ArrayPool<byte>.Shared.Return(_lookbackBufferArray);
+                    _lookbackBufferArray = null;
+                    _lookbackBuffer = default;
                 }
             }
         }
 
-        namespace Writer
+        /// <summary>
+        /// Emits the stream format used for Snappy streams.
+        /// </summary>
+        internal class SnappyStreamCompressor : IDisposable
         {
-            /// <summary>
-            /// 	Writer interface
-            /// </summary>
-            public interface IWriter
+            private static ReadOnlySpan<byte> SnappyHeader => new byte[]
             {
-                /// <summary>
-                /// 	Sets the expected length.
-                /// </summary>
-                /// <param name='length'>
-                /// 	Length.
-                /// </param>
-                void SetExpectedLength(int length);
-                /// <summary>
-                /// 	Checks the length.
-                /// </summary>
-                /// <returns>
-                /// 	The length.
-                /// </returns>
-                bool CheckLength();
-                /// <summary>
-                /// 	Append the specified pointer, length and allowFastpath.
-                /// </summary>
-                /// <param name='pointer'>
-                /// 	If set to <c>true</c> pointer.
-                /// </param>
-                /// <param name='length'>
-                /// 	If set to <c>true</c> length.
-                /// </param>
-                /// <param name='allowFastpath'>
-                /// 	If set to <c>true</c> allow fastpath.
-                /// </param>
-                bool Append(MemoryStream pointer, int length, bool allowFastpath);
-                /// <summary>
-                /// 	Appends from self.
-                /// </summary>
-                /// <returns>
-                /// 	The from self.
-                /// </returns>
-                /// <param name='offset'>
-                /// 	If set to <c>true</c> offset.
-                /// </param>
-                /// <param name='length'>
-                /// 	If set to <c>true</c> length.
-                /// </param>
-                bool AppendFromSelf(int offset, int length);
+            0xff, 0x06, 0x00, 0x00, 0x73, 0x4e, 0x61, 0x50, 0x70, 0x59
+            };
+
+            private SnappyCompressor? _compressor = new SnappyCompressor();
+
+            private byte[]? _inputBuffer;
+            private int _inputBufferSize;
+
+            private byte[]? _outputBuffer;
+            private int _outputBufferSize;
+
+            private bool _streamHeaderWritten;
+
+            /// <summary>
+            /// Processes some input, potentially returning compressed data. Flush must be called when input is complete
+            /// to get any remaining compressed data.
+            /// </summary>
+            /// <param name="input">Uncompressed data to emit.</param>
+            /// <param name="stream">Output stream.</param>
+            /// <returns>A block of memory with compressed data (if any). Must be used before any subsequent call to Write.</returns>
+            public void Write(ReadOnlySpan<byte> input, Stream stream)
+            {
+                ThrowHelper.ThrowIfNull(stream);
+                if (_compressor == null)
+                {
+                    ThrowHelper.ThrowObjectDisposedException(nameof(SnappyStreamCompressor));
+                }
+
+                EnsureBuffer();
+                EnsureStreamHeaderWritten();
+
+                while (input.Length > 0)
+                {
+                    var bytesRead = CompressInput(input);
+                    input = input.Slice(bytesRead);
+
+                    WriteOutputBuffer(stream);
+                }
             }
 
             /// <summary>
-            /// 	Snappy array writer.
+            /// Processes some input, potentially returning compressed data. Flush must be called when input is complete
+            /// to get any remaining compressed data.
             /// </summary>
-            public class SnappyArrayWriter : IWriter
+            /// <param name="input">Uncompressed data to emit.</param>
+            /// <param name="stream">Output stream.</param>
+            /// <param name="cancellationToken">Cancellation token.</param>
+            /// <returns>A block of memory with compressed data (if any). Must be used before any subsequent call to Write.</returns>
+            public async ValueTask WriteAsync(ReadOnlyMemory<byte> input, Stream stream, CancellationToken cancellationToken = default)
             {
-                /// <summary>
-                /// 	The destination.
-                /// </summary>
-                private byte[] destination = null;
-                /// <summary>
-                /// 	The op.
-                /// </summary>
-                private int op = 0;
-                /// <summary>
-                /// 	The limit.
-                /// </summary>
-                private int limit = 0;
-
-                /// <summary>
-                /// 	Initializes a new instance of the <see cref="SnappySharp.Writer.SnappyArrayWriter"/> class.
-                /// </summary>
-                /// <param name='destination'>
-                /// 	Destination array.
-                /// </param>
-                public SnappyArrayWriter(byte[] destination)
+                ThrowHelper.ThrowIfNull(stream);
+                if (_compressor == null)
                 {
-                    this.destination = destination;
+                    ThrowHelper.ThrowObjectDisposedException(nameof(SnappyStreamCompressor));
                 }
 
-                #region IWriter implementation
-                public bool AppendFromSelf(int offset, int length)
+                EnsureBuffer();
+                EnsureStreamHeaderWritten();
+
+                while (input.Length > 0)
                 {
-                    int spaceLeft = this.limit - this.op;
-                    if (this.op <= offset - 1u)
-                        return false;
-                    if (spaceLeft < length)
-                        return false;
-                    for (int i = 0; i < length; ++i)
-                        this.destination[this.op - offset + i] = this.destination[this.op + i];
-                    this.op += length;
+                    var bytesRead = CompressInput(input.Span);
+                    input = input.Slice(bytesRead);
+
+                    await WriteOutputBufferAsync(stream, cancellationToken).ConfigureAwait(false);
+                }
+            }
+
+            public void Flush(Stream stream)
+            {
+                ThrowHelper.ThrowIfNull(stream);
+                if (_compressor == null)
+                {
+                    ThrowHelper.ThrowObjectDisposedException(nameof(SnappyStreamCompressor));
+                }
+
+                EnsureBuffer();
+                EnsureStreamHeaderWritten();
+
+                if (_inputBufferSize > 0)
+                {
+                    CompressBlock(_inputBuffer.AsSpan(0, _inputBufferSize));
+                    _inputBufferSize = 0;
+                }
+
+                WriteOutputBuffer(stream);
+            }
+
+            public async ValueTask FlushAsync(Stream stream, CancellationToken cancellationToken = default)
+            {
+                ThrowHelper.ThrowIfNull(stream);
+                if (_compressor == null)
+                {
+                    ThrowHelper.ThrowObjectDisposedException(nameof(SnappyStreamCompressor));
+                }
+
+                EnsureBuffer();
+                EnsureStreamHeaderWritten();
+
+                if (_inputBufferSize > 0)
+                {
+                    CompressBlock(_inputBuffer.AsSpan(0, _inputBufferSize));
+                    _inputBufferSize = 0;
+                }
+
+                await WriteOutputBufferAsync(stream, cancellationToken).ConfigureAwait(false);
+            }
+
+            private void WriteOutputBuffer(Stream stream)
+            {
+                if (_outputBufferSize <= 0)
+                {
+                    return;
+                }
+
+                stream.Write(_outputBuffer!, 0, _outputBufferSize);
+
+                _outputBufferSize = 0;
+            }
+
+            private async ValueTask WriteOutputBufferAsync(Stream stream, CancellationToken cancellationToken = default)
+            {
+                if (_outputBufferSize <= 0)
+                {
+                    return;
+                }
+
+                await stream.WriteAsync(_outputBuffer!, 0, _outputBufferSize, cancellationToken).ConfigureAwait(false);
+
+                _outputBufferSize = 0;
+            }
+
+            private void EnsureStreamHeaderWritten()
+            {
+                if (!_streamHeaderWritten)
+                {
+                    SnappyHeader.CopyTo(_outputBuffer.AsSpan());
+                    _outputBufferSize += SnappyHeader.Length;
+
+                    _streamHeaderWritten = true;
+                }
+            }
+
+            /// <summary>
+            /// Processes up to one entire block from the input, potentially combining with previous input blocks.
+            /// Fills the compressed data to the output buffer. Will not process more than one output block at a time
+            /// to avoid overflowing the output buffer.
+            /// </summary>
+            /// <param name="input">Input to compress.</param>
+            /// <returns>Number of bytes consumed.</returns>
+            private int CompressInput(ReadOnlySpan<byte> input)
+            {
+                Debug.Assert(input.Length > 0);
+
+                if (_inputBufferSize == 0 && input.Length >= Constants.BlockSize)
+                {
+                    // Optimize to avoid copying
+
+                    input = input.Slice(0, (int)Constants.BlockSize);
+                    CompressBlock(input);
+                    return input.Length;
+                }
+
+                // Append what we can to the input buffer
+
+                var appendLength = Math.Min(input.Length, (int)Constants.BlockSize - _inputBufferSize);
+                input.Slice(0, appendLength).CopyTo(_inputBuffer.AsSpan(_inputBufferSize));
+                _inputBufferSize += appendLength;
+
+                if (_inputBufferSize >= Constants.BlockSize)
+                {
+                    CompressBlock(_inputBuffer.AsSpan(0, _inputBufferSize));
+                    _inputBufferSize = 0;
+                }
+
+                return appendLength;
+            }
+
+			#pragma warning disable CS8602
+			private void CompressBlock(ReadOnlySpan<byte> input)
+            {
+                Debug.Assert(_compressor != null);
+                Debug.Assert(input.Length <= Constants.BlockSize);
+
+                var output = _outputBuffer.AsSpan(_outputBufferSize);
+
+                // Make room for the header and CRC
+                var compressionOutput = output.Slice(8);
+
+                var bytesWritten = _compressor.Compress(input, compressionOutput);
+
+                // Write the header
+
+                WriteCompressedBlockHeader(input, output, bytesWritten);
+
+                _outputBufferSize += bytesWritten + 8;
+            }
+			#pragma warning restore CS8602
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void WriteCompressedBlockHeader(ReadOnlySpan<byte> input, Span<byte> output, int compressedSize)
+            {
+                var blockSize = compressedSize + 4; // CRC
+
+                BinaryPrimitives.WriteInt32LittleEndian(output.Slice(1), blockSize);
+                output[0] = (byte)Constants.ChunkType.CompressedData;
+
+                var crc = Crc32CAlgorithm.Compute(input);
+                crc = Crc32CAlgorithm.ApplyMask(crc);
+                BinaryPrimitives.WriteUInt32LittleEndian(output.Slice(4), crc);
+            }
+
+            private void EnsureBuffer()
+            {
+                if (_outputBuffer is null)
+                {
+                    // Allocate enough room for the stream header and block headers
+                    _outputBuffer =
+                        ArrayPool<byte>.Shared.Rent(Helpers.MaxCompressedLength((int)Constants.BlockSize) + 8 + SnappyHeader.Length);
+                }
+
+                if (_inputBuffer is null)
+                {
+                    // Allocate enough room for the stream header and block headers
+                    _inputBuffer = ArrayPool<byte>.Shared.Rent((int)Constants.BlockSize);
+                }
+            }
+
+            public void Dispose()
+            {
+                _compressor?.Dispose();
+                _compressor = null;
+
+                if (_outputBuffer is not null)
+                {
+                    ArrayPool<byte>.Shared.Return(_outputBuffer);
+                    _outputBuffer = null;
+                }
+                if (_inputBuffer is not null)
+                {
+                    ArrayPool<byte>.Shared.Return(_inputBuffer);
+                    _inputBuffer = null;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Parses the stream format used for Snappy streams.
+        /// </summary>
+        internal sealed class SnappyStreamDecompressor : IDisposable
+        {
+            private const int ScratchBufferSize = 4;
+
+            private SnappyDecompressor? _decompressor = new();
+
+            private ReadOnlyMemory<byte> _input;
+
+            private readonly byte[] _scratch = new byte[ScratchBufferSize];
+            private int _scratchLength;
+            private Constants.ChunkType? _chunkType;
+            private int _chunkSize;
+            private int _chunkBytesProcessed;
+            private uint _expectedChunkCrc;
+            private uint _chunkCrc;
+
+			#pragma warning disable CS8602
+            public int Decompress(Span<byte> buffer)
+            {
+                Debug.Assert(_decompressor != null);
+
+                ReadOnlySpan<byte> input = _input.Span;
+
+                // Cache this to use later to calculate the total bytes written
+                int originalBufferLength = buffer.Length;
+
+                while (buffer.Length > 0
+                       && (input.Length > 0 || (_chunkType == Constants.ChunkType.CompressedData && _decompressor.AllDataDecompressed)))
+                {
+                    // ReSharper disable once SwitchStatementHandlesSomeKnownEnumValuesWithDefault
+                    switch (_chunkType)
+                    {
+                        case null:
+                            // Not in a chunk, read the chunk type and size
+
+                            uint rawChunkHeader = ReadChunkHeader(ref input);
+
+                            if (rawChunkHeader == 0)
+                            {
+                                // Not enough data, get some more
+                                goto exit;
+                            }
+
+                            _chunkType = (Constants.ChunkType)(rawChunkHeader & 0xff);
+                            _chunkSize = unchecked((int)(rawChunkHeader >> 8));
+                            _chunkBytesProcessed = 0;
+                            _scratchLength = 0;
+                            _chunkCrc = 0;
+                            break;
+
+                        case Constants.ChunkType.CompressedData:
+                            {
+                                if (_chunkBytesProcessed < 4)
+                                {
+                                    _decompressor.Reset();
+
+                                    if (!ReadChunkCrc(ref input))
+                                    {
+                                        // Incomplete CRC
+                                        goto exit;
+                                    }
+
+                                    if (input.Length == 0)
+                                    {
+                                        // No more data
+                                        goto exit;
+                                    }
+                                }
+
+                                while (buffer.Length > 0 && !_decompressor.EndOfFile)
+                                {
+                                    if (_decompressor.NeedMoreData)
+                                    {
+                                        if (input.Length == 0)
+                                        {
+                                            // No more data to give
+                                            goto exit;
+                                        }
+
+                                        int availableChunkBytes = Math.Min(input.Length, _chunkSize - _chunkBytesProcessed);
+                                        Debug.Assert(availableChunkBytes > 0);
+
+                                        _decompressor.Decompress(input.Slice(0, availableChunkBytes));
+
+                                        _chunkBytesProcessed += availableChunkBytes;
+                                        input = input.Slice(availableChunkBytes);
+                                    }
+
+                                    int decompressedBytes = _decompressor.Read(buffer);
+
+                                    _chunkCrc = Crc32CAlgorithm.Append(_chunkCrc, buffer.Slice(0, decompressedBytes));
+
+                                    buffer = buffer.Slice(decompressedBytes);
+                                }
+
+                                if (_decompressor.EndOfFile)
+                                {
+                                    // Completed reading the chunk
+                                    _chunkType = null;
+
+                                    uint crc = Crc32CAlgorithm.ApplyMask(_chunkCrc);
+                                    if (_expectedChunkCrc != crc)
+                                    {
+                                        ThrowHelper.ThrowInvalidDataException("Chunk CRC mismatch.");
+                                    }
+                                }
+
+                                break;
+                            }
+
+                        case Constants.ChunkType.UncompressedData:
+                            {
+                                if (_chunkBytesProcessed < 4)
+                                {
+                                    if (!ReadChunkCrc(ref input))
+                                    {
+                                        // Incomplete CRC
+                                        goto exit;
+                                    }
+
+                                    if (input.Length == 0)
+                                    {
+                                        // No more data
+                                        goto exit;
+                                    }
+                                }
+
+                                int chunkBytes = unchecked(Math.Min(Math.Min(buffer.Length, input.Length),
+                                    _chunkSize - _chunkBytesProcessed));
+
+                                input.Slice(0, chunkBytes).CopyTo(buffer);
+
+                                _chunkCrc = Crc32CAlgorithm.Append(_chunkCrc, buffer.Slice(0, chunkBytes));
+
+                                buffer = buffer.Slice(chunkBytes);
+                                input = input.Slice(chunkBytes);
+                                _chunkBytesProcessed += chunkBytes;
+
+                                if (_chunkBytesProcessed >= _chunkSize)
+                                {
+                                    // Completed reading the chunk
+                                    _chunkType = null;
+
+                                    uint crc = Crc32CAlgorithm.ApplyMask(_chunkCrc);
+                                    if (_expectedChunkCrc != crc)
+                                    {
+                                        ThrowHelper.ThrowInvalidDataException("Chunk CRC mismatch.");
+                                    }
+                                }
+
+                                break;
+                            }
+
+                        default:
+                            {
+                                if (_chunkType < Constants.ChunkType.SkippableChunk)
+                                {
+                                    ThrowHelper.ThrowInvalidDataException($"Unknown chunk type {(int)_chunkType:x}");
+                                }
+
+                                int chunkBytes = Math.Min(input.Length, _chunkSize - _chunkBytesProcessed);
+
+                                input = input.Slice(chunkBytes);
+                                _chunkBytesProcessed += chunkBytes;
+
+                                if (_chunkBytesProcessed >= _chunkSize)
+                                {
+                                    // Completed reading the chunk
+                                    _chunkType = null;
+                                }
+
+                                break;
+                            }
+                    }
+                }
+
+            // We use a label and goto exit to avoid an unnecessary comparison on the while loop clause before
+            // exiting the loop in cases where we know we're done processing data.
+            exit:
+                _input = _input.Slice(_input.Length - input.Length);
+                return originalBufferLength - buffer.Length;
+            }
+			#pragma warning restore CS8602
+            public void SetInput(ReadOnlyMemory<byte> input)
+            {
+                _input = input;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private uint ReadChunkHeader(ref ReadOnlySpan<byte> buffer)
+            {
+                if (_scratchLength > 0)
+                {
+                    var bytesToCopyToScratch = 4 - _scratchLength;
+
+                    Span<byte> scratch = _scratch.AsSpan();
+                    buffer.Slice(0, bytesToCopyToScratch).CopyTo(scratch.Slice(_scratchLength));
+
+                    buffer = buffer.Slice(bytesToCopyToScratch);
+                    _scratchLength += bytesToCopyToScratch;
+
+                    if (_scratchLength < 4)
+                    {
+                        // Insufficient data
+                        return 0;
+                    }
+
+                    _scratchLength = 0;
+                    return BinaryPrimitives.ReadUInt32LittleEndian(scratch);
+                }
+
+                if (buffer.Length < 4)
+                {
+                    // Insufficient data
+
+                    buffer.CopyTo(_scratch);
+
+                    _scratchLength = buffer.Length;
+                    buffer = Span<byte>.Empty;
+
+                    return 0;
+                }
+                else
+                {
+                    uint result = BinaryPrimitives.ReadUInt32LittleEndian(buffer);
+                    buffer = buffer.Slice(4);
+                    return result;
+                }
+            }
+
+            /// <summary>
+            /// Assuming that we're at the beginning of a chunk, reads the CRC. If partially read, stores the value in
+            /// _scratch for subsequent reads. Should not be called if chunkByteProcessed >= 4.
+            /// </summary>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private bool ReadChunkCrc(ref ReadOnlySpan<byte> input)
+            {
+                Debug.Assert(_chunkBytesProcessed < 4);
+
+                if (_chunkBytesProcessed == 0 && input.Length >= 4)
+                {
+                    // Common fast path
+
+                    _expectedChunkCrc = BinaryPrimitives.ReadUInt32LittleEndian(input);
+                    input = input.Slice(4);
+                    _chunkBytesProcessed += 4;
                     return true;
                 }
 
-                public bool Append(MemoryStream pointer, int length, bool allowFastpath)
+                // Copy to scratch
+                int crcBytesAvailable = Math.Min(input.Length, 4 - _chunkBytesProcessed);
+                input.Slice(0, crcBytesAvailable).CopyTo(_scratch.AsSpan(_scratchLength));
+                _scratchLength += crcBytesAvailable;
+                input = input.Slice(crcBytesAvailable);
+                _chunkBytesProcessed += crcBytesAvailable;
+
+                if (_scratchLength >= 4)
                 {
-                    int spaceLeft = this.limit - this.op;
-                    if (spaceLeft < length)
-                        return false;
-                    pointer.Read(this.destination, this.op, length);
-                    this.op += length;
+                    _expectedChunkCrc = BinaryPrimitives.ReadUInt32LittleEndian(_scratch);
+                    _scratchLength = 0;
                     return true;
                 }
 
-                public bool CheckLength()
-                {
-                    return this.limit == this.op;
-                }
-
-                public void SetExpectedLength(int length)
-                {
-                    this.limit = this.op + length;
-                }
-                #endregion
+                return false;
             }
 
-            /// <summary>
-            /// 	Snappy decompression validator.
-            /// </summary>
-            public class SnappyDecompressionValidator : IWriter
+            public void Dispose()
             {
-                /// <summary>
-                /// 
-                /// </summary>
-                private int expected = 0;
-                /// <summary>
-                /// 	
-                /// </summary>
-                private int produced = 0;
-
-                #region IWriter implementation
-                public bool AppendFromSelf(int offset, int length)
-                {
-                    if (this.produced <= offset - length)
-                        return false;
-                    this.produced += length;
-                    return this.produced <= this.expected;
-                }
-
-                public bool Append(MemoryStream pointer, int length, bool allowFastpath)
-                {
-                    this.produced += length;
-                    return this.produced <= this.expected;
-                }
-
-                public bool CheckLength()
-                {
-                    return this.expected == this.produced;
-                }
-
-                public void SetExpectedLength(int length)
-                {
-                    this.expected = length;
-                }
-                #endregion
+                _decompressor?.Dispose();
+                _decompressor = null;
             }
+        }
+
+        internal static class ThrowHelper
+        {
+            [DoesNotReturn]
+            public static void ThrowArgumentException(string? message, string? paramName) =>
+                throw new ArgumentException(message, paramName);
+
+            [DoesNotReturn]
+            public static void ThrowArgumentOutOfRangeException(string? paramName, string? message) =>
+                throw new ArgumentOutOfRangeException(paramName, message);
+
+			#if NET6_0_OR_GREATER
+				public static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null) =>
+					ArgumentNullException.ThrowIfNull(argument, paramName);
+			#else
+            [DoesNotReturn]
+				private static void ThrowArgumentNullException(string? paramName) =>
+					throw new ArgumentNullException(paramName);
+
+				public static void ThrowIfNull([NotNull] object? argument, [CallerArgumentExpression(nameof(argument))] string? paramName = null)
+				{
+					if (argument is null)
+					{
+						ThrowArgumentNullException(paramName);
+					}
+				}
+			#endif
+
+            [DoesNotReturn]
+            public static void ThrowInvalidDataException(string? message) =>
+                throw new InvalidDataException(message);
+
+            [DoesNotReturn]
+            public static void ThrowInvalidOperationException(string? message) =>
+                throw new InvalidOperationException(message);
+
+            [DoesNotReturn]
+            public static void ThrowNotSupportedException() =>
+                throw new NotSupportedException();
+
+            [DoesNotReturn]
+            public static void ThrowObjectDisposedException(string? objectName) =>
+                throw new ObjectDisposedException(objectName);
         }
     
 	}
+	#nullable disable
 
 }
