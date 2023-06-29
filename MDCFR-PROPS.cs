@@ -5,6 +5,7 @@
 
 using System;
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: System.Reflection.AssemblyCompanyAttribute("© MDCDI1315. https://github.com/mdcdi1315/mdcframework")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
@@ -15,3 +16,5 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyProductAttribute("MDC Application Framework , Version 1.5.5.0 Minor 0")]
 [assembly: System.Reflection.AssemblyTitleAttribute(".NET Application Development Framework")]
 [assembly: System.Reflection.AssemblyVersionAttribute("4.4.0.0")]
+[assembly: System.Runtime.InteropServices.ComVisible(false)]
+[assembly: System.CLSCompliant(false)]

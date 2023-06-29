@@ -1528,10 +1528,7 @@ namespace ExternalArchivingMethods
 				br->val_ >>= 8;
 				if (Is64Bit) { br->val_ |= ((ulong) *br->next_in) << 56; }
 				else { br->val_ |= ((uint) *br->next_in) << 24; }
-				br->bit_pos_ -= 8;
-				--br->avail_in;
-				++br->next_in;
-				return true;
+				br->bit_pos_ -= 8; --br->avail_in; ++br->next_in; return true;
 			}
 
 			/* Returns currently available bits.
@@ -1550,8 +1547,7 @@ namespace ExternalArchivingMethods
 			private static unsafe bool BrotliSafeGetBits(BrotliBitReader* br, uint n_bits, uint* val) 
 			{
 				while (BrotliGetAvailableBits(br) < n_bits) { if (!BrotliPullByte(br)) { return false; } }
-				*val = (uint) (BrotliGetBitsUnmasked(br) & BitMask(n_bits));
-				return true;
+				*val = (uint) (BrotliGetBitsUnmasked(br) & BitMask(n_bits)); return true;
 			}
 
 			/* Advances the bit pos by n_bits. */
@@ -1647,15 +1643,13 @@ namespace ExternalArchivingMethods
 				#else
 					var sz = Marshal.SizeOf(typeof(T));
 				#endif
-				var hMem = Marshal.AllocHGlobal(sz);
-				memset(hMem.ToPointer(), 0, sz);
+				var hMem = Marshal.AllocHGlobal(sz); memset(hMem.ToPointer(), 0, sz);
 				#if SIZE_OF_T
 					var s = Marshal.PtrToStructure<T>(hMem);
 				#else
 					var s = Marshal.PtrToStructure(hMem, typeof(T));
 				#endif
-				Marshal.FreeHGlobal(hMem);
-				return (T) s;
+				Marshal.FreeHGlobal(hMem); return (T) s;
 			}
 
 			private static unsafe void* DefaultAllocFunc(void* opaque, size_t size) { return Marshal.AllocHGlobal((int) size).ToPointer(); }
@@ -1700,13 +1694,11 @@ namespace ExternalArchivingMethods
 			private static unsafe BrotliDecoderErrorCode WriteRingBuffer(ref BrotliDecoderState s, size_t* available_out, byte** next_out,size_t* total_out, bool force) 
 			{
 				var start = s.ringbuffer + (s.partial_pos_out & (size_t) s.ringbuffer_mask);
-				var to_write = UnwrittenBytes(ref s, true);
-				var num_written = *available_out;
+				var to_write = UnwrittenBytes(ref s, true); var num_written = *available_out;
 				if (num_written > to_write) { num_written = to_write; }
 				if (s.meta_block_remaining_len < 0) { return BrotliDecoderErrorCode.BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_1; }
 				if (next_out != null && *next_out == null) { *next_out = start; } else  { if (next_out != null) { memcpy(*next_out, start, num_written); *next_out += num_written; } }
-				*available_out -= num_written;
-				s.partial_pos_out += num_written;
+				*available_out -= num_written; s.partial_pos_out += num_written;
 				if (total_out != null) *total_out = s.partial_pos_out - s.custom_dict_size;
 				if (num_written < to_write) 
 				{
@@ -1723,8 +1715,7 @@ namespace ExternalArchivingMethods
 			   Precondition: bit-reader accumulator has at least 7 bits. */
 			private static unsafe uint DecodeWindowBits(BrotliBitReader* br) 
 			{
-				uint n;
-				BrotliTakeBits(br, 1, &n);
+				uint n; BrotliTakeBits(br, 1, &n);
 				if (n == 0) { return 16; }
 				BrotliTakeBits(br, 3, &n);
 				if (n != 0) { return 17 + n; }
@@ -1736,8 +1727,7 @@ namespace ExternalArchivingMethods
 			/* Decodes a metablock length and flags by reading 2 - 31 bits. */
 			private static unsafe BrotliDecoderErrorCode DecodeMetaBlockLength(ref BrotliDecoderState s, BrotliBitReader* br) 
 			{
-				uint bits;
-				int i;
+				uint bits; int i;
 				for (;;) 
 				{
 					switch (s.substate_metablock_header) 
@@ -1841,8 +1831,7 @@ namespace ExternalArchivingMethods
 				var window_size = 1 << (int) s.window_bits; var new_ringbuffer_size = window_size;
 				/* We need at least 2 bytes of ring buffer size to get the last two
 				   bytes for context from there */
-				var min_size = s.ringbuffer_size != 0 ? s.ringbuffer_size : 1024;
-				int output_size;
+				var min_size = s.ringbuffer_size != 0 ? s.ringbuffer_size : 1024; int output_size;
 				/* If maximum is already reached, no further extension is retired. */
 				if (s.ringbuffer_size == window_size) { return; }
 				/* Metadata blocks does not touch ring buffer. */
@@ -1868,8 +1857,7 @@ namespace ExternalArchivingMethods
 				/* We need the slack region for the following reasons:
 					- doing up to two 16-byte copies for fast backward copying
 					- inserting transformed dictionary word (5 prefix + 24 base + 8 suffix) */
-				const int kRingBufferWriteAheadSlack = 42;
-				var old_ringbuffer = s.ringbuffer;
+				const int kRingBufferWriteAheadSlack = 42; var old_ringbuffer = s.ringbuffer;
 				if (s.ringbuffer_size == s.new_ringbuffer_size) { return true; }
 				s.ringbuffer = (byte*) s.alloc_func(s.memory_manager_opaque, (size_t) (s.new_ringbuffer_size + kRingBufferWriteAheadSlack));
 				if (s.ringbuffer == null) {/* Restore previous value. */ s.ringbuffer = old_ringbuffer; return false; }
@@ -1888,8 +1876,7 @@ namespace ExternalArchivingMethods
 					memcpy(s.ringbuffer, old_ringbuffer, (size_t) s.pos);
 					s.free_func(s.memory_manager_opaque, old_ringbuffer); old_ringbuffer = null;
 				}
-				s.ringbuffer_size = s.new_ringbuffer_size;
-				s.ringbuffer_mask = s.new_ringbuffer_size - 1;
+				s.ringbuffer_size = s.new_ringbuffer_size; s.ringbuffer_mask = s.new_ringbuffer_size - 1;
 				s.ringbuffer_end = s.ringbuffer + s.ringbuffer_size;
 				return true;
 			}
@@ -1912,8 +1899,7 @@ namespace ExternalArchivingMethods
 								if (s.pos + nbytes > s.ringbuffer_size) { nbytes = s.ringbuffer_size - s.pos; }
 								/* Copy remaining bytes from s.br.buf_ to ring-buffer. */
 								BrotliCopyBytes(&s.ringbuffer[s.pos], br, (size_t) nbytes);
-								s.pos += nbytes;
-								s.meta_block_remaining_len -= nbytes;
+								s.pos += nbytes; s.meta_block_remaining_len -= nbytes;
 								if (s.pos < 1 << (int) s.window_bits) 
 								{
 									if (s.meta_block_remaining_len == 0) { return BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS; }
@@ -1951,9 +1937,7 @@ namespace ExternalArchivingMethods
 			private static unsafe BrotliDecoderErrorCode ReadSimpleHuffmanSymbols(uint alphabet_size, ref BrotliDecoderState s) 
 			{
 				/* max_bits == 1..10; symbol == 0..3; 1..40 bits will be read. */
-				var max_bits = Log2Floor(alphabet_size - 1);
-				var i = s.sub_loop_counter;
-				var num_symbols = s.symbol;
+				var max_bits = Log2Floor(alphabet_size - 1); var i = s.sub_loop_counter; var num_symbols = s.symbol;
 				while (i <= num_symbols) 
 				{
 					uint v;
@@ -1967,7 +1951,7 @@ namespace ExternalArchivingMethods
 						}
 					}
 					if (v >= alphabet_size) { return BrotliDecoderErrorCode.BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_ALPHABET; }
-					fixed (ushort* sla = s.symbols_lists_array) { sla[i] = (ushort)v; }
+					fixed (ushort* sla = s.symbols_lists_array) { sla[i] = (ushort)v; } 
 					++i;
 				}
 
@@ -2029,23 +2013,17 @@ namespace ExternalArchivingMethods
 			{
 				fixed (BrotliBitReader* br = &s.br) 
 				{
-					var num_codes = s.repeat;
-					var space = s.space;
-					var i = s.sub_loop_counter;
+					var num_codes = s.repeat; var space = s.space; var i = s.sub_loop_counter;
 					for (; i < BROTLI_CODE_LENGTH_CODES; ++i) 
 					{
-						var code_len_idx = kCodeLengthCodeOrder[i];
-						uint ix;
-						uint v;
+						var code_len_idx = kCodeLengthCodeOrder[i]; uint ix; uint v;
 						if (!BrotliSafeGetBits(br, 4, &ix)) 
 						{
 							var available_bits = BrotliGetAvailableBits(br);
 							if (available_bits != 0) { ix = BrotliGetBitsUnmasked(br) & 0xF; } else { ix = 0; }
 							if (kCodeLengthPrefixLength[ix] > available_bits) 
 							{
-								s.sub_loop_counter = i;
-								s.repeat = num_codes;
-								s.space = space;
+								s.sub_loop_counter = i; s.repeat = num_codes; s.space = space;
 								s.substate_huffman = BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_COMPLEX;
 								return BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT;
 							}
@@ -2055,8 +2033,7 @@ namespace ExternalArchivingMethods
 						fixed (byte* clcl = s.code_length_code_lengths) { clcl[code_len_idx] = (byte)v; }
 						if (v != 0) 
 						{
-							space = space - (32U >> (int) v);
-							++num_codes;
+							space = space - (32U >> (int) v); ++num_codes;
 							fixed (ushort* clh = s.code_length_histo) { ++clh[v]; }
 							if (space - 1U >= 32U) { /* space is 0 or wrapped around */ break; }
 						}
@@ -2110,13 +2087,8 @@ namespace ExternalArchivingMethods
 				if (*repeat_code_len != 0) 
 				{
 					var last = *symbol + repeat_delta; var next = next_symbol[*repeat_code_len];
-					do 
-					{
-						symbol_lists[next] = (ushort) *symbol;
-						next = (int) *symbol;
-					} while (++(*symbol) != last);
-					next_symbol[*repeat_code_len] = next;
-					*space -= repeat_delta << (int) (15 - *repeat_code_len);
+					do { symbol_lists[next] = (ushort) *symbol; next = (int) *symbol; } while (++(*symbol) != last);
+					next_symbol[*repeat_code_len] = next; *space -= repeat_delta << (int) (15 - *repeat_code_len);
 					code_length_histo[*repeat_code_len] = (ushort) (code_length_histo[*repeat_code_len] + repeat_delta);
 				}
 				else { *symbol += repeat_delta; }
@@ -2131,12 +2103,9 @@ namespace ExternalArchivingMethods
 					{
 						fixed (HuffmanCode* t = s.table) 
 						{
-							var p = t;
-							uint code_len;
-							uint bits = 0;
+							var p = t; uint code_len; uint bits = 0;
 							if (get_byte && !BrotliPullByte(br)) { return BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT; }
-							get_byte = false;
-							var available_bits = BrotliGetAvailableBits(br);
+							get_byte = false; var available_bits = BrotliGetAvailableBits(br);
 							if (available_bits != 0) { bits = (uint) BrotliGetBitsUnmasked(br); }
 							p += bits & BitMask(BROTLI_HUFFMAN_MAX_CODE_LENGTH_CODE_LENGTH);
 							if (p->bits > available_bits) { get_byte = true; continue; }
@@ -2156,8 +2125,7 @@ namespace ExternalArchivingMethods
 								else 
 								{
 									/* code_len == 16..17, extra_bits == 2..3 */
-									var extra_bits = code_len - 14U;
-									var repeat_delta = (bits >> p->bits) & BitMask(extra_bits);
+									var extra_bits = code_len - 14U; var repeat_delta = (bits >> p->bits) & BitMask(extra_bits);
 									if (available_bits < p->bits + extra_bits) { get_byte = true; continue; }
 									BrotliDropBits(br, p->bits + extra_bits);
 									fixed (uint* rcl = &s.repeat_code_len)
@@ -2178,25 +2146,19 @@ namespace ExternalArchivingMethods
 			{
 				fixed (BrotliBitReader* br = &s.br) 
 				{
-					var symbol = s.symbol;
-					var repeat = s.repeat;
-					var space = s.space;
-					var prev_code_len = s.prev_code_len;
-					var repeat_code_len = s.repeat_code_len;
-					var symbol_lists = s.symbol_lists;
+					var symbol = s.symbol; var repeat = s.repeat; var space = s.space; var prev_code_len = s.prev_code_len; 
+					var repeat_code_len = s.repeat_code_len; var symbol_lists = s.symbol_lists;
 					fixed (ushort* clh = s.code_length_histo) 
 					{
 						fixed (int* ns = s.next_symbol) 
 						{
-							var code_length_histo = clh;
-							var next_symbol = ns;
+							var code_length_histo = clh; var next_symbol = ns;
 							if (!BrotliWarmupBitReader(br)) { return BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT; }
 							while (symbol < alphabet_size && space > 0) 
 							{
 								fixed (HuffmanCode* t = s.table) 
 								{
-									var p = t;
-									uint code_len;
+									var p = t; uint code_len;
 									if (!BrotliCheckInputAmount(br, BROTLI_SHORT_FILL_BIT_WINDOW_READ)) 
 									{
 										s.symbol = symbol; s.repeat = repeat; s.prev_code_len = prev_code_len; s.repeat_code_len = repeat_code_len; s.space = space;
@@ -2204,8 +2166,7 @@ namespace ExternalArchivingMethods
 									}
 									BrotliFillBitWindow16(br);
 									p += BrotliGetBitsUnmasked(br) & BitMask(BROTLI_HUFFMAN_MAX_CODE_LENGTH_CODE_LENGTH);
-									BrotliDropBits(br, p->bits); /* Use 1..5 bits */
-									code_len = p->value; /* code_len == 0..17 */
+									BrotliDropBits(br, p->bits); /* Use 1..5 bits */ code_len = p->value; /* code_len == 0..17 */
 									if (code_len < BROTLI_REPEAT_PREVIOUS_CODE_LENGTH) 
 									{
 										ProcessSingleCodeLength(code_len, &symbol, &repeat, &space, &prev_code_len, symbol_lists, code_length_histo, next_symbol);
@@ -2214,15 +2175,13 @@ namespace ExternalArchivingMethods
 									{
 										/* code_len == 16..17, extra_bits == 2..3 */
 										var extra_bits = (code_len == BROTLI_REPEAT_PREVIOUS_CODE_LENGTH) ? 2u : 3u;
-										var repeat_delta = (uint) (BrotliGetBitsUnmasked(br) & BitMask(extra_bits));
-										BrotliDropBits(br, extra_bits);
+										var repeat_delta = (uint) (BrotliGetBitsUnmasked(br) & BitMask(extra_bits)); BrotliDropBits(br, extra_bits);
 										ProcessRepeatedCodeLength(code_len, repeat_delta, alphabet_size, &symbol, &repeat, &space, &prev_code_len, &repeat_code_len,
 											symbol_lists, code_length_histo, next_symbol);
 									}
 								}
 							}
-							s.space = space;
-							return BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS;
+							s.space = space; return BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS;
 						}
 					}
 				}
@@ -2261,8 +2220,7 @@ namespace ExternalArchivingMethods
 									s.space = 32; s.repeat = 0; /* num_codes */
 									fixed (ushort* clh = s.code_length_histo) { memset(&clh[0], 0, sizeof(ushort) *(BROTLI_HUFFMAN_MAX_CODE_LENGTH_CODE_LENGTH + 1)); }
 									fixed (byte* clcl = s.code_length_code_lengths) { memset(&clcl[0], 0, BROTLI_CODE_LENGTH_CODES); }
-									s.substate_huffman = BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_COMPLEX;
-									continue;
+									s.substate_huffman = BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_COMPLEX; continue;
 								}
 								/* No break, transit to the next state. */
 								goto case BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_SIMPLE_SIZE;
@@ -2305,8 +2263,7 @@ namespace ExternalArchivingMethods
 
 							/* Decode Huffman-coded code lengths. */
 							case BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_COMPLEX: {
-								uint i;
-								var result = ReadCodeLengthCodeLengths(ref s);
+								uint i; var result = ReadCodeLengthCodeLengths(ref s);
 								if (result != BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS) { return result; }
 								fixed (HuffmanCode* t = s.table)
 								fixed (byte* clcl = s.code_length_code_lengths)
@@ -2323,19 +2280,14 @@ namespace ExternalArchivingMethods
 										}
 									}
 								}
-
-								s.symbol = 0;
-								s.prev_code_len = BROTLI_INITIAL_REPEATED_CODE_LENGTH;
-								s.repeat = 0;
-								s.repeat_code_len = 0;
-								s.space = 32768;
+								s.symbol = 0; s.prev_code_len = BROTLI_INITIAL_REPEATED_CODE_LENGTH;
+								s.repeat = 0; s.repeat_code_len = 0; s.space = 32768;
 								s.substate_huffman = BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_LENGTH_SYMBOLS;
 								/* No break, transit to the next state. */
 								goto case BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_LENGTH_SYMBOLS;
 							}
 							case BrotliRunningHuffmanState.BROTLI_STATE_HUFFMAN_LENGTH_SYMBOLS: {
-								uint table_size;
-								var result = ReadSymbolCodeLengths(alphabet_size, ref s);
+								uint table_size; var result = ReadSymbolCodeLengths(alphabet_size, ref s);
 								if (result == BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT) { result = SafeReadSymbolCodeLengths(alphabet_size, ref s); }
 								if (result != BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS) { return result; }
 								if (s.space != 0) { return BrotliDecoderErrorCode.BROTLI_DECODER_ERROR_FORMAT_HUFFMAN_SPACE; }
@@ -2372,9 +2324,7 @@ namespace ExternalArchivingMethods
 				if (available_bits <= HUFFMAN_TABLE_BITS) { return false; /* Not enough bits to move to the second level. */ }
 				/* Speculatively drop HUFFMAN_TABLE_BITS. */ val = (val & BitMask(table->bits)) >> HUFFMAN_TABLE_BITS; available_bits -= HUFFMAN_TABLE_BITS; table += table->value + val;
 				if (available_bits < table->bits) { return false; /* Not enough bits for the second level. */ }
-				BrotliDropBits(br, (uint) (HUFFMAN_TABLE_BITS + table->bits));
-				*result = table->value;
-				return true;
+				BrotliDropBits(br, (uint) (HUFFMAN_TABLE_BITS + table->bits)); *result = table->value; return true;
 			}
 
 			private static unsafe bool SafeReadSymbol(HuffmanCode* table, BrotliBitReader* br, uint* result) 
@@ -2392,8 +2342,7 @@ namespace ExternalArchivingMethods
 				if (s.substate_read_block_length == BrotliRunningReadBlockLengthState.BROTLI_STATE_READ_BLOCK_LENGTH_NONE) 
 				{ if (!SafeReadSymbol(table, br, &index)) { return false; } } else { index = s.block_length_index; }
 				{
-					uint bits;
-					uint nbits = kBlockLengthPrefixCode[index].nbits; /* nbits == 2..24 */
+					uint bits; uint nbits = kBlockLengthPrefixCode[index].nbits; /* nbits == 2..24 */
 					if (!BrotliSafeReadBits(br, nbits, &bits)) 
 					{
 						s.block_length_index = index;
@@ -2443,8 +2392,7 @@ namespace ExternalArchivingMethods
 			private static unsafe void InverseMoveToFrontTransform(byte* v, uint v_len, ref BrotliDecoderState state) 
 			{
 				/* Reinitialize elements that could have been changed. */
-				uint i = 1;
-				var upper_bound = state.mtf_upper_bound;
+				uint i = 1; var upper_bound = state.mtf_upper_bound;
 				fixed (uint* m = state.mtf) 
 				{
 					var mtf = &m[1]; /* Make mtf[-1] addressable. */ var mtf_u8 = (byte*) mtf;
@@ -2557,8 +2505,7 @@ namespace ExternalArchivingMethods
 							s.substate_context_map = BrotliRunningContextMapState.BROTLI_STATE_CONTEXT_MAP_NONE;
 							return BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS;
 						}
-						default:
-							return BrotliDecoderErrorCode.BROTLI_DECODER_ERROR_UNREACHABLE;
+						default: return BrotliDecoderErrorCode.BROTLI_DECODER_ERROR_UNREACHABLE;
 					}
 				}
 			}
@@ -2596,8 +2543,7 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void PrepareLiteralDecoding(ref BrotliDecoderState s) 
 			{
-				byte context_mode;
-				size_t trivial;
+				byte context_mode; size_t trivial;
 				fixed (uint* btr = s.block_type_rb)
 				fixed (uint* tlc = s.trivial_literal_contexts) 
 				{
@@ -2619,8 +2565,7 @@ namespace ExternalArchivingMethods
 			/* Decodes a block length by reading 3..39 bits. */
 			private static unsafe uint ReadBlockLength(HuffmanCode* table, BrotliBitReader* br) 
 			{
-				uint code; uint nbits; code = ReadSymbol(table, br);
-				nbits = kBlockLengthPrefixCode[code].nbits; /* nbits == 2..24 */
+				uint code; uint nbits; code = ReadSymbol(table, br); nbits = kBlockLengthPrefixCode[code].nbits; /* nbits == 2..24 */
 				return kBlockLengthPrefixCode[code].offset + BrotliReadBits(br, nbits);
 			}
 
@@ -2642,8 +2587,7 @@ namespace ExternalArchivingMethods
 						/* Read 0..15 + 3..39 bits */
 						if (safe == 0) { block_type = ReadSymbol(type_tree, br); bl[tree_type] = ReadBlockLength(len_tree, br); } else 
 						{
-							BrotliBitReaderState memento;
-							BrotliBitReaderSaveState(br, &memento);
+							BrotliBitReaderState memento; BrotliBitReaderSaveState(br, &memento);
 							if (!SafeReadSymbol(type_tree, br, &block_type)) { return false; }
 							if (!SafeReadBlockLength(ref s, &bl[tree_type], len_tree, br)) 
 							{
@@ -2654,8 +2598,7 @@ namespace ExternalArchivingMethods
 
 						if (block_type == 1) { block_type = ringbuffer[1] + 1; } else if (block_type == 0) { block_type = ringbuffer[0]; } else { block_type -= 2; }
 						if (block_type >= max_block_type) { block_type -= max_block_type; }
-						ringbuffer[0] = ringbuffer[1]; ringbuffer[1] = block_type;
-						return true;
+						ringbuffer[0] = ringbuffer[1]; ringbuffer[1] = block_type; return true;
 					}
 				}
 			}
@@ -2756,8 +2699,7 @@ namespace ExternalArchivingMethods
 						/*-0, 0,-0, 0,-1, 1,-2, 2,-3, 3,-1, 1,-2, 2,-3, 3 */
 						const uint kDistanceShortCodeValueOffset = 0xfa5fa500;
 						var v = (s.dist_rb_idx + (int) (kDistanceShortCodeIndexOffset >> distance_code)) & 0x3;
-						s.distance_code = drb[v];
-						v = (int) (kDistanceShortCodeValueOffset >> distance_code) & 0x3;
+						s.distance_code = drb[v]; v = (int) (kDistanceShortCodeValueOffset >> distance_code) & 0x3;
 						if ((distance_code & 0x3) != 0) { s.distance_code += v; }
 						else 
 						{
@@ -2773,9 +2715,7 @@ namespace ExternalArchivingMethods
 			{
 				fixed (uint* bl = s.block_length) 
 				{
-					int distval;
-					BrotliBitReaderState memento;
-					var distance_tree = s.distance_hgroup.htrees[s.dist_htree_index];
+					int distval; BrotliBitReaderState memento; var distance_tree = s.distance_hgroup.htrees[s.dist_htree_index];
 					if (safe == 0) { s.distance_code = (int) ReadSymbol(distance_tree, br); } else 
 					{ uint code; BrotliBitReaderSaveState(br, &memento);
 						if (!SafeReadSymbol(distance_tree, br, &code)) { return false; }
@@ -2835,8 +2775,7 @@ namespace ExternalArchivingMethods
 						if (!CheckInputAmount(safe, br, 28)) 
 						{
 							/* 156 bits + 7 bytes */
-							s.state = BrotliRunningState.BROTLI_STATE_COMMAND_BEGIN;
-							result = BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT;
+							s.state = BrotliRunningState.BROTLI_STATE_COMMAND_BEGIN; result = BrotliDecoderErrorCode.BROTLI_DECODER_NEEDS_MORE_INPUT;
 							goto saveStateAndReturn;
 						}
 						if (bl[1] == 0) 
@@ -2900,8 +2839,7 @@ namespace ExternalArchivingMethods
 									if (s.trivial_literal_context != 0) goto CommandInner;
 								}
 								context = (byte) (s.context_lookup1[p1] | s.context_lookup2[p2]);
-								hc = s.literal_hgroup.htrees[s.context_map_slice[context]];
-								p2 = p1;
+								hc = s.literal_hgroup.htrees[s.context_map_slice[context]]; p2 = p1;
 								if (safe == 0) { p1 = (byte) ReadSymbol(hc, br); }
 								else 
 								{
@@ -2941,8 +2879,7 @@ namespace ExternalArchivingMethods
 						{
 							if (i >= BROTLI_MIN_DICTIONARY_WORD_LENGTH && i <= BROTLI_MAX_DICTIONARY_WORD_LENGTH) 
 							{
-								var offset = (int) kBrotliDictionaryOffsetsByLength[i];
-								var word_id = s.distance_code - s.max_distance - 1;
+								var offset = (int) kBrotliDictionaryOffsetsByLength[i]; var word_id = s.distance_code - s.max_distance - 1;
 								uint shift = kBrotliDictionarySizeBitsByLength[i]; var mask = (int) BitMask(shift);
 								var word_idx = word_id & mask; var transform_idx = word_id >> (int) shift; offset += word_idx * i;
 								if (transform_idx < kNumTransforms) 
@@ -3037,9 +2974,7 @@ namespace ExternalArchivingMethods
 										   is expanded byte-by-byte until it is enough to complete read. */
 										s.buffer_length = 0;
 										/* Switch to input stream and restart. */
-										result = BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS;
-										br->avail_in = *available_in; br->next_in = *next_in;
-										continue;
+										result = BrotliDecoderErrorCode.BROTLI_DECODER_SUCCESS; br->avail_in = *available_in; br->next_in = *next_in; continue;
 									}
 									else if (*available_in != 0) 
 									{
@@ -3355,8 +3290,7 @@ namespace ExternalArchivingMethods
 				{
 					code.bits = (byte) bits;
 					for (bits_count = count[bits]; bits_count != 0; --bits_count) { code.value = (ushort) sorted[symbol++]; ReplicateValue(&table[BrotliReverseBits(key)], step, table_size, code); key += key_step; }
-					step <<= 1; key_step >>= 1;
-				} while (++bits <= BROTLI_HUFFMAN_MAX_CODE_LENGTH_CODE_LENGTH);
+					step <<= 1; key_step >>= 1; } while (++bits <= BROTLI_HUFFMAN_MAX_CODE_LENGTH_CODE_LENGTH);
 			}
 
 			private static unsafe uint BrotliBuildHuffmanTable(HuffmanCode* root_table, int root_bits, ushort* symbol_lists, ushort* count)
@@ -3390,8 +3324,7 @@ namespace ExternalArchivingMethods
 					for (bits_count = count[bits]; bits_count != 0; --bits_count) 
 					{
 						symbol = symbol_lists[symbol]; code.value = (ushort) symbol;
-						ReplicateValue(&table[BrotliReverseBits(key)], step, table_size, code);
-						key += key_step;
+						ReplicateValue(&table[BrotliReverseBits(key)], step, table_size, code); key += key_step;
 					}
 					step <<= 1; key_step >>= 1;
 				} while (++bits <= table_bits);
@@ -3401,8 +3334,7 @@ namespace ExternalArchivingMethods
 				while (total_size != table_size) { memcpy(&table[table_size], &table[0], (size_t) table_size * sizeof(HuffmanCode)); table_size <<= 1; }
 
 				/* fill in 2nd level tables and add pointers to root table */
-				key_step = BROTLI_REVERSE_BITS_LOWEST >> (root_bits - 1);
-				sub_key = (BROTLI_REVERSE_BITS_LOWEST << 1); sub_key_step = BROTLI_REVERSE_BITS_LOWEST;
+				key_step = BROTLI_REVERSE_BITS_LOWEST >> (root_bits - 1); sub_key = (BROTLI_REVERSE_BITS_LOWEST << 1); sub_key_step = BROTLI_REVERSE_BITS_LOWEST;
 				for (len = root_bits + 1, step = 2; len <= max_length; ++len) 
 				{
 					symbol = len - (BROTLI_HUFFMAN_MAX_CODE_LENGTH + 1);
@@ -3410,16 +3342,13 @@ namespace ExternalArchivingMethods
 					{
 						if (sub_key == (BROTLI_REVERSE_BITS_LOWEST << 1)) 
 						{
-							table += table_size;
-							table_bits = NextTableBitSize(count, len, root_bits); table_size = 1 << table_bits;
+							table += table_size; table_bits = NextTableBitSize(count, len, root_bits); table_size = 1 << table_bits;
 							total_size += table_size; sub_key = BrotliReverseBits(key); key += key_step;
 							root_table[sub_key].bits = (byte) (table_bits + root_bits);
-							root_table[sub_key].value = (ushort) ((size_t) (table - root_table) - sub_key);
-							sub_key = 0;
+							root_table[sub_key].value = (ushort) ((size_t) (table - root_table) - sub_key); sub_key = 0;
 						}
 						code.bits = (byte) (len - root_bits); symbol = symbol_lists[symbol];
-						code.value = (ushort) symbol; ReplicateValue(&table[BrotliReverseBits(sub_key)], step, table_size, code);
-						sub_key += sub_key_step;
+						code.value = (ushort) symbol; ReplicateValue(&table[BrotliReverseBits(sub_key)], step, table_size, code); sub_key += sub_key_step;
 					}
 					step <<= 1; sub_key_step >>= 1;
 				}
@@ -3518,12 +3447,9 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void BrotliDecoderStateCleanupAfterMetablock(ref BrotliDecoderState s) 
 			{
-				s.free_func(s.memory_manager_opaque, s.context_modes);
-				s.context_modes = null;
-				s.free_func(s.memory_manager_opaque, s.context_map);
-				s.context_map = null;
-				s.free_func(s.memory_manager_opaque, s.dist_context_map);
-				s.dist_context_map = null;
+				s.free_func(s.memory_manager_opaque, s.context_modes); s.context_modes = null;
+				s.free_func(s.memory_manager_opaque, s.context_map); s.context_map = null;
+				s.free_func(s.memory_manager_opaque, s.dist_context_map); s.dist_context_map = null;
 
 				fixed (HuffmanTreeGroup* lh = &s.literal_hgroup)
 				fixed (HuffmanTreeGroup* ich = &s.insert_copy_hgroup)
@@ -3534,38 +3460,27 @@ namespace ExternalArchivingMethods
 			{
 				/* Pack two allocations into one */
 				size_t max_table_size = (int) kMaxHuffmanTableSize[(alphabet_size + 31) >> 5];
-				size_t code_size = sizeof(HuffmanCode) * ntrees * max_table_size;
-				size_t htree_size = IntPtr.Size * ntrees;
+				size_t code_size = sizeof(HuffmanCode) * ntrees * max_table_size; size_t htree_size = IntPtr.Size * ntrees;
 				/* Pointer alignment is, hopefully, wider than sizeof(HuffmanCode). */
 				var p = (HuffmanCode**) s.alloc_func(s.memory_manager_opaque, code_size + htree_size);
 				group->alphabet_size = (ushort) alphabet_size;
-				group->num_htrees = (ushort) ntrees; group->htrees = (HuffmanCode**) p; group->codes = (HuffmanCode*) (&p[ntrees]);
-				return p != null;
+				group->num_htrees = (ushort) ntrees; group->htrees = (HuffmanCode**) p; group->codes = (HuffmanCode*) (&p[ntrees]); return p != null;
 			}
 
-			internal enum BrotliDecoderErrorCode {
+			internal enum BrotliDecoderErrorCode 
+			{
 				/* Same as BrotliDecoderResult values */
-				BROTLI_DECODER_NO_ERROR,
-				BROTLI_DECODER_SUCCESS,
-				BROTLI_DECODER_NEEDS_MORE_INPUT,
-				BROTLI_DECODER_NEEDS_MORE_OUTPUT,
+				BROTLI_DECODER_NO_ERROR, BROTLI_DECODER_SUCCESS,
+				BROTLI_DECODER_NEEDS_MORE_INPUT, BROTLI_DECODER_NEEDS_MORE_OUTPUT,
 
 				/* Errors caused by invalid input */
-				BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_NIBBLE = -1,
-				BROTLI_DECODER_ERROR_FORMAT_RESERVED = -2,
-				BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_META_NIBBLE = -3,
-				BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_ALPHABET = -4,
-				BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_SAME = -5,
-				BROTLI_DECODER_ERROR_FORMAT_CL_SPACE = -6,
-				BROTLI_DECODER_ERROR_FORMAT_HUFFMAN_SPACE = -7,
-				BROTLI_DECODER_ERROR_FORMAT_CONTEXT_MAP_REPEAT = -8,
-				BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_1 = -9,
-				BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_2 = -10,
-				BROTLI_DECODER_ERROR_FORMAT_TRANSFORM = -11,
-				BROTLI_DECODER_ERROR_FORMAT_DICTIONARY = -12,
-				BROTLI_DECODER_ERROR_FORMAT_WINDOW_BITS = -13,
-				BROTLI_DECODER_ERROR_FORMAT_PADDING_1 = -14,
-				BROTLI_DECODER_ERROR_FORMAT_PADDING_2 = -15,
+				BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_NIBBLE = -1, BROTLI_DECODER_ERROR_FORMAT_RESERVED = -2,
+				BROTLI_DECODER_ERROR_FORMAT_EXUBERANT_META_NIBBLE = -3, BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_ALPHABET = -4,
+				BROTLI_DECODER_ERROR_FORMAT_SIMPLE_HUFFMAN_SAME = -5, BROTLI_DECODER_ERROR_FORMAT_CL_SPACE = -6,
+				BROTLI_DECODER_ERROR_FORMAT_HUFFMAN_SPACE = -7, BROTLI_DECODER_ERROR_FORMAT_CONTEXT_MAP_REPEAT = -8,
+				BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_1 = -9, BROTLI_DECODER_ERROR_FORMAT_BLOCK_LENGTH_2 = -10,
+				BROTLI_DECODER_ERROR_FORMAT_TRANSFORM = -11, BROTLI_DECODER_ERROR_FORMAT_DICTIONARY = -12,
+				BROTLI_DECODER_ERROR_FORMAT_WINDOW_BITS = -13, BROTLI_DECODER_ERROR_FORMAT_PADDING_1 = -14, BROTLI_DECODER_ERROR_FORMAT_PADDING_2 = -15,
 
 				/* -16..-19 codes are reserved */
 
@@ -3576,9 +3491,7 @@ namespace ExternalArchivingMethods
 				/* Literalinsert and distance trees together */
 				BROTLI_DECODER_ERROR_ALLOC_TREE_GROUPS = -22,
 				/* -23..-24 codes are reserved for distinct tree groups */
-				BROTLI_DECODER_ERROR_ALLOC_CONTEXT_MAP = -25,
-				BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_1 = -26,
-				BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_2 = -27,
+				BROTLI_DECODER_ERROR_ALLOC_CONTEXT_MAP = -25, BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_1 = -26, BROTLI_DECODER_ERROR_ALLOC_RING_BUFFER_2 = -27,
 				/* -28..-29 codes are reserved for dynamic ring-buffer allocation */
 				BROTLI_DECODER_ERROR_ALLOC_BLOCK_TYPE_TREES = -30,
 
@@ -3702,10 +3615,8 @@ namespace ExternalArchivingMethods
 				/* This ring buffer holds a few past copy distances that will be used by */
 				/* some special distance codes. */
 				public HuffmanTreeGroup literal_hgroup;
-				public HuffmanTreeGroup insert_copy_hgroup;
-				public HuffmanTreeGroup distance_hgroup;
-				public HuffmanCode* block_type_trees;
-				public HuffmanCode* block_len_trees;
+				public HuffmanTreeGroup insert_copy_hgroup; public HuffmanTreeGroup distance_hgroup;
+				public HuffmanCode* block_type_trees; public HuffmanCode* block_len_trees;
 				/* This is true if the literal context map histogram type always matches the
 				block type. It is then not needed to keep the context (faster decoding). */
 				public int trivial_literal_context;
@@ -3757,12 +3668,9 @@ namespace ExternalArchivingMethods
 				/* less used attributes are in the end of this struct */
 				/* States inside function calls */
 				public BrotliRunningMetablockHeaderState substate_metablock_header;
-				public BrotliRunningTreeGroupState substate_tree_group;
-				public BrotliRunningContextMapState substate_context_map;
-				public BrotliRunningUncompressedState substate_uncompressed;
-				public BrotliRunningHuffmanState substate_huffman;
-				public BrotliRunningDecodeUint8State substate_decode_uint8;
-				public BrotliRunningReadBlockLengthState substate_read_block_length;
+				public BrotliRunningTreeGroupState substate_tree_group; public BrotliRunningContextMapState substate_context_map;
+				public BrotliRunningUncompressedState substate_uncompressed; public BrotliRunningHuffmanState substate_huffman;
+				public BrotliRunningDecodeUint8State substate_decode_uint8; public BrotliRunningReadBlockLengthState substate_read_block_length;
 
 				public bool is_last_metablock; public bool is_uncompressed;
 				public bool is_metadata; public bool should_wrap_ringbuffer; public byte size_nibbles; public uint window_bits;
@@ -14326,8 +14234,7 @@ namespace ExternalArchivingMethods
 				var idx = 0;
 				{ fixed (char* kps = kPrefixSuffix) { var prefix = &kps[kTransforms[transform].prefix_id]; while (*prefix != 0) { dst[idx++] = (byte) *prefix++; } } }
 				{
-					int t = kTransforms[transform].transform; var i = 0;
-					var skip = t - ((int) WordTransformType.kOmitFirst1 - 1);
+					int t = kTransforms[transform].transform; var i = 0; var skip = t - ((int) WordTransformType.kOmitFirst1 - 1);
 					if (skip > 0) { word += skip; len -= skip; }
 					else if (t <= (int) WordTransformType.kOmitLast9) { len -= t; }
 					while (i < len) { dst[idx++] = word[i++]; }
@@ -14424,7 +14331,8 @@ namespace ExternalArchivingMethods
 
 			/* Histogram based cost model for zopflification. */
 			[StructLayout(LayoutKind.Sequential)]
-			private unsafe struct ZopfliCostModel {
+			private unsafe struct ZopfliCostModel 
+			{
 				/* The insert and copy length symbols. */
 				public fixed float cost_cmd_[BROTLI_NUM_COMMAND_SYMBOLS];
 
@@ -14453,9 +14361,7 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void BrotliInitZopfliNodes(ZopfliNode* array, size_t length) 
 			{
-				ZopfliNode stub = new ZopfliNode();
-				size_t i; stub.length = 1; stub.distance = 0;
-				stub.insert_length = 0; stub.u.cost = kInfinity;
+				ZopfliNode stub = new ZopfliNode(); size_t i; stub.length = 1; stub.distance = 0; stub.insert_length = 0; stub.u.cost = kInfinity;
 				for (i = 0; i < length; ++i) array[i] = stub;
 			}
 
@@ -14479,10 +14385,7 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void ZopfliCostModelSetFromLiteralCosts(ZopfliCostModel* self, size_t position, byte* ringbuffer, size_t ringbuffer_mask) 
 			{
-				float* literal_costs = self->literal_costs_;
-				float* cost_dist = self->cost_dist_;
-				float* cost_cmd = self->cost_cmd_;
-				size_t num_bytes = self->num_bytes_; size_t i;
+				float* literal_costs = self->literal_costs_; float* cost_dist = self->cost_dist_; float* cost_cmd = self->cost_cmd_; size_t num_bytes = self->num_bytes_; size_t i;
 				BrotliEstimateBitCostsForLiterals(position, num_bytes, ringbuffer_mask, ringbuffer, &literal_costs[1]);
 				literal_costs[0] = 0.0f;
 				for (i = 0; i < num_bytes; ++i) { literal_costs[i + 1] += literal_costs[i]; }
@@ -14539,9 +14442,7 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void StartPosQueuePush(StartPosQueue* self, PosData* posdata) 
 			{
-				size_t offset = ~(self->idx_++) & 7;
-				size_t len = StartPosQueueSize(self); size_t i;
-				PosData* q = self->q_; q[offset] = *posdata;
+				size_t offset = ~(self->idx_++) & 7; size_t len = StartPosQueueSize(self); size_t i; PosData* q = self->q_; q[offset] = *posdata;
 				/* Restore the sorted order. In the list of |len| items at most |len - 1|
 				   adjacent element comparisons / swaps are required. */
 				for (i = 1; i < len; ++i) { if (q[offset & 7].costdiff > q[(offset + 1) & 7].costdiff) { PosData tmp = q[offset & 7]; q[offset & 7] = q[(offset + 1) & 7]; q[(offset + 1) & 7] = tmp; } ++offset; }
@@ -14552,14 +14453,11 @@ namespace ExternalArchivingMethods
 			private static unsafe void EvaluateNode( size_t block_start, size_t pos, size_t max_backward_limit, int* starting_dist_cache, ZopfliCostModel* model, StartPosQueue* queue, ZopfliNode* nodes) 
 			{
 				/* Save cost, because ComputeDistanceCache invalidates it. */
-				float node_cost = nodes[pos].u.cost;
-				nodes[pos].u.shortcut = ComputeDistanceShortcut(block_start, pos, max_backward_limit, nodes);
+				float node_cost = nodes[pos].u.cost; nodes[pos].u.shortcut = ComputeDistanceShortcut(block_start, pos, max_backward_limit, nodes);
 				if (node_cost <= ZopfliCostModelGetLiteralCosts(model, 0, pos)) 
 				{
-					PosData posdata; posdata.pos = pos; posdata.cost = node_cost;
-					posdata.costdiff = node_cost - ZopfliCostModelGetLiteralCosts(model, 0, pos);
-					ComputeDistanceCache(pos, starting_dist_cache, nodes, posdata.distance_cache);
-					StartPosQueuePush(queue, &posdata);
+					PosData posdata; posdata.pos = pos; posdata.cost = node_cost; posdata.costdiff = node_cost - ZopfliCostModelGetLiteralCosts(model, 0, pos);
+					ComputeDistanceCache(pos, starting_dist_cache, nodes, posdata.distance_cache); StartPosQueuePush(queue, &posdata);
 				}
 			}
 
@@ -14570,8 +14468,7 @@ namespace ExternalArchivingMethods
 			private static unsafe size_t ComputeMinimumCopyLength(float start_cost, ZopfliNode* nodes, size_t num_bytes, size_t pos) 
 			{
 				/* Compute the minimum possible cost of reaching any future position. */
-				float min_cost = start_cost; size_t len = 2;
-				size_t next_len_bucket = 4; size_t next_len_offset = 10;
+				float min_cost = start_cost; size_t len = 2; size_t next_len_bucket = 4; size_t next_len_offset = 10;
 				while (pos + len <= num_bytes && nodes[pos + len].u.cost <= min_cost) 
 				{
 					/* We already reached (pos + len) with no more cost than the minimum
@@ -14594,10 +14491,8 @@ namespace ExternalArchivingMethods
 			private static unsafe void UpdateZopfliNode(ZopfliNode* nodes, size_t pos,
 				size_t start_pos, size_t len, size_t len_code, size_t dist, size_t short_code, float cost) 
 			{
-				ZopfliNode* next = &nodes[pos + len];
-				next->length = (uint) (len | ((len + 9u - len_code) << 24));
-				next->distance = (uint) (dist | (short_code << 25));
-				next->insert_length = (uint) (pos - start_pos); next->u.cost = cost;
+				ZopfliNode* next = &nodes[pos + len]; next->length = (uint) (len | ((len + 9u - len_code) << 24));
+				next->distance = (uint) (dist | (short_code << 25)); next->insert_length = (uint) (pos - start_pos); next->u.cost = cost;
 			}
 
 			/* Returns longest copy length. */
@@ -14605,12 +14500,9 @@ namespace ExternalArchivingMethods
 				size_t max_backward_limit, int* starting_dist_cache, size_t num_matches, BackwardMatch* matches, ZopfliCostModel* model, StartPosQueue* queue, ZopfliNode* nodes) 
 			{
 				size_t cur_ix = block_start + pos;
-				size_t cur_ix_masked = cur_ix & ringbuffer_mask;
-				size_t max_distance = Math.Min(cur_ix, max_backward_limit);
-				size_t max_len = num_bytes - pos;
-				size_t max_zopfli_len = MaxZopfliLen(params_);
-				size_t max_iters = MaxZopfliCandidates(params_);
-				size_t min_len; size_t result = 0; size_t k;
+				size_t cur_ix_masked = cur_ix & ringbuffer_mask; size_t max_distance = Math.Min(cur_ix, max_backward_limit);
+				size_t max_len = num_bytes - pos; size_t max_zopfli_len = MaxZopfliLen(params_);
+				size_t max_iters = MaxZopfliCandidates(params_); size_t min_len; size_t result = 0; size_t k;
 
 				EvaluateNode(block_start, pos, max_backward_limit, starting_dist_cache, model, queue, nodes);
 
@@ -14624,16 +14516,13 @@ namespace ExternalArchivingMethods
 				   difference. */
 				for (k = 0; k < max_iters && k < StartPosQueueSize(queue); ++k) 
 				{
-					PosData* posdata = StartPosQueueAt(queue, k);
-					size_t start = posdata->pos;
-					ushort inscode = GetInsertLengthCode(pos - start);
-					float start_costdiff = posdata->costdiff;
+					PosData* posdata = StartPosQueueAt(queue, k); size_t start = posdata->pos;
+					ushort inscode = GetInsertLengthCode(pos - start); float start_costdiff = posdata->costdiff;
 					float base_cost = start_costdiff + (float) GetInsertExtra(inscode) + ZopfliCostModelGetLiteralCosts(model, 0, pos);
 
 					/* Look for last distance matches using the distance cache from this
 					   starting position. */
-					size_t best_len = min_len - 1;
-					size_t j = 0;
+					size_t best_len = min_len - 1; size_t j = 0;
 					for (; j < BROTLI_NUM_DISTANCE_SHORT_CODES && best_len < max_len; ++j) 
 					{
 						size_t idx = kDistanceCacheIndex[j];
@@ -14646,8 +14535,7 @@ namespace ExternalArchivingMethods
 						if (cur_ix_masked + best_len > ringbuffer_mask || prev_ix + best_len > ringbuffer_mask || ringbuffer[cur_ix_masked + best_len] != ringbuffer[prev_ix + best_len]) { continue; }
 						{
 							size_t len = FindMatchLengthWithLimit(&ringbuffer[prev_ix], &ringbuffer[cur_ix_masked], max_len);
-							float dist_cost = base_cost + ZopfliCostModelGetDistanceCost(model, j);
-							size_t l;
+							float dist_cost = base_cost + ZopfliCostModelGetDistanceCost(model, j); size_t l;
 							for (l = best_len + 1; l <= len; ++l) 
 							{
 								ushort copycode = GetCopyLengthCode(l);
@@ -14669,17 +14557,12 @@ namespace ExternalArchivingMethods
 						size_t len = min_len;
 						for (j = 0; j < num_matches; ++j) 
 						{
-							BackwardMatch match = matches[j];
-							size_t dist = match.distance;
+							BackwardMatch match = matches[j]; size_t dist = match.distance;
 							bool is_dictionary_match = (dist > max_distance);
 							/* We already tried all possible last distance matches, so we can use
 							   normal distance code here. */
 							size_t dist_code = dist + BROTLI_NUM_DISTANCE_SHORT_CODES - 1;
-							ushort dist_symbol;
-							uint distextra;
-							uint distnumextra;
-							float dist_cost;
-							size_t max_match_len;
+							ushort dist_symbol; uint distextra; uint distnumextra; float dist_cost; size_t max_match_len;
 							PrefixEncodeCopyDistance(dist_code, 0, 0, &dist_symbol, &distextra);
 							distnumextra = distextra >> 24;
 							dist_cost = base_cost + (float) distnumextra + ZopfliCostModelGetDistanceCost(model, dist_symbol);
@@ -14716,8 +14599,7 @@ namespace ExternalArchivingMethods
 			private static unsafe size_t BrotliZopfliComputeShortestPath(ref MemoryManager m, size_t num_bytes, size_t position, byte* ringbuffer, size_t ringbuffer_mask,
 				BrotliEncoderParams* params_, size_t max_backward_limit, int* dist_cache, HasherHandle hasher, ZopfliNode* nodes) 
 			{
-				size_t max_zopfli_len = MaxZopfliLen(params_);
-				ZopfliCostModel model; StartPosQueue queue;
+				size_t max_zopfli_len = MaxZopfliLen(params_); ZopfliCostModel model; StartPosQueue queue;
 				BackwardMatch* matches = stackalloc BackwardMatch[MAX_NUM_MATCHES_H10];
 				HashToBinaryTreeH10 h10 = (HashToBinaryTreeH10) kHashers[10];
 				size_t store_end = num_bytes >= h10.StoreLookahead() ? position + num_bytes - h10.StoreLookahead() + 1 : position;
@@ -14726,10 +14608,8 @@ namespace ExternalArchivingMethods
 				InitStartPosQueue(&queue);
 				for (i = 0; i + h10.HashTypeLength() - 1 < num_bytes; i++) 
 				{
-					size_t pos = position + i;
-					size_t max_distance = Math.Min(pos, max_backward_limit);
-					size_t num_matches = HashToBinaryTreeH10.FindAllMatches(hasher, ringbuffer, ringbuffer_mask, pos, num_bytes - i, max_distance, params_, matches);
-					size_t skip;
+					size_t pos = position + i; size_t max_distance = Math.Min(pos, max_backward_limit);
+					size_t num_matches = HashToBinaryTreeH10.FindAllMatches(hasher, ringbuffer, ringbuffer_mask, pos, num_bytes - i, max_distance, params_, matches); size_t skip;
 					if (num_matches > 0 && BackwardMatchLength(&matches[num_matches - 1]) > max_zopfli_len)  { matches[0] = matches[num_matches - 1]; num_matches = 1; }
 					skip = UpdateNodes(num_bytes, position, i, ringbuffer, ringbuffer_mask, params_, max_backward_limit, dist_cache, num_matches, matches, &model, &queue, nodes);
 					if (skip < BROTLI_LONG_COPY_QUICK_STEP) skip = 0;
@@ -14780,8 +14660,7 @@ namespace ExternalArchivingMethods
 				BrotliEncoderParams* params_, HasherHandle hasher, int* dist_cache, size_t* last_insert_len, Command* commands, size_t* num_commands, size_t* num_literals) 
 			{
 				size_t max_backward_limit = BROTLI_MAX_BACKWARD_LIMIT(params_->lgwin); ZopfliNode* nodes;
-				nodes = (ZopfliNode*) BrotliAllocate(ref m, (num_bytes + 1) * sizeof(ZopfliNode));
-				BrotliInitZopfliNodes(nodes, num_bytes + 1);
+				nodes = (ZopfliNode*) BrotliAllocate(ref m, (num_bytes + 1) * sizeof(ZopfliNode)); BrotliInitZopfliNodes(nodes, num_bytes + 1);
 				*num_commands += BrotliZopfliComputeShortestPath(ref m, num_bytes, position, ringbuffer, ringbuffer_mask, params_, max_backward_limit, dist_cache, hasher, nodes);
 				BrotliZopfliCreateCommands(num_bytes, position, max_backward_limit, nodes, dist_cache, last_insert_len, commands, num_literals);
 				BrotliFree(ref m, nodes);
@@ -14806,10 +14685,8 @@ namespace ExternalArchivingMethods
 				size_t num_commands, size_t last_insert_len) 
 			{
 				uint* histogram_literal = stackalloc uint[BROTLI_NUM_LITERAL_SYMBOLS];
-				uint* histogram_cmd = stackalloc uint[BROTLI_NUM_COMMAND_SYMBOLS];
-				uint* histogram_dist = stackalloc uint[BROTLI_NUM_DISTANCE_SYMBOLS];
-				float* cost_literal = stackalloc float[BROTLI_NUM_LITERAL_SYMBOLS];
-				size_t pos = position - last_insert_len;
+				uint* histogram_cmd = stackalloc uint[BROTLI_NUM_COMMAND_SYMBOLS]; uint* histogram_dist = stackalloc uint[BROTLI_NUM_DISTANCE_SYMBOLS];
+				float* cost_literal = stackalloc float[BROTLI_NUM_LITERAL_SYMBOLS]; size_t pos = position - last_insert_len;
 				float min_cost_cmd = kInfinity; size_t i; float* cost_cmd = self->cost_cmd_;
 
 				memset(histogram_literal, 0, BROTLI_NUM_LITERAL_SYMBOLS * sizeof(uint));
@@ -14868,8 +14745,7 @@ namespace ExternalArchivingMethods
 				BrotliEncoderParams* params_, HasherHandle hasher, int* dist_cache, size_t* last_insert_len, Command* commands, size_t* num_commands, size_t* num_literals) 
 			{
 				size_t max_backward_limit = BROTLI_MAX_BACKWARD_LIMIT(params_->lgwin);
-				uint* num_matches = (uint*) BrotliAllocate(ref m, num_bytes * sizeof(uint));
-				size_t matches_size = 4 * num_bytes; Hasher h = kHashers[10];
+				uint* num_matches = (uint*) BrotliAllocate(ref m, num_bytes * sizeof(uint)); size_t matches_size = 4 * num_bytes; Hasher h = kHashers[10];
 				size_t store_end = num_bytes >= h.StoreLookahead() ? position + num_bytes - h.StoreLookahead() + 1 : position;
 				size_t cur_match_pos = 0; size_t i; size_t orig_num_literals; size_t orig_last_insert_len;
 				int* orig_dist_cache = stackalloc int[4]; size_t orig_num_commands; ZopfliCostModel model; ZopfliNode* nodes;
@@ -14897,8 +14773,7 @@ namespace ExternalArchivingMethods
 				}
 				orig_num_literals = *num_literals; orig_last_insert_len = *last_insert_len;
 				memcpy(orig_dist_cache, dist_cache, 4 * sizeof(int)); orig_num_commands = *num_commands;
-				nodes = (ZopfliNode*) BrotliAllocate(ref m, (num_bytes + 1) * sizeof(ZopfliNode));
-				InitZopfliCostModel(ref m, &model, num_bytes);
+				nodes = (ZopfliNode*) BrotliAllocate(ref m, (num_bytes + 1) * sizeof(ZopfliNode)); InitZopfliCostModel(ref m, &model, num_bytes);
 				for (i = 0; i < 2; i++) 
 				{
 					BrotliInitZopfliNodes(nodes, num_bytes + 1);
@@ -14972,10 +14847,8 @@ namespace ExternalArchivingMethods
 						/* In this loop we compute the entropy of the histogram and simultaneously
 						   build a simplified histogram of the code length codes where we use the
 						   zero repeat code 17, but we don't use the non-zero repeat code 16. */
-						size_t max_depth = 1;
-						uint* depth_histo = stackalloc uint[BROTLI_CODE_LENGTH_CODES];
-						memset(depth_histo, 0, BROTLI_CODE_LENGTH_CODES * sizeof(uint));
-						double log2total = FastLog2(histogram->total_count_);
+						size_t max_depth = 1; uint* depth_histo = stackalloc uint[BROTLI_CODE_LENGTH_CODES];
+						memset(depth_histo, 0, BROTLI_CODE_LENGTH_CODES * sizeof(uint)); double log2total = FastLog2(histogram->total_count_);
 						for (i = 0; i < data_size;)
 						{
 							if (histogram->data_[i] > 0)
@@ -15025,17 +14898,13 @@ namespace ExternalArchivingMethods
 					if (count == 2) { return (kTwoSymbolHistogramCost + (double)histogram->total_count_); }
 					if (count == 3)
 					{
-						uint histo0 = histogram->data_[s[0]];
-						uint histo1 = histogram->data_[s[1]];
-						uint histo2 = histogram->data_[s[2]];
-						uint histomax = Math.Max(histo0, Math.Max(histo1, histo2));
+						uint histo0 = histogram->data_[s[0]]; uint histo1 = histogram->data_[s[1]];
+						uint histo2 = histogram->data_[s[2]]; uint histomax = Math.Max(histo0, Math.Max(histo1, histo2));
 						return (kThreeSymbolHistogramCost + 2 * (histo0 + histo1 + histo2) - histomax);
 					}
 					if (count == 4)
 					{
-						uint* histo = stackalloc uint[4];
-						uint h23;
-						uint histomax;
+						uint* histo = stackalloc uint[4]; uint h23; uint histomax;
 						for (i = 0; i < 4; ++i) { histo[i] = histogram->data_[s[i]]; }
 						/* Sort */
 						for (i = 0; i < 4; ++i)
@@ -15052,8 +14921,7 @@ namespace ExternalArchivingMethods
 						/* In this loop we compute the entropy of the histogram and simultaneously
 						   build a simplified histogram of the code length codes where we use the
 						   zero repeat code 17, but we don't use the non-zero repeat code 16. */
-						size_t max_depth = 1;
-						uint* depth_histo = stackalloc uint[BROTLI_CODE_LENGTH_CODES];
+						size_t max_depth = 1; uint* depth_histo = stackalloc uint[BROTLI_CODE_LENGTH_CODES];
 						memset(depth_histo, 0, BROTLI_CODE_LENGTH_CODES * sizeof(uint));
 						double log2total = FastLog2(histogram->total_count_);
 						for (i = 0; i < data_size;)
@@ -15064,8 +14932,7 @@ namespace ExternalArchivingMethods
 															= log2(total_count) - log2(count(symbol)) */
 								double log2p = log2total - FastLog2(histogram->data_[i]);
 								/* Approximate the bit depth by round(-log2(P(symbol))) */
-								size_t depth = (size_t)(log2p + 0.5);
-								bits += histogram->data_[i] * log2p;
+								size_t depth = (size_t)(log2p + 0.5); bits += histogram->data_[i] * log2p;
 								if (depth > 15) { depth = 15; }
 								if (depth > max_depth) { max_depth = depth; }
 								++depth_histo[depth]; ++i;
@@ -15174,8 +15041,7 @@ namespace ExternalArchivingMethods
 									{
 										++depth_histo[BROTLI_REPEAT_ZERO_CODE_LENGTH];
 										/* Add the 3 extra bits for the 17 code length code. */
-										bits += 3;
-										reps >>= 3;
+										bits += 3; reps >>= 3;
 									}
 								}
 							}
@@ -15264,12 +15130,9 @@ namespace ExternalArchivingMethods
 	   vector of block types and block lengths and stores it to the bit stream. */
 			private static unsafe void BuildAndStoreBlockSplitCode(byte* types, uint* lengths, size_t num_blocks, size_t num_types, HuffmanTree* tree, BlockSplitCode* code, size_t* storage_ix, byte* storage) 
 			{
-				uint* type_histo = stackalloc uint[BROTLI_MAX_BLOCK_TYPE_SYMBOLS];
-				uint* length_histo = stackalloc uint[BROTLI_NUM_BLOCK_LEN_SYMBOLS];
-				size_t i; BlockTypeCodeCalculator type_code_calculator;
-				memset(type_histo, 0, (num_types + 2) * sizeof(uint));
-				memset(length_histo, 0, BROTLI_NUM_BLOCK_LEN_SYMBOLS * sizeof(uint));
-				InitBlockTypeCodeCalculator(&type_code_calculator);
+				uint* type_histo = stackalloc uint[BROTLI_MAX_BLOCK_TYPE_SYMBOLS]; uint* length_histo = stackalloc uint[BROTLI_NUM_BLOCK_LEN_SYMBOLS];
+				size_t i; BlockTypeCodeCalculator type_code_calculator; memset(type_histo, 0, (num_types + 2) * sizeof(uint));
+				memset(length_histo, 0, BROTLI_NUM_BLOCK_LEN_SYMBOLS * sizeof(uint)); InitBlockTypeCodeCalculator(&type_code_calculator);
 				for (i = 0; i < num_blocks; ++i) 
 				{
 					size_t type_code = NextBlockTypeCode(&type_code_calculator, types[i]);
@@ -15296,12 +15159,9 @@ namespace ExternalArchivingMethods
 				StoreVarLenUint8(num_types - 1, storage_ix, storage);
 				if (num_types > 1) 
 				{
-					size_t repeat_code = context_bits - 1u;
-					size_t repeat_bits = (1u << (int) repeat_code) - 1u;
-					size_t alphabet_size = num_types + repeat_code;
-					uint* histogram = stackalloc uint[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
-					byte* depths = stackalloc byte[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
-					ushort* bits = stackalloc ushort[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
+					size_t repeat_code = context_bits - 1u; size_t repeat_bits = (1u << (int) repeat_code) - 1u;
+					size_t alphabet_size = num_types + repeat_code; uint* histogram = stackalloc uint[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
+					byte* depths = stackalloc byte[BROTLI_MAX_CONTEXT_MAP_SYMBOLS]; ushort* bits = stackalloc ushort[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
 					size_t i; memset(histogram, 0, alphabet_size * sizeof(uint));
 					/* Write RLEMAX. */
 					BrotliWriteBits(1, 1, storage_ix, storage); BrotliWriteBits(4, repeat_code - 1, storage_ix, storage);
@@ -15343,12 +15203,7 @@ namespace ExternalArchivingMethods
 				for (i = 0; i <= max_value; ++i) { mtf[i] = (byte) i; }
 				{
 					size_t mtf_size = max_value + 1;
-					for (i = 0; i < v_size; ++i) 
-					{
-						size_t index = IndexOf(mtf, mtf_size, (byte) v_in[i]);
-						v_out[i] = (uint) index;
-						MoveToFront(mtf, index);
-					}
+					for (i = 0; i < v_size; ++i) { size_t index = IndexOf(mtf, mtf_size, (byte) v_in[i]); v_out[i] = (uint) index; MoveToFront(mtf, index); }
 				}
 			}
 
@@ -15405,12 +15260,9 @@ namespace ExternalArchivingMethods
 
 			private static unsafe void EncodeContextMap(ref MemoryManager m, uint* context_map, size_t context_map_size, size_t num_clusters, HuffmanTree* tree, size_t* storage_ix, byte* storage) 
 			{
-				size_t i; uint* rle_symbols;
-				uint max_run_length_prefix = 6; size_t num_rle_symbols = 0;
-				uint* histogram = stackalloc uint[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
-				const uint kSymbolMask = (1u << SYMBOL_BITS) - 1u;
-				byte* depths = stackalloc byte[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
-				ushort* bits = stackalloc ushort[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
+				size_t i; uint* rle_symbols; uint max_run_length_prefix = 6; size_t num_rle_symbols = 0;
+				uint* histogram = stackalloc uint[BROTLI_MAX_CONTEXT_MAP_SYMBOLS]; const uint kSymbolMask = (1u << SYMBOL_BITS) - 1u;
+				byte* depths = stackalloc byte[BROTLI_MAX_CONTEXT_MAP_SYMBOLS]; ushort* bits = stackalloc ushort[BROTLI_MAX_CONTEXT_MAP_SYMBOLS];
 
 				StoreVarLenUint8(num_clusters - 1, storage_ix, storage);
 
@@ -15430,13 +15282,11 @@ namespace ExternalArchivingMethods
 				BuildAndStoreHuffmanTree(histogram, num_clusters + max_run_length_prefix, tree, depths, bits, storage_ix, storage);
 				for (i = 0; i < num_rle_symbols; ++i) 
 				{
-					uint rle_symbol = rle_symbols[i] & kSymbolMask;
-					uint extra_bits_val = rle_symbols[i] >> SYMBOL_BITS;
+					uint rle_symbol = rle_symbols[i] & kSymbolMask; uint extra_bits_val = rle_symbols[i] >> SYMBOL_BITS;
 					BrotliWriteBits(depths[rle_symbol], bits[rle_symbol], storage_ix, storage);
 					if (rle_symbol > 0 && rle_symbol <= max_run_length_prefix) { BrotliWriteBits(rle_symbol, extra_bits_val, storage_ix, storage); }
 				}
-				BrotliWriteBits(1, 1, storage_ix, storage); /* use move-to-front */
-				BrotliFree(ref m, rle_symbols);
+				BrotliWriteBits(1, 1, storage_ix, storage); /* use move-to-front */ BrotliFree(ref m, rle_symbols);
 			}
 
 			/* Stores the next symbol with the entropy code of the current block type.
@@ -15467,11 +15317,7 @@ namespace ExternalArchivingMethods
 					StoreBlockSwitch(&self->block_split_code_, block_len, block_type, false, storage_ix, storage);
 				}
 				--self->block_len_;
-				{
-					size_t histo_ix = context_map[self->entropy_ix_ + context];
-					size_t ix = histo_ix * self->alphabet_size_ + symbol;
-					BrotliWriteBits(self->depths_[ix], self->bits_[ix], storage_ix, storage);
-				}
+				{ size_t histo_ix = context_map[self->entropy_ix_ + context]; size_t ix = histo_ix * self->alphabet_size_ + symbol; BrotliWriteBits(self->depths_[ix], self->bits_[ix], storage_ix, storage); }
 			}
 
 			private static unsafe void CleanupBlockEncoder(ref MemoryManager m, BlockEncoder* self) { BrotliFree(ref m, self->depths_); BrotliFree(ref m, self->bits_); }
@@ -15480,10 +15326,8 @@ namespace ExternalArchivingMethods
 				bool is_last, uint num_direct_distance_codes, uint distance_postfix_bits, ContextType literal_context_mode, Command* commands, size_t n_commands,
 				MetaBlockSplit* mb, size_t* storage_ix, byte* storage) 
 			{
-				size_t pos = start_pos; size_t i;
-				size_t num_distance_codes = BROTLI_NUM_DISTANCE_SHORT_CODES + num_direct_distance_codes + (48u << (int) distance_postfix_bits);
-				HuffmanTree* tree;
-				BlockEncoder literal_enc; BlockEncoder command_enc; BlockEncoder distance_enc;
+				size_t pos = start_pos; size_t i; size_t num_distance_codes = BROTLI_NUM_DISTANCE_SHORT_CODES + num_direct_distance_codes + (48u << (int) distance_postfix_bits);
+				HuffmanTree* tree; BlockEncoder literal_enc; BlockEncoder command_enc; BlockEncoder distance_enc;
 
 				StoreCompressedMetaBlockHeader(is_last, length, storage_ix, storage);
 
@@ -15497,8 +15341,7 @@ namespace ExternalArchivingMethods
 				BuildAndStoreBlockSwitchEntropyCodes(&command_enc, tree, storage_ix, storage);
 				BuildAndStoreBlockSwitchEntropyCodes(&distance_enc, tree, storage_ix, storage);
 
-				BrotliWriteBits(2, distance_postfix_bits, storage_ix, storage);
-				BrotliWriteBits(4, num_direct_distance_codes >> (int) distance_postfix_bits, storage_ix, storage);
+				BrotliWriteBits(2, distance_postfix_bits, storage_ix, storage); BrotliWriteBits(4, num_direct_distance_codes >> (int) distance_postfix_bits, storage_ix, storage);
 				for (i = 0; i < mb->literal_split.num_types; ++i) { BrotliWriteBits(2, (ulong) literal_context_mode, storage_ix, storage); }
 
 				if (mb->literal_context_map_size == 0) { StoreTrivialContextMap(mb->literal_histograms_size, BROTLI_LITERAL_CONTEXT_BITS, tree, storage_ix, storage); }
@@ -15517,10 +15360,8 @@ namespace ExternalArchivingMethods
 
 				for (i = 0; i < n_commands; ++i) 
 				{
-					Command cmd = commands[i];
-					size_t cmd_code = cmd.cmd_prefix_;
-					StoreSymbol(&command_enc, cmd_code, storage_ix, storage);
-					StoreCommandExtra(&cmd, storage_ix, storage);
+					Command cmd = commands[i]; size_t cmd_code = cmd.cmd_prefix_;
+					StoreSymbol(&command_enc, cmd_code, storage_ix, storage); StoreCommandExtra(&cmd, storage_ix, storage);
 					if (mb->literal_context_map_size == 0) 
 					{
 						size_t j;
@@ -15563,8 +15404,7 @@ namespace ExternalArchivingMethods
 			   REQUIRES: length <= (1 << 24) */
 			private static unsafe void BrotliEncodeMlen(size_t length, ulong* bits, size_t* numbits, ulong* nibblesbits) 
 			{
-				size_t lg = (length == 1) ? 1 : Log2FloorNonZero((uint) (length - 1)) + 1;
-				size_t mnibbles = (lg < 16 ? 16 : (lg + 3)) / 4;
+				size_t lg = (length == 1) ? 1 : Log2FloorNonZero((uint) (length - 1)) + 1; size_t mnibbles = (lg < 16 ? 16 : (lg + 3)) / 4;
 				*nibblesbits = mnibbles - 4; *numbits = mnibbles * 4; *bits = length - 1;
 			}
 
@@ -15592,12 +15432,9 @@ namespace ExternalArchivingMethods
 			private static unsafe void StoreCommandExtra(Command* cmd, size_t* storage_ix, byte* storage) 
 			{
 				uint copylen_code = CommandCopyLenCode(cmd);
-				ushort inscode = GetInsertLengthCode(cmd->insert_len_);
-				ushort copycode = GetCopyLengthCode(copylen_code);
-				uint insnumextra = GetInsertExtra(inscode);
-				ulong insextraval = cmd->insert_len_ - GetInsertBase(inscode);
-				ulong copyextraval = copylen_code - GetCopyBase(copycode);
-				ulong bits = (copyextraval << (int) insnumextra) | insextraval;
+				ushort inscode = GetInsertLengthCode(cmd->insert_len_); ushort copycode = GetCopyLengthCode(copylen_code);
+				uint insnumextra = GetInsertExtra(inscode); ulong insextraval = cmd->insert_len_ - GetInsertBase(inscode);
+				ulong copyextraval = copylen_code - GetCopyBase(copycode); ulong bits = (copyextraval << (int) insnumextra) | insextraval;
 				BrotliWriteBits(insnumextra + GetCopyExtra(copycode), bits, storage_ix, storage);
 			}
 
@@ -15608,8 +15445,7 @@ namespace ExternalArchivingMethods
 				for (i = 0; i < n_commands; ++i) 
 				{
 					Command cmd = commands[i]; size_t cmd_code = cmd.cmd_prefix_; size_t j;
-					BrotliWriteBits(cmd_depth[cmd_code], cmd_bits[cmd_code], storage_ix, storage);
-					StoreCommandExtra(&cmd, storage_ix, storage);
+					BrotliWriteBits(cmd_depth[cmd_code], cmd_bits[cmd_code], storage_ix, storage); StoreCommandExtra(&cmd, storage_ix, storage);
 					for (j = cmd.insert_len_; j != 0; --j) { byte literal = input[pos & mask]; BrotliWriteBits(lit_depth[literal], lit_bits[literal], storage_ix, storage); ++pos; }
 					pos += CommandCopyLen(&cmd);
 					if (CommandCopyLen(&cmd) != 0 && cmd.cmd_prefix_ >= 128) 
@@ -15638,8 +15474,7 @@ namespace ExternalArchivingMethods
 			private static unsafe void StoreSimpleHuffmanTree(byte* depths, size_t* symbols, size_t num_symbols, size_t max_bits, size_t* storage_ix, byte* storage) 
 			{
 				/* value of 1 indicates a simple Huffman code */
-				BrotliWriteBits(2, 1, storage_ix, storage);
-				BrotliWriteBits(2, num_symbols - 1, storage_ix, storage); /* NSYM - 1 */
+				BrotliWriteBits(2, 1, storage_ix, storage); BrotliWriteBits(2, num_symbols - 1, storage_ix, storage); /* NSYM - 1 */
 
 				{
 					/* Sort */
@@ -15667,16 +15502,14 @@ namespace ExternalArchivingMethods
 				bits[0:length] and stores the encoded tree to the bit stream. */
 			private static unsafe void BuildAndStoreHuffmanTree(uint* histogram, size_t length, HuffmanTree* tree, byte* depth, ushort* bits, size_t* storage_ix, byte* storage) 
 			{
-				size_t count = 0; size_t* s4 = stackalloc size_t[4];
-				memset(s4, 0, 4 * sizeof(size_t)); size_t i; size_t max_bits = 0;
+				size_t count = 0; size_t* s4 = stackalloc size_t[4]; memset(s4, 0, 4 * sizeof(size_t)); size_t i; size_t max_bits = 0;
 				for (i = 0; i < length; i++) { if (histogram[i] != 0) { if (count < 4) { s4[count] = i; } else if (count > 4) { break; } count++; } }
 
 				{ size_t max_bits_counter = length - 1; while (max_bits_counter != 0) { max_bits_counter >>= 1; ++max_bits; } }
 				
 				if (count <= 1) { BrotliWriteBits(4, 1, storage_ix, storage); BrotliWriteBits(max_bits, s4[0], storage_ix, storage); depth[s4[0]] = 0; bits[s4[0]] = 0; return; }
 
-				memset(depth, 0, length); BrotliCreateHuffmanTree(histogram, length, 15, tree, depth);
-				BrotliConvertBitDepthsToSymbols(depth, length, bits);
+				memset(depth, 0, length); BrotliCreateHuffmanTree(histogram, length, 15, tree, depth); BrotliConvertBitDepthsToSymbols(depth, length, bits);
 
 				if (count <= 4)  { StoreSimpleHuffmanTree(depth, s4, count, max_bits, storage_ix, storage); } else { BrotliStoreHuffmanTree(depth, length, tree, storage_ix, storage); }
 				
@@ -15685,14 +15518,10 @@ namespace ExternalArchivingMethods
 			private static unsafe void BrotliStoreMetaBlockTrivial(ref MemoryManager m, byte* input, size_t start_pos, size_t length, size_t mask, bool is_last,
 				Command* commands, size_t n_commands, size_t* storage_ix, byte* storage) 
 			{
-				HistogramLiteral lit_histo; HistogramCommand cmd_histo; HistogramDistance dist_histo;
-				byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS];
-				ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS];
-				byte* cmd_depth = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
-				ushort* cmd_bits = stackalloc ushort[BROTLI_NUM_COMMAND_SYMBOLS];
-				byte* dist_depth = stackalloc byte[SIMPLE_DISTANCE_ALPHABET_SIZE];
-				ushort* dist_bits = stackalloc ushort[SIMPLE_DISTANCE_ALPHABET_SIZE];
-				HuffmanTree* tree;
+				HistogramLiteral lit_histo; HistogramCommand cmd_histo; HistogramDistance dist_histo; byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS];
+				ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS]; byte* cmd_depth = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
+				ushort* cmd_bits = stackalloc ushort[BROTLI_NUM_COMMAND_SYMBOLS]; byte* dist_depth = stackalloc byte[SIMPLE_DISTANCE_ALPHABET_SIZE];
+				ushort* dist_bits = stackalloc ushort[SIMPLE_DISTANCE_ALPHABET_SIZE]; HuffmanTree* tree;
 
 				StoreCompressedMetaBlockHeader(is_last, length, storage_ix, storage);
 
@@ -15722,10 +15551,8 @@ namespace ExternalArchivingMethods
 				if (n_commands <= 128) 
 				{
 					uint* histogram = stackalloc uint[BROTLI_NUM_LITERAL_SYMBOLS];
-					memset(histogram, 0, BROTLI_NUM_LITERAL_SYMBOLS * sizeof(uint));
-					size_t pos = start_pos; size_t num_literals = 0; size_t i;
-					byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS];
-					ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS];
+					memset(histogram, 0, BROTLI_NUM_LITERAL_SYMBOLS * sizeof(uint)); size_t pos = start_pos; size_t num_literals = 0; size_t i;
+					byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS]; ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS];
 					for (i = 0; i < n_commands; ++i) 
 					{
 						Command cmd = commands[i]; size_t j;
@@ -15747,12 +15574,9 @@ namespace ExternalArchivingMethods
 				else 
 				{
 					HistogramLiteral lit_histo; HistogramCommand cmd_histo; HistogramDistance dist_histo;
-					byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS];
-					ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS];
-					byte* cmd_depth = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
-					ushort* cmd_bits = stackalloc ushort[BROTLI_NUM_COMMAND_SYMBOLS];
-					byte* dist_depth = stackalloc byte[SIMPLE_DISTANCE_ALPHABET_SIZE];
-					ushort* dist_bits = stackalloc ushort[SIMPLE_DISTANCE_ALPHABET_SIZE];
+					byte* lit_depth = stackalloc byte[BROTLI_NUM_LITERAL_SYMBOLS]; ushort* lit_bits = stackalloc ushort[BROTLI_NUM_LITERAL_SYMBOLS];
+					byte* cmd_depth = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS]; ushort* cmd_bits = stackalloc ushort[BROTLI_NUM_COMMAND_SYMBOLS];
+					byte* dist_depth = stackalloc byte[SIMPLE_DISTANCE_ALPHABET_SIZE]; ushort* dist_bits = stackalloc ushort[SIMPLE_DISTANCE_ALPHABET_SIZE];
 					HistogramLiteral.HistogramClear(&lit_histo); HistogramCommand.HistogramClear(&cmd_histo); 
 					HistogramDistance.HistogramClear(&dist_histo);
 					BuildHistograms(input, start_pos, mask, commands, n_commands, &lit_histo, &cmd_histo, &dist_histo);
@@ -15804,10 +15628,8 @@ namespace ExternalArchivingMethods
 
 				/* Write ISLAST bit.
 				   Uncompressed block cannot be the last one, so set to 0. */
-				BrotliWriteBits(1, 0, storage_ix, storage);
-				BrotliEncodeMlen(length, &lenbits, &nlenbits, &nibblesbits);
-				BrotliWriteBits(2, nibblesbits, storage_ix, storage);
-				BrotliWriteBits(nlenbits, lenbits, storage_ix, storage);
+				BrotliWriteBits(1, 0, storage_ix, storage); BrotliEncodeMlen(length, &lenbits, &nlenbits, &nibblesbits);
+				BrotliWriteBits(2, nibblesbits, storage_ix, storage); BrotliWriteBits(nlenbits, lenbits, storage_ix, storage);
 				/* Write ISUNCOMPRESSED bit. */
 				BrotliWriteBits(1, 1, storage_ix, storage);
 			}
@@ -15864,14 +15686,10 @@ namespace ExternalArchivingMethods
 				/* Write the Huffman tree into the brotli-representation.
 				   The command alphabet is the largest, so this allocation will fit all
 				   alphabets. */
-				byte* huffman_tree = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
-				byte* huffman_tree_extra_bits = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
-				size_t huffman_tree_size = 0;
-				byte* code_length_bitdepth = stackalloc byte[BROTLI_CODE_LENGTH_CODES];
-				memset(code_length_bitdepth, 0, BROTLI_CODE_LENGTH_CODES);
-				ushort* code_length_bitdepth_symbols = stackalloc ushort[BROTLI_CODE_LENGTH_CODES];
-				uint* huffman_tree_histogram = stackalloc uint[BROTLI_CODE_LENGTH_CODES];
-				memset(huffman_tree_histogram, 0, BROTLI_CODE_LENGTH_CODES * sizeof(uint));
+				byte* huffman_tree = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS]; byte* huffman_tree_extra_bits = stackalloc byte[BROTLI_NUM_COMMAND_SYMBOLS];
+				size_t huffman_tree_size = 0; byte* code_length_bitdepth = stackalloc byte[BROTLI_CODE_LENGTH_CODES];
+				memset(code_length_bitdepth, 0, BROTLI_CODE_LENGTH_CODES); ushort* code_length_bitdepth_symbols = stackalloc ushort[BROTLI_CODE_LENGTH_CODES];
+				uint* huffman_tree_histogram = stackalloc uint[BROTLI_CODE_LENGTH_CODES]; memset(huffman_tree_histogram, 0, BROTLI_CODE_LENGTH_CODES * sizeof(uint));
 				size_t i; int num_codes = 0; size_t code = 0;
 
 				BrotliWriteHuffmanTree(depths, num, &huffman_tree_size, huffman_tree, huffman_tree_extra_bits);
@@ -15907,9 +15725,7 @@ namespace ExternalArchivingMethods
 
 				memset(depth, 0, length);
 				{
-					size_t max_tree_size = 2 * length + 1;
-					HuffmanTree* tree = (HuffmanTree*) BrotliAllocate(ref m, max_tree_size * sizeof(HuffmanTree));
-					uint count_limit;
+					size_t max_tree_size = 2 * length + 1; HuffmanTree* tree = (HuffmanTree*) BrotliAllocate(ref m, max_tree_size * sizeof(HuffmanTree)); uint count_limit;
 
 					for (count_limit = 1;; count_limit *= 2) 
 					{
@@ -15920,8 +15736,7 @@ namespace ExternalArchivingMethods
 							if (histogram[l] != 0) { if ((histogram[l] >= count_limit)) { InitHuffmanTree(node, histogram[l], -1, (short) l); } else { InitHuffmanTree(node, count_limit, -1, (short) l); } ++node; }
 						}
 						{
-							int n = (int) (node - tree); HuffmanTree sentinel;
-							int i = 0; /* Points to the next leaf node. */
+							int n = (int) (node - tree); HuffmanTree sentinel; int i = 0; /* Points to the next leaf node. */
 							int j = n + 1; /* Points to the next non-leaf node. */ int k;
 
 							SortHuffmanTreeItems(tree, (size_t) n, SortHuffmanTreeBitStream);
@@ -15979,9 +15794,7 @@ namespace ExternalArchivingMethods
 				}
 				else 
 				{
-					byte previous_value = 8; size_t i;
-					/* Complex Huffman Tree */
-					StoreStaticCodeLengthCode(storage_ix, storage);
+					byte previous_value = 8; size_t i; /* Complex Huffman Tree */ StoreStaticCodeLengthCode(storage_ix, storage);
 
 					/* Actual RLE coding. */
 					for (i = 0; i < length;) 
@@ -16007,8 +15820,7 @@ namespace ExternalArchivingMethods
 					HistogramLiteral* histograms, size_t histograms_size, HuffmanTree* tree, size_t* storage_ix, byte* storage)
 				{
 					size_t alphabet_size = self->alphabet_size_; size_t table_size = histograms_size * alphabet_size;
-					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte));
-					self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
+					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte)); self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
 					{
 						size_t i;
 						for (i = 0; i < histograms_size; ++i)
@@ -16026,8 +15838,7 @@ namespace ExternalArchivingMethods
 					size_t histograms_size, HuffmanTree* tree, size_t* storage_ix, byte* storage)
 				{
 					size_t alphabet_size = self->alphabet_size_; size_t table_size = histograms_size * alphabet_size;
-					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte));
-					self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
+					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte)); self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
 					{
 						size_t i;
 						for (i = 0; i < histograms_size; ++i)
@@ -16045,8 +15856,7 @@ namespace ExternalArchivingMethods
 					HistogramCommand* histograms, size_t histograms_size, HuffmanTree* tree, size_t* storage_ix, byte* storage)
 				{
 					size_t alphabet_size = self->alphabet_size_; size_t table_size = histograms_size * alphabet_size;
-					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte));
-					self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
+					self->depths_ = (byte*)BrotliAllocate(ref m, table_size * sizeof(byte)); self->bits_ = (ushort*)BrotliAllocate(ref m, table_size * sizeof(ushort));
 					{
 						size_t i;
 						for (i = 0; i < histograms_size; ++i)
@@ -16113,8 +15923,7 @@ namespace ExternalArchivingMethods
 				size_t mask, BrotliEncoderParams* params_, BlockSplit* literal_split, BlockSplit* insert_and_copy_split, BlockSplit* dist_split)
 			{
 				{
-					size_t literals_count = CountLiterals(cmds, num_commands);
-					byte* literals = (byte*)BrotliAllocate(ref m, literals_count * sizeof(byte));
+					size_t literals_count = CountLiterals(cmds, num_commands); byte* literals = (byte*)BrotliAllocate(ref m, literals_count * sizeof(byte));
 					/* Create a continuous array of literals. */
 					CopyLiteralsToByteArray(cmds, num_commands, data, pos, mask, literals);
 					/* Create the block split on the array of literals.
@@ -16187,10 +15996,8 @@ namespace ExternalArchivingMethods
 					iters = ((iters + num_histograms - 1) / num_histograms) * num_histograms;
 					for (iter = 0; iter < iters; ++iter) 
 					{
-						HistogramLiteral sample;
-						HistogramLiteral.HistogramClear(&sample);
-						RandomSample(&seed, data, length, stride, &sample);
-						HistogramLiteral.HistogramAddHistogram(&histograms[iter % num_histograms], &sample);
+						HistogramLiteral sample; HistogramLiteral.HistogramClear(&sample);
+						RandomSample(&seed, data, length, stride, &sample); HistogramLiteral.HistogramAddHistogram(&histograms[iter % num_histograms], &sample);
 					}
 				}
 
@@ -16200,11 +16007,7 @@ namespace ExternalArchivingMethods
 				private static unsafe size_t FindBlocks(byte* data, size_t length, double block_switch_bitcost, size_t num_histograms, HistogramLiteral* histograms,
 					double* insert_cost, double* cost, byte* switch_signal, byte* block_id) 
 				{
-					size_t data_size = HistogramLiteral.HistogramDataSize();
-					size_t bitmaplen = (num_histograms + 7) >> 3;
-					size_t num_blocks = 1;
-					size_t i;
-					size_t j;
+					size_t data_size = HistogramLiteral.HistogramDataSize(); size_t bitmaplen = (num_histograms + 7) >> 3; size_t num_blocks = 1; size_t i; size_t j;
 					if (num_histograms <= 1) { for (i = 0; i < length; ++i) { block_id[i] = 0; } return 1; }
 					memset(insert_cost, 0, sizeof(double) * data_size * num_histograms);
 					for (i = 0; i < num_histograms; ++i) { insert_cost[i] = FastLog2((uint) histograms[i].total_count_); }
@@ -16219,12 +16022,8 @@ namespace ExternalArchivingMethods
 					   position, we need to switch here. */
 					for (i = 0; i < length; ++i) 
 					{
-						size_t byte_ix = i;
-						size_t ix = byte_ix * bitmaplen;
-						size_t insert_cost_ix = data[byte_ix] * num_histograms;
-						double min_cost = 1e99;
-						double block_switch_cost = block_switch_bitcost;
-						size_t k;
+						size_t byte_ix = i; size_t ix = byte_ix * bitmaplen; size_t insert_cost_ix = data[byte_ix] * num_histograms;
+						double min_cost = 1e99; double block_switch_cost = block_switch_bitcost; size_t k;
 						for (k = 0; k < num_histograms; ++k) { /* We are coding the symbol in data[byte_ix] with entropy code k. */ cost[k] += insert_cost[insert_cost_ix + k]; if (cost[k] < min_cost) { min_cost = cost[k]; block_id[byte_ix] = (byte) k; } }
 						/* More blocks for the beginning. */
 						if (byte_ix < 2000) { block_switch_cost *= 0.77 + 0.07 * (double) byte_ix / 2000; }
@@ -16235,14 +16034,10 @@ namespace ExternalArchivingMethods
 					}
 					{
 						/* Trace back from the last position and switch at the marked places. */
-						size_t byte_ix = length - 1;
-						size_t ix = byte_ix * bitmaplen;
-						byte cur_id = block_id[byte_ix];
+						size_t byte_ix = length - 1; size_t ix = byte_ix * bitmaplen; byte cur_id = block_id[byte_ix];
 						while (byte_ix > 0) 
 						{
-							byte mask = (byte) (1u << (cur_id & 7));
-							--byte_ix;
-							ix -= bitmaplen;
+							byte mask = (byte) (1u << (cur_id & 7)); --byte_ix; ix -= bitmaplen;
 							if ((switch_signal[ix + (cur_id >> 3)] & mask) != 0) { if (cur_id != block_id[byte_ix]) { cur_id = block_id[byte_ix]; ++num_blocks; } }
 							block_id[byte_ix] = cur_id;
 						}
@@ -16252,9 +16047,7 @@ namespace ExternalArchivingMethods
 
 				private static size_t RemapBlockIds(byte* block_ids, size_t length, ushort* new_id, size_t num_histograms) 
 				{
-					const ushort kInvalidId = 256;
-					ushort next_id = 0;
-					size_t i;
+					const ushort kInvalidId = 256; ushort next_id = 0; size_t i;
 					for (i = 0; i < num_histograms; ++i) { new_id[i] = kInvalidId; }
 					for (i = 0; i < length; ++i) { if (new_id[block_ids[i]] == kInvalidId) { new_id[block_ids[i]] = next_id++; } }
 					for (i = 0; i < length; ++i) { block_ids[i] = (byte) new_id[block_ids[i]]; }
@@ -16273,32 +16066,19 @@ namespace ExternalArchivingMethods
 					uint* histogram_symbols = (uint*) BrotliAllocate(ref m, num_blocks * sizeof(uint));
 					uint* block_lengths = (uint*) BrotliAllocate(ref m, num_blocks * sizeof(uint));
 					size_t expected_num_clusters = CLUSTERS_PER_BATCH * (num_blocks + HISTOGRAMS_PER_BATCH - 1) / HISTOGRAMS_PER_BATCH;
-					size_t all_histograms_size = 0;
-					size_t all_histograms_capacity = expected_num_clusters;
+					size_t all_histograms_size = 0; size_t all_histograms_capacity = expected_num_clusters;
 					HistogramLiteral* all_histograms = (HistogramLiteral*) BrotliAllocate(ref m, all_histograms_capacity * sizeof(HistogramLiteral));
-					size_t cluster_size_size = 0;
-					size_t cluster_size_capacity = expected_num_clusters;
+					size_t cluster_size_size = 0; size_t cluster_size_capacity = expected_num_clusters;
 					uint* cluster_size = (uint*) BrotliAllocate(ref m, cluster_size_capacity * sizeof(uint));
 					size_t num_clusters = 0;
-					HistogramLiteral* histograms = (HistogramLiteral*) BrotliAllocate(ref m,
-						Math.Min(num_blocks, HISTOGRAMS_PER_BATCH) * sizeof(HistogramLiteral));
-					size_t max_num_pairs = HISTOGRAMS_PER_BATCH * HISTOGRAMS_PER_BATCH / 2;
-					size_t pairs_capacity = max_num_pairs + 1;
+					HistogramLiteral* histograms = (HistogramLiteral*) BrotliAllocate(ref m, Math.Min(num_blocks, HISTOGRAMS_PER_BATCH) * sizeof(HistogramLiteral));
+					size_t max_num_pairs = HISTOGRAMS_PER_BATCH * HISTOGRAMS_PER_BATCH / 2; size_t pairs_capacity = max_num_pairs + 1;
 					HistogramPair* pairs = (HistogramPair*) BrotliAllocate(ref m, pairs_capacity * sizeof(HistogramPair));
-					size_t pos = 0;
-					uint* clusters;
-					size_t num_final_clusters;
-					const uint kInvalidIndex = uint.MaxValue;
-					uint* new_index;
-					size_t i;
-					uint* sizes = stackalloc uint[HISTOGRAMS_PER_BATCH];
-					memset(sizes, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
-					uint* new_clusters = stackalloc uint[HISTOGRAMS_PER_BATCH];
-					memset(new_clusters, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
-					uint* symbols = stackalloc uint[HISTOGRAMS_PER_BATCH];
-					memset(symbols, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
-					uint* remap = stackalloc uint[HISTOGRAMS_PER_BATCH];
-					memset(remap, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
+					size_t pos = 0; uint* clusters; size_t num_final_clusters; const uint kInvalidIndex = uint.MaxValue; uint* new_index; size_t i;
+					uint* sizes = stackalloc uint[HISTOGRAMS_PER_BATCH]; memset(sizes, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
+					uint* new_clusters = stackalloc uint[HISTOGRAMS_PER_BATCH]; memset(new_clusters, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
+					uint* symbols = stackalloc uint[HISTOGRAMS_PER_BATCH]; memset(symbols, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
+					uint* remap = stackalloc uint[HISTOGRAMS_PER_BATCH]; memset(remap, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
 
 
 					memset(block_lengths, 0, num_blocks * sizeof(uint));
@@ -16307,18 +16087,12 @@ namespace ExternalArchivingMethods
 
 					for (i = 0; i < num_blocks; i += HISTOGRAMS_PER_BATCH) 
 					{
-						size_t num_to_combine = Math.Min(num_blocks - i, HISTOGRAMS_PER_BATCH);
-						size_t num_new_clusters;
-						size_t j;
+						size_t num_to_combine = Math.Min(num_blocks - i, HISTOGRAMS_PER_BATCH); size_t num_new_clusters; size_t j;
 						for (j = 0; j < num_to_combine; ++j) 
 						{
-							size_t k;
-							HistogramLiteral.HistogramClear(&histograms[j]);
+							size_t k; HistogramLiteral.HistogramClear(&histograms[j]);
 							for (k = 0; k < block_lengths[i + j]; ++k) { HistogramLiteral.HistogramAdd(&histograms[j], data[pos++]); }
-							histograms[j].bit_cost_ = BitCostLiteral.BrotliPopulationCost(&histograms[j]);
-							new_clusters[j] = (uint) j;
-							symbols[j] = (uint) j;
-							sizes[j] = 1;
+							histograms[j].bit_cost_ = BitCostLiteral.BrotliPopulationCost(&histograms[j]); new_clusters[j] = (uint) j; symbols[j] = (uint) j; sizes[j] = 1;
 						}
 						num_new_clusters = ClusterLiteral.BrotliHistogramCombine( histograms, sizes, symbols, new_clusters, pairs, num_to_combine, num_to_combine, HISTOGRAMS_PER_BATCH, max_num_pairs);
 
@@ -16338,8 +16112,7 @@ namespace ExternalArchivingMethods
 
 					for (i = 0; i < num_clusters; ++i) { clusters[i] = (uint) i; }
 					num_final_clusters = ClusterLiteral.BrotliHistogramCombine( all_histograms, cluster_size, histogram_symbols, clusters, pairs, num_clusters, num_blocks, BROTLI_MAX_NUMBER_OF_BLOCK_TYPES, max_num_pairs);
-					BrotliFree(ref m, pairs);
-					BrotliFree(ref m, cluster_size);
+					BrotliFree(ref m, pairs); BrotliFree(ref m, cluster_size);
 
 					new_index = (uint*) BrotliAllocate(ref m, num_clusters * sizeof(uint));
 
@@ -16349,11 +16122,7 @@ namespace ExternalArchivingMethods
 						uint next_index = 0;
 						for (i = 0; i < num_blocks; ++i) 
 						{
-							HistogramLiteral histo;
-							size_t j;
-							uint best_out;
-							double best_bits;
-							HistogramLiteral.HistogramClear(&histo);
+							HistogramLiteral histo; size_t j; uint best_out; double best_bits; HistogramLiteral.HistogramClear(&histo);
 							for (j = 0; j < block_lengths[i]; ++j) { HistogramLiteral.HistogramAdd(&histo, data[pos++]); }
 							best_out = (i == 0) ? histogram_symbols[0] : histogram_symbols[i - 1];
 							best_bits = ClusterLiteral.BrotliHistogramBitCostDistance(&histo, &all_histograms[best_out]);
@@ -16373,36 +16142,24 @@ namespace ExternalArchivingMethods
 					BrotliEnsureCapacity(ref m, sizeof(uint), (void**)&split->lengths, &split->lengths_alloc_size, num_blocks);
 
 					{
-						uint cur_length = 0;
-						size_t block_idx = 0;
-						byte max_type = 0;
+						uint cur_length = 0; size_t block_idx = 0; byte max_type = 0;
 						for (i = 0; i < num_blocks; ++i) 
 						{
 							cur_length += block_lengths[i];
 							if (i + 1 == num_blocks || histogram_symbols[i] != histogram_symbols[i + 1]) 
 							{
-								byte id = (byte) new_index[histogram_symbols[i]];
-								split->types[block_idx] = id;
-								split->lengths[block_idx] = cur_length;
-								max_type = Math.Max(max_type, id);
-								cur_length = 0;
-								++block_idx;
+								byte id = (byte) new_index[histogram_symbols[i]]; split->types[block_idx] = id; split->lengths[block_idx] = cur_length; max_type = Math.Max(max_type, id); cur_length = 0; ++block_idx;
 							}
 						}
-						split->num_blocks = block_idx;
-						split->num_types = (size_t) max_type + 1;
+						split->num_blocks = block_idx; split->num_types = (size_t) max_type + 1;
 					}
-					BrotliFree(ref m, new_index);
-					BrotliFree(ref m, block_lengths);
-					BrotliFree(ref m, histogram_symbols);
+					BrotliFree(ref m, new_index); BrotliFree(ref m, block_lengths); BrotliFree(ref m, histogram_symbols);
 				}
 
 				public static unsafe void SplitByteVector(ref MemoryManager m, byte* data, size_t length, size_t literals_per_histogram, size_t max_histograms,
 					size_t sampling_stride_length, double block_switch_cost, BrotliEncoderParams* params_, BlockSplit* split) 
 				{
-					size_t data_size = HistogramLiteral.HistogramDataSize();
-					size_t num_histograms = length / literals_per_histogram + 1;
-					HistogramLiteral* histograms;
+					size_t data_size = HistogramLiteral.HistogramDataSize(); size_t num_histograms = length / literals_per_histogram + 1; HistogramLiteral* histograms;
 					if (num_histograms > max_histograms) { num_histograms = max_histograms; }
 					if (length == 0) { split->num_types = 1; return; }
 					else if (length < kMinLengthForBlockSplitting) 
@@ -16410,10 +16167,7 @@ namespace ExternalArchivingMethods
 						BrotliEnsureCapacity(ref m, sizeof(byte), (void**)&split->types, &split->types_alloc_size, split->num_blocks + 1);
 						BrotliEnsureCapacity(ref m, sizeof(uint), (void**)&split->lengths, &split->lengths_alloc_size, split->num_blocks + 1);
 
-						split->num_types = 1;
-						split->types[split->num_blocks] = 0;
-						split->lengths[split->num_blocks] = (uint) length;
-						split->num_blocks++;
+						split->num_types = 1; split->types[split->num_blocks] = 0; split->lengths[split->num_blocks] = (uint) length; split->num_blocks++;
 						return;
 					}
 					histograms = (HistogramLiteral*) BrotliAllocate(ref m, num_histograms * sizeof(HistogramLiteral));
@@ -16423,15 +16177,10 @@ namespace ExternalArchivingMethods
 					RefineEntropyCodes(data, length, sampling_stride_length, num_histograms, histograms);
 					{
 						/* Find a good path through literals with the good entropy codes. */
-						byte* block_ids = (byte*) BrotliAllocate(ref m, length * sizeof(byte));
-						size_t num_blocks = 0;
-						size_t bitmaplen = (num_histograms + 7) >> 3;
-						double* insert_cost = (double*) BrotliAllocate(ref m, data_size * num_histograms * sizeof(double));
-						double* cost = (double*) BrotliAllocate(ref m, num_histograms * sizeof(double));
-						byte* switch_signal = (byte*) BrotliAllocate(ref m, length * bitmaplen * sizeof(byte));
-						ushort* new_id = (ushort*) BrotliAllocate(ref m, num_histograms * sizeof(ushort));
-						size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10;
-						size_t i;
+						byte* block_ids = (byte*) BrotliAllocate(ref m, length * sizeof(byte)); size_t num_blocks = 0;
+						size_t bitmaplen = (num_histograms + 7) >> 3; double* insert_cost = (double*) BrotliAllocate(ref m, data_size * num_histograms * sizeof(double));
+						double* cost = (double*) BrotliAllocate(ref m, num_histograms * sizeof(double)); byte* switch_signal = (byte*) BrotliAllocate(ref m, length * bitmaplen * sizeof(byte));
+						ushort* new_id = (ushort*) BrotliAllocate(ref m, num_histograms * sizeof(ushort)); size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10; size_t i;
 
 						for (i = 0; i < iters; ++i) 
 						{
@@ -16439,11 +16188,8 @@ namespace ExternalArchivingMethods
 							num_histograms = RemapBlockIds(block_ids, length, new_id, num_histograms);
 							BuildBlockHistograms(data, length, block_ids, num_histograms, histograms);
 						}
-						BrotliFree(ref m, insert_cost);
-						BrotliFree(ref m, cost);
-						BrotliFree(ref m, switch_signal);
-						BrotliFree(ref m, new_id);
-						BrotliFree(ref m, histograms);
+						BrotliFree(ref m, insert_cost); BrotliFree(ref m, cost); BrotliFree(ref m, switch_signal); 
+						BrotliFree(ref m, new_id); BrotliFree(ref m, histograms);
 						ClusterBlocks(ref m, data, length, num_blocks, block_ids, split);
 
 						BrotliFree(ref m, block_ids);
@@ -16493,14 +16239,13 @@ namespace ExternalArchivingMethods
 				private static unsafe size_t FindBlocks(ushort* data, size_t length, double block_switch_bitcost, size_t num_histograms, HistogramCommand* histograms, 
 					double* insert_cost, double* cost, byte* switch_signal, byte* block_id)
 				{
-					size_t data_size = HistogramCommand.HistogramDataSize();
+					size_t data_size = HistogramCommand.HistogramDataSize(); 
 					size_t bitmaplen = (num_histograms + 7) >> 3; size_t num_blocks = 1; size_t i; size_t j;
 					if (num_histograms <= 1) { for (i = 0; i < length; ++i) { block_id[i] = 0; } return 1; }
 					memset(insert_cost, 0, sizeof(double) * data_size * num_histograms);
 					for (i = 0; i < num_histograms; ++i) { insert_cost[i] = FastLog2((uint)histograms[i].total_count_); }
 					for (i = data_size; i != 0;) { --i; for (j = 0; j < num_histograms; ++j) { insert_cost[i * num_histograms + j] = insert_cost[j] - BitCost(histograms[j].data_[i]); } }
-					memset(cost, 0, sizeof(double) * num_histograms);
-					memset(switch_signal, 0, sizeof(byte) * length * bitmaplen);
+					memset(cost, 0, sizeof(double) * num_histograms); memset(switch_signal, 0, sizeof(byte) * length * bitmaplen);
 					/* After each iteration of this loop, cost[k] will contain the difference
 					   between the minimum cost of arriving at the current byte position using
 					   entropy code k, and the minimum cost of arriving at the current byte
@@ -16548,8 +16293,7 @@ namespace ExternalArchivingMethods
 				private static unsafe void ClusterBlocks(ref MemoryManager m, ushort* data, size_t length,
 					size_t num_blocks, byte* block_ids, BlockSplit* split)
 				{
-					uint* histogram_symbols = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
-					uint* block_lengths = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
+					uint* histogram_symbols = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint)); uint* block_lengths = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
 					size_t expected_num_clusters = CLUSTERS_PER_BATCH * (num_blocks + HISTOGRAMS_PER_BATCH - 1) / HISTOGRAMS_PER_BATCH;
 					size_t all_histograms_size = 0; size_t all_histograms_capacity = expected_num_clusters;
 					HistogramCommand* all_histograms = (HistogramCommand*)BrotliAllocate(ref m, all_histograms_capacity * sizeof(HistogramCommand));
@@ -16573,8 +16317,7 @@ namespace ExternalArchivingMethods
 
 					for (i = 0; i < num_blocks; i += HISTOGRAMS_PER_BATCH)
 					{
-						size_t num_to_combine = Math.Min(num_blocks - i, HISTOGRAMS_PER_BATCH);
-						size_t num_new_clusters; size_t j;
+						size_t num_to_combine = Math.Min(num_blocks - i, HISTOGRAMS_PER_BATCH); size_t num_new_clusters; size_t j;
 						for (j = 0; j < num_to_combine; ++j)
 						{
 							size_t k; HistogramCommand.HistogramClear(&histograms[j]);
@@ -16615,8 +16358,7 @@ namespace ExternalArchivingMethods
 						uint next_index = 0;
 						for (i = 0; i < num_blocks; ++i)
 						{
-							HistogramCommand histo; size_t j; uint best_out; double best_bits;
-							HistogramCommand.HistogramClear(&histo);
+							HistogramCommand histo; size_t j; uint best_out; double best_bits; HistogramCommand.HistogramClear(&histo);
 							for (j = 0; j < block_lengths[i]; ++j) { HistogramCommand.HistogramAdd(&histo, data[pos++]); }
 							best_out = (i == 0) ? histogram_symbols[0] : histogram_symbols[i - 1];
 							best_bits = ClusterCommand.BrotliHistogramBitCostDistance(&histo, &all_histograms[best_out]);
@@ -16642,8 +16384,8 @@ namespace ExternalArchivingMethods
 							cur_length += block_lengths[i];
 							if (i + 1 == num_blocks || histogram_symbols[i] != histogram_symbols[i + 1])
 							{
-								byte id = (byte)new_index[histogram_symbols[i]];
-								split->types[block_idx] = id; split->lengths[block_idx] = cur_length; 
+								byte id = (byte)new_index[histogram_symbols[i]]; 
+								split->types[block_idx] = id; split->lengths[block_idx] = cur_length;  
 								max_type = Math.Max(max_type, id); cur_length = 0; ++block_idx;
 							}
 						}
@@ -16675,22 +16417,17 @@ namespace ExternalArchivingMethods
 					{
 						/* Find a good path through literals with the good entropy codes. */
 						byte* block_ids = (byte*)BrotliAllocate(ref m, length * sizeof(byte));
-						size_t num_blocks = 0; size_t bitmaplen = (num_histograms + 7) >> 3;
-						double* insert_cost = (double*)BrotliAllocate(ref m, data_size * num_histograms * sizeof(double));
-						double* cost = (double*)BrotliAllocate(ref m, num_histograms * sizeof(double));
-						byte* switch_signal = (byte*)BrotliAllocate(ref m, length * bitmaplen * sizeof(byte));
-						ushort* new_id = (ushort*)BrotliAllocate(ref m, num_histograms * sizeof(ushort));
-						size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10; size_t i;
+						size_t num_blocks = 0; size_t bitmaplen = (num_histograms + 7) >> 3; double* insert_cost = (double*)BrotliAllocate(ref m, data_size * num_histograms * sizeof(double));
+						double* cost = (double*)BrotliAllocate(ref m, num_histograms * sizeof(double)); byte* switch_signal = (byte*)BrotliAllocate(ref m, length * bitmaplen * sizeof(byte));
+						ushort* new_id = (ushort*)BrotliAllocate(ref m, num_histograms * sizeof(ushort)); size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10; size_t i;
 
 						for (i = 0; i < iters; ++i)
 						{
 							num_blocks = FindBlocks(data, length, block_switch_cost, num_histograms, histograms, insert_cost, cost, switch_signal, block_ids);
-							num_histograms = RemapBlockIds(block_ids, length, new_id, num_histograms);
-							BuildBlockHistograms(data, length, block_ids, num_histograms, histograms);
+							num_histograms = RemapBlockIds(block_ids, length, new_id, num_histograms); BuildBlockHistograms(data, length, block_ids, num_histograms, histograms);
 						}
 						BrotliFree(ref m, insert_cost); BrotliFree(ref m, cost); BrotliFree(ref m, switch_signal);
-						BrotliFree(ref m, new_id); BrotliFree(ref m, histograms);
-						ClusterBlocks(ref m, data, length, num_blocks, block_ids, split);
+						BrotliFree(ref m, new_id); BrotliFree(ref m, histograms); ClusterBlocks(ref m, data, length, num_blocks, block_ids, split);
 
 						BrotliFree(ref m, block_ids);
 					}
@@ -16739,8 +16476,7 @@ namespace ExternalArchivingMethods
 				private static unsafe size_t FindBlocks(ushort* data, size_t length, double block_switch_bitcost, size_t num_histograms,
 					HistogramDistance* histograms, double* insert_cost, double* cost, byte* switch_signal, byte* block_id)
 				{
-					size_t data_size = HistogramDistance.HistogramDataSize();
-					size_t bitmaplen = (num_histograms + 7) >> 3; size_t num_blocks = 1; size_t i; size_t j;
+					size_t data_size = HistogramDistance.HistogramDataSize(); size_t bitmaplen = (num_histograms + 7) >> 3; size_t num_blocks = 1; size_t i; size_t j;
 					if (num_histograms <= 1) { for (i = 0; i < length; ++i) { block_id[i] = 0; } return 1; }
 					memset(insert_cost, 0, sizeof(double) * data_size * num_histograms);
 					for (i = 0; i < num_histograms; ++i) { insert_cost[i] = FastLog2((uint)histograms[i].total_count_); }
@@ -16797,16 +16533,14 @@ namespace ExternalArchivingMethods
 
 				private static unsafe void ClusterBlocks(ref MemoryManager m, ushort* data, size_t length, size_t num_blocks, byte* block_ids, BlockSplit* split)
 				{
-					uint* histogram_symbols = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
-					uint* block_lengths = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
+					uint* histogram_symbols = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint)); uint* block_lengths = (uint*)BrotliAllocate(ref m, num_blocks * sizeof(uint));
 					size_t expected_num_clusters = CLUSTERS_PER_BATCH * (num_blocks + HISTOGRAMS_PER_BATCH - 1) / HISTOGRAMS_PER_BATCH;
 					size_t all_histograms_size = 0; size_t all_histograms_capacity = expected_num_clusters;
 					HistogramDistance* all_histograms = (HistogramDistance*)BrotliAllocate(ref m, all_histograms_capacity * sizeof(HistogramDistance));
 					size_t cluster_size_size = 0; size_t cluster_size_capacity = expected_num_clusters;
 					uint* cluster_size = (uint*)BrotliAllocate(ref m, cluster_size_capacity * sizeof(uint)); size_t num_clusters = 0;
 					HistogramDistance* histograms = (HistogramDistance*)BrotliAllocate(ref m, Math.Min(num_blocks, HISTOGRAMS_PER_BATCH) * sizeof(HistogramDistance));
-					size_t max_num_pairs = HISTOGRAMS_PER_BATCH * HISTOGRAMS_PER_BATCH / 2;
-					size_t pairs_capacity = max_num_pairs + 1;
+					size_t max_num_pairs = HISTOGRAMS_PER_BATCH * HISTOGRAMS_PER_BATCH / 2; size_t pairs_capacity = max_num_pairs + 1;
 					HistogramPair* pairs = (HistogramPair*)BrotliAllocate(ref m, pairs_capacity * sizeof(HistogramPair));
 					size_t pos = 0; uint* clusters; size_t num_final_clusters; const uint kInvalidIndex = uint.MaxValue; uint* new_index; size_t i;
 					uint* sizes = stackalloc uint[HISTOGRAMS_PER_BATCH]; memset(sizes, 0, HISTOGRAMS_PER_BATCH * sizeof(uint));
@@ -16835,9 +16569,7 @@ namespace ExternalArchivingMethods
 
 						for (j = 0; j < num_new_clusters; ++j)
 						{
-							all_histograms[all_histograms_size++] = histograms[new_clusters[j]];
-							cluster_size[cluster_size_size++] = sizes[new_clusters[j]];
-							remap[new_clusters[j]] = (uint)j;
+							all_histograms[all_histograms_size++] = histograms[new_clusters[j]]; cluster_size[cluster_size_size++] = sizes[new_clusters[j]]; remap[new_clusters[j]] = (uint)j;
 						}
 						for (j = 0; j < num_to_combine; ++j) { histogram_symbols[i + j] = (uint)num_clusters + remap[symbols[j]]; }
 						num_clusters += num_new_clusters;
@@ -16862,12 +16594,10 @@ namespace ExternalArchivingMethods
 						uint next_index = 0;
 						for (i = 0; i < num_blocks; ++i)
 						{
-							HistogramDistance histo; size_t j; uint best_out; 
-							double best_bits; HistogramDistance.HistogramClear(&histo);
+							HistogramDistance histo; size_t j; uint best_out; double best_bits; HistogramDistance.HistogramClear(&histo);
 							for (j = 0; j < block_lengths[i]; ++j) { HistogramDistance.HistogramAdd(&histo, data[pos++]); }
 							best_out = (i == 0) ? histogram_symbols[0] : histogram_symbols[i - 1];
-							best_bits =
-								ClusterDistance.BrotliHistogramBitCostDistance(&histo, &all_histograms[best_out]);
+							best_bits = ClusterDistance.BrotliHistogramBitCostDistance(&histo, &all_histograms[best_out]);
 							for (j = 0; j < num_final_clusters; ++j)
 							{
 								double cur_bits = ClusterDistance.BrotliHistogramBitCostDistance(&histo, &all_histograms[clusters[j]]);
@@ -16887,11 +16617,9 @@ namespace ExternalArchivingMethods
 						for (i = 0; i < num_blocks; ++i)
 						{
 							cur_length += block_lengths[i];
-							if (i + 1 == num_blocks ||
-								histogram_symbols[i] != histogram_symbols[i + 1])
+							if (i + 1 == num_blocks || histogram_symbols[i] != histogram_symbols[i + 1])
 							{
-								byte id = (byte)new_index[histogram_symbols[i]];
-								split->types[block_idx] = id; split->lengths[block_idx] = cur_length;
+								byte id = (byte)new_index[histogram_symbols[i]]; split->types[block_idx] = id; split->lengths[block_idx] = cur_length;
 								max_type = Math.Max(max_type, id); cur_length = 0; ++block_idx;
 							}
 						}
@@ -16903,9 +16631,7 @@ namespace ExternalArchivingMethods
 				public static unsafe void SplitByteVector(ref MemoryManager m, ushort* data, size_t length, size_t literals_per_histogram, size_t max_histograms,
 					size_t sampling_stride_length, double block_switch_cost, BrotliEncoderParams* params_, BlockSplit* split)
 				{
-					size_t data_size = HistogramDistance.HistogramDataSize();
-					size_t num_histograms = length / literals_per_histogram + 1;
-					HistogramDistance* histograms;
+					size_t data_size = HistogramDistance.HistogramDataSize(); size_t num_histograms = length / literals_per_histogram + 1; HistogramDistance* histograms;
 					if (num_histograms > max_histograms) { num_histograms = max_histograms; }
 					if (length == 0) { split->num_types = 1; return; }
 					else if (length < kMinLengthForBlockSplitting)
@@ -16913,8 +16639,7 @@ namespace ExternalArchivingMethods
 						BrotliEnsureCapacity(ref m, sizeof(byte), (void**)&split->types, &split->types_alloc_size, split->num_blocks + 1);
 						BrotliEnsureCapacity(ref m, sizeof(uint), (void**)&split->lengths, &split->lengths_alloc_size, split->num_blocks + 1);
 
-						split->num_types = 1; split->types[split->num_blocks] = 0; 
-						split->lengths[split->num_blocks] = (uint)length; split->num_blocks++;
+						split->num_types = 1; split->types[split->num_blocks] = 0; split->lengths[split->num_blocks] = (uint)length; split->num_blocks++;
 						return;
 					}
 					histograms = (HistogramDistance*)BrotliAllocate(ref m, num_histograms * sizeof(HistogramDistance));
@@ -16924,15 +16649,12 @@ namespace ExternalArchivingMethods
 					RefineEntropyCodes(data, length, sampling_stride_length, num_histograms, histograms);
 					{
 						/* Find a good path through literals with the good entropy codes. */
-						byte* block_ids = (byte*)BrotliAllocate(ref m, length * sizeof(byte));
-						size_t num_blocks = 0;
-						size_t bitmaplen = (num_histograms + 7) >> 3;
+						byte* block_ids = (byte*)BrotliAllocate(ref m, length * sizeof(byte)); size_t num_blocks = 0; size_t bitmaplen = (num_histograms + 7) >> 3;
 						double* insert_cost = (double*)BrotliAllocate(ref m, data_size * num_histograms * sizeof(double));
 						double* cost = (double*)BrotliAllocate(ref m, num_histograms * sizeof(double));
 						byte* switch_signal = (byte*)BrotliAllocate(ref m, length * bitmaplen * sizeof(byte));
 						ushort* new_id = (ushort*)BrotliAllocate(ref m, num_histograms * sizeof(ushort));
-						size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10;
-						size_t i;
+						size_t iters = params_->quality < HQ_ZOPFLIFICATION_QUALITY ? 3 : 10; size_t i;
 
 						for (i = 0; i < iters; ++i)
 						{
@@ -16940,11 +16662,8 @@ namespace ExternalArchivingMethods
 							num_histograms = RemapBlockIds(block_ids, length, new_id, num_histograms);
 							BuildBlockHistograms(data, length, block_ids, num_histograms, histograms);
 						}
-						BrotliFree(ref m, insert_cost);
-						BrotliFree(ref m, cost);
-						BrotliFree(ref m, switch_signal);
-						BrotliFree(ref m, new_id);
-						BrotliFree(ref m, histograms);
+						BrotliFree(ref m, insert_cost); BrotliFree(ref m, cost); BrotliFree(ref m, switch_signal); 
+						BrotliFree(ref m, new_id); BrotliFree(ref m, histograms);
 						ClusterBlocks(ref m, data, length, num_blocks, block_ids, split);
 
 						BrotliFree(ref m, block_ids);
@@ -16973,19 +16692,15 @@ namespace ExternalArchivingMethods
 					bool is_good_pair = false; HistogramPair p = new HistogramPair();
 					if (idx1 == idx2) { return; }
 					if (idx2 < idx1) { uint t = idx2; idx2 = idx1; idx1 = t; }
-					p.idx1 = idx1; p.idx2 = idx2;
-					p.cost_diff = 0.5 * ClusterCostDiff(cluster_size[idx1], cluster_size[idx2]);
+					p.idx1 = idx1; p.idx2 = idx2; p.cost_diff = 0.5 * ClusterCostDiff(cluster_size[idx1], cluster_size[idx2]);
 					p.cost_diff -= out_[idx1].bit_cost_; p.cost_diff -= out_[idx2].bit_cost_;
 
 					if (out_[idx1].total_count_ == 0) { p.cost_combo = out_[idx2].bit_cost_; is_good_pair = true; }
 					else if (out_[idx2].total_count_ == 0) { p.cost_combo = out_[idx1].bit_cost_; is_good_pair = true; }
 					else 
 					{
-						double threshold = *num_pairs == 0 ? 1e99 : Math.Max(0.0, pairs[0].cost_diff);
-						HistogramLiteral combo = out_[idx1];
-						double cost_combo;
-						HistogramLiteral.HistogramAddHistogram(&combo, &out_[idx2]);
-						cost_combo = BitCostLiteral.BrotliPopulationCost(&combo);
+						double threshold = *num_pairs == 0 ? 1e99 : Math.Max(0.0, pairs[0].cost_diff); HistogramLiteral combo = out_[idx1]; double cost_combo;
+						HistogramLiteral.HistogramAddHistogram(&combo, &out_[idx2]); cost_combo = BitCostLiteral.BrotliPopulationCost(&combo);
 						if (cost_combo < threshold - p.cost_diff) { p.cost_combo = cost_combo; is_good_pair = true; }
 					}
 					if (is_good_pair) 
@@ -17022,17 +16737,16 @@ namespace ExternalArchivingMethods
 						uint best_idx1; uint best_idx2; size_t i;
 						if (pairs[0].cost_diff >= cost_diff_threshold) { cost_diff_threshold = 1e99; min_cluster_size = max_clusters; continue; }
 						/* Take the best pair from the top of heap. */
-						best_idx1 = pairs[0].idx1; best_idx2 = pairs[0].idx2;
-						HistogramLiteral.HistogramAddHistogram(&out_[best_idx1], &out_[best_idx2]);
-						out_[best_idx1].bit_cost_ = pairs[0].cost_combo;
-						cluster_size[best_idx1] += cluster_size[best_idx2];
+						best_idx1 = pairs[0].idx1; best_idx2 = pairs[0].idx2; HistogramLiteral.HistogramAddHistogram(&out_[best_idx1], &out_[best_idx2]);
+						out_[best_idx1].bit_cost_ = pairs[0].cost_combo; cluster_size[best_idx1] += cluster_size[best_idx2];
 						for (i = 0; i < symbols_size; ++i) { if (symbols[i] == best_idx2) { symbols[i] = best_idx1; } }
 						for (i = 0; i < num_clusters; ++i) { if (clusters[i] == best_idx2) { memmove(&clusters[i], &clusters[i + 1], (num_clusters - i - 1) * sizeof(uint)); break; } }
 						--num_clusters;
 						{
 							/* Remove pairs intersecting the just combined best pair. */
 							size_t copy_to_idx = 0;
-							for (i = 0; i < num_pairs; ++i) {
+							for (i = 0; i < num_pairs; ++i) 
+							{
 								HistogramPair* p = &pairs[i];
 								if (p->idx1 == best_idx1 || p->idx2 == best_idx1 || p->idx1 == best_idx2 || p->idx2 == best_idx2) { /* Remove invalid pair from the queue. */ continue; }
 								if (HistogramPairIsLess(&pairs[0], p)) 
@@ -17073,8 +16787,7 @@ namespace ExternalArchivingMethods
 					for (i = 0; i < in_size; ++i) 
 					{
 						uint best_out = i == 0 ? symbols[0] : symbols[i - 1];
-						double best_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[best_out]);
-						size_t j;
+						double best_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[best_out]); size_t j;
 						for (j = 0; j < num_clusters; ++j) { double cur_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[clusters[j]]); if (cur_bits < best_bits) { best_bits = cur_bits; best_out = clusters[j]; } }
 						symbols[i] = best_out;
 					}
@@ -17097,10 +16810,7 @@ namespace ExternalArchivingMethods
 				public static size_t BrotliHistogramReindex(ref MemoryManager m, HistogramLiteral* out_, uint* symbols, size_t length) 
 				{
 					const uint kInvalidIndex = uint.MaxValue;
-					uint* new_index = (uint*) BrotliAllocate(ref m, length * sizeof(uint));
-					uint next_index;
-					HistogramLiteral* tmp;
-					size_t i;
+					uint* new_index = (uint*) BrotliAllocate(ref m, length * sizeof(uint)); uint next_index; HistogramLiteral* tmp; size_t i;
 					for (i = 0; i < length; ++i) { new_index[i] = kInvalidIndex; }
 					next_index = 0;
 					for (i = 0; i < length; ++i) { if (new_index[symbols[i]] == kInvalidIndex) { new_index[symbols[i]] = next_index; ++next_index; } }
@@ -17111,29 +16821,24 @@ namespace ExternalArchivingMethods
 					for (i = 0; i < length; ++i) { if (new_index[symbols[i]] == next_index) { tmp[next_index] = out_[symbols[i]]; ++next_index; } symbols[i] = new_index[symbols[i]]; }
 					BrotliFree(ref m, new_index);
 					for (i = 0; i < next_index; ++i) { out_[i] = tmp[i]; }
-					BrotliFree(ref m, tmp);
-					return next_index;
+					BrotliFree(ref m, tmp); return next_index;
 				}
 
 				public static void BrotliClusterHistograms(ref MemoryManager m, HistogramLiteral* in_, size_t in_size, size_t max_histograms, HistogramLiteral* out_, size_t* out_size, uint* histogram_symbols) 
 				{
 					uint* cluster_size = (uint*) BrotliAllocate(ref m, in_size * sizeof(uint));
 					uint* clusters = (uint*) BrotliAllocate(ref m, in_size * sizeof(uint));
-					size_t num_clusters = 0;
-					size_t max_input_histograms = 64;
+					size_t num_clusters = 0; size_t max_input_histograms = 64;
 					size_t pairs_capacity = max_input_histograms * max_input_histograms / 2;
 					/* For the first pass of clustering, we allow all pairs. */
-					HistogramPair* pairs = (HistogramPair*) BrotliAllocate(ref m, (pairs_capacity + 1) * sizeof(HistogramPair));
-					size_t i;
+					HistogramPair* pairs = (HistogramPair*) BrotliAllocate(ref m, (pairs_capacity + 1) * sizeof(HistogramPair)); size_t i;
 					for (i = 0; i < in_size; ++i) { cluster_size[i] = 1; }
 
 					for (i = 0; i < in_size; ++i) { out_[i] = in_[i]; out_[i].bit_cost_ = BitCostLiteral.BrotliPopulationCost(&in_[i]); histogram_symbols[i] = (uint) i; }
 
 					for (i = 0; i < in_size; i += max_input_histograms) 
 					{
-						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms);
-						size_t num_new_clusters;
-						size_t j;
+						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms); size_t num_new_clusters; size_t j;
 						for (j = 0; j < num_to_combine; ++j) { clusters[num_clusters + j] = (uint) (i + j); }
 						num_new_clusters = BrotliHistogramCombine(out_, cluster_size, &histogram_symbols[i], &clusters[num_clusters], pairs, num_to_combine, num_to_combine, max_histograms, pairs_capacity);
 						num_clusters += num_new_clusters;
@@ -17142,15 +16847,13 @@ namespace ExternalArchivingMethods
 					{
 						/* For the second pass, we limit the total number of histogram pairs.
 						   After this limit is reached, we only keep searching for the best pair. */
-						size_t max_num_pairs = Math.Min(
-							64 * num_clusters, (num_clusters / 2) * num_clusters);
+						size_t max_num_pairs = Math.Min(64 * num_clusters, (num_clusters / 2) * num_clusters);
 						BrotliEnsureCapacity(ref m, sizeof(HistogramPair), (void**)&pairs, &pairs_capacity, max_num_pairs + 1);
 
 						/* Collapse similar histograms. */
 						num_clusters = BrotliHistogramCombine(out_, cluster_size, histogram_symbols, clusters, pairs, num_clusters, in_size, max_histograms, max_num_pairs);
 					}
-					BrotliFree(ref m, pairs);
-					BrotliFree(ref m, cluster_size);
+					BrotliFree(ref m, pairs); BrotliFree(ref m, cluster_size);
 					/* Find the optimal map from original histograms to the final ones. */
 					BrotliHistogramRemap(in_, in_size, clusters, num_clusters, out_, histogram_symbols);
 					BrotliFree(ref m, clusters);
@@ -17168,11 +16871,9 @@ namespace ExternalArchivingMethods
 					HistogramPair p = new HistogramPair();
 					if (idx1 == idx2) { return; }
 					if (idx2 < idx1) { uint t = idx2; idx2 = idx1; idx1 = t; }
-					p.idx1 = idx1;
-					p.idx2 = idx2;
+					p.idx1 = idx1; p.idx2 = idx2;
 					p.cost_diff = 0.5 * ClusterCostDiff(cluster_size[idx1], cluster_size[idx2]);
-					p.cost_diff -= out_[idx1].bit_cost_;
-					p.cost_diff -= out_[idx2].bit_cost_;
+					p.cost_diff -= out_[idx1].bit_cost_; p.cost_diff -= out_[idx2].bit_cost_;
 
 					if (out_[idx1].total_count_ == 0) { p.cost_combo = out_[idx2].bit_cost_; is_good_pair = true; }
 					else if (out_[idx2].total_count_ == 0)
@@ -17180,8 +16881,7 @@ namespace ExternalArchivingMethods
 					else
 					{
 						double threshold = *num_pairs == 0 ? 1e99 : Math.Max(0.0, pairs[0].cost_diff);
-						HistogramCommand combo = out_[idx1];
-						double cost_combo;
+						HistogramCommand combo = out_[idx1]; double cost_combo;
 						HistogramCommand.HistogramAddHistogram(&combo, &out_[idx2]);
 						cost_combo = BitCostCommand.BrotliPopulationCost(&combo);
 						if (cost_combo < threshold - p.cost_diff) { p.cost_combo = cost_combo; is_good_pair = true; }
@@ -17197,9 +16897,7 @@ namespace ExternalArchivingMethods
 				public static size_t BrotliHistogramCombine(HistogramCommand* out_, uint* cluster_size, uint* symbols, uint* clusters, HistogramPair* pairs, size_t num_clusters,
 					size_t symbols_size, size_t max_clusters, size_t max_num_pairs)
 				{
-					double cost_diff_threshold = 0.0;
-					size_t min_cluster_size = 1;
-					size_t num_pairs = 0;
+					double cost_diff_threshold = 0.0; size_t min_cluster_size = 1; size_t num_pairs = 0;
 
 					{
 						/* We maintain a vector of histogram pairs, with the property that the pair
@@ -17210,16 +16908,12 @@ namespace ExternalArchivingMethods
 
 					while (num_clusters > min_cluster_size)
 					{
-						uint best_idx1;
-						uint best_idx2;
-						size_t i;
+						uint best_idx1; uint best_idx2; size_t i;
 						if (pairs[0].cost_diff >= cost_diff_threshold) { cost_diff_threshold = 1e99; min_cluster_size = max_clusters; continue; }
 						/* Take the best pair from the top of heap. */
-						best_idx1 = pairs[0].idx1;
-						best_idx2 = pairs[0].idx2;
+						best_idx1 = pairs[0].idx1; best_idx2 = pairs[0].idx2;
 						HistogramCommand.HistogramAddHistogram(&out_[best_idx1], &out_[best_idx2]);
-						out_[best_idx1].bit_cost_ = pairs[0].cost_combo;
-						cluster_size[best_idx1] += cluster_size[best_idx2];
+						out_[best_idx1].bit_cost_ = pairs[0].cost_combo; cluster_size[best_idx1] += cluster_size[best_idx2];
 						for (i = 0; i < symbols_size; ++i) { if (symbols[i] == best_idx2) { symbols[i] = best_idx1; } }
 						for (i = 0; i < num_clusters; ++i) { if (clusters[i] == best_idx2) { memmove(&clusters[i], &clusters[i + 1], (num_clusters - i - 1) * sizeof(uint)); break; } }
 						--num_clusters;
@@ -17233,9 +16927,7 @@ namespace ExternalArchivingMethods
 								if (HistogramPairIsLess(&pairs[0], p))
 								{
 									/* Replace the top of the queue if needed. */
-									HistogramPair front = pairs[0];
-									pairs[0] = *p;
-									pairs[copy_to_idx] = front;
+									HistogramPair front = pairs[0]; pairs[0] = *p; pairs[copy_to_idx] = front;
 								} else { pairs[copy_to_idx] = *p; }
 								++copy_to_idx;
 							}
@@ -17270,8 +16962,7 @@ namespace ExternalArchivingMethods
 					for (i = 0; i < in_size; ++i)
 					{
 						uint best_out = i == 0 ? symbols[0] : symbols[i - 1];
-						double best_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[best_out]);
-						size_t j;
+						double best_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[best_out]); size_t j;
 						for (j = 0; j < num_clusters; ++j)
 						{
 							double cur_bits = BrotliHistogramBitCostDistance(&in_[i], &out_[clusters[j]]);
@@ -17297,11 +16988,7 @@ namespace ExternalArchivingMethods
 				   Returns N, the number of unique values in symbols[]. */
 				public static size_t BrotliHistogramReindex(ref MemoryManager m, HistogramCommand* out_, uint* symbols, size_t length)
 				{
-					const uint kInvalidIndex = uint.MaxValue;
-					uint* new_index = (uint*)BrotliAllocate(ref m, length * sizeof(uint));
-					uint next_index;
-					HistogramCommand* tmp;
-					size_t i;
+					const uint kInvalidIndex = uint.MaxValue; uint* new_index = (uint*)BrotliAllocate(ref m, length * sizeof(uint)); uint next_index; HistogramCommand* tmp; size_t i;
 					for (i = 0; i < length; ++i) { new_index[i] = kInvalidIndex; }
 					next_index = 0;
 					for (i = 0; i < length; ++i) { if (new_index[symbols[i]] == kInvalidIndex) { new_index[symbols[i]] = next_index; ++next_index; } }
@@ -17312,27 +16999,21 @@ namespace ExternalArchivingMethods
 					for (i = 0; i < length; ++i) { if (new_index[symbols[i]] == next_index) { tmp[next_index] = out_[symbols[i]]; ++next_index; } symbols[i] = new_index[symbols[i]]; }
 					BrotliFree(ref m, new_index);
 					for (i = 0; i < next_index; ++i) { out_[i] = tmp[i]; }
-					BrotliFree(ref m, tmp);
-					return next_index;
+					BrotliFree(ref m, tmp); return next_index;
 				}
 
 				public static void BrotliClusterHistograms(ref MemoryManager m, HistogramCommand* in_, size_t in_size, size_t max_histograms, HistogramCommand* out_, size_t* out_size, uint* histogram_symbols)
 				{
 					uint* cluster_size = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint));
 					uint* clusters = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint));
-					size_t num_clusters = 0;
-					size_t max_input_histograms = 64;
-					size_t pairs_capacity = max_input_histograms * max_input_histograms / 2;
+					size_t num_clusters = 0; size_t max_input_histograms = 64; size_t pairs_capacity = max_input_histograms * max_input_histograms / 2;
 					/* For the first pass of clustering, we allow all pairs. */
-					HistogramPair* pairs = (HistogramPair*)BrotliAllocate(ref m, (pairs_capacity + 1) * sizeof(HistogramPair));
-					size_t i;
+					HistogramPair* pairs = (HistogramPair*)BrotliAllocate(ref m, (pairs_capacity + 1) * sizeof(HistogramPair)); size_t i;
 					for (i = 0; i < in_size; ++i) { cluster_size[i] = 1; }
 					for (i = 0; i < in_size; ++i){ out_[i] = in_[i]; out_[i].bit_cost_ = BitCostCommand.BrotliPopulationCost(&in_[i]); histogram_symbols[i] = (uint)i; }
 					for (i = 0; i < in_size; i += max_input_histograms)
 					{
-						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms);
-						size_t num_new_clusters;
-						size_t j;
+						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms); size_t num_new_clusters; size_t j;
 						for (j = 0; j < num_to_combine; ++j) { clusters[num_clusters + j] = (uint)(i + j); }
 						num_new_clusters = BrotliHistogramCombine(out_, cluster_size, &histogram_symbols[i], &clusters[num_clusters], pairs, num_to_combine, num_to_combine, max_histograms, pairs_capacity);
 						num_clusters += num_new_clusters;
@@ -17347,11 +17028,9 @@ namespace ExternalArchivingMethods
 						/* Collapse similar histograms. */
 						num_clusters = BrotliHistogramCombine(out_, cluster_size, histogram_symbols, clusters, pairs, num_clusters, in_size, max_histograms, max_num_pairs);
 					}
-					BrotliFree(ref m, pairs);
-					BrotliFree(ref m, cluster_size);
+					BrotliFree(ref m, pairs); BrotliFree(ref m, cluster_size);
 					/* Find the optimal map from original histograms to the final ones. */
-					BrotliHistogramRemap(in_, in_size, clusters, num_clusters, out_, histogram_symbols);
-					BrotliFree(ref m, clusters);
+					BrotliHistogramRemap(in_, in_size, clusters, num_clusters, out_, histogram_symbols); BrotliFree(ref m, clusters);
 					/* Convert the context map to a canonical form. */
 					*out_size = BrotliHistogramReindex(ref m, out_, histogram_symbols, in_size);
 				}
@@ -17366,8 +17045,7 @@ namespace ExternalArchivingMethods
 					bool is_good_pair = false; HistogramPair p = new HistogramPair();
 					if (idx1 == idx2) { return; }
 					if (idx2 < idx1) { uint t = idx2; idx2 = idx1; idx1 = t; }
-					p.idx1 = idx1; p.idx2 = idx2;
-					p.cost_diff = 0.5 * ClusterCostDiff(cluster_size[idx1], cluster_size[idx2]);
+					p.idx1 = idx1; p.idx2 = idx2; p.cost_diff = 0.5 * ClusterCostDiff(cluster_size[idx1], cluster_size[idx2]);
 					p.cost_diff -= out_[idx1].bit_cost_; p.cost_diff -= out_[idx2].bit_cost_;
 
 					if (out_[idx1].total_count_ == 0) { p.cost_combo = out_[idx2].bit_cost_; is_good_pair = true; }
@@ -17414,10 +17092,8 @@ namespace ExternalArchivingMethods
 						uint best_idx1; uint best_idx2; size_t i;
 						if (pairs[0].cost_diff >= cost_diff_threshold) { cost_diff_threshold = 1e99; min_cluster_size = max_clusters; continue; }
 						/* Take the best pair from the top of heap. */
-						best_idx1 = pairs[0].idx1; best_idx2 = pairs[0].idx2;
-						HistogramDistance.HistogramAddHistogram(&out_[best_idx1], &out_[best_idx2]);
-						out_[best_idx1].bit_cost_ = pairs[0].cost_combo;
-						cluster_size[best_idx1] += cluster_size[best_idx2];
+						best_idx1 = pairs[0].idx1; best_idx2 = pairs[0].idx2; HistogramDistance.HistogramAddHistogram(&out_[best_idx1], &out_[best_idx2]); 
+						out_[best_idx1].bit_cost_ = pairs[0].cost_combo; cluster_size[best_idx1] += cluster_size[best_idx2];
 						for (i = 0; i < symbols_size; ++i) { if (symbols[i] == best_idx2) { symbols[i] = best_idx1; } }
 						for (i = 0; i < num_clusters; ++i) { if (clusters[i] == best_idx2) { memmove(&clusters[i], &clusters[i + 1], (num_clusters - i - 1) * sizeof(uint)); break; } }
 						--num_clusters;
@@ -17489,9 +17165,8 @@ namespace ExternalArchivingMethods
 				   Returns N, the number of unique values in symbols[]. */
 				public static size_t BrotliHistogramReindex(ref MemoryManager m, HistogramDistance* out_, uint* symbols, size_t length)
 				{
-					const uint kInvalidIndex = uint.MaxValue;
-					uint* new_index = (uint*)BrotliAllocate(ref m, length * sizeof(uint));
-					uint next_index; HistogramDistance* tmp; size_t i;
+					const uint kInvalidIndex = uint.MaxValue; 
+					uint* new_index = (uint*)BrotliAllocate(ref m, length * sizeof(uint)); uint next_index; HistogramDistance* tmp; size_t i;
 					for (i = 0; i < length; ++i) { new_index[i] = kInvalidIndex; }
 					next_index = 0;
 					for (i = 0; i < length; ++i) { if (new_index[symbols[i]] == kInvalidIndex) { new_index[symbols[i]] = next_index; ++next_index; } }
@@ -17507,10 +17182,8 @@ namespace ExternalArchivingMethods
 
 				public static void BrotliClusterHistograms(ref MemoryManager m, HistogramDistance* in_, size_t in_size, size_t max_histograms, HistogramDistance* out_, size_t* out_size, uint* histogram_symbols)
 				{
-					uint* cluster_size = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint));
-					uint* clusters = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint));
-					size_t num_clusters = 0; size_t max_input_histograms = 64;
-					size_t pairs_capacity = max_input_histograms * max_input_histograms / 2;
+					uint* cluster_size = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint)); uint* clusters = (uint*)BrotliAllocate(ref m, in_size * sizeof(uint));
+					size_t num_clusters = 0; size_t max_input_histograms = 64; size_t pairs_capacity = max_input_histograms * max_input_histograms / 2;
 					/* For the first pass of clustering, we allow all pairs. */
 					HistogramPair* pairs = (HistogramPair*)BrotliAllocate(ref m, (pairs_capacity + 1) * sizeof(HistogramPair)); size_t i;
 					for (i = 0; i < in_size; ++i) { cluster_size[i] = 1; }
@@ -17519,9 +17192,7 @@ namespace ExternalArchivingMethods
 
 					for (i = 0; i < in_size; i += max_input_histograms)
 					{
-						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms);
-						size_t num_new_clusters;
-						size_t j;
+						size_t num_to_combine = Math.Min(in_size - i, max_input_histograms); size_t num_new_clusters; size_t j;
 						for (j = 0; j < num_to_combine; ++j) { clusters[num_clusters + j] = (uint)(i + j); }
 						num_new_clusters = BrotliHistogramCombine(out_, cluster_size, &histogram_symbols[i], &clusters[num_clusters], pairs, num_to_combine, num_to_combine, max_histograms, pairs_capacity);
 						num_clusters += num_new_clusters;
@@ -17536,11 +17207,9 @@ namespace ExternalArchivingMethods
 						/* Collapse similar histograms. */
 						num_clusters = BrotliHistogramCombine(out_, cluster_size, histogram_symbols, clusters, pairs, num_clusters, in_size, max_histograms, max_num_pairs);
 					}
-					BrotliFree(ref m, pairs);
-					BrotliFree(ref m, cluster_size);
+					BrotliFree(ref m, pairs); BrotliFree(ref m, cluster_size);
 					/* Find the optimal map from original histograms to the final ones. */
-					BrotliHistogramRemap(in_, in_size, clusters, num_clusters, out_, histogram_symbols);
-					BrotliFree(ref m, clusters);
+					BrotliHistogramRemap(in_, in_size, clusters, num_clusters, out_, histogram_symbols); BrotliFree(ref m, clusters);
 					/* Convert the context map to a canonical form. */
 					*out_size = BrotliHistogramReindex(ref m, out_, histogram_symbols, in_size);
 				}
@@ -17621,8 +17290,7 @@ namespace ExternalArchivingMethods
 				if (self->dist_prefix_ < BROTLI_NUM_DISTANCE_SHORT_CODES) { return self->dist_prefix_; }
 				else
 				{
-					uint nbits = self->dist_extra_ >> 24;
-					uint extra = self->dist_extra_ & 0xffffff;
+					uint nbits = self->dist_extra_ >> 24; uint extra = self->dist_extra_ & 0xffffff;
 					/* It is assumed that the distance was first encoded with NPOSTFIX = 0 and
 					   NDIRECT = 0, so the code itself is of this form:
 						 BROTLI_NUM_DISTANCE_SHORT_CODES + 2 * (nbits - 1) + prefix_bit
@@ -17675,8 +17343,7 @@ namespace ExternalArchivingMethods
 					/* ISLAST */
 					BrotliWriteBits(1, 0, storage_ix, storage);
 					if (len <= (1U << 16)) { nibbles = 4; } else if (len <= (1U << 20)) { nibbles = 5; }
-					BrotliWriteBits(2, nibbles - 4, storage_ix, storage);
-					BrotliWriteBits(nibbles * 4, len - 1, storage_ix, storage);
+					BrotliWriteBits(2, nibbles - 4, storage_ix, storage); BrotliWriteBits(nibbles * 4, len - 1, storage_ix, storage);
 					/* ISUNCOMPRESSED */
 					BrotliWriteBits(1, is_uncompressed ? 1U : 0U, storage_ix, storage);
 				}
@@ -17685,12 +17352,9 @@ namespace ExternalArchivingMethods
 
 				private static unsafe void EmitUncompressedMetaBlock(byte* begin, byte* end, size_t storage_ix_start, size_t* storage_ix, byte* storage) 
 				{
-					size_t len = (size_t) (end - begin);
-					RewindBitPosition(storage_ix_start, storage_ix, storage);
-					BrotliStoreMetaBlockHeader(len, true, storage_ix, storage);
-					*storage_ix = (*storage_ix + 7u) & ~7u;
-					memcpy(&storage[*storage_ix >> 3], begin, len);
-					*storage_ix += len << 3; storage[*storage_ix >> 3] = 0;
+					size_t len = (size_t) (end - begin); RewindBitPosition(storage_ix_start, storage_ix, storage);
+					BrotliStoreMetaBlockHeader(len, true, storage_ix, storage); *storage_ix = (*storage_ix + 7u) & ~7u;
+					memcpy(&storage[*storage_ix >> 3], begin, len); *storage_ix += len << 3; storage[*storage_ix >> 3] = 0;
 				}
 
 				/* Builds a literal prefix code into "depths" and "bits" based on the statistics
@@ -17747,10 +17411,8 @@ namespace ExternalArchivingMethods
 					if (insertlen < 6) { size_t code = insertlen + 40; BrotliWriteBits(depth[code], bits[code], storage_ix, storage); ++histo[code]; }
 					else if (insertlen < 130) 
 					{
-						size_t tail = insertlen - 2; uint nbits = Log2FloorNonZero(tail) - 1u;
-						size_t prefix = tail >> (int) nbits; size_t inscode = (nbits << 1) + prefix + 42;
-						BrotliWriteBits(depth[inscode], bits[inscode], storage_ix, storage);
-						BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage); ++histo[inscode];
+						size_t tail = insertlen - 2; uint nbits = Log2FloorNonZero(tail) - 1u; size_t prefix = tail >> (int) nbits; size_t inscode = (nbits << 1) + prefix + 42;
+						BrotliWriteBits(depth[inscode], bits[inscode], storage_ix, storage); BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage); ++histo[inscode];
 					}
 					else if (insertlen < 2114) 
 					{
@@ -17795,18 +17457,14 @@ namespace ExternalArchivingMethods
 					if (copylen < 12) { BrotliWriteBits(depth[copylen - 4], bits[copylen - 4], storage_ix, storage); ++histo[copylen - 4]; }
 					else if (copylen < 72) 
 					{
-						size_t tail = copylen - 8; uint nbits = Log2FloorNonZero(tail) - 1;
-						size_t prefix = tail >> (int) nbits; size_t code = (nbits << 1) + prefix + 4;
-						BrotliWriteBits(depth[code], bits[code], storage_ix, storage);
-						BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage);
+						size_t tail = copylen - 8; uint nbits = Log2FloorNonZero(tail) - 1; size_t prefix = tail >> (int) nbits; size_t code = (nbits << 1) + prefix + 4;
+						BrotliWriteBits(depth[code], bits[code], storage_ix, storage); BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage);
 						++histo[code];
 					}
 					else if (copylen < 136) 
 					{
-						size_t tail = copylen - 8; size_t code = (tail >> 5) + 30;
-						BrotliWriteBits(depth[code], bits[code], storage_ix, storage);
-						BrotliWriteBits(5, tail & 31, storage_ix, storage);
-						BrotliWriteBits(depth[64], bits[64], storage_ix, storage); ++histo[code]; ++histo[64];
+						size_t tail = copylen - 8; size_t code = (tail >> 5) + 30; BrotliWriteBits(depth[code], bits[code], storage_ix, storage);
+						BrotliWriteBits(5, tail & 31, storage_ix, storage); BrotliWriteBits(depth[64], bits[64], storage_ix, storage); ++histo[code]; ++histo[64];
 					}
 					else if (copylen < 2120) 
 					{
@@ -17830,16 +17488,13 @@ namespace ExternalArchivingMethods
 					if (copylen < 10) { BrotliWriteBits(depth[copylen + 14], bits[copylen + 14], storage_ix, storage); ++histo[copylen + 14]; }
 					else if (copylen < 134) 
 					{
-						size_t tail = copylen - 6; uint nbits = Log2FloorNonZero(tail) - 1u;
-						size_t prefix = tail >> (int) nbits; size_t code = (nbits << 1) + prefix + 20;
-						BrotliWriteBits(depth[code], bits[code], storage_ix, storage);
-						BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage); ++histo[code];
+						size_t tail = copylen - 6; uint nbits = Log2FloorNonZero(tail) - 1u; size_t prefix = tail >> (int) nbits; size_t code = (nbits << 1) + prefix + 20;
+						BrotliWriteBits(depth[code], bits[code], storage_ix, storage); BrotliWriteBits(nbits, tail - (prefix << (int) nbits), storage_ix, storage); ++histo[code];
 					}
 					else if (copylen < 2118) 
 					{
 						size_t tail = copylen - 70; uint nbits = Log2FloorNonZero(tail); size_t code = nbits + 28;
-						BrotliWriteBits(depth[code], bits[code], storage_ix, storage);
-						BrotliWriteBits(nbits, tail - ((size_t) 1 << (int) nbits), storage_ix, storage); ++histo[code];
+						BrotliWriteBits(depth[code], bits[code], storage_ix, storage); BrotliWriteBits(nbits, tail - ((size_t) 1 << (int) nbits), storage_ix, storage); ++histo[code];
 					} else { BrotliWriteBits(depth[39], bits[39], storage_ix, storage); BrotliWriteBits(24, copylen - 2118, storage_ix, storage); ++histo[47]; }
 				}
 
@@ -17860,11 +17515,9 @@ namespace ExternalArchivingMethods
 					while (n_bits > 0) 
 					{
 						size_t byte_pos = pos >> 3; size_t n_unchanged_bits = pos & 7;
-						size_t n_changed_bits = Math.Min(n_bits, 8 - n_unchanged_bits);
-						size_t total_bits = n_unchanged_bits + n_changed_bits;
+						size_t n_changed_bits = Math.Min(n_bits, 8 - n_unchanged_bits); size_t total_bits = n_unchanged_bits + n_changed_bits;
 						uint mask = (~((1u << (int) total_bits) - 1u)) | ((1u << (int) n_unchanged_bits) - 1u);
-						uint unchanged_bits = array[byte_pos] & mask;
-						uint changed_bits = bits & ((1u << (int) n_changed_bits) - 1u);
+						uint unchanged_bits = array[byte_pos] & mask; uint changed_bits = bits & ((1u << (int) n_changed_bits) - 1u);
 						array[byte_pos] = (byte) ((changed_bits << (int) n_unchanged_bits) | unchanged_bits);
 						n_bits -= n_changed_bits; bits >>= (int) n_changed_bits; pos += n_changed_bits;
 					}
@@ -17887,10 +17540,8 @@ namespace ExternalArchivingMethods
 					   the full alphabet. This looks complicated, but having the symbols
 					   in this order in the command bits saves a few branches in the Emit*
 					   functions. */
-					memcpy(cmd_depth, depth, 24);
-					memcpy(cmd_depth + 24, depth + 40, 8); memcpy(cmd_depth + 32, depth + 24, 8);
-					memcpy(cmd_depth + 40, depth + 48, 8); memcpy(cmd_depth + 48, depth + 32, 8);
-					memcpy(cmd_depth + 56, depth + 56, 8);
+					memcpy(cmd_depth, depth, 24); memcpy(cmd_depth + 24, depth + 40, 8); memcpy(cmd_depth + 32, depth + 24, 8);
+					memcpy(cmd_depth + 40, depth + 48, 8); memcpy(cmd_depth + 48, depth + 32, 8); memcpy(cmd_depth + 56, depth + 56, 8);
 					BrotliConvertBitDepthsToSymbols(cmd_depth, 64, cmd_bits);
 					memcpy(bits, cmd_bits, 48); memcpy(bits + 24, cmd_bits + 32, 16);
 					memcpy(bits + 32, cmd_bits + 48, 16); memcpy(bits + 40, cmd_bits + 24, 16);
@@ -17912,8 +17563,7 @@ namespace ExternalArchivingMethods
 					bool is_last, int* table, size_t table_bits, byte* cmd_depth, ushort* cmd_bits, size_t* cmd_code_numbits, byte* cmd_code,
 					size_t* storage_ix, byte* storage) 
 				{
-					uint* cmd_histo = stackalloc uint[128];
-					byte* ip_end;
+					uint* cmd_histo = stackalloc uint[128]; byte* ip_end;
 					/* "next_emit" is a pointer to the first byte that is not covered by a
 					   previous copy. Bytes between "next_emit" and the start of the next copy or
 					   the end of the input will be emitted as literal bytes. */
@@ -17921,8 +17571,7 @@ namespace ExternalArchivingMethods
 					/* Save the start of the first block for position and distance computations. */
 					byte* base_ip = input; size_t kFirstBlockSize = 3 << 15;
 					size_t kMergeBlockSize = 1 << 16; size_t kInputMarginBytes = BROTLI_WINDOW_GAP; size_t kMinMatchLen = 5;
-					byte* metablock_start = input; size_t block_size = Math.Min(input_size, kFirstBlockSize);
-					size_t total_block_size = block_size;
+					byte* metablock_start = input; size_t block_size = Math.Min(input_size, kFirstBlockSize); size_t total_block_size = block_size;
 					/* Save the bit position of the MLEN field of the meta-block header, so that
 					   we can update it later if we decide to extend this meta-block. */
 					size_t mlen_storage_ix = *storage_ix + 3;
@@ -17954,8 +17603,7 @@ namespace ExternalArchivingMethods
 						   sure that all distances are at most window size - 16.
 						   For all other blocks, we only need to keep a margin of 5 bytes so that
 						   we don't go over the block size with a copy. */
-						size_t len_limit = Math.Min(block_size - kMinMatchLen, input_size - kInputMarginBytes);
-						byte* ip_limit = input + len_limit; uint next_hash;
+						size_t len_limit = Math.Min(block_size - kMinMatchLen, input_size - kInputMarginBytes); byte* ip_limit = input + len_limit; uint next_hash;
 						for (next_hash = Hash(++ip, shift);;) 
 						{
 							/* Step 1: Scan forward in the input looking for a 5-byte-long match.
@@ -17977,8 +17625,7 @@ namespace ExternalArchivingMethods
 							trawl:
 							do 
 							{
-								uint hash = next_hash; uint bytes_between_hash_lookups = skip++ >> 5;
-								ip = next_ip; next_ip = ip + bytes_between_hash_lookups;
+								uint hash = next_hash; uint bytes_between_hash_lookups = skip++ >> 5; ip = next_ip; next_ip = ip + bytes_between_hash_lookups;
 								if (next_ip > ip_limit) { goto emit_remainder; }
 								next_hash = Hash(next_ip, shift); candidate = ip - last_distance;
 								if (IsMatch(ip, candidate)) { if (candidate < ip) { table[hash] = (int) (ip - base_ip); break; } }
@@ -17997,11 +17644,9 @@ namespace ExternalArchivingMethods
 							{
 								/* We have a 5-byte match at ip, and we need to emit bytes in
 								   [next_emit, ip). */
-								byte* base_ = ip;
-								size_t matched = 5 + FindMatchLengthWithLimit(candidate + 5, ip + 5, (size_t) (ip_end - ip) - 5);
+								byte* base_ = ip; size_t matched = 5 + FindMatchLengthWithLimit(candidate + 5, ip + 5, (size_t) (ip_end - ip) - 5);
 								int distance = (int) (base_ - candidate); /* > 0 */
-								size_t insert = (size_t) (base_ - next_emit);
-								ip += matched;
+								size_t insert = (size_t) (base_ - next_emit); ip += matched;
 								if (insert < 6210) { EmitInsertLen(insert, cmd_depth, cmd_bits, cmd_histo, storage_ix, storage); }
 								else if (ShouldUseUncompressedMode(metablock_start, next_emit, insert,literal_ratio)) 
 								{
@@ -18069,8 +17714,7 @@ namespace ExternalArchivingMethods
 						/* Update the size of the current meta-block and continue emitting commands.
 						   We can do this because the current size and the new size both have 5
 						   nibbles. */
-						total_block_size += block_size;
-						UpdateBits(20, (uint) (total_block_size - 1), mlen_storage_ix, storage);
+						total_block_size += block_size; UpdateBits(20, (uint) (total_block_size - 1), mlen_storage_ix, storage);
 						goto emit_commands;
 					}
 

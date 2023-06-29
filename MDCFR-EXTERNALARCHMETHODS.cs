@@ -3,9 +3,6 @@
 // Second one: (Version 1.5.5.0) Cabinet Archives.
 // Third one: (Version 1.5.5.0) Snappy Archives.
 
-// Global Preprocessor definitions
-#define INTERNAL_NULLABLE_ATTRIBUTES
-
 // Global namespaces
 using System;
 using System.IO;
@@ -32,162 +29,7 @@ using System.Text.RegularExpressions;
 	using static System.Runtime.Intrinsics.X86.Ssse3;
 #endif
 
-//Code required when the Snappy Archiving is compiled < .NET 6 .
-#if !NET6_0_OR_GREATER
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
 
-// ReSharper disable once CheckNamespace
-namespace System.Runtime.CompilerServices
-{
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
-    internal sealed class CallerArgumentExpressionAttribute : Attribute
-    {
-        public CallerArgumentExpressionAttribute(string parameterName)
-        {
-            ParameterName = parameterName;
-        }
-
-        public string ParameterName { get; }
-    }
-}
-#endif
-
-#if NETSTANDARD2_0 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NET45 || NET451 || NET452 || NET6 || NET461 || NET462 || NET47 || NET471 || NET472 || NET48
-
-// https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
-
-// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
-
-// ReSharper disable once CheckNamespace
-namespace System.Diagnostics.CodeAnalysis
-{
-    /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class AllowNullAttribute : Attribute { }
-
-    /// <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class DisallowNullAttribute : Attribute { }
-
-    /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class MaybeNullAttribute : Attribute { }
-
-    /// <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
-    [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class NotNullAttribute : Attribute { }
-
-    /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class MaybeNullWhenAttribute : Attribute
-		{
-			/// <summary>Initializes the attribute with the specified return value condition.</summary>
-			/// <param name="returnValue">
-			/// The return value condition. If the method returns this value, the associated parameter may be null.
-			/// </param>
-			public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
-
-			/// <summary>Gets the return value condition.</summary>
-			public bool ReturnValue { get; }
-		}
-
-    /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class NotNullWhenAttribute : Attribute
-		{
-			/// <summary>Initializes the attribute with the specified return value condition.</summary>
-			/// <param name="returnValue">
-			/// The return value condition. If the method returns this value, the associated parameter will not be null.
-			/// </param>
-			public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
-
-			/// <summary>Gets the return value condition.</summary>
-			public bool ReturnValue { get; }
-		}
-
-    /// <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-	        public
-		#endif
-        sealed class NotNullIfNotNullAttribute : Attribute
-		{
-			/// <summary>Initializes the attribute with the associated parameter name.</summary>
-			/// <param name="parameterName">
-			/// The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
-			/// </param>
-			public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
-
-			/// <summary>Gets the associated parameter name.</summary>
-			public string ParameterName { get; }
-		}
-
-    /// <summary>Applied to a method that will never return under any circumstance.</summary>
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class DoesNotReturnAttribute : Attribute { }
-
-    /// <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-		#if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-		#else
-			public
-		#endif
-        sealed class DoesNotReturnIfAttribute : Attribute
-		{
-			/// <summary>Initializes the attribute with the specified parameter value.</summary>
-			/// <param name="parameterValue">
-			/// The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
-			/// the associated parameter matches this value.
-			/// </param>
-			public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
-
-			/// <summary>Gets the condition parameter value.</summary>
-			public bool ParameterValue { get; }
-		}
-}
-
-#endif
 
 namespace ExternalArchivingMethods
 {
@@ -250,17 +92,14 @@ namespace ExternalArchivingMethods
 				return bytesToWrite;
 			}
 
-			public bool CanWrite
-			{
-				get
-				{
-					return canWrite;
-				}
-			}
+			public bool CanWrite { get { return canWrite; } }
 		}
 		// Ends here: -->
 		
 		// IArchiveDataWriter.cs file: <--
+		/// <summary>
+		/// An abstract interface to use for specifying a compression algorithm to the TAR archive.
+		/// </summary>
 		public interface IArchiveDataWriter
 		{
 			/// <summary>
@@ -269,8 +108,15 @@ namespace ExternalArchivingMethods
 			/// <param name="buffer">data storage</param>
 			/// <param name="count">how many bytes to be written to the corresponding archive</param>
 			int Write(byte[] buffer, int count);
+			/// <summary>
+			/// Whether the specified algorithm have finished compression for the stream or not.
+			/// </summary>
 			bool CanWrite { get; }
 		}
+		/// <summary>
+		/// An handler to write with a custom algorithm data to the TAR writer.
+		/// </summary>
+		/// <param name="writer">A class that abstracts the <see cref="IArchiveDataWriter"/> interface.</param>
 		public delegate void WriteDataDelegate(IArchiveDataWriter writer);
 		// Ends here: -->
 		
@@ -284,6 +130,7 @@ namespace ExternalArchivingMethods
 			/// The Entry is a file.
 			/// </summary>
 			File = 0,
+			/// <summary>RSVD</summary>
 			FileObsolete = 0x30,
 			/// <summary>
 			/// The Entry is a hard-coded(strongly typed) link.
@@ -293,26 +140,62 @@ namespace ExternalArchivingMethods
 			/// The Entry is a symbolic link.
 			/// </summary>
 			SymLink = 0x32,
-			CharDevice = 0x33,
-			BlockDevice = 0x34,
+            /// <summary>RSVD</summary>
+            CharDevice = 0x33,
+            /// <summary>RSVD</summary>
+            BlockDevice = 0x34,
 			/// <summary>
 			/// The Entry is a directory.
 			/// </summary>
 			Directory = 0x35,
-			Fifo = 0x36,
+            /// <summary>RSVD</summary>
+            Fifo = 0x36,
 		}
 
+		/// <summary>
+		/// The interface of how a TAR archive header is created.
+		/// </summary>
 		public interface ITarHeader
 		{
+			/// <summary>
+			/// The file name to add.
+			/// </summary>
 			string FileName { get; set; }
+			/// <summary>
+			/// The mode that was used to add an entry.
+			/// </summary>
 			int Mode { get; set; }
+			/// <summary>
+			/// The User ID that archived this entry.
+			/// </summary>
 			int UserId { get; set; }
-			string UserName { get; set; }
-			int GroupId { get; set; }
-			string GroupName { get; set; }
+            /// <summary>
+            /// The User name that archived this entry.
+            /// </summary>
+            string UserName { get; set; }
+            /// <summary>
+            /// The Group ID that archived this entry.
+            /// </summary>
+            int GroupId { get; set; }
+            /// <summary>
+            /// The Group name that archived this entry.
+            /// </summary>
+            string GroupName { get; set; }
+			/// <summary>
+			/// The entry size in bytes.
+			/// </summary>
 			long SizeInBytes { get; set; }
+			/// <summary>
+			/// When the entry was modified for the last time before added.
+			/// </summary>
 			DateTime LastModification { get; set; }
+			/// <summary>
+			/// Gets the TAR header size.
+			/// </summary>
 			int HeaderSize { get; }
+			/// <summary>
+			/// The entry type to add.
+			/// </summary>
 			EntryType EntryType { get; set; }
 		}
 		// Ends here: -->
@@ -322,6 +205,7 @@ namespace ExternalArchivingMethods
 		/// <summary>
 		/// The Legacy Tar writer specified by it's original author. You should not use this class in your source code.
 		/// </summary>
+		#pragma warning disable CS1591
 		public class LegacyTarWriter : IDisposable
 		{
 			private readonly Stream outStream;
@@ -516,22 +400,25 @@ namespace ExternalArchivingMethods
 				isClosed = true;
 			}
 		}
-		// Ends here: -->
-		
-		// TarException.cs file: <--
-		/// <summary>
-		/// It is a normal <see cref="System.Exception"/> that allows you to differentiate the the source of the exception (That is , the Tar Code) .
-		/// </summary>
-		public class TarException : Exception
+		#pragma warning restore CS1591
+        // Ends here: -->
+
+        // TarException.cs file: <--
+        /// <summary>
+        /// It is a normal <see cref="System.Exception"/> that allows you to differentiate the the source of the exception (That is , the Tar Code) .
+        /// </summary>
+        public class TarException : Exception
 		{
-			public TarException(string message) : base(message)
+			#pragma warning disable CS1591
+            public TarException(string message) : base(message)
 			{
 			}
-		}
-		// Ends here: -->
-		
-		// TarHeader.cs file: <--
-		internal class TarHeader : ITarHeader
+			#pragma warning restore CS1591
+        }
+        // Ends here: -->
+
+        // TarHeader.cs file: <--
+        internal class TarHeader : ITarHeader
 		{
 			private readonly byte[] buffer = new byte[512];
 			private long headerChecksum;
@@ -743,10 +630,10 @@ namespace ExternalArchivingMethods
 				header = new UsTarHeader();
 			}
 
-			public ITarHeader FileInfo
-			{
-				get { return header; }
-			}
+			/// <summary>
+			/// A descriptive TAR header that allows you to review the File Info data.
+			/// </summary>
+			public ITarHeader FileInfo { get { return header; } }
 
             /// <summary>
             /// Read all files from an archive to a directory. It creates some child directories to
@@ -801,6 +688,11 @@ namespace ExternalArchivingMethods
 				Debug.WriteLine("tar stream position Read out: " + inStream.Position);
 			}
 
+			/// <summary>
+			/// Read the current entry's contents and pass them to the <paramref name="buffer"/> specified.
+			/// </summary>
+			/// <param name="buffer">The empty buffer to write data to.</param>
+			/// <returns>The total size , in bytes, written to the <paramref name="buffer"/>.</returns>
 			protected int Read(out byte[] buffer)
 			{
 				if(remainingBytesInFile == 0)
@@ -956,6 +848,16 @@ namespace ExternalArchivingMethods
 			{
 			}
 
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="name"></param>
+			/// <param name="lastModificationTime"></param>
+			/// <param name="count"></param>
+			/// <param name="userId"></param>
+			/// <param name="groupId"></param>
+			/// <param name="mode"></param>
+			/// <param name="entryType"></param>
 			protected override void WriteHeader(string name, DateTime lastModificationTime, long count, int userId, int groupId, int mode, EntryType entryType)
 			{
 				var tarHeader = new UsTarHeader()
@@ -973,6 +875,15 @@ namespace ExternalArchivingMethods
 				OutStream.Write(tarHeader.GetHeaderValue(), 0, tarHeader.HeaderSize);
 			}
 
+			/// <summary>
+			/// 
+			/// </summary>
+			/// <param name="name"></param>
+			/// <param name="lastModificationTime"></param>
+			/// <param name="count"></param>
+			/// <param name="userName"></param>
+			/// <param name="groupName"></param>
+			/// <param name="mode"></param>
 			protected virtual void WriteHeader(string name, DateTime lastModificationTime, long count, string userName, string groupName, int mode)
 			{
 				var tarHeader = new UsTarHeader()

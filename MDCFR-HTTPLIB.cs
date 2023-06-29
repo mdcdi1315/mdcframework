@@ -213,7 +213,6 @@ using System.Net;
 using System.Linq;
 using System.Text;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Collections.Generic;
 #if NETFX_CORE
 	using Windows.Storage.Streams;
@@ -222,22 +221,44 @@ using System.Collections.Generic;
 namespace HTTPLIB 
 {
 	// Request.cs file: <--
+    /// <summary>
+    /// Contains the data to create a new HTTP request and execute it.
+    /// </summary>
 	public class Request
     {
+        /// <summary>
+        /// The URL to make an HTTP request from.
+        /// </summary>
         protected string url;
+        /// <summary>
+        /// The HTTP VERB to use for this request.
+        /// </summary>
         protected HttpVerb method = HttpVerb.Get;
+        /// <summary>
+        /// Specifies the Header Provider to use.
+        /// </summary>
         protected HeaderProvider headers;
+        /// <summary>
+        /// Specifies the Authentication Provider to use.
+        /// </summary>
         protected AuthenticationProvider auth;
+        /// <summary>
+        /// Specifies the Body Provider to use.
+        /// </summary>
         protected BodyProvider body;
-
+        /// <summary>
+        /// Specifies the Action Provider to use.
+        /// </summary>
         protected ActionProvider action;
 
-        public Request()
-        {
-            
-        }
+        /// <summary>
+        /// Creates a new instance of the class <see cref="Request"/> so as to create a new HTTP request.
+        /// </summary>
+        public Request() { }
 
-
+        /// <summary>
+        /// The URL to make an HTTP request from.
+        /// </summary>
         public String Url
         {
             set
@@ -250,6 +271,9 @@ namespace HTTPLIB
             }
         }
 
+        /// <summary>
+        /// The HTTP VERB to use for this request.
+        /// </summary>
         public HttpVerb Method
         {
             set
@@ -263,6 +287,9 @@ namespace HTTPLIB
             }
         }
 
+        /// <summary>
+        /// The Header Provider to use.
+        /// </summary>
         public HeaderProvider Headers
         {
             set
@@ -275,6 +302,9 @@ namespace HTTPLIB
             }
         }
 
+        /// <summary>
+        /// The Authentication Provider to use.
+        /// </summary>
         public AuthenticationProvider Auth
         {
             set
@@ -286,7 +316,9 @@ namespace HTTPLIB
                 return this.auth;
             }
         }
-
+        /// <summary>
+        /// The Action Provider to use.
+        /// </summary>
         public ActionProvider Action
         {
             set
@@ -298,7 +330,9 @@ namespace HTTPLIB
                 return this.action;
             }
         }
-
+        /// <summary>
+        /// The Body Provider to use.
+        /// </summary>
         public BodyProvider Body
         {
             set
@@ -311,17 +345,25 @@ namespace HTTPLIB
             }
         }
 
+        /// <summary>
+        /// Starts the request with the specified settings done in the properties.
+        /// </summary>
         public void Go()
         {
             MakeRequest();
         }
 
-
+        /// <summary>
+        /// Do not make any settings , and do a GET request from the specified <paramref name="url"/>.
+        /// </summary>
+        /// <param name="url">The URL to execute the GET request.</param>
+        /// <returns>A new <see cref="HttpWebRequest"/> class.</returns>
         protected virtual HttpWebRequest GetWebRequest(string url)
         {
             return (HttpWebRequest)HttpWebRequest.Create(new Uri(url));
         }
-
+        /// <summary></summary>
+        /// <exception cref="ArgumentNullException"></exception>
         protected void MakeRequest()
         {
             if (string.IsNullOrWhiteSpace(url))
@@ -386,12 +428,12 @@ namespace HTTPLIB
             return whc;
         }
 
-
+        /// <summary></summary>
         protected virtual void ExecuteRequestWithoutBody(HttpWebRequest request)
         {
             request.BeginGetResponse(ProcessCallback(action.Success, action.Fail), request);
         }
-
+        /// <summary></summary>
         protected virtual void ExecuteRequestWithBody(HttpWebRequest request)
         {
             request.BeginGetRequestStream(new AsyncCallback((IAsyncResult callbackResult) =>
@@ -411,7 +453,7 @@ namespace HTTPLIB
             }), request);
         }
 
-
+        /// <summary></summary>
         protected AsyncCallback ProcessCallback(Action<WebHeaderCollection, Stream> success, Action<WebException> fail)
         {
             return new AsyncCallback((callbackResult) =>
@@ -445,17 +487,29 @@ namespace HTTPLIB
 	
 	// NamedFileStream.cs file: <--
 	/// <summary>
-    /// NamedFileStream is a simple data structre that holds a file name, and stream
+    /// NamedFileStream is a simple data structure that holds a file name, and a <see cref="System.IO.Stream"/>
     /// </summary>
-    public sealed class NamedFileStream
+    public struct NamedFileStream
     {
+        /// <summary>
+        /// The Name of the file.
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// The file path of the file.
+        /// </summary>
         public string Filename { get; private set; }
+        /// <summary>
+        /// The Content Type of this file. It is on a specific format , e.g. "www-app-????"
+        /// </summary>
         public string ContentType { get; private set; }
+        /// <summary>
+        /// The <see cref="System.IO.Stream"/> that carries the data.
+        /// </summary>
         public Stream Stream { get; private set; }
 
         /// <summary>
-        /// Create a new NamedFileStream
+        /// Create a new NamedFileStream structure.
         /// </summary>
         /// <param name="name">Form name for file</param>
         /// <param name="filename">Name of file</param>
@@ -472,6 +526,10 @@ namespace HTTPLIB
 	// Ends here: -->
 	
 	// HttpVerb.cs file: <--
+    /// <summary>
+    /// An enumeration that contains HTTP verbs that are available for usage.
+    /// </summary>
+    #pragma warning disable CS1591
 	public enum HttpVerb
     {
         Get,
@@ -482,16 +540,30 @@ namespace HTTPLIB
         Delete,
         Options
     }
-	// Ends here: -->
-	
-	// Http.cs file: <--
-	public static class Http
+    #pragma warning restore CS1591
+    // Ends here: -->
+
+    // Http.cs file: <--
+    /// <summary>
+    /// The Http <see langword="static"/> <see langword="class"/> contains generic methods to create a new HTTP request.
+    /// </summary>
+    public static class Http
     {
+        /// <summary>
+        /// Use HTTP GET to get the contents of an website.
+        /// </summary>
+        /// <param name="url">The URL of the website.</param>
+        /// <returns>A new <see cref="RequestBuilder"/> class.</returns>
         public static RequestBuilder Get(string url)
         {
             return new RequestBuilder(url, HttpVerb.Get);
         }
 
+        /// <summary>
+        /// Use HTTP HEAD to get the contents of the head part of an website.
+        /// </summary>
+        /// <param name="url">The URL of the website.</param>
+        /// <returns>A new <see cref="RequestBuilder"/> class.</returns>
         public static RequestBuilder Head(string url)
         {
             return new RequestBuilder(url, HttpVerb.Head);
@@ -520,7 +592,7 @@ namespace HTTPLIB
 	// Ends here: -->
 	
 	// Header.cs file: <--
-	public class Header
+	public struct Header
     {
 
         public Header(string name, string value)
@@ -967,7 +1039,7 @@ namespace HTTPLIB
 	// Ends here: -->
 	
 	// Provider\BasicAuthenticationProvider.cs file: <--
-	public class BasicAuthenticationProvider : AuthenticationProvider
+	public struct BasicAuthenticationProvider : AuthenticationProvider
     {
         private string username;
         private string password;
@@ -1607,5 +1679,5 @@ namespace HTTPLIB
     }
 	// Ends here: -->
 	
-	// Http Library Ended. Line 1610.
+	// Http Library Ended. Line 1683.
 }
