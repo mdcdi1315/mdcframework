@@ -107,4 +107,16 @@
 	<Message Importance="High" Text="Sucessfull copying ..." />
   </Target>
 
+  <Target Name="End_N3" AfterTargets="Publish" Condition="'$(OS)' == 'Unix'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries... (For publishing)" />
+	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot; -publish" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+
+  <Target Name="End_N4" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Unix'">
+	<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
+	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot;" />
+	<Message Importance="High" Text="Sucessfull copying ..." />
+  </Target>
+
 </Project>
