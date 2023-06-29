@@ -36,9 +36,12 @@ or included until now. The Library will be also updated with new features and bu
 ## Avaliable Platforms
  The Project is compiled as a Dynamic Link Library (DLL) and works on any platform (Not sure , but surely is compiled as MSIL).
  
- You can compile it either using the command `dotnet` or using the bundled Visual Studio Solution.
+ You can compile it for now only by using the Visual Studio Solution.
+
+  __NOTE__ You can also compile this DLL on other .NET Versions and platforms , but it will need to refactor some code lines to work correctly.
+   Also , you must know how to edit the project file in order to target it to another .NET Version and platform.
  
- __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit machines and cannot be used in any other machine architectures.
+ __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit Unicode machines and cannot be used in any other machine architectures.
 
 ## What it includes?
 The project includes operations related to:
