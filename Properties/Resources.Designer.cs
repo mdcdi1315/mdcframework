@@ -61,11 +61,119 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Index was out of bounds:.
+        /// </summary>
+        internal static string Arg_ArgumentOutOfRangeException {
+            get {
+                return ResourceManager.GetString("Arg_ArgumentOutOfRangeException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number of elements in source vector is greater than the destination array.
+        /// </summary>
+        internal static string Arg_ElementsInSourceIsGreaterThanDestination {
+            get {
+                return ResourceManager.GetString("Arg_ElementsInSourceIsGreaterThanDestination", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to At least {0} element(s) are expected in the parameter &quot;{1}&quot;..
+        /// </summary>
+        internal static string Arg_InsufficientNumberOfElements {
+            get {
+                return ResourceManager.GetString("Arg_InsufficientNumberOfElements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The method was called with a null array argument..
+        /// </summary>
+        internal static string Arg_NullArgumentNullRef {
+            get {
+                return ResourceManager.GetString("Arg_NullArgumentNullRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The ResourceReader class does not know how to read this version of .resources files. Expected version: {0}  This file: {1}.
         /// </summary>
         internal static string Arg_ResourceFileUnsupportedVersion {
             get {
                 return ResourceManager.GetString("Arg_ResourceFileUnsupportedVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified type is not supported.
+        /// </summary>
+        internal static string Arg_TypeNotSupported {
+            get {
+                return ResourceManager.GetString("Arg_TypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Format specifier was invalid..
+        /// </summary>
+        internal static string Argument_BadFormatSpecifier {
+            get {
+                return ResourceManager.GetString("Argument_BadFormatSpecifier", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Characters following the format symbol must be a number of {0} or less..
+        /// </summary>
+        internal static string Argument_CannotParsePrecision {
+            get {
+                return ResourceManager.GetString("Argument_CannotParsePrecision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination is too short..
+        /// </summary>
+        internal static string Argument_DestinationTooShort {
+            get {
+                return ResourceManager.GetString("Argument_DestinationTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;G&apos; format combined with a precision is not supported..
+        /// </summary>
+        internal static string Argument_GWithPrecisionNotSupported {
+            get {
+                return ResourceManager.GetString("Argument_GWithPrecisionNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot use type &apos;{0}&apos;. Only value types without pointers or references are supported..
+        /// </summary>
+        internal static string Argument_InvalidTypeWithPointersNotSupported {
+            get {
+                return ResourceManager.GetString("Argument_InvalidTypeWithPointersNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Overlapping spans have mismatching alignment..
+        /// </summary>
+        internal static string Argument_OverlapAlignmentMismatch {
+            get {
+                return ResourceManager.GetString("Argument_OverlapAlignmentMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Precision cannot be larger than {0}..
+        /// </summary>
+        internal static string Argument_PrecisionTooLarge {
+            get {
+                return ResourceManager.GetString("Argument_PrecisionTooLarge", resourceCulture);
             }
         }
         
@@ -214,6 +322,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to End position was not reached during enumeration..
+        /// </summary>
+        internal static string EndPositionNotReached {
+            get {
+                return ResourceManager.GetString("EndPositionNotReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Error {
@@ -317,11 +434,38 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Memory&lt;T&gt; has been disposed..
+        /// </summary>
+        internal static string MemoryDisposed {
+            get {
+                return ResourceManager.GetString("MemoryDisposed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This platform does not support binary serialized resources..
         /// </summary>
         internal static string NotSupported_BinarySerializedResources {
             get {
                 return ResourceManager.GetString("NotSupported_BinarySerializedResources", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Equals() on Span and ReadOnlySpan is not supported. Use operator== instead..
+        /// </summary>
+        internal static string NotSupported_CannotCallEqualsOnSpan {
+            get {
+                return ResourceManager.GetString("NotSupported_CannotCallEqualsOnSpan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetHashCode() on Span and ReadOnlySpan is not supported..
+        /// </summary>
+        internal static string NotSupported_CannotCallGetHashCodeOnSpan {
+            get {
+                return ResourceManager.GetString("NotSupported_CannotCallGetHashCodeOnSpan", resourceCulture);
             }
         }
         
@@ -358,6 +502,15 @@ namespace MDCFR.Properties {
         internal static string ObjectDisposed_ResourceSet {
             get {
                 return ResourceManager.GetString("ObjectDisposed_ResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release all references before disposing this instance..
+        /// </summary>
+        internal static string OutstandingReferences {
+            get {
+                return ResourceManager.GetString("OutstandingReferences", resourceCulture);
             }
         }
         
@@ -404,6 +557,15 @@ namespace MDCFR.Properties {
         internal static string TypeLoadException_CannotLoadConverter {
             get {
                 return ResourceManager.GetString("TypeLoadException_CannotLoadConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected segment type..
+        /// </summary>
+        internal static string UnexpectedSegmentType {
+            get {
+                return ResourceManager.GetString("UnexpectedSegmentType", resourceCulture);
             }
         }
         

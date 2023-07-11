@@ -569,6 +569,11 @@ namespace HTTPLIB
             return new RequestBuilder(url, HttpVerb.Head);
         }
 
+        /// <summary>
+        /// Use the HTTP POST command.
+        /// </summary>
+        /// <param name="url">The URL of the website.</param>
+        /// <returns>A new <see cref="RequestBuilder"/> class.</returns>
         public static RequestBuilder Post(string url)
         {
             return new RequestBuilder(url, HttpVerb.Post);
@@ -584,6 +589,11 @@ namespace HTTPLIB
             return new RequestBuilder(url, HttpVerb.Patch);
         }
 
+        /// <summary>
+        /// Perform a HTTP DELETE on the URL provided.
+        /// </summary>
+        /// <param name="url">The URL of the website.</param>
+        /// <returns>A new <see cref="RequestBuilder"/> class.</returns>
         public static RequestBuilder Delete(string url)
         {
             return new RequestBuilder(url, HttpVerb.Delete);
@@ -592,44 +602,74 @@ namespace HTTPLIB
 	// Ends here: -->
 	
 	// Header.cs file: <--
+    /// <summary>
+    /// The Header structure is a value class that is used
+    /// for the internal HTTP creator to get data from.
+    /// (Let's say it HTTP dictionary.)
+    /// </summary>
 	public struct Header
     {
-
+        /// <summary>
+        /// Create a new instance of the <see cref="Header"/> structure.
+        /// </summary>
+        /// <param name="name">The name of this header.</param>
+        /// <param name="value">The value that this header uses.</param>
         public Header(string name, string value)
         {
             this.Name = name;
             this.Value = value;
         }
 
-
+        /// <summary>
+        /// The Header name.
+        /// </summary>
         public string Name { get; private set; }
+        /// <summary>
+        /// The Header value.
+        /// </summary>
         public string Value { get; private set; }
-		
 		
     }
 	// Ends here: -->
 	
 	// Cookies.cs file: <--
+    /// <summary>
+    /// The Cookies class is the top-level website cookies management.
+    /// </summary>
 	public class Cookies
     {
-        protected static CookieContainer cookies = new CookieContainer();
+        internal protected static CookieContainer cookies = new CookieContainer();
 
+        /// <summary>
+        /// Clear the current Cookies record.
+        /// </summary>
         public static void ClearCookies()
         {
             cookies = new CookieContainer();
         }
 
+        /// <summary>
+        /// The new Cookies record to write.
+        /// </summary>
+        /// <param name="cookieContainer">The Cookie data.</param>
         public static void SetCookies(CookieContainer cookieContainer)
         {
             cookies = cookieContainer;
         }
 
+        /// <summary>
+        /// The Current used Cookies record.
+        /// </summary>
         public static CookieContainer Container { get { return cookies; } }
     }
 	// Ends here: -->
 	
 	
 	// Builder\RequestBuilder.cs file: <--
+    /// <summary>
+    /// The Request Builder constructs the proper HTTP command required to execute.
+    /// The available HTTP commands are located at the <see cref="Http"/> class.
+    /// </summary>
 	public partial class RequestBuilder
     {
         private string url;
@@ -642,7 +682,9 @@ namespace HTTPLIB
         }
 
 
-
+        /// <summary>
+        /// Creates a new request defined by the user settings and executes it.
+        /// </summary>
         public void Go()
         {
             /*
@@ -667,19 +709,17 @@ namespace HTTPLIB
             
         }
 
-
-
-
-
+        /// <summary>
+        /// The HTTP method that will be used for this request.
+        /// </summary>
         public HttpVerb Method { get { return method; } }
+        /// <summary>
+        /// The URL where the request will be executed.
+        /// </summary>
         public String Url { get { return url; } }
 
-
-
-        public Action<WebHeaderCollection,Stream> GetOnSuccess()
-        {
-            return this.success;
-        }
+        /// <inheritdoc />
+        public Action<WebHeaderCollection,Stream> GetOnSuccess() { return this.success; }
     }
 	// Ends here: -->
 	
@@ -689,7 +729,7 @@ namespace HTTPLIB
 
         #region Headers
         private HeaderProvider headerProvider;
-
+        #pragma warning disable CS1591
         public RequestBuilder Headers(object header)
         {
             Dictionary<String, String> headers = new Dictionary<String, String>();
@@ -719,18 +759,29 @@ namespace HTTPLIB
             this.headerProvider = headerProvider;
             return this;
         }
-
+        #pragma warning restore CS1591
         #endregion
-		
+
     }
-	// Ends here: -->
-	
-	// Builder\RequestBuilder.Body.cs file: <--
-	public partial class RequestBuilder
+    // Ends here: -->
+
+    // Builder\RequestBuilder.Body.cs file: <--
+    public partial class RequestBuilder
     {
         #region Body
         private BodyProvider bodyProvider;
 
+        /// <summary>
+        /// Upload one or more files to the already loaded URL.
+        /// </summary>
+        /// <param name="files">The Files to upload.</param>
+        /// <param name="parameters">Addtional parameters to pass to the URL while uploading
+        /// (like custom settings).</param>
+        /// <param name="onProgressChanged">What actions to perform when the file uploading progress
+        /// has been changed.</param>
+        /// <param name="onUploadComplete">What actions to perform when the uploading has been completed.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder Upload(NamedFileStream[] files, object parameters, Action<long,long?> onProgressChanged, Action<long> onUploadComplete)
         {
             MultipartBodyProvider bodyProvider = new MultipartBodyProvider();
@@ -745,22 +796,44 @@ namespace HTTPLIB
             return this.Body(bodyProvider);
         }
 
+        /// <summary>
+        /// Upload one or more files to the already loaded URL.
+        /// </summary>
+        /// <param name="files">The Files to upload.</param>
+        /// <param name="parameters">Addtional parameters to pass to the URL while uploading
+        /// (like custom settings).</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder Upload(NamedFileStream[] files, object parameters)
         {
             return this.Upload(files, parameters,(a,b)=> { }, a=>{ });
         }
 
+        /// <summary>
+        /// Upload one or more files to the already loaded URL.
+        /// </summary>
+        /// <param name="files">The Files to upload.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder Upload(NamedFileStream[] files)
         {
             return this.Upload(files, new { });
         }
 
+        /// <summary>
+        /// Upload one or more files to the already loaded URL.
+        /// </summary>
+        /// <param name="files">The Files to upload.</param>
+        /// <param name="onProgressChanged">What actions to perform when the file uploading progress
+        /// has been changed.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder Upload(NamedFileStream[] files, Action<long, long?> onProgressChanged)
         {
             return this.Upload(files, new { }, onProgressChanged, a => { });
         }
 
-
+        #pragma warning disable CS1591
         public RequestBuilder Form(object body)
         {
             FormBodyProvider bodyProvider = new FormBodyProvider();
@@ -811,17 +884,19 @@ namespace HTTPLIB
             this.bodyProvider = provider;
             return this;
         }
-
+        #pragma warning restore CS1591
         #endregion
     }
-	// Ends here: -->
-	
-	// Builder\RequestBuilder.Auth.cs file: <--
-	public partial class RequestBuilder
+    // Ends here: -->
+
+    // Builder\RequestBuilder.Auth.cs file: <--
+    public partial class RequestBuilder
     {
 
         #region Auth
         private AuthenticationProvider authProvider;
+
+        #pragma warning disable CS1591
         public RequestBuilder Auth(string username, string password)
         {
             authProvider = new BasicAuthenticationProvider(username, password);
@@ -839,13 +914,14 @@ namespace HTTPLIB
             authProvider = provider;
             return this;
         }
+        #pragma warning restore CS1591
         #endregion
-		
+
     }
-	// Ends here: -->
-	
-	// Builder\RequestBuilder.Action.cs file: <--
-	public partial class RequestBuilder
+    // Ends here: -->
+
+    // Builder\RequestBuilder.Action.cs file: <--
+    public partial class RequestBuilder
     {
 
         #region Actions
@@ -854,6 +930,18 @@ namespace HTTPLIB
         Action<WebException> fail;
         Action<HttpWebRequest> make;
 
+        /// <summary>
+        /// [<see langword="async"/>] What actions to perform when the HTTP operation has
+        /// successfully completed.
+        /// <para>
+        /// When the HTTP operation is GET , then the <see cref="System.String"/> parameter will return
+        /// the HTML page contents.
+        /// </para>
+        /// </summary>
+        /// <param name="action">A lambda expression that is a function that accepts the argument types 
+        /// <see cref="WebHeaderCollection"/> and <see cref="System.String"/>.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder OnSuccess(Action<WebHeaderCollection, String> action)
         {
             this.success = (headers, stream) =>
@@ -866,6 +954,18 @@ namespace HTTPLIB
             return this;
         }
 
+        /// <summary>
+        /// [<see langword="async"/>] What actions to perform when the HTTP operation has
+        /// successfully completed.
+        /// <para>
+        /// When the HTTP operation is GET , then the <see cref="System.String"/> parameter will return
+        /// the HTML page contents.
+        /// </para>
+        /// </summary>
+        /// <param name="action">A lambda expression that is a function that accepts the argument type
+        /// <see cref="System.String"/>.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder OnSuccess(Action<String> action)
         {
             this.success = (headers, stream) =>
@@ -876,16 +976,16 @@ namespace HTTPLIB
             return this;
         }
 
-
+        /// <inheritdoc />
         public RequestBuilder OnSuccess(Action<WebHeaderCollection, Stream> action)
         {
             this.success = action;
             return this;
         }
-		
-		
-		
-	#if NETFX_CORE
+
+
+
+#if NETFX_CORE
         public RequestBuilder DownloadTo(Windows.Storage.IStorageFile file)
         {
             this.success = (headers, result) =>
@@ -902,19 +1002,22 @@ namespace HTTPLIB
             return this;
         }
 		
-	#else
+#else
+
+        /// <summary>
+        /// The <see cref="DownloadTo(System.String)"/> extension can download a file if the URL supports it.
+        /// </summary>
+        /// <param name="filePath">The filepath to save the got file data to.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder DownloadTo(String filePath)
         {
-
-
 
             this.success = (headers, result) =>
             {
 
                 long? length = null;
                 if (headers.AllKeys.Contains("Content-Length")) { length = long.Parse(headers["Content-Length"]); }
-
-
 
                 FileStream fs = new FileStream(filePath, FileMode.OpenOrCreate);
                 ProgressCallbackHelper operation = result.CopyToProgress(fs,length);
@@ -925,6 +1028,14 @@ namespace HTTPLIB
 
         }
 
+        /// <summary>
+        /// The <see cref="DownloadTo(System.String)"/> extension can download a file if the URL supports it.
+        /// </summary>
+        /// <param name="filePath">The filepath to save the got file data to.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// <param name="OnProgressChanged">What actions to perform when the file downloading progress
+        /// has been changed.</param>
+        /// on a created instance.</returns>
         public RequestBuilder DownloadTo(String filePath, Action<long,long?> OnProgressChanged)
         {
             this.success = (headers, result) =>
@@ -943,6 +1054,13 @@ namespace HTTPLIB
 
         }
 
+        /// <summary>
+        /// The <see cref="DownloadTo(System.String)"/> extension can download a file if the URL supports it.
+        /// </summary>
+        /// <param name="filePath">The filepath to save the got file data to.</param>
+        /// <param name="onSuccess">What actions to perform when the downloading has finished.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder DownloadTo(String filePath, Action<WebHeaderCollection> onSuccess)
         {
             this.success = (headers, result) =>
@@ -956,12 +1074,19 @@ namespace HTTPLIB
 
                 operation.Completed += (totalbytes) => { fs.Close(); onSuccess(headers); };
 
-               
             };
             return this;
         }
 
-
+        /// <summary>
+        /// The <see cref="DownloadTo(System.String)"/> extension can download a file if the URL supports it.
+        /// </summary>
+        /// <param name="filePath">The filepath to save the got file data to.</param>
+        /// <param name="onProgressChanged">What actions to perform when the file downloading progress
+        /// has been changed.</param>
+        /// <param name="onSuccess">What actions to perform when the downloading has finished.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder DownloadTo(String filePath, Action<long, long?> onProgressChanged,Action<WebHeaderCollection> onSuccess)
         {
             this.success = (headers, result) =>
@@ -979,6 +1104,12 @@ namespace HTTPLIB
             return this;
         }
 
+        /// <summary>
+        /// The <see cref="DownloadTo(System.String)"/> extension can download a file if the URL supports it.
+        /// </summary>
+        /// <param name="filePath">The filepath to save the got file data to.</param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder AppendTo(String filePath)
         {
             this.success = (headers, result) =>
@@ -989,33 +1120,42 @@ namespace HTTPLIB
             };
             return this;
         }
-		
-	#endif
 
+#endif
+
+        /// <summary>
+        /// [<see langword="async"/>] What actions to perform when the HTTP request is being built.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder OnMake(Action<HttpWebRequest> action)
         {
             make = action;
             return this;
         }
 
-
+        /// <summary>
+        /// [<see langword="async"/>] What actions to perform when the HTTP request has failed.
+        /// </summary>
+        /// <param name="action"></param>
+        /// <returns>Something that you don't need to know. Just make sure to use this method
+        /// on a created instance.</returns>
         public RequestBuilder OnFail(Action<WebException> action)
         {
             fail = action;
             return this;
         }
 
-
+        /// <inheritdoc />
         public RequestBuilder Action(ActionProvider action)
         {
             actionProvider = action;
             return this;
         }
 
-        public ActionProvider GetAction()
-        {
-            return actionProvider;
-        }
+        /// <inheritdoc />
+        public ActionProvider GetAction() { return actionProvider; }
 
         #endregion
 		

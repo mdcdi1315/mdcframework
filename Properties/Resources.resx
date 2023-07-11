@@ -139,94 +139,94 @@
   <data name="ArgumentException_BufferNotFromPool" xml:space="preserve">
     <value>The buffer is not associated with this pool and may not be returned to it.</value>
   </data>
-	<data name="ArgumentOutOfRange_StreamLength" xml:space="preserve">
+  <data name="ArgumentOutOfRange_StreamLength" xml:space="preserve">
     <value>Stream length must be non-negative and less than 2^31 - 1 - origin.</value>
   </data>
-	<data name="Argument_StreamNotReadable" xml:space="preserve">
+  <data name="Argument_StreamNotReadable" xml:space="preserve">
     <value>Stream was not readable</value>
   </data>
-	<data name="Argument_StreamNotWritable" xml:space="preserve">
+  <data name="Argument_StreamNotWritable" xml:space="preserve">
     <value>Stream was not writable.</value>
   </data>
-	<data name="Arg_ResourceFileUnsupportedVersion" xml:space="preserve">
+  <data name="Arg_ResourceFileUnsupportedVersion" xml:space="preserve">
     <value>The ResourceReader class does not know how to read this version of .resources files. Expected version: {0}  This file: {1}</value>
   </data>
-	<data name="BadImageFormat_InvalidType" xml:space="preserve">
+  <data name="BadImageFormat_InvalidType" xml:space="preserve">
     <value>Corrupt .resources file.  The specified type doesn't exist.</value>
   </data>
-	<data name="BadImageFormat_NegativeStringLength" xml:space="preserve">
+  <data name="BadImageFormat_NegativeStringLength" xml:space="preserve">
     <value>Corrupt .resources file. String length must be non-negative.</value>
   </data>
-	<data name="BadImageFormat_ResourceDataLengthInvalid" xml:space="preserve">
+  <data name="BadImageFormat_ResourceDataLengthInvalid" xml:space="preserve">
     <value>Corrupt .resources file.  The specified data length '{0}' is not a valid position in the stream.</value>
   </data>
-	<data name="BadImageFormat_ResourceNameCorrupted" xml:space="preserve">
+  <data name="BadImageFormat_ResourceNameCorrupted" xml:space="preserve">
     <value>Corrupt .resources file. A resource name extends past the end of the stream.</value>
   </data>
-	<data name="BadImageFormat_ResourceNameCorrupted_NameIndex" xml:space="preserve">
+  <data name="BadImageFormat_ResourceNameCorrupted_NameIndex" xml:space="preserve">
     <value>Corrupt .resources file. The resource name for name index {0} extends past the end of the stream.</value>
   </data>
-	<data name="BadImageFormat_ResourcesDataInvalidOffset" xml:space="preserve">
+  <data name="BadImageFormat_ResourcesDataInvalidOffset" xml:space="preserve">
     <value>Corrupt .resources file. Invalid offset '{0}' into data section.</value>
   </data>
-	<data name="BadImageFormat_ResourcesHeaderCorrupted" xml:space="preserve">
+  <data name="BadImageFormat_ResourcesHeaderCorrupted" xml:space="preserve">
     <value>Corrupt .resources file. Unable to read resources from this file because of invalid header information. Try regenerating the .resources file.</value>
   </data>
-	<data name="BadImageFormat_ResourcesIndexTooLong" xml:space="preserve">
+  <data name="BadImageFormat_ResourcesIndexTooLong" xml:space="preserve">
     <value>Corrupt .resources file. String for name index '{0}' extends past the end of the file.</value>
   </data>
-	<data name="BadImageFormat_ResourcesNameInvalidOffset" xml:space="preserve">
+  <data name="BadImageFormat_ResourcesNameInvalidOffset" xml:space="preserve">
     <value>Corrupt .resources file. Invalid offset '{0}' into name section.</value>
   </data>
-	<data name="BadImageFormat_ResourcesNameTooLong" xml:space="preserve">
+  <data name="BadImageFormat_ResourcesNameTooLong" xml:space="preserve">
     <value>Corrupt .resources file. Resource name extends past the end of the file.</value>
   </data>
-	<data name="BadImageFormat_ResType_SerBlobMismatch" xml:space="preserve">
+  <data name="BadImageFormat_ResType_SerBlobMismatch" xml:space="preserve">
     <value>The type serialized in the .resources file was not the same type that the .resources file said it contained. Expected '{0}' but read '{1}'.</value>
   </data>
-	<data name="BadImageFormat_TypeMismatch" xml:space="preserve">
+  <data name="BadImageFormat_TypeMismatch" xml:space="preserve">
     <value>Corrupt .resources file.  The specified type doesn't match the available data in the stream.</value>
   </data>
-	<data name="Format_Bad7BitInt32" xml:space="preserve">
+  <data name="Format_Bad7BitInt32" xml:space="preserve">
     <value>Too many bytes in what should have been a 7 bit encoded Int32.</value>
   </data>
-	<data name="InvalidOperation_EnumEnded" xml:space="preserve">
+  <data name="InvalidOperation_EnumEnded" xml:space="preserve">
     <value>Enumeration already finished.</value>
   </data>
-	<data name="InvalidOperation_EnumNotStarted" xml:space="preserve">
+  <data name="InvalidOperation_EnumNotStarted" xml:space="preserve">
     <value>Enumeration has not started. Call MoveNext.</value>
   </data>
-	<data name="InvalidOperation_ResourceNotString_Type" xml:space="preserve">
+  <data name="InvalidOperation_ResourceNotString_Type" xml:space="preserve">
     <value>Resource was of type '{0}' instead of String - call GetObject instead.</value>
   </data>
-	<data name="InvalidOperation_ResourceWriterSaved" xml:space="preserve">
+  <data name="InvalidOperation_ResourceWriterSaved" xml:space="preserve">
     <value>The resource writer has already been closed and cannot be edited.</value>
   </data>
-	<data name="NotSupported_BinarySerializedResources" xml:space="preserve">
+  <data name="NotSupported_BinarySerializedResources" xml:space="preserve">
     <value>This platform does not support binary serialized resources.</value>
   </data>
-	<data name="NotSupported_ResourceObjectSerialization" xml:space="preserve">
+  <data name="NotSupported_ResourceObjectSerialization" xml:space="preserve">
     <value>Cannot read resources that depend on serialization.</value>
   </data>
-	<data name="NotSupported_UnseekableStream" xml:space="preserve">
+  <data name="NotSupported_UnseekableStream" xml:space="preserve">
     <value>Stream does not support seeking.</value>
   </data>
-	<data name="NotSupported_WrongResourceReader_Type" xml:space="preserve">
+  <data name="NotSupported_WrongResourceReader_Type" xml:space="preserve">
     <value>This .resources file should not be read with this reader. The resource reader type is "{0}".</value>
   </data>
-	<data name="ObjectDisposed_ResourceSet" xml:space="preserve">
+  <data name="ObjectDisposed_ResourceSet" xml:space="preserve">
     <value>Cannot access a closed resource set.</value>
   </data>
-	<data name="ResourceManager_ReflectionNotAllowed" xml:space="preserve">
+  <data name="ResourceManager_ReflectionNotAllowed" xml:space="preserve">
     <value>Use of ResourceManager for custom types is disabled. Set the MSBuild Property CustomResourceTypesSupport to true in order to enable it.</value>
   </data>
-	<data name="ResourceReaderIsClosed" xml:space="preserve">
+  <data name="ResourceReaderIsClosed" xml:space="preserve">
     <value>ResourceReader is closed.</value>
   </data>
-	<data name="Resources_StreamNotValid" xml:space="preserve">
+  <data name="Resources_StreamNotValid" xml:space="preserve">
     <value>Stream is not a valid resource file.</value>
   </data>
-	<data name="TypeLoadException_CannotLoadConverter" xml:space="preserve">
+  <data name="TypeLoadException_CannotLoadConverter" xml:space="preserve">
     <value>Could not load a converter for type {0}.</value>
   </data>
   <data name="InvalidOperation_ResourceNotStream_Name" xml:space="preserve">
@@ -235,7 +235,58 @@
   <data name="InvalidOperation_ResourceNotString_Name" xml:space="preserve">
     <value>Resource '{0}' was not a String - call GetObject instead.</value>
   </data>
-	<data name="InvalidOperation_ResourceNotString_Type" xml:space="preserve">
-    <value>Resource was of type '{0}' instead of String - call GetObject instead.</value>
+  <data name="UnexpectedSegmentType" xml:space="preserve">
+    <value>Unexpected segment type.</value>
   </data>
+  <data name="Argument_GWithPrecisionNotSupported" xml:space="preserve">
+    <value>The 'G' format combined with a precision is not supported.</value>
+  </data>
+  <data name="OutstandingReferences" xml:space="preserve">
+    <value>Release all references before disposing this instance.</value>
+  </data>
+  <data name="Argument_PrecisionTooLarge" xml:space="preserve">
+    <value>Precision cannot be larger than {0}.</value>
+  </data>
+  <data name="MemoryDisposed" xml:space="preserve">
+    <value>Memory&lt;T&gt; has been disposed.</value>
+  </data>
+  <data name="Argument_BadFormatSpecifier" xml:space="preserve">
+    <value>Format specifier was invalid.</value>
+  </data>
+  <data name="Argument_OverlapAlignmentMismatch" xml:space="preserve">
+    <value>Overlapping spans have mismatching alignment.</value>
+  </data>
+  <data name="Argument_DestinationTooShort" xml:space="preserve">
+    <value>Destination is too short.</value>
+  </data>
+  <data name="NotSupported_CannotCallGetHashCodeOnSpan" xml:space="preserve">
+    <value>GetHashCode() on Span and ReadOnlySpan is not supported.</value>
+  </data>
+  <data name="EndPositionNotReached" xml:space="preserve">
+    <value>End position was not reached during enumeration.</value>
+  </data>
+  <data name="NotSupported_CannotCallEqualsOnSpan" xml:space="preserve">
+    <value>Equals() on Span and ReadOnlySpan is not supported. Use operator== instead.</value>
+  </data>
+  <data name="Argument_InvalidTypeWithPointersNotSupported" xml:space="preserve">
+    <value>Cannot use type '{0}'. Only value types without pointers or references are supported.</value>
+  </data>
+  <data name="Argument_CannotParsePrecision" xml:space="preserve">
+    <value>Characters following the format symbol must be a number of {0} or less.</value>
+  </data>
+	<data name="Arg_InsufficientNumberOfElements" xml:space="preserve">
+		<value>At least {0} element(s) are expected in the parameter "{1}".</value>
+	</data>
+	<data name="Arg_ArgumentOutOfRangeException" xml:space="preserve">
+		<value>Index was out of bounds:</value>
+	</data>
+	<data name="Arg_TypeNotSupported" xml:space="preserve">
+		<value>Specified type is not supported</value>
+	</data>
+	<data name="Arg_ElementsInSourceIsGreaterThanDestination" xml:space="preserve">
+		<value>Number of elements in source vector is greater than the destination array</value>
+	</data>
+	<data name="Arg_NullArgumentNullRef" xml:space="preserve">
+		<value>The method was called with a null array argument.</value>
+	</data>
 </root>

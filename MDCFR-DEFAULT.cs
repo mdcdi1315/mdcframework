@@ -22,25 +22,25 @@ namespace ROOT
 	/// <summary>
 	/// Contains a lot and different static methods for different usages.
 	/// </summary>
-	public static class MAIN 
+	public static class MAIN
 	{
 
-        /// <summary>
-        /// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
-        /// </summary>
-        /// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
-        /// <returns>The full file path returned by the dialog.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
+		/// <summary>
+		/// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
+		/// </summary>
+		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
+		/// <returns>The full file path returned by the dialog.</returns>
+		[SupportedOSPlatform("windows")]
+		public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
 
-        /// <summary>
-        /// Gets from an instance of the <see cref="DialogsReturner"/> class if the dialog was executed sucessfully and a path was got.
-        /// </summary>
-        /// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
-        /// <returns>A <see cref="System.Boolean"/> value indicating whether the dialog execution 
+		/// <summary>
+		/// Gets from an instance of the <see cref="DialogsReturner"/> class if the dialog was executed sucessfully and a path was got.
+		/// </summary>
+		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
+		/// <returns>A <see cref="System.Boolean"/> value indicating whether the dialog execution 
 		/// was sucessfull; <c>false</c> in the case of error or the user did not supplied a file path.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
+		[SupportedOSPlatform("windows")]
+		public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
 
 		/// <summary>
 		/// A static class which creates console colored messages to differentiate the types of errors or information given.
@@ -53,7 +53,7 @@ namespace ROOT
 			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
 			public static void InfoText(System.String Text)
 			{
-				System.ConsoleColor FORE , BACK;
+				System.ConsoleColor FORE, BACK;
 				FORE = System.Console.ForegroundColor;
 				BACK = System.Console.BackgroundColor;
 				System.Console.ForegroundColor = System.ConsoleColor.Gray;
@@ -63,13 +63,13 @@ namespace ROOT
 				System.Console.BackgroundColor = BACK;
 			}
 
-            /// <summary>
-            /// This writes the data specified on the console. These data are warnings. The background is black and the foreground is yellow.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            public static void WarningText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are warnings. The background is black and the foreground is yellow.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			public static void WarningText(System.String Text)
 			{
-				System.ConsoleColor FORE , BACK;
+				System.ConsoleColor FORE, BACK;
 				FORE = System.Console.ForegroundColor;
 				BACK = System.Console.BackgroundColor;
 				System.Console.ForegroundColor = System.ConsoleColor.Yellow;
@@ -79,13 +79,13 @@ namespace ROOT
 				System.Console.BackgroundColor = BACK;
 			}
 
-            /// <summary>
-            /// This writes the data specified on the console. These data are errors. The background is black and the foreground is red.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            public static void ErrorText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are errors. The background is black and the foreground is red.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			public static void ErrorText(System.String Text)
 			{
-				System.ConsoleColor FORE , BACK;
+				System.ConsoleColor FORE, BACK;
 				FORE = System.Console.ForegroundColor;
 				BACK = System.Console.BackgroundColor;
 				System.Console.ForegroundColor = System.ConsoleColor.Red;
@@ -95,13 +95,13 @@ namespace ROOT
 				System.Console.BackgroundColor = BACK;
 			}
 
-            /// <summary>
-            /// This writes the data specified on the console. These data are fatal errors. The background is black and the foreground is magenta.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            public static void FatalText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are fatal errors. The background is black and the foreground is magenta.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			public static void FatalText(System.String Text)
 			{
-				System.ConsoleColor FORE , BACK;
+				System.ConsoleColor FORE, BACK;
 				FORE = System.Console.ForegroundColor;
 				BACK = System.Console.BackgroundColor;
 				System.Console.ForegroundColor = System.ConsoleColor.Magenta;
@@ -110,15 +110,15 @@ namespace ROOT
 				System.Console.ForegroundColor = FORE;
 				System.Console.BackgroundColor = BACK;
 			}
-			
+
 		}
 
-        /// <summary>
-        /// This method plays a sound to the computer.
-        /// </summary>
-        [SupportedOSPlatform("windows")]
-        public static void EmitBeepSound() { Microsoft.VisualBasic.Interaction.Beep(); }
-		
+		/// <summary>
+		/// This method plays a sound to the computer.
+		/// </summary>
+		[SupportedOSPlatform("windows")]
+		public static void EmitBeepSound() { Microsoft.VisualBasic.Interaction.Beep(); }
+
 		/// <summary>
 		/// This is an exact implementation of <see cref="System.Console.WriteLine()"/> which just writes data to the console.
 		/// </summary>
@@ -130,22 +130,22 @@ namespace ROOT
 		/// contains such a method , but this one is different and has no any relationship with that one.
 		/// </summary>
 		/// <param name="Text">The <see cref="System.Char"/>[] data to write.</param>
-		public static void WriteConsoleText(System.Char[] Text) 
+		public static void WriteConsoleText(System.Char[] Text)
 		{
 			System.String Result = null;
 			for (System.Int32 D = 0; D < Text.Length; D++) { Result += Text[D]; }
 			System.Console.WriteLine(Result);
 		}
 
-        /// <summary>
-        /// This writes a custom colored text to console and returns to the current console color settings after written.
-        /// </summary>
-        /// <param name="Message">The <see cref="System.String"/> data to write to.</param>
-        /// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
-        /// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
-        public static void WriteCustomColoredText(System.String Message , System.ConsoleColor ForegroundColor , System.ConsoleColor BackgroundColor)
+		/// <summary>
+		/// This writes a custom colored text to console and returns to the current console color settings after written.
+		/// </summary>
+		/// <param name="Message">The <see cref="System.String"/> data to write to.</param>
+		/// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
+		/// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
+		public static void WriteCustomColoredText(System.String Message, System.ConsoleColor ForegroundColor, System.ConsoleColor BackgroundColor)
 		{
-			System.ConsoleColor FORE , BACK;
+			System.ConsoleColor FORE, BACK;
 			FORE = System.Console.ForegroundColor;
 			BACK = System.Console.BackgroundColor;
 			System.Console.ForegroundColor = ForegroundColor;
@@ -154,14 +154,14 @@ namespace ROOT
 			System.Console.ForegroundColor = FORE;
 			System.Console.BackgroundColor = BACK;
 		}
-		
+
 		/// <summary>
 		/// (For informational purposes only) The Current Visual Basic Runtime Library version that is used by the runtime.
 		/// </summary>
 		/// <returns>A <see cref="System.String"/> which contains the Visual Basic Runtime Library version.</returns>
 		public static System.String GetVBRuntimeInfo()
 		{
-			return Microsoft.VisualBasic.Globals.ScriptEngine + " Engine , Version " + 
+			return Microsoft.VisualBasic.Globals.ScriptEngine + " Engine , Version " +
 			Microsoft.VisualBasic.Globals.ScriptEngineMajorVersion.ToString() + "." +
 			Microsoft.VisualBasic.Globals.ScriptEngineMinorVersion.ToString() +
 			"." + Microsoft.VisualBasic.Globals.ScriptEngineBuildVersion.ToString();
@@ -169,11 +169,11 @@ namespace ROOT
 
 #if NET472_OR_GREATER
 
-        /// <summary>
-        /// (For informational purposes only) The CLR version that the application called this method runs.
-        /// </summary>
-        /// <returns>A <see cref="System.String"/> that describes the current CLR version.</returns>
-        public static System.String GetRuntimeVersion() { return System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion(); }
+		/// <summary>
+		/// (For informational purposes only) The CLR version that the application called this method runs.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that describes the current CLR version.</returns>
+		public static System.String GetRuntimeVersion() { return System.Runtime.InteropServices.RuntimeEnvironment.GetSystemVersion(); }
 
 		/// <summary>
 		/// Check if the application is run on a specific platform.
@@ -183,17 +183,17 @@ namespace ROOT
 		public static System.Boolean CheckIfStartedFromSpecifiedOS(System.Runtime.InteropServices.OSPlatform OSP)
 		{ return System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(OSP); }
 
-        /// <summary>
-        /// (For informational purposes only) The OS information that the .NET runtime is run to.
-        /// </summary>
-        /// <returns>A <see cref="System.String"/> that describes this OS infromation.</returns>
-        public static System.String OSInformation() { return System.Runtime.InteropServices.RuntimeInformation.OSDescription; }
+		/// <summary>
+		/// (For informational purposes only) The OS information that the .NET runtime is run to.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that describes this OS infromation.</returns>
+		public static System.String OSInformation() { return System.Runtime.InteropServices.RuntimeInformation.OSDescription; }
 
-        /// <summary>
-        /// (For informational purposes only) The OS .NET Runtime Specific information.
-        /// </summary>
-        /// <returns>A <see cref="System.String"/> describing the OS .NET Runtime information.</returns>
-        public static System.String OSFramework() {return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; }
+		/// <summary>
+		/// (For informational purposes only) The OS .NET Runtime Specific information.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> describing the OS .NET Runtime information.</returns>
+		public static System.String OSFramework() { return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; }
 
 		/// <summary>
 		/// This method returns the computer's processor architecture.
@@ -204,18 +204,18 @@ namespace ROOT
 		public static System.String OSProcessorArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
-			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; } 
+			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
 			else if (System.Runtime.InteropServices.Architecture.X64 == RRD) { return "AMD64"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm == RRD) { return "ARM"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm64 == RRD) { return "ARM64"; } else { return "Error"; }
 		}
-        /// <summary>
-        /// This method returns the application's compiled platform.
-        /// </summary>
-        /// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit processes , 
-        /// <c>"AMD64"</c> for Unicode 64-Bit processes , <c>"ARM"</c> for ARM 32-Bit processes , and <c>"ARM64"</c> for ARM 64-Bit
-        /// processes. Otherwise , <c>"Error"</c>.</returns>
-        public static System.String ProcessArchitecture()
+		/// <summary>
+		/// This method returns the application's compiled platform.
+		/// </summary>
+		/// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit processes , 
+		/// <c>"AMD64"</c> for Unicode 64-Bit processes , <c>"ARM"</c> for ARM 32-Bit processes , and <c>"ARM64"</c> for ARM 64-Bit
+		/// processes. Otherwise , <c>"Error"</c>.</returns>
+		public static System.String ProcessArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture;
 			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
@@ -224,21 +224,22 @@ namespace ROOT
 			else if (System.Runtime.InteropServices.Architecture.Arm64 == RRD) { return "ARM64"; } else { return "Error"; }
 		}
 
-#endif 
+#endif
 
-		/// <summary>
-		/// The method returns a new <see cref="System.String"/> defined from the <paramref name="StringToClear"/> parameter , 
-		/// but it's characters removed defined by the <paramref name="CharToClear"/> parameter.
-		/// </summary>
-		/// <param name="StringToClear">The <see cref="System.String"/> which the characters will be removed from.</param>
-		/// <param name="CharToClear">The <see cref="System.Char"/>[] array which defines which characters will be removed.
-		/// The array can also have only one entry (character) to remove from the <see cref="System.String"/>.</param>
-		/// <returns>A new <see cref="System.String"/> which is the 
-		/// <paramref name="StringToClear"/> but with the defined characters removed.</returns>
-		public static System.String RemoveDefinedChars(System.String StringToClear , System.Char[] CharToClear)
+        /// <summary>
+        /// The method returns a new <see cref="System.String"/> defined from the <paramref name="StringToClear"/> parameter , 
+        /// but it's characters removed defined by the <paramref name="CharToClear"/> parameter.
+        /// </summary>
+        /// <param name="StringToClear">The <see cref="System.String"/> which the characters will be removed from.</param>
+        /// <param name="CharToClear">The <see cref="System.Char"/>[] array which defines which characters will be removed.
+        /// The array can also have only one entry (character) to remove from the <see cref="System.String"/>.</param>
+        /// <returns>A new <see cref="System.String"/> which is the 
+        /// <paramref name="StringToClear"/> but with the defined characters removed.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String RemoveDefinedChars(System.String StringToClear, System.Char[] CharToClear)
 		{
 			System.Char[] CharString = StringToClear.ToCharArray();
-			if (CharString.Length <= 0 ) { return null; }
+			if (CharString.Length <= 0) { return null; }
 			if (CharToClear.Length <= 0) { return null; }
 			System.Boolean Keeper = false;
 			System.String Result = null;
@@ -262,30 +263,31 @@ namespace ROOT
 		/// <param name="Title">The window's title.</param>
 		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
 		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
-		[Notice("GetAStringFromTheUser" , "GetAStringFromTheUserNew")]
-        [SupportedOSPlatform("windows")]
-        public static System.String GetAStringFromTheUser(System.String Prompt, 
+		[Notice("GetAStringFromTheUser", "GetAStringFromTheUserNew")]
+		[SupportedOSPlatform("windows")]
+		public static System.String GetAStringFromTheUser(System.String Prompt,
 		System.String Title, System.String DefaultResponse)
 		{
-			System.String RETVAL = Microsoft.VisualBasic.Interaction.InputBox(Prompt , Title , DefaultResponse);
-			if (RETVAL == "") { return null; }  else { return RETVAL; }
+			System.String RETVAL = Microsoft.VisualBasic.Interaction.InputBox(Prompt, Title, DefaultResponse);
+			if (RETVAL == "") { return null; } else { return RETVAL; }
 		}
 
-        /// <summary>
-        /// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
-        /// </summary>
-        /// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
-        /// <param name="Title">The window's title.</param>
-        /// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
-        /// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
+		/// <summary>
+		/// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
+		/// </summary>
+		/// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
+		/// <param name="Title">The window's title.</param>
+		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
+		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
 		/// <remarks>Note: This uses the <see cref="ROOT.IntuitiveInteraction.GetAStringFromTheUser"/> class instead of the 
 		/// <see cref="Microsoft.VisualBasic.Interaction.InputBox(string, string, string, int, int)"/> method.</remarks>
 		[SupportedOSPlatform("windows")]
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.String GetAStringFromTheUserNew(System.String Prompt,
 		System.String Title, System.String DefaultResponse)
 		{
-			IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt ,Title , DefaultResponse);
-			switch (DZ.ButtonClicked) 
+			IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt, Title, DefaultResponse);
+			switch (DZ.ButtonClicked)
 			{
 				case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer: return null;
 				default: return DZ.ValueReturned;
@@ -299,13 +301,13 @@ namespace ROOT
 		/// <returns>If the file exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
 		public static System.Boolean FileExists(System.String Path) { if (System.IO.File.Exists(Path)) { return true; } else { return false; } }
 
-        /// <summary>
-        /// Checks whether a directory exists or not by the <paramref name="Path"/> supplied.
-        /// </summary>
-        /// <param name="Path">The <see cref="System.String"/> which is a directory path to check if the directory exists.</param>
-        /// <returns>If the directory exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
-        public static System.Boolean DirExists(System.String Path) { if (System.IO.Directory.Exists(Path)) { return true; } else { return false; } }
-		
+		/// <summary>
+		/// Checks whether a directory exists or not by the <paramref name="Path"/> supplied.
+		/// </summary>
+		/// <param name="Path">The <see cref="System.String"/> which is a directory path to check if the directory exists.</param>
+		/// <returns>If the directory exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
+		public static System.Boolean DirExists(System.String Path) { if (System.IO.Directory.Exists(Path)) { return true; } else { return false; } }
+
 		/// <summary>
 		/// Creates a directory specified by the <paramref name="Path"/> parameter.
 		/// </summary>
@@ -316,7 +318,7 @@ namespace ROOT
 			try { System.IO.Directory.CreateDirectory(Path); } catch (System.Exception) { return false; }
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Deletes a directory specified by the <paramref name="Path"/> parameter.
 		/// If it is NOT empty , you can also delete all of it's contents by passing <c>true</c>
@@ -325,24 +327,24 @@ namespace ROOT
 		/// <param name="Path">The directory to delete. It is a path.</param>
 		/// <param name="DeleteAll">Specifies whether to delete everyting inside the directory or not.</param>
 		/// <returns><c>true</c> if the directory was deleted sucessfully; otherwise , <c>false</c>.</returns>
-		public static System.Boolean DeleteADir(System.String Path , System.Boolean DeleteAll)
+		public static System.Boolean DeleteADir(System.String Path, System.Boolean DeleteAll)
 		{
-			try { System.IO.Directory.Delete(Path , DeleteAll); } catch (System.Exception) { return false; }
+			try { System.IO.Directory.Delete(Path, DeleteAll); } catch (System.Exception) { return false; }
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Move files or directories specified by the parameters. The <paramref name="SourcePath"/> must exist.
 		/// </summary>
 		/// <param name="SourcePath">The path to get the directory or file to move it.</param>
 		/// <param name="DestPath">The destination path that the file or directory should go to.</param>
 		/// <returns><c>true</c> if the file or directory was moved; otherwise , <c>false</c>.</returns>
-		public static System.Boolean MoveFilesOrDirs(System.String SourcePath , System.String DestPath)
+		public static System.Boolean MoveFilesOrDirs(System.String SourcePath, System.String DestPath)
 		{
-			try { System.IO.Directory.Move(SourcePath , DestPath); } catch (System.Exception) { return false; }
+			try { System.IO.Directory.Move(SourcePath, DestPath); } catch (System.Exception) { return false; }
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Copy a file from a directory to another one.
 		/// </summary>
@@ -350,13 +352,13 @@ namespace ROOT
 		/// <param name="DestPath">The destination path of the file. Must also have the filename. Example: <![CDATA[C:\Files\fg.txt]]> .</param>
 		/// <param name="OverWriteAllowed">[opt] Allows to overwrite the target if it exists.</param>
 		/// <returns><c>true</c> if the file was copied to <paramref name="DestPath"/>; otherwise , <c>false</c>.</returns>
-		public static System.Boolean CopyFile(System.String SourceFilePath ,
-		System.String DestPath ,System.Boolean OverWriteAllowed = false)
+		public static System.Boolean CopyFile(System.String SourceFilePath,
+		System.String DestPath, System.Boolean OverWriteAllowed = false)
 		{
-			try { System.IO.File.Copy(SourceFilePath , DestPath , OverWriteAllowed); } catch (System.Exception) { return false; }
+			try { System.IO.File.Copy(SourceFilePath, DestPath, OverWriteAllowed); } catch (System.Exception) { return false; }
 			return true;
 		}
-		
+
 		/// <summary>
 		/// Gets a new <see cref="System.IO.FileSystemInfo"/> captured from the specified directory.
 		/// </summary>
@@ -372,14 +374,14 @@ namespace ROOT
 			}
 			catch (System.Exception) { return null; }
 		}
-		
+
 		/// <summary>
 		/// Creates a new and fresh file and opens a new handle for it by the <see cref="System.IO.FileStream"/>.
 		/// </summary>
 		/// <param name="Path">The file path where the file will be created. Example: <![CDATA[C:\Files\Start.txt]]> .</param>
 		/// <returns>A new <see cref="System.IO.FileStream"/> object if no error occured; otherwise , <c>null</c>.</returns>
 		public static System.IO.FileStream CreateANewFile(System.String Path) { try { return System.IO.File.OpenWrite(Path); } catch (System.Exception) { return null; } }
-		
+
 		/// <summary>
 		/// Opens an handle for the existing file as a <see cref="System.IO.FileStream"/>.
 		/// The file is opened with both Read and Write permissions.
@@ -389,27 +391,27 @@ namespace ROOT
 		public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path)
 		{
 			if (FileExists(Path) == false) { return null; }
-			try  { return System.IO.File.Open(Path , System.IO.FileMode.Open); } catch (System.Exception) { return null; }
+			try { return System.IO.File.Open(Path, System.IO.FileMode.Open); } catch (System.Exception) { return null; }
 		}
 
-        /// <summary>
-        /// Clears the pontential data that the file specified has and opens that file with Write permissions.
+		/// <summary>
+		/// Clears the pontential data that the file specified has and opens that file with Write permissions.
 		/// The file specified at the <paramref name="Path"/> parameter must exist.
-        /// </summary>
-        /// <param name="Path">The file path where the file is located to.</param>
-        /// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
-        public static System.IO.FileStream ClearAndWriteAFile(System.String Path)
+		/// </summary>
+		/// <param name="Path">The file path where the file is located to.</param>
+		/// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
+		public static System.IO.FileStream ClearAndWriteAFile(System.String Path)
 		{
-			if (FileExists(Path) == false) {return null;}
-			try { return System.IO.File.Open(Path , System.IO.FileMode.Truncate); } catch (System.Exception) { return null; }
+			if (FileExists(Path) == false) { return null; }
+			try { return System.IO.File.Open(Path, System.IO.FileMode.Truncate); } catch (System.Exception) { return null; }
 		}
-		
+
 		/// <summary>
 		/// This method writes the <see cref="System.String"/> data specified to an alive <see cref="System.IO.FileStream"/> object with Write permissions.
 		/// </summary>
 		/// <param name="Contents">The <see cref="System.String"/> contents to write to the file.</param>
 		/// <param name="FileStreamObject">The </param>
-		public static void PassNewContentsToFile(System.String Contents,System.IO.FileStream FileStreamObject)
+		public static void PassNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
 			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents + System.Environment.NewLine);
 			try
@@ -432,7 +434,7 @@ namespace ROOT
 			try
 			{
 				FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
-			} catch (System.Exception) {}
+			} catch (System.Exception) { }
 			EMDK = null;
 			return;
 		}
@@ -446,29 +448,30 @@ namespace ROOT
 		public static System.String GetContentsFromFile(System.IO.FileStream FileStreamObject)
 		{
 			System.Byte[] EMS = new System.Byte[FileStreamObject.Length];
-			FileStreamObject.Read(EMS , 0 , System.Convert.ToInt32(FileStreamObject.Length));
+			FileStreamObject.Read(EMS, 0, System.Convert.ToInt32(FileStreamObject.Length));
 			return new System.Text.UTF8Encoding(true).GetString(EMS);
 		}
 
-		/// <summary>
-		/// This method gets a cryptography hash for the selected file with the selected algorithm.
-		/// </summary>
-		/// <param name="PathOfFile">The path to the file you want it's hash.</param>
-		/// <param name="HashToSelect">The hash algorithm to select. Consult the <see cref="HashDigestSelection"/> <see cref="System.Enum"/>
-		/// for more information.
-		/// </param>
-		/// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
-		/// otherwise , the <see cref="System.String" /> <c>"Error"</c>. </returns>
-		public static System.String GetACryptographyHashForAFile(System.String PathOfFile, HashDigestSelection HashToSelect)
+        /// <summary>
+        /// This method gets a cryptography hash for the selected file with the selected algorithm.
+        /// </summary>
+        /// <param name="PathOfFile">The path to the file you want it's hash.</param>
+        /// <param name="HashToSelect">The hash algorithm to select. Consult the <see cref="HashDigestSelection"/> <see cref="System.Enum"/>
+        /// for more information.
+        /// </param>
+        /// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
+        /// otherwise , the <see cref="System.String" /> <c>"Error"</c>. </returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String GetACryptographyHashForAFile(System.String PathOfFile, HashDigestSelection HashToSelect)
 		{
 			System.Byte[] Contents = null;
 			using System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
 			{
 				if (Initialiser == null) { return "Error"; } else { Contents = new System.Byte[Initialiser.Length]; }
-				Initialiser.Read(Contents , 0 , Contents.Length);
+				if (Initialiser != null) { Initialiser.Read(Contents, 0, Contents.Length); }
 			}
 			System.Security.Cryptography.HashAlgorithm EDI;
-			switch (HashToSelect) 
+			switch (HashToSelect)
 			{
 				case HashDigestSelection.SHA1: EDI = new System.Security.Cryptography.SHA1Managed(); break;
 				case HashDigestSelection.SHA256: EDI = new System.Security.Cryptography.SHA256Managed(); break;
@@ -486,20 +489,21 @@ namespace ROOT
 			return Result;
 		}
 
-		/// <summary>
-		/// This method gets a cryptography hash for the selected file with the selected algorithm.
-		/// </summary>
-		/// <param name="PathOfFile">The path to the file you want it's hash.</param>
-		/// <param name="HashToSelect">The hash algorithm to select. Valid Values: <code>"SHA1" , "SHA256" , "SHA384" , "SHA512" , "MD5"</code></param>
-		/// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
-		/// otherwise , the <see cref="System.String" /> <c>"Error"</c>. </returns>
-		public static System.String GetACryptographyHashForAFile(System.String PathOfFile , System.String HashToSelect)
+        /// <summary>
+        /// This method gets a cryptography hash for the selected file with the selected algorithm.
+        /// </summary>
+        /// <param name="PathOfFile">The path to the file you want it's hash.</param>
+        /// <param name="HashToSelect">The hash algorithm to select. Valid Values: <code>"SHA1" , "SHA256" , "SHA384" , "SHA512" , "MD5"</code></param>
+        /// <returns>The computed hash as a hexadecimal <see cref="System.String" /> if succeeded; 
+        /// otherwise , the <see cref="System.String" /> <c>"Error"</c>. </returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String GetACryptographyHashForAFile(System.String PathOfFile, System.String HashToSelect)
 		{
 			System.Byte[] Contents = null;
 			System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
 			if (Initialiser == null) { return "Error"; } else { Contents = new System.Byte[Initialiser.Length]; }
-			Initialiser.Read(Contents, 0, Contents.Length);
-			if (Initialiser != null) { Initialiser.Close();  Initialiser.Dispose(); }	
+			if (Initialiser != null) { Initialiser.Read(Contents, 0, Contents.Length); }
+			if (Initialiser != null) { Initialiser.Close(); Initialiser.Dispose(); }
 			System.Security.Cryptography.HashAlgorithm EDI;
 			switch (HashToSelect)
 			{
@@ -529,32 +533,32 @@ namespace ROOT
 			return Result;
 		}
 
-		#pragma warning disable CS1591
+#pragma warning disable CS1591
 		[System.ObsoleteAttribute("AppendAnExistingFile method is no longer required , because using ReadAFileUsingFileStream will normally open it with R/W " +
-			"permissions. Use then the AppendNewContentsToFile function to append data to that opened file." , true)]
+			"permissions. Use then the AppendNewContentsToFile function to append data to that opened file.", true)]
 		public static System.IO.StreamWriter AppendAnExistingFile(System.String Path) { try { return System.IO.File.AppendText(Path); } catch (System.Exception) { return null; } }
-		#pragma warning restore CS1591
-        /// <summary>
-        /// This method deletes the specified file from the <paramref name="Path"/> specified.
-        /// </summary>
-        /// <param name="Path">The file path wich points out the file to delete.</param>
-        /// <returns><c>true</c> if the file was deleted; otherwise , <c>false</c>.</returns>
-        public static System.Boolean DeleteAFile(System.String Path)
+#pragma warning restore CS1591
+		/// <summary>
+		/// This method deletes the specified file from the <paramref name="Path"/> specified.
+		/// </summary>
+		/// <param name="Path">The file path wich points out the file to delete.</param>
+		/// <returns><c>true</c> if the file was deleted; otherwise , <c>false</c>.</returns>
+		public static System.Boolean DeleteAFile(System.String Path)
 		{
-			if (FileExists(Path) == false) {return false;}
+			if (FileExists(Path) == false) { return false; }
 			try { System.IO.File.Delete(Path); } catch (System.Exception) { return false; }
 			return true;
 		}
 
-		#pragma warning disable CS1591
-        [System.ObsoleteAttribute("ReadAFile method has been replaced with the ReadAFileUsingFileStream function , which performs better at performance level." +
-			"You should notice that sometime this function will be removed without prior notice." , false)]
+#pragma warning disable CS1591
+		[System.ObsoleteAttribute("ReadAFile method has been replaced with the ReadAFileUsingFileStream function , which performs better at performance level." +
+			"You should notice that sometime this function will be removed without prior notice.", false)]
 		public static System.IO.StreamReader ReadAFile(System.String Path)
 		{
 			if (FileExists(Path) == false) { return null; }
 			try
 			{
-				return new System.IO.StreamReader(new System.IO.FileStream(Path , System.IO.FileMode.Open));
+				return new System.IO.StreamReader(new System.IO.FileStream(Path, System.IO.FileMode.Open));
 			}
 			catch (System.Exception) { return null; }
 		}
@@ -572,24 +576,24 @@ namespace ROOT
 			catch (System.Exception) { return null; }
 		}
 
-		#pragma warning restore CS1591
+#pragma warning restore CS1591
 
 #if NET472_OR_GREATER
 
-        /// <summary>
-        /// This shows the default Windows Message box on the screen.
-        /// </summary>
-        /// <param name="MessageString">The text for the message to show.</param>
-        /// <param name="Title">The window's title.</param>
-        /// <param name="MessageButton">The button(s) to show as options in the message box.</param>
-        /// <param name="MessageIcon">The icon to show as a prompt in the message box.</param>
-        /// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , 
-		System.Windows.Forms.MessageBoxButtons MessageButton = 0 , 
+		/// <summary>
+		/// This shows the default Windows Message box on the screen.
+		/// </summary>
+		/// <param name="MessageString">The text for the message to show.</param>
+		/// <param name="Title">The window's title.</param>
+		/// <param name="MessageButton">The button(s) to show as options in the message box.</param>
+		/// <param name="MessageIcon">The icon to show as a prompt in the message box.</param>
+		/// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
+		[SupportedOSPlatform("windows")]
+		public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title,
+		System.Windows.Forms.MessageBoxButtons MessageButton = 0,
 		System.Windows.Forms.MessageBoxIcon MessageIcon = 0)
 		{
-			System.Windows.Forms.DialogResult RET = System.Windows.Forms.MessageBox.Show(MessageString , Title , MessageButton , MessageIcon);
+			System.Windows.Forms.DialogResult RET = System.Windows.Forms.MessageBox.Show(MessageString, Title, MessageButton, MessageIcon);
 			switch (RET)
 			{
 				case System.Windows.Forms.DialogResult.OK: return 1;
@@ -599,24 +603,25 @@ namespace ROOT
 				case System.Windows.Forms.DialogResult.Ignore: return 5;
 				case System.Windows.Forms.DialogResult.Yes: return 6;
 				case System.Windows.Forms.DialogResult.No: return 7;
-				default:  return 0;
+				default: return 0;
 			}
 		}
 
-        /// <summary>
-        /// This is a modified Windows Message box made by me.
-        /// To customize the options and for more information , consult the <see cref="IntuitiveInteraction.IntuitiveMessageBox"/> class.
-        /// </summary>
-        /// <param name="MessageString">The text for the message to show.</param>
-        /// <param name="Title">The window's title.</param>
-        /// <param name="MessageButton">The button(s) to show as options in the message box.</param>
-        /// <param name="IconToSelect">The icon to show as a prompt in the message box.</param>
-        /// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title, 
-			ROOT.IntuitiveInteraction.ButtonSelection MessageButton , ROOT.IntuitiveInteraction.IconSelection IconToSelect)
+		/// <summary>
+		/// This is a modified Windows Message box made by me.
+		/// To customize the options and for more information , consult the <see cref="IntuitiveInteraction.IntuitiveMessageBox"/> class.
+		/// </summary>
+		/// <param name="MessageString">The text for the message to show.</param>
+		/// <param name="Title">The window's title.</param>
+		/// <param name="MessageButton">The button(s) to show as options in the message box.</param>
+		/// <param name="IconToSelect">The icon to show as a prompt in the message box.</param>
+		/// <returns>An <see cref="System.Int32"/> which indicates which button the user pressed.</returns>
+		[SupportedOSPlatform("windows")]
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title,
+			ROOT.IntuitiveInteraction.ButtonSelection MessageButton, ROOT.IntuitiveInteraction.IconSelection IconToSelect)
 		{
-			ROOT.IntuitiveInteraction.IntuitiveMessageBox DX = new(MessageString , Title , MessageButton , IconToSelect);
+			ROOT.IntuitiveInteraction.IntuitiveMessageBox DX = new(MessageString, Title, MessageButton, IconToSelect);
 			switch (DX.ButtonSelected)
 			{
 				case ROOT.IntuitiveInteraction.ButtonReturned.OK: return 1;
@@ -630,18 +635,18 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Load File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle , System.String DirToPresent)
+		/// <summary>
+		/// This spawns a new and classical Windows Load File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.String DirToPresent)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = FileDialogType.LoadFile;
@@ -705,18 +710,18 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Save File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle , System.String DirToPresent)
+		/// <summary>
+		/// This spawns a new and classical Windows Save File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.String DirToPresent)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = FileDialogType.CreateFile;
@@ -780,16 +785,16 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Load File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
+		/// <summary>
+		/// This spawns a new and classical Windows Load File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
 		System.String FileDialogWindowTitle)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
@@ -811,7 +816,7 @@ namespace ROOT
 			}
 
 			var FLD = new Microsoft.Win32.OpenFileDialog();
-			
+
 			FLD.Title = FileDialogWindowTitle;
 			FLD.DefaultExt = FileExtensionToPresent;
 			FLD.Filter = FileFilterOfWin32;
@@ -828,7 +833,7 @@ namespace ROOT
 			// -->
 			// Now , spawn the dialog after all these settings.
 			System.Boolean? REST = FLD.ShowDialog();
-			
+
 			if (REST == true)
 			{
 				EDOut.FileNameFullPath = FLD.FileName;
@@ -843,16 +848,16 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Save File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32,System.String FileExtensionToPresent ,
+		/// <summary>
+		/// This spawns a new and classical Windows Save File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
 		System.String FileDialogWindowTitle)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
@@ -872,9 +877,9 @@ namespace ROOT
 				EDOut.ErrorCode = "Error";
 				return EDOut;
 			}
-			
+
 			var FLD = new Microsoft.Win32.SaveFileDialog();
-			
+
 			FLD.Title = FileDialogWindowTitle;
 			FLD.DefaultExt = FileExtensionToPresent;
 			FLD.Filter = FileFilterOfWin32;
@@ -891,7 +896,7 @@ namespace ROOT
 			// -->
 			// Now , spawn the dialog after all these settings.
 			System.Boolean? REST = FLD.ShowDialog();
-			
+
 			if (REST == true)
 			{
 				EDOut.FileNameFullPath = FLD.FileName;
@@ -906,19 +911,19 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Save File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <param name="FileMustExist">A <see cref="System.Boolean"/> value that the file selected must be existing.</param>
-        /// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle , System.Boolean FileMustExist , System.String DirToPresent)
+		/// <summary>
+		/// This spawns a new and classical Windows Save File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="FileMustExist">A <see cref="System.Boolean"/> value that the file selected must be existing.</param>
+		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.Boolean FileMustExist, System.String DirToPresent)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = ROOT.FileDialogType.CreateFile;
@@ -972,18 +977,18 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a new and classical Windows Save File dialog to the user.
-        /// </summary>
-        /// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-        /// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-        /// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-        /// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-        /// <param name="FileMustExist">A <see cref="System.Boolean"/> value that the file selected must be existing.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle , System.Boolean FileMustExist)
+		/// <summary>
+		/// This spawns a new and classical Windows Save File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="FileMustExist">A <see cref="System.Boolean"/> value that the file selected must be existing.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.Boolean FileMustExist)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = ROOT.FileDialogType.CreateFile;
@@ -1036,14 +1041,14 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a Directory Selection dialog to the user.
-        /// </summary>
-        /// <param name="DirToPresent">The Directory that this dialog should show first.</param>
-        /// <param name="DialogWindowTitle">The title that will be shown when this dialog is invoked , with an additional description if needed.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent , System.String DialogWindowTitle)
+		/// <summary>
+		/// This spawns a Directory Selection dialog to the user.
+		/// </summary>
+		/// <param name="DirToPresent">The Directory that this dialog should show first.</param>
+		/// <param name="DialogWindowTitle">The title that will be shown when this dialog is invoked , with an additional description if needed.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = ROOT.FileDialogType.DirSelect;
@@ -1074,15 +1079,15 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// This spawns a Directory Selection dialog to the user.
-        /// </summary>
-        /// <param name="DirToPresent">The Directory that this dialog should show first.</param>
-        /// <param name="DialogWindowTitle">The title that will be shown when this dialog is invoked , with an additional description if needed.</param>
-        /// <param name="AlternateDir">When the <paramref name="DirToPresent"/> parameter is MyComputer , you can set whatever initial directory you like to.</param>
-        /// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-        [SupportedOSPlatform("windows")]
-        public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle ,System.String AlternateDir)
+		/// <summary>
+		/// This spawns a Directory Selection dialog to the user.
+		/// </summary>
+		/// <param name="DirToPresent">The Directory that this dialog should show first.</param>
+		/// <param name="DialogWindowTitle">The title that will be shown when this dialog is invoked , with an additional description if needed.</param>
+		/// <param name="AlternateDir">When the <paramref name="DirToPresent"/> parameter is MyComputer , you can set whatever initial directory you like to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle, System.String AlternateDir)
 		{
 			DialogsReturner EDOut = new DialogsReturner();
 			EDOut.DialogType = ROOT.FileDialogType.DirSelect;
@@ -1126,19 +1131,19 @@ namespace ROOT
 		/// <param name="TimeoutEpoch">The time to stop the execution.</param>
 		public static void HaltApplicationThread(System.Int32 TimeoutEpoch) { System.Threading.Thread.Sleep(TimeoutEpoch); }
 
-        /// <summary>
-        /// Launches a new process defined by the parameters.
-        /// </summary>
-        /// <param name="PathOfExecToRun">The path of executable or document to open.</param>
-        /// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
-        /// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
-        /// <param name="WaitToClose">Wait for the app to close.</param>
-        /// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
-        /// otherwise , the process exit code. 
-        /// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
+		/// <summary>
+		/// Launches a new process defined by the parameters.
+		/// </summary>
+		/// <param name="PathOfExecToRun">The path of executable or document to open.</param>
+		/// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
+		/// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
+		/// <param name="WaitToClose">Wait for the app to close.</param>
+		/// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
+		/// otherwise , the process exit code. 
+		/// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
 		/// <c>-10337881</c> for any other generic error.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
+		[SupportedOSPlatform("windows")]
+		public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
 		System.Boolean ImplicitSearch, System.Boolean WaitToClose)
 		{
 			System.Int32 ExitCode = 0;
@@ -1204,22 +1209,22 @@ namespace ROOT
 			return ExitCode;
 		}
 
-        /// <summary>
-        /// Launches a new process defined by the parameters.
-        /// </summary>
-        /// <param name="PathOfExecToRun">The path of executable or document to open.</param>
-        /// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
-        /// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
-        /// <param name="WaitToClose">Wait for the app to close.</param>
+		/// <summary>
+		/// Launches a new process defined by the parameters.
+		/// </summary>
+		/// <param name="PathOfExecToRun">The path of executable or document to open.</param>
+		/// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
+		/// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
+		/// <param name="WaitToClose">Wait for the app to close.</param>
 		/// <param name="RunAtNativeConsole">Whether the app should use the aplication shell to run.</param>
 		/// <param name="HideExternalConsole">Whether the process console window must be hidden.</param>
-        /// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
-        /// otherwise , the process exit code. 
-        /// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
-        /// <c>-10337881</c> for any other generic error.</returns>
-        [SupportedOSPlatform("windows")]
-		public static System.Int32 LaunchProcess(System.String PathOfExecToRun ,System.String CommandLineArgs , 
-		System.Boolean ImplicitSearch ,System.Boolean WaitToClose ,System.Boolean? RunAtNativeConsole , 
+		/// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
+		/// otherwise , the process exit code. 
+		/// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
+		/// <c>-10337881</c> for any other generic error.</returns>
+		[SupportedOSPlatform("windows")]
+		public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
+		System.Boolean ImplicitSearch, System.Boolean WaitToClose, System.Boolean? RunAtNativeConsole,
 		System.Boolean? HideExternalConsole)
 		{
 			if (RunAtNativeConsole == null) { RunAtNativeConsole = false; }
@@ -1262,10 +1267,10 @@ namespace ROOT
 				}
 			}
 			System.Diagnostics.Process FRM = new System.Diagnostics.Process();
-			if (RunAtNativeConsole == true) 
+			if (RunAtNativeConsole == true)
 			{
 				FRM.StartInfo.UseShellExecute = false;
-			} else 
+			} else
 			{
 				FRM.StartInfo.UseShellExecute = true;
 				if (HideExternalConsole == true)
@@ -1275,13 +1280,13 @@ namespace ROOT
 			}
 			FRM.StartInfo.FileName = FinalFilePath;
 			FRM.StartInfo.Arguments = CommandLineArgs;
-			try {FRM.Start();} catch (System.ComponentModel.Win32Exception)
+			try { FRM.Start(); } catch (System.ComponentModel.Win32Exception)
 			{
 				FRM = null;
 				return -10337880;
-			} catch (System.Exception) 
+			} catch (System.Exception)
 			{
-				FRM = null; 
+				FRM = null;
 				return -10337881;
 			}
 			if (WaitToClose)
@@ -1295,12 +1300,15 @@ namespace ROOT
 			FRM = null;
 			return ExitCode;
 		}
-		
+
 		/// <summary>
 		/// Gets the %PATH% environment variable of this instance.
 		/// </summary>
 		/// <returns>The <see cref="System.String"/>[] of the directory paths found in the variable.</returns>
-		public static System.String[] GetPathEnvironmentVar()
+		[SupportedOSPlatform("windows")]
+		// Spliting can be a very consuming process , process the data as fast as possible.
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String[] GetPathEnvironmentVar()
 		{
 			try
 			{
@@ -1309,137 +1317,243 @@ namespace ROOT
 			}
 			catch (System.Exception) { return null; }
 		}
-		
+
+        /// <summary>
+        /// Finds a specified file from the %PATH% variable.
+        /// </summary>
+        /// <param name="FileName">The File name to look up. Must have and it's extension too.</param>
+        /// <returns>A new <see cref="FileSearchResult"/> <see langword="struct"/> 
+        /// which contains the file path that was found.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static FileSearchResult FindFileFromPath(System.String FileName)
+		{
+			FileSearchResult FSR = new FileSearchResult();
+			if (FileName == null) { FSR.success = false; return FSR; }
+			if (FileName.IndexOf('\\') != -1) { FSR.success = false; return FSR; }
+			System.String[] strings = GetPathEnvironmentVar();
+			for (System.Int32 I = 0; I < strings.Length; I++)
+			{
+				if (FileExists($"{strings[I]}\\{FileName}") == true)
+				{
+					FSR.Filepath = $"{strings[I]}\\{FileName}";
+					FSR.GetExtension();
+					FSR.success = true;
+					return FSR;
+				}
+			}
+			FSR.success = false;
+			return FSR;
+		}
+
+        /// <summary>
+        /// Finds a specified file from the %PATH% variable.
+        /// </summary>
+        /// <param name="FileName">The File name to look up , without it's extension.</param>
+        /// <param name="Extensions">The Extensions to also look up. 
+        /// The array must have the file extensions without the dot. Example:
+        /// <c>{ "exe" , "dll" , "txt" , "log" , "evtx" }</c></param>
+        /// <returns>A new <see cref="FileSearchResult"/> <see langword="struct"/> 
+        /// which contains the file path that was found.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static FileSearchResult FindFileFromPath(System.String FileName, System.String[] Extensions)
+		{
+			FileSearchResult FSR = new FileSearchResult();
+			if (FileName == null) { FSR.success = false; return FSR; }
+			if (FileName.IndexOf('\\') != -1) { FSR.success = false; return FSR; }
+			if (Extensions.Length == 0) { FSR.success = false; return FSR; }
+			if (Extensions == null) { FSR.success = false; return FSR; }
+			System.String[] strings = GetPathEnvironmentVar();
+			for (System.Int32 A = 0; A < Extensions.Length; A++)
+			{
+				for (System.Int32 B = 0; B < strings.Length; B++)
+				{
+					if (FileExists($"{strings[B]}\\{FileName}.{Extensions[A]}") == true)
+					{
+						FSR.Filepath = $"{strings[B]}\\{FileName}.{Extensions[A]}";
+						FSR.extension = Extensions[A];
+						FSR.success = true;
+						return FSR;
+					}
+				}
+			}
+			FSR.success = false;
+			return FSR;
+		}
+
 	}
 
+	/// <summary>
+	/// The <see cref="FileSearchResult"/> <see langword="struct"/> is the return type for the file
+	/// searcher functions defined in the <see cref="MAIN"/> class.
+	/// </summary>
+	public struct FileSearchResult
+	{
+		internal System.String Filepath;
+		internal System.Boolean success;
+		internal System.String extension;
 
-    /// <summary>
-    /// An enumeration of values which indicate which dialog was invoked.
-    /// </summary>
-    public enum FileDialogType : System.Int32
-    {
-        /// <summary>
-        /// The Dialog invoked was one of the <see cref="MAIN.CreateSaveDialog(string, string, string)"/> overloads.
-        /// </summary>
-        CreateFile = 0,
-        /// <summary>
-        /// The Dialog invoked was one of the <see cref="MAIN.CreateLoadDialog(string, string, string)"/> overloads.
-        /// </summary>
-        LoadFile = 2,
-        /// <summary>
-        /// The Dialog invoked was one of the <see cref="MAIN.GetADirDialog(Environment.SpecialFolder, string)"/> overloads.
-        /// </summary>
-        DirSelect = 4
-    }
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        internal FileSearchResult(System.String Path, System.Boolean Successfull)
+		{
+			Filepath = Path;
+			success = Successfull;
+		}
 
-	#if NET472_OR_GREATER
+		internal void GetExtension()
+		{
+			if (Filepath != null)
+			{
+				// The try clause is added because the below method can throw exceptions.
+				try
+				{
+					extension = Filepath.Substring(Filepath.LastIndexOf('.') + 1);
+				} catch { return; }
+			}
+		}
 
-    // Found that the File Dialogs work the same even when 
-    // these run under .NET Standard.
-    // Weird that they work the same , though.
+		/// <summary>
+		/// The file extension , without the dot.
+		/// </summary>
+		public System.String Extension { get { return extension; } }
 
+		/// <summary>
+		/// The Path where the file is located.
+		/// </summary>
+		public System.String Path { get { return Filepath; } }
 
+		/// <summary>
+		/// Detect whether the functions found a match or not.
+		/// </summary>
+		public System.Boolean MatchFound { get { return success; } }
+	}
 
-    /// <summary>
-    /// A storage class used by the file/dir dialogs to access the paths given (Full and name only) , the dialog type ran and if there was an error.		
-    /// </summary>
-    /// <remarks>This class is used only by several functions in the MAIN class. It is not allowed to override this class.</remarks>
-    [SupportedOSPlatform("windows")]
-    public struct DialogsReturner
-    {
-        private string ERC;
-        private string FNM;
-        private string FNMFP;
-        private FileDialogType FT;
-        private System.String FTD;
+	/// <summary>
+	/// An enumeration of values which indicate which dialog was invoked.
+	/// </summary>
+	public enum FileDialogType : System.Int32
+	{
+		/// <summary>
+		/// The Dialog invoked was one of the <see cref="MAIN.CreateSaveDialog(string, string, string)"/> overloads.
+		/// </summary>
+		CreateFile = 0,
+		/// <summary>
+		/// The Dialog invoked was one of the <see cref="MAIN.CreateLoadDialog(string, string, string)"/> overloads.
+		/// </summary>
+		LoadFile = 2,
+		/// <summary>
+		/// The Dialog invoked was one of the <see cref="MAIN.GetADirDialog(Environment.SpecialFolder, string)"/> overloads.
+		/// </summary>
+		DirSelect = 4
+	}
 
-        /// <summary>Initializes a new instance of the <see cref="DialogsReturner"/> structure. </summary>
-        public DialogsReturner() { }
+#if NET472_OR_GREATER
 
-        /// <summary>
-        /// Returns the dialog used when this class was constructed.
-        /// </summary>
-        public FileDialogType DialogType
-        {
-            get { return FT; }
-            set { FT = value; }
-        }
-
-        /// <summary>
-        /// The Error code string that is returned. A generic error is indicated by the <c>"Error"</c> <see cref="System.String"/>.
-        /// </summary>
-        public string ErrorCode
-        {
-            get { return ERC; }
-            set { ERC = value; }
-        }
-
-        /// <summary>
-        /// The file name returned by the dialog. (Example: That.txt)
-        /// </summary>
-        public string FileNameOnly
-        {
-            get { return FNM; }
-            set
-            {
-                if (FT == FileDialogType.DirSelect)
-                {
-                    throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
-                }
-                FNM = value;
-            }
-        }
-
-        /// <summary>
-        /// The full path of the file returned by the dialog (Example: C:\That.txt)
-        /// </summary>
-        public string FileNameFullPath
-        {
-            get { return FNMFP; }
-            set
-            {
-                if (FT == FileDialogType.DirSelect)
-                {
-                    throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
-                }
-                FNMFP = value;
-            }
-        }
-        /// <summary>
-        /// The directory that was returned from the dialog. It returns null when the dialog invoked is NOT a Directory Select dialog.
-        /// </summary>
-        public System.String DirPath
-        {
-            get { return FTD; }
-            set
-            {
-                if (FT != FileDialogType.DirSelect)
-                {
-                    throw new InvalidOperationException("Not allowed to set the Directory Path when the dialog is initialised for files!!");
-                }
-                FTD = value;
-            }
-        }
-    }
-
-	#endif
+	// Found that the File Dialogs work the same even when 
+	// these run under .NET Standard.
+	// Weird that they work the same , though.
 
 
-    /// <summary>
-    /// An enumeration of values which help the function <see cref="MAIN.GetACryptographyHashForAFile(string, HashDigestSelection)"/> to properly select the algorithm requested.
-    /// </summary>
-    public enum HashDigestSelection
+
+	/// <summary>
+	/// A storage class used by the file/dir dialogs to access the paths given (Full and name only) , the dialog type ran and if there was an error.		
+	/// </summary>
+	/// <remarks>This class is used only by several functions in the MAIN class. It is not allowed to override this class.</remarks>
+	[SupportedOSPlatform("windows")]
+	public struct DialogsReturner
+	{
+		private string ERC;
+		private string FNM;
+		private string FNMFP;
+		private FileDialogType FT;
+		private System.String FTD;
+
+		/// <summary>Initializes a new instance of the <see cref="DialogsReturner"/> structure. </summary>
+		public DialogsReturner() { }
+
+		/// <summary>
+		/// Returns the dialog used when this class was constructed.
+		/// </summary>
+		public FileDialogType DialogType
+		{
+			get { return FT; }
+			set { FT = value; }
+		}
+
+		/// <summary>
+		/// The Error code string that is returned. A generic error is indicated by the <c>"Error"</c> <see cref="System.String"/>.
+		/// </summary>
+		public string ErrorCode
+		{
+			get { return ERC; }
+			set { ERC = value; }
+		}
+
+		/// <summary>
+		/// The file name returned by the dialog. (Example: That.txt)
+		/// </summary>
+		public string FileNameOnly
+		{
+			get { return FNM; }
+			set
+			{
+				if (FT == FileDialogType.DirSelect)
+				{
+					throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
+				}
+				FNM = value;
+			}
+		}
+
+		/// <summary>
+		/// The full path of the file returned by the dialog (Example: C:\That.txt)
+		/// </summary>
+		public string FileNameFullPath
+		{
+			get { return FNMFP; }
+			set
+			{
+				if (FT == FileDialogType.DirSelect)
+				{
+					throw new InvalidOperationException("Not allowed to set the File Path when the dialog is initialised for directories!!");
+				}
+				FNMFP = value;
+			}
+		}
+		/// <summary>
+		/// The directory that was returned from the dialog. It returns null when the dialog invoked is NOT a Directory Select dialog.
+		/// </summary>
+		public System.String DirPath
+		{
+			get { return FTD; }
+			set
+			{
+				if (FT != FileDialogType.DirSelect)
+				{
+					throw new InvalidOperationException("Not allowed to set the Directory Path when the dialog is initialised for files!!");
+				}
+				FTD = value;
+			}
+		}
+	}
+
+#endif
+
+
+	/// <summary>
+	/// An enumeration of values which help the function <see cref="MAIN.GetACryptographyHashForAFile(string, HashDigestSelection)"/> to properly select the algorithm requested.
+	/// </summary>
+	public enum HashDigestSelection
 	{
 		/// <summary> RSVD </summary>
 		Default_None = 0,
-        /// <summary> RSVD </summary>
-        RSVD_0 = 1,
-        /// <summary> RSVD </summary>
-        RSVD_1 = 2,
-        /// <summary> RSVD </summary>
-        RSVD_2 = 3,
-        /// <summary> RSVD </summary>
-        RSVD_3 = 4,
+		/// <summary> RSVD </summary>
+		RSVD_0 = 1,
+		/// <summary> RSVD </summary>
+		RSVD_1 = 2,
+		/// <summary> RSVD </summary>
+		RSVD_2 = 3,
+		/// <summary> RSVD </summary>
+		RSVD_3 = 4,
 		/// <summary>
 		/// The SHA1 Digest will be used.
 		/// </summary>
@@ -1467,45 +1581,45 @@ namespace ROOT
 	internal readonly struct HW31Mapper
 	{
         public static readonly System.Object[,] Mapper = { { 0 , "AA" } , { 1 , "AB" } , { 2 , "AC" } , { 3 , "AD" } , { 4 , "AE" } , { 5 , "AF" } ,
-        { 6 , "AG" } , { 7 , "AH" } , { 8 , "AI" } , { 9 , "AJ" } , {10 , "AK" } , {11 , "AL" } , {12 , "AM" } , { 13 , "AN" } , { 14 , "AO" } ,
-        { 15 , "AP" } , { 16 , "AQ" } , { 17 , "AR" } , { 18 , "AS" } , { 19 , "AT" } , { 20 , "AU" } , { 21 , "AV" } , { 22 , "AW" } , { 23 , "AX" },
-        { 24 , "AY" } , { 25 , "AZ" } , { 26 , "Aa" } , { 27 , "Ab" } , { 28 , "Ac" } , { 29 , "Ad" } , { 30 , "Ae" } , { 31 , "Af" } , { 32 , "Ag" },
-        { 33 , "Ah" } , { 34 , "Ai" } , { 35 , "Aj" } , { 36 , "Ak" } , { 37  , "Al" } , { 38 , "Am" } , { 39 , "An" } , { 40 , "Ao" } , { 41 , "Ap" },
-        { 42 , "Aq" } , { 43 , "Ar" } , { 44 , "As" } , { 45 , "At" } , { 46 , "Au" } , { 47 , "Av" } , { 48 , "Aw" } , { 49 , "Ax" } , { 50 , "Ay" },
-        { 51 , "Az" } , { 52 , "aA" } , { 53 , "aB" } , { 54 , "aC" } , { 55 , "aD" } , { 56 , "aE" } , { 57 , "aF" } , { 58 , "aG" } , { 59 , "aH" },
-        { 60 , "aI" } , { 61 , "aJ" } , { 62 , "aK" } , { 63 , "aL" } , { 64 , "aM" } , { 65 , "aN" } , { 66 , "aO" } , { 67 , "aP" } , { 68 , "aQ" },
-        { 69 , "aR" } , { 70 , "aS" } , { 71 , "aT" } , { 72 , "aU" } , { 73 , "aV" } , { 74 , "aW" } , { 75 , "aX" } , { 76 , "aY" } , { 77 , "aZ" },
-        { 78 , "aa" } , { 79 , "ab" } , { 80 , "ac" } , { 81 , "ad" } , { 82 , "ae" } , { 83 , "af" } , { 84 , "ag" } , { 85 , "ah" } , { 86 , "ai" },
-        { 87 , "aj" } , { 88 , "ak" } , { 89 , "al" } , { 90 , "am" } , { 91 , "an" } , { 92 , "ao" } , { 93 , "ap" } , { 94 , "aq" } , { 95 , "ar" },
-        { 96 , "as" } , { 97 , "at" } , { 98 , "au" } , { 99 , "av" } , { 100 , "aw" } , { 101 , "ax" } , { 102 , "ay" } , { 103 , "az" } ,
-        { 104 , "BA" } , { 105 , "BB" } , { 106 , "BC" } , { 107 , "BD" } , { 108 , "BE" } , { 109 , "BF" } , { 110 , "BG" } , { 111 , "BH" },
-        { 112 , "BI" } , { 113 , "BJ" } , { 114 , "BK" } , { 115 , "BL" } , { 116 , "BM" } , { 117 , "BO" } , { 118 , "BP" },
-        { 119 , "BQ" } , { 120 , "BR" } , { 121 , "BS" } , { 122 , "BT" } , { 123 , "BU" } , { 124 , "BV" } , { 125 , "BW" } , { 126 , "BX" },
-        { 127 , "BY" } , { 128 , "BZ" } , { 129 , "Ba" } , { 130 , "Bb" } , { 131 , "Bc" } , { 132 , "Bd" } , { 133 , "Be" } , { 134 , "Bf" },
-        { 135 , "Bg" } , { 136 , "Bh" } , { 137 , "Bi" } , { 138 , "Bj" } , { 139 , "Bk" } , { 140 , "Bl" } , { 141 , "Bm" } , { 142 , "Bn" } ,
-        { 143 , "Bo" } , { 144 , "Bp" } , { 145 , "Bq" } , { 146 , "Br" } , { 147 , "Bs" } , { 148 , "Bt" } , { 149 , "Bu" } , { 150 , "Bv" },
-        { 151 , "Bw" } , { 152 , "Bx" } , { 153 , "By" } , { 154 , "Bz" } , { 155 , "bA" } , { 156 , "bB" } , { 157 , "bC" } , { 158 , "bD" },
-        { 159 , "bE" } , { 160 , "bF" } , { 161 , "bG" } , { 162 , "bH" } , { 163 , "bI" } , { 164 , "bJ" } , { 165 , "bK" } , { 166 , "bL" },
-        { 167 , "bM" } , { 168 , "bN" } , { 169 , "bP" } , { 170 , "bQ" } , { 171 , "bR" } , { 172 , "bS" } , { 173 , "bT" },
-        { 174 , "bU" } , { 175 , "bV" } , { 176 , "bW" } , { 177 , "bX" } , { 178 , "bY" } , { 179 , "bZ" } , { 180 , "ba" } , { 181 , "bb" },
-        { 182 , "bc" } , { 183 , "bd" } , { 184 , "be" } , { 185 , "bf" } , { 186 , "bg" } , { 187 , "bh" } , { 188 , "bi" } , { 189 , "bj" },
-        { 190 , "bk" } , { 191 , "bl" } , { 192 , "bm" } , { 193 , "bn" } , { 194 , "bo" } , { 195 , "bp" } , { 196 , "bq" } , { 197 , "br" },
-        { 198 , "bs" } , { 199 , "bt" } , { 200 , "bu" } , { 201 , "bv" } , { 202 , "bw" } , { 203 , "bx" } , { 204 , "by" } , { 205 , "bz" },
-        { 206 , "CA" } , { 207 , "CB" } , { 208 , "CC" } , { 209 , "CD" } , { 210 , "CE" } , { 211 , "CF" } , { 212 , "CG" } , { 213 , "CH" },
-        { 214 , "CI" } , { 215 , "CJ" } , { 216 , "CK" } , { 217 , "CL" } , { 218 , "CM" } , { 219 , "CN" } , { 220 , "CO" } , { 221 , "CP" },
-        { 222 , "CQ" } , { 223 , "CR" } , { 224 , "CS" } , { 225 , "CT" } , { 226 , "CU" } , { 227 , "CV" } , { 228 , "CW" } , { 229 , "CX" },
-        { 230 , "CY" } , { 231 , "CZ" } ,  { 232 , "Ca" } , { 233 , "Cb" } , { 234 , "Cc" } , { 235 , "Cd" } , { 236 , "Cf" } , { 237 , "Cg" },
-        { 238 , "Ch" } , { 239 , "Ci" } , { 240 , "Cj" } , { 241 , "Ck" } , { 242 , "Cl" } , { 243 , "Cm" } , { 244 , "Cn" } , { 245 , "Co" },
-        { 246 , "Cp" } , { 247 , "Cq" } , { 248 , "Cr" } , { 249 , "Cs" } , { 250 , "Ct" } , { 251 , "Cu" } , { 252 , "Cv" } , { 253 , "Cw" },
-        { 254 , "Cx" } , { 255 , "Cy" } };
-    }
+		{ 6 , "AG" } , { 7 , "AH" } , { 8 , "AI" } , { 9 , "AJ" } , {10 , "AK" } , {11 , "AL" } , {12 , "AM" } , { 13 , "AN" } , { 14 , "AO" } ,
+		{ 15 , "AP" } , { 16 , "AQ" } , { 17 , "AR" } , { 18 , "AS" } , { 19 , "AT" } , { 20 , "AU" } , { 21 , "AV" } , { 22 , "AW" } , { 23 , "AX" },
+		{ 24 , "AY" } , { 25 , "AZ" } , { 26 , "Aa" } , { 27 , "Ab" } , { 28 , "Ac" } , { 29 , "Ad" } , { 30 , "Ae" } , { 31 , "Af" } , { 32 , "Ag" },
+		{ 33 , "Ah" } , { 34 , "Ai" } , { 35 , "Aj" } , { 36 , "Ak" } , { 37  , "Al" } , { 38 , "Am" } , { 39 , "An" } , { 40 , "Ao" } , { 41 , "Ap" },
+		{ 42 , "Aq" } , { 43 , "Ar" } , { 44 , "As" } , { 45 , "At" } , { 46 , "Au" } , { 47 , "Av" } , { 48 , "Aw" } , { 49 , "Ax" } , { 50 , "Ay" },
+		{ 51 , "Az" } , { 52 , "aA" } , { 53 , "aB" } , { 54 , "aC" } , { 55 , "aD" } , { 56 , "aE" } , { 57 , "aF" } , { 58 , "aG" } , { 59 , "aH" },
+		{ 60 , "aI" } , { 61 , "aJ" } , { 62 , "aK" } , { 63 , "aL" } , { 64 , "aM" } , { 65 , "aN" } , { 66 , "aO" } , { 67 , "aP" } , { 68 , "aQ" },
+		{ 69 , "aR" } , { 70 , "aS" } , { 71 , "aT" } , { 72 , "aU" } , { 73 , "aV" } , { 74 , "aW" } , { 75 , "aX" } , { 76 , "aY" } , { 77 , "aZ" },
+		{ 78 , "aa" } , { 79 , "ab" } , { 80 , "ac" } , { 81 , "ad" } , { 82 , "ae" } , { 83 , "af" } , { 84 , "ag" } , { 85 , "ah" } , { 86 , "ai" },
+		{ 87 , "aj" } , { 88 , "ak" } , { 89 , "al" } , { 90 , "am" } , { 91 , "an" } , { 92 , "ao" } , { 93 , "ap" } , { 94 , "aq" } , { 95 , "ar" },
+		{ 96 , "as" } , { 97 , "at" } , { 98 , "au" } , { 99 , "av" } , { 100 , "aw" } , { 101 , "ax" } , { 102 , "ay" } , { 103 , "az" } ,
+		{ 104 , "BA" } , { 105 , "BB" } , { 106 , "BC" } , { 107 , "BD" } , { 108 , "BE" } , { 109 , "BF" } , { 110 , "BG" } , { 111 , "BH" },
+		{ 112 , "BI" } , { 113 , "BJ" } , { 114 , "BK" } , { 115 , "BL" } , { 116 , "BM" } , { 117 , "BO" } , { 118 , "BP" },
+		{ 119 , "BQ" } , { 120 , "BR" } , { 121 , "BS" } , { 122 , "BT" } , { 123 , "BU" } , { 124 , "BV" } , { 125 , "BW" } , { 126 , "BX" },
+		{ 127 , "BY" } , { 128 , "BZ" } , { 129 , "Ba" } , { 130 , "Bb" } , { 131 , "Bc" } , { 132 , "Bd" } , { 133 , "Be" } , { 134 , "Bf" },
+		{ 135 , "Bg" } , { 136 , "Bh" } , { 137 , "Bi" } , { 138 , "Bj" } , { 139 , "Bk" } , { 140 , "Bl" } , { 141 , "Bm" } , { 142 , "Bn" } ,
+		{ 143 , "Bo" } , { 144 , "Bp" } , { 145 , "Bq" } , { 146 , "Br" } , { 147 , "Bs" } , { 148 , "Bt" } , { 149 , "Bu" } , { 150 , "Bv" },
+		{ 151 , "Bw" } , { 152 , "Bx" } , { 153 , "By" } , { 154 , "Bz" } , { 155 , "bA" } , { 156 , "bB" } , { 157 , "bC" } , { 158 , "bD" },
+		{ 159 , "bE" } , { 160 , "bF" } , { 161 , "bG" } , { 162 , "bH" } , { 163 , "bI" } , { 164 , "bJ" } , { 165 , "bK" } , { 166 , "bL" },
+		{ 167 , "bM" } , { 168 , "bN" } , { 169 , "bP" } , { 170 , "bQ" } , { 171 , "bR" } , { 172 , "bS" } , { 173 , "bT" },
+		{ 174 , "bU" } , { 175 , "bV" } , { 176 , "bW" } , { 177 , "bX" } , { 178 , "bY" } , { 179 , "bZ" } , { 180 , "ba" } , { 181 , "bb" },
+		{ 182 , "bc" } , { 183 , "bd" } , { 184 , "be" } , { 185 , "bf" } , { 186 , "bg" } , { 187 , "bh" } , { 188 , "bi" } , { 189 , "bj" },
+		{ 190 , "bk" } , { 191 , "bl" } , { 192 , "bm" } , { 193 , "bn" } , { 194 , "bo" } , { 195 , "bp" } , { 196 , "bq" } , { 197 , "br" },
+		{ 198 , "bs" } , { 199 , "bt" } , { 200 , "bu" } , { 201 , "bv" } , { 202 , "bw" } , { 203 , "bx" } , { 204 , "by" } , { 205 , "bz" },
+		{ 206 , "CA" } , { 207 , "CB" } , { 208 , "CC" } , { 209 , "CD" } , { 210 , "CE" } , { 211 , "CF" } , { 212 , "CG" } , { 213 , "CH" },
+		{ 214 , "CI" } , { 215 , "CJ" } , { 216 , "CK" } , { 217 , "CL" } , { 218 , "CM" } , { 219 , "CN" } , { 220 , "CO" } , { 221 , "CP" },
+		{ 222 , "CQ" } , { 223 , "CR" } , { 224 , "CS" } , { 225 , "CT" } , { 226 , "CU" } , { 227 , "CV" } , { 228 , "CW" } , { 229 , "CX" },
+		{ 230 , "CY" } , { 231 , "CZ" } ,  { 232 , "Ca" } , { 233 , "Cb" } , { 234 , "Cc" } , { 235 , "Cd" } , { 236 , "Cf" } , { 237 , "Cg" },
+		{ 238 , "Ch" } , { 239 , "Ci" } , { 240 , "Cj" } , { 241 , "Ck" } , { 242 , "Cl" } , { 243 , "Cm" } , { 244 , "Cn" } , { 245 , "Co" },
+		{ 246 , "Cp" } , { 247 , "Cq" } , { 248 , "Cr" } , { 249 , "Cs" } , { 250 , "Ct" } , { 251 , "Cu" } , { 252 , "Cv" } , { 253 , "Cw" },
+		{ 254 , "Cx" } , { 255 , "Cy" } };
+	}
 
 	/// <summary>
 	/// A static class which constructs HW31 strings from <see cref="System.Byte"/>[] arrays.
 	/// </summary>
 	public static class HW31Strings
 	{
-		/*
+        /*
 		 * Where this class is useful? 
 		 * > The class , like Base64 , creates a string representation of the byte array given.
 		 *    However , Base64 and HW31 have differences:
@@ -1519,7 +1633,8 @@ namespace ROOT
 		 * HW31 could be also used in small data dictionaries , where data precision is required.
 		 */
 
-		private static System.String ByteToCorrespondingChars(System.Byte Value)
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static System.String ByteToCorrespondingChars(System.Byte Value)
 		{
 			for (System.Int32 I = 0; I < HW31Mapper.Mapper.Length; I++)
 			{
@@ -1528,12 +1643,13 @@ namespace ROOT
 			return "Error";
 		}
 
-		private static System.Byte CharsToCorrespondingByte(System.String Chars)
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static System.Byte CharsToCorrespondingByte(System.String Chars)
 		{
 			if (Chars.Length > 2 && Chars.Length < 2) { return 0; }
 			for (System.Int32 I = 0; I < HW31Mapper.Mapper.Length; I++)
 			{
-				if ((System.String) HW31Mapper.Mapper[I, 1] == Chars) { return System.Convert.ToByte(HW31Mapper.Mapper[I, 0]); }
+				if ((System.String)HW31Mapper.Mapper[I, 1] == Chars) { return System.Convert.ToByte(HW31Mapper.Mapper[I, 0]); }
 			}
 			return 0;
 		}
@@ -1544,21 +1660,22 @@ namespace ROOT
 			if (HW31.Length < 3) { return false; }
 			System.Char[] HW31Arr = HW31.ToCharArray();
 			if (HW31Arr[2] != ' ') { return false; }
-            if (HW31Arr[HW31Arr.Length - 1] != ' ') { return false; }
-            HW31Arr = null;
+			if (HW31Arr[HW31Arr.Length - 1] != ' ') { return false; }
+			HW31Arr = null;
 			return true;
 		}
 
-		/// <summary>
-		/// Converts a <see cref="System.Byte"/>[] array to a new HW31 <see cref="System.String"/>. 
-		/// </summary>
-		/// <param name="Array">The Byte array to get the data from.</param>
-		/// <returns>A new HW31 <see cref="System.String"/> . </returns>
-		public static HW31 ByteArrayToHW31String(System.Byte[] Array)
+        /// <summary>
+        /// Converts a <see cref="System.Byte"/>[] array to a new HW31 <see cref="System.String"/>. 
+        /// </summary>
+        /// <param name="Array">The Byte array to get the data from.</param>
+        /// <returns>A new HW31 <see cref="System.String"/> . </returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static HW31 ByteArrayToHW31String(System.Byte[] Array)
 		{
 			HW31 DC = new HW31();
 			if (Array.Length < 1) { DC.SetOrGetError = true; return DC; }
-            System.String Result = null;
+			System.String Result = null;
 			for (System.Int32 I = 0; I < Array.Length; I++)
 			{
 				if (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) != "Error")
@@ -1566,7 +1683,7 @@ namespace ROOT
 					Result += (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) + " ");
 				}
 				else { DC.SetOrGetError = true; return DC; }
-            }
+			}
 			DC = new HW31(Result);
 			return DC;
 		}
@@ -1575,42 +1692,45 @@ namespace ROOT
         /// Converts a <see cref="System.Byte"/>[] array to a new HW31 <see langword="struct"/>. 
         /// </summary>
         /// <param name="Array">The Byte array to get the data from.</param>
-		/// <param name="Count">How many iterations will happen to the array.</param>
-		/// <param name="Start">From which point the iterator will start calculating.</param>
+        /// <param name="Count">How many iterations will happen to the array.</param>
+        /// <param name="Start">From which point the iterator will start calculating.</param>
         /// <returns>A new HW31 <see langword="struct"/> .</returns>
-        public static HW31 ByteArrayToHW31String(System.Byte[] Array , System.Int32 Start , System.Int32 Count)
-        {
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static HW31 ByteArrayToHW31String(System.Byte[] Array, System.Int32 Start, System.Int32 Count)
+		{
 			HW31 DC = new HW31();
-            if (Array.Length < 1) { DC.SetOrGetError = true; return DC; }
+			if (Array.Length < 1) { DC.SetOrGetError = true; return DC; }
 			if (Start < 0) { DC.SetOrGetError = true; return DC; }
-            if (Start > Count) { DC.SetOrGetError = true; return DC; }
-            if (Count < 1) { DC.SetOrGetError = true; return DC; }
-            System.String Result = null;
-            for (System.Int32 I = Start; I < Count; I++)
-            {
-                if (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) != "Error")
-                {
-                    Result += (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) + " ");
-                }
-                else { DC.SetOrGetError = true; return DC; }
-            }
+			if (Start > Count) { DC.SetOrGetError = true; return DC; }
+			if (Count < 1) { DC.SetOrGetError = true; return DC; }
+			System.String Result = null;
+			for (System.Int32 I = Start; I < Count; I++)
+			{
+				if (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) != "Error")
+				{
+					Result += (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) + " ");
+				}
+				else { DC.SetOrGetError = true; return DC; }
+			}
 			DC = new HW31(Result);
-            return DC;
-        }
+			return DC;
+		}
 
         /// <summary>
         /// Calculates the length of the HW31 string before it is created.
         /// </summary>
         /// <param name="Array">The <see cref="System.Byte"/>[] to calculate the data from.</param>
         /// <returns>The estimated HW31 <see langword="struct"/> containing length.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.Int64 EstimateHW31StringLength(System.Byte[] Array) { return Array.Length * 3; }
 
-		/// <summary>
-		/// Converts a created HW31 <see cref="System.String"/> back to a <see cref="System.Byte"/>[] array.
-		/// </summary>
-		/// <param name="HW31String">The already created HW31 <see cref="System.String"/>. </param>
-		/// <returns>A new <see cref="System.Byte"/>[] containing the byte data kept by the HW31 string.</returns>
-		public static System.Byte[] HW31StringToByteArray(HW31 HW31String)
+        /// <summary>
+        /// Converts a created HW31 <see cref="System.String"/> back to a <see cref="System.Byte"/>[] array.
+        /// </summary>
+        /// <param name="HW31String">The already created HW31 <see cref="System.String"/>. </param>
+        /// <returns>A new <see cref="System.Byte"/>[] containing the byte data kept by the HW31 string.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Byte[] HW31StringToByteArray(HW31 HW31String)
 		{
 			if (TestIfItIsAnHW31String(HW31String.ReturnHW31) == false) { return null; }
 			System.Char[] HW31Arr = HW31String.ReturnHW31.ToCharArray();
@@ -1631,15 +1751,15 @@ namespace ROOT
 			} catch (System.Exception) { return null; }
 			return Result;
 		}
-	
+
 	}
 
-    /// <summary>
-    /// The HW31 structure. HW31 is an intermediate storage to store binary data to <see cref="System.String"/>'s and the opposite.
-    /// </summary>
-	#nullable enable
-    [Serializable]
-    public struct HW31 : IEquatable<HW31?>
+	/// <summary>
+	/// The HW31 structure. HW31 is an intermediate storage to store binary data to <see cref="System.String"/>'s and the opposite.
+	/// </summary>
+#nullable enable
+	[Serializable]
+	public struct HW31 : IEquatable<HW31?>
 	{
 		private System.String BackField;
 		private System.Boolean Erro_r = false;
@@ -1671,12 +1791,12 @@ namespace ROOT
 		/// <summary>Initialises a new instance of the <see cref="HW31"/> structure.</summary>
 		public HW31() { BackField = ""; }
 
-        private static System.Boolean TestIfItIsAnHW31String(System.String HW31)
-        {
-            if (HW31 == null) { return false; }
-            if (HW31.Length < 3) { return false; }
-            System.Char[] HW31Arr = HW31.ToCharArray();
-            if (HW31Arr[2] != ' ') { return false; }
+		private static System.Boolean TestIfItIsAnHW31String(System.String HW31)
+		{
+			if (HW31 == null) { return false; }
+			if (HW31.Length < 3) { return false; }
+			System.Char[] HW31Arr = HW31.ToCharArray();
+			if (HW31Arr[2] != ' ') { return false; }
 			if (HW31Arr[HW31Arr.Length - 1] != ' ') { return false; }
 			for (System.Int32 I = 0; I < HW31Arr.Length; I++)
 			{
@@ -1685,8 +1805,8 @@ namespace ROOT
 					if (IsDigit(System.Convert.ToInt32(HW31Arr[I])) == true) { return false; }
 				} catch { continue; }
 			}
-            return true;
-        }
+			return true;
+		}
 
 		/// <summary>
 		/// Detects if the specified <see cref="System.String"/> is an HW31 <see cref="System.String"/>.
@@ -1696,14 +1816,15 @@ namespace ROOT
 		/// can be an HW31 <see langword="struct"/>; otherwise , <c>false</c>.</returns>
 		public static System.Boolean IsHW31(System.String HW31) { return TestIfItIsAnHW31String(HW31); }
 
-		/// <summary>
-		/// Test if an <see cref="HW31"/> structure that holds the HW31 <see cref="System.String"/> 
-		/// is equal to a non-structured HW31 <see cref="System.String"/>.
-		/// </summary>
-		/// <param name="left">The <see cref="HW31"/> structure to take the <see cref="System.String"/> from.</param>
-		/// <param name="right">The non-structured <see cref="System.String"/> to compare against.</param>
-		/// <returns><c>true</c> if these two objects specified are equal; otherwise ,  <c>false</c>.</returns>
-		public static System.Boolean operator ==(HW31 left, System.String right) { return left.ReturnHW31.Equals(right); }
+        /// <summary>
+        /// Test if an <see cref="HW31"/> structure that holds the HW31 <see cref="System.String"/> 
+        /// is equal to a non-structured HW31 <see cref="System.String"/>.
+        /// </summary>
+        /// <param name="left">The <see cref="HW31"/> structure to take the <see cref="System.String"/> from.</param>
+        /// <param name="right">The non-structured <see cref="System.String"/> to compare against.</param>
+        /// <returns><c>true</c> if these two objects specified are equal; otherwise ,  <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Boolean operator ==(HW31 left, System.String right) { return left.ReturnHW31.Equals(right); }
 
         /// <summary>
         /// Test if an <see cref="HW31"/> structure that holds the HW31 <see cref="System.String"/> 
@@ -1712,6 +1833,7 @@ namespace ROOT
         /// <param name="left">The <see cref="HW31"/> structure to take the <see cref="System.String"/> from.</param>
         /// <param name="right">The non-structured <see cref="System.String"/> to compare against.</param>
         /// <returns><c>true</c> if these two objects specified are NOT equal; otherwise ,  <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.Boolean operator !=(HW31 left, System.String right) { return left.ReturnHW31.Equals(right) == false; }
 
         /// <summary>
@@ -1720,7 +1842,8 @@ namespace ROOT
         /// <param name="lhs">The first structure.</param>
         /// <param name="rhs">The second structure.</param>
         /// <returns><c>true</c> if the structures are equal; otherwise , <c>false</c>.</returns>
-        public static System.Boolean operator ==(HW31 lhs, HW31 rhs) {  return lhs.Equals(rhs); }
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Boolean operator ==(HW31 lhs, HW31 rhs) { return lhs.Equals(rhs); }
 
         /// <summary>
         /// Test if an <see cref="HW31"/> structure is NOT equal to another.
@@ -1728,15 +1851,17 @@ namespace ROOT
         /// <param name="lhs">The first structure.</param>
         /// <param name="rhs">The second structure.</param>
         /// <returns><c>true</c> if the structures are NOT equal; otherwise , false.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.Boolean operator !=(HW31 lhs, HW31 rhs) { return lhs.Equals(rhs) == false; }
 
-		/// <summary>
-		/// Test if an generic object is equal to this HW31 instance structure.
-		/// </summary>
-		/// <param name="obj">The generic object to compare.</param>
-		/// <returns><c>true</c> if this structure is equal to the <paramref name="obj"/>;
-		/// otherwise , <c>false</c>.</returns>
-        public override System.Boolean Equals(object obj) { return System.String.Equals(BackField , obj); }
+        /// <summary>
+        /// Test if an generic object is equal to this HW31 instance structure.
+        /// </summary>
+        /// <param name="obj">The generic object to compare.</param>
+        /// <returns><c>true</c> if this structure is equal to the <paramref name="obj"/>;
+        /// otherwise , <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public override System.Boolean Equals(object obj) { return System.String.Equals(BackField, obj); }
 
         /// <summary>
         /// Test if another nullable HW31 construct is equal to this HW31 instance structure.
@@ -1744,10 +1869,11 @@ namespace ROOT
         /// <param name="Struct">The nullable HW31 construct to compare.</param>
         /// <returns><c>true</c> if this structure is equal to the <paramref name="Struct"/>;
         /// otherwise , <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public System.Boolean Equals(HW31? Struct) { if (Struct?.Equals(this) == true) { return true; } else { return false; } }
 
 		/// <inheritdoc />
-        public override System.Int32 GetHashCode() { return BackField.GetHashCode(); }
+		public override System.Int32 GetHashCode() { return BackField.GetHashCode(); }
 
 		/// <summary>
 		/// Gets the length of the HW31 <see cref="System.String"/>.
@@ -1755,36 +1881,37 @@ namespace ROOT
 		/// <returns>The computed length.</returns>
 		public System.Int32 Length() { return BackField.Length; }
 
-		/// <summary>
-		/// Gets the length of the HW31 <see cref="System.String"/> , but only the real interpreted characters.
-		/// </summary>
-		/// <returns>The computed length.</returns>
-		public System.Int32 ClearLength() 
+        /// <summary>
+        /// Gets the length of the HW31 <see cref="System.String"/> , but only the real interpreted characters.
+        /// </summary>
+        /// <returns>The computed length.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public System.Int32 ClearLength()
 		{
 			System.Char[] Chars = BackField.ToCharArray();
 			System.Int32 Remove = 0;
-			for(System.Int32 I = 0; I< Chars.Length; I++) { if (Chars[I] == ' ') { Remove++; } }
+			for (System.Int32 I = 0; I < Chars.Length; I++) { if (Chars[I] == ' ') { Remove++; } }
 			return Chars.Length - Remove;
 		}
 
 		// The below code is residing in the System.Buffers.Text namespace , which is a method for the internal mechanisms.
 		// Here it is used for checking if the HW31 has digits , which is illegal.
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsDigit(System.Int32 I) { return (System.UInt32) (I - '0') <= ('9' - '0'); }
+		private static bool IsDigit(System.Int32 I) { return (System.UInt32)(I - '0') <= ('9' - '0'); }
 
-        /// <summary>
-        /// Returns the real HW31 <see cref="System.String"/> created.
-        /// </summary>
-        /// <returns>The HW31 <see cref="System.String"/> .</returns>
-        public override System.String ToString() 
+		/// <summary>
+		/// Returns the real HW31 <see cref="System.String"/> created.
+		/// </summary>
+		/// <returns>The HW31 <see cref="System.String"/> .</returns>
+		public override System.String ToString()
 		{
 			if (Erro_r == true) { throw new InvalidOperationException("Cannot use this HW31 instance " +
 				"because this structure is marked as invalid."); }
-			return BackField.ToString(); 
+			return BackField.ToString();
 		}
 
-    }
-	#nullable disable
+	}
+#nullable disable
 	/// <summary>
 	/// The Registry Types that the user can use to set the data to a value.
 	/// </summary>
@@ -1794,16 +1921,16 @@ namespace ROOT
 		/// Reserved property. Should not be used directly by your source code.
 		/// </summary>
 		ERROR = 0,
-        /// <summary> RSVD </summary>
-        RSVD_0 = 1,
-        /// <summary> RSVD </summary>
-        RSVD_1 = 2,
-        /// <summary> RSVD </summary>
-        RSVD_2 = 3,
-        /// <summary> RSVD </summary>
-        RSVD_3 = 4,
-        /// <summary> RSVD </summary>
-        RSVD_4 = 5,
+		/// <summary> RSVD </summary>
+		RSVD_0 = 1,
+		/// <summary> RSVD </summary>
+		RSVD_1 = 2,
+		/// <summary> RSVD </summary>
+		RSVD_2 = 3,
+		/// <summary> RSVD </summary>
+		RSVD_3 = 4,
+		/// <summary> RSVD </summary>
+		RSVD_4 = 5,
 		/// <summary>
 		/// The Registry type will be a string value.
 		/// </summary>
@@ -1831,10 +1958,10 @@ namespace ROOT
 		/// Generic error.
 		/// </summary>
 		Error = 0,
-        /// <summary> RSVD </summary>
-        RSVD_0 = 1,
-        /// <summary> RSVD </summary>
-        RSVD_1 = 2,
+		/// <summary> RSVD </summary>
+		RSVD_0 = 1,
+		/// <summary> RSVD </summary>
+		RSVD_1 = 2,
 		/// <summary>
 		/// Incorrect Registry Path.
 		/// </summary>
@@ -1859,22 +1986,22 @@ namespace ROOT
 		/// Reserved property for indicating a custom or unusuable root key.
 		/// </summary>
 		Inabsolute = 0,
-        /// <summary> RSVD </summary>
-        RSVD_0 = 1,
-        /// <summary> RSVD </summary>
-        RSVD_1 = 2,
-        /// <summary> HKLM Path. </summary>
-        HKLM = 3,
-        /// <summary> HKCU Path. </summary>
-        HKCU = 4,
-        /// <summary> HKCC Path. </summary>
-        HKCC = 5,
-        /// <summary> HKPD Path. </summary>
-        HKPD = 6,
-        /// <summary> HKU Path. </summary>
-        HKU = 7,
-        /// <summary> HKCR Path. </summary>
-        HKCR = 8,
+		/// <summary> RSVD </summary>
+		RSVD_0 = 1,
+		/// <summary> RSVD </summary>
+		RSVD_1 = 2,
+		/// <summary> HKLM Path. </summary>
+		HKLM = 3,
+		/// <summary> HKCU Path. </summary>
+		HKCU = 4,
+		/// <summary> HKCC Path. </summary>
+		HKCC = 5,
+		/// <summary> HKPD Path. </summary>
+		HKPD = 6,
+		/// <summary> HKU Path. </summary>
+		HKU = 7,
+		/// <summary> HKCR Path. </summary>
+		HKCR = 8,
 		/// <summary>
 		/// This provides the path to the Local Machine.
 		/// </summary>
@@ -1912,7 +2039,7 @@ namespace ROOT
 		private System.String _RootKey_;
 		private System.String _SubKey_;
 		private System.Boolean _DIAG_;
-		
+
 		/// <summary>
 		/// The Registry Root Key. It accepts only specific values.
 		/// </summary>
@@ -1920,9 +2047,9 @@ namespace ROOT
 		{
 			get
 			{
-				switch (_RootKey_) 
+				switch (_RootKey_)
 				{
-					case "HKEY_LOCAL_MACHINE":  return RegRootKeyValues.HKLM;
+					case "HKEY_LOCAL_MACHINE": return RegRootKeyValues.HKLM;
 					case "HKEY_CURRENT_USER": return RegRootKeyValues.HKCU;
 					case "HKEY_CURRENT_CONFIG": return RegRootKeyValues.HKCC;
 					case "HKEY_PERFORMANCE_DATA": return RegRootKeyValues.HKPD;
@@ -1931,7 +2058,7 @@ namespace ROOT
 					default: return RegRootKeyValues.Inabsolute;
 				}
 			}
-			set 
+			set
 			{
 				switch (value)
 				{
@@ -1944,7 +2071,7 @@ namespace ROOT
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// The Registry sub-root key. Can be nested the one on the another.
 		/// </summary>
@@ -1953,7 +2080,7 @@ namespace ROOT
 			get { return _SubKey_; }
 			set { if (System.String.IsNullOrEmpty(value) == false) { _SubKey_ = value; } }
 		}
-		
+
 		/// <summary>
 		/// The default , classical and parameterless constructor.
 		/// </summary>
@@ -1965,7 +2092,7 @@ namespace ROOT
 		/// </summary>
 		/// <param name="KeyValue">One of the valid Root Keys. See the <see cref="RegRootKeyValues"/> <see cref="System.Enum"/> for more information. </param>
 		/// <param name="SubKey">The Registry sub-root key. Can be nested the one on the another.</param>
-		public RegEditor(RegRootKeyValues KeyValue , System.String SubKey)
+		public RegEditor(RegRootKeyValues KeyValue, System.String SubKey)
 		{
 			switch (KeyValue)
 			{
@@ -1986,13 +2113,13 @@ namespace ROOT
 		{
 			set { _DIAG_ = value; }
 		}
-		
+
 		private System.Boolean _CheckPredefinedProperties()
 		{
 			if ((System.String.IsNullOrEmpty(_RootKey_) == false) && (System.String.IsNullOrEmpty(_SubKey_) == false))
 			{ return true; } else { return false; }
 		}
-		
+
 		/// <summary>
 		/// Gets the specified value from the key provided.
 		/// </summary>
@@ -2001,12 +2128,12 @@ namespace ROOT
 		public System.Object GetEntry(System.String VariableRegistryMember)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember)) { return "Error"; }
-			if (! _CheckPredefinedProperties())
+			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
+				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return "UNDEF_ERR";
 			}
-			System.Object RegEntry = Microsoft.Win32.Registry.GetValue($"{_RootKey_}\\{_SubKey_}" , VariableRegistryMember , "_ER_C_");
+			System.Object RegEntry = Microsoft.Win32.Registry.GetValue($"{_RootKey_}\\{_SubKey_}", VariableRegistryMember, "_ER_C_");
 			if (System.Convert.ToString(RegEntry) == "_ER_C_") { return "Error"; }
 			else
 			{
@@ -2028,7 +2155,7 @@ namespace ROOT
 				}
 			}
 		}
-		
+
 		/// <summary>
 		/// Sets or creates the specified value.
 		/// </summary>
@@ -2036,20 +2163,20 @@ namespace ROOT
 		/// <param name="RegistryType">The value type that this value will have. Consult the <see cref="RegTypes"/> <see cref="System.Enum"/> for more information.</param>
 		/// <param name="RegistryData">The new data that will be saved on the value; The type is depending upon the <paramref name="RegistryType"/> parameter.</param>
 		/// <returns>A new <see cref="RegFunctionResult"/> <see cref="System.Enum"/> explaining if it succeeded.</returns>
-		public RegFunctionResult SetEntry(System.String VariableRegistryMember,RegTypes RegistryType,System.Object RegistryData)
+		public RegFunctionResult SetEntry(System.String VariableRegistryMember, RegTypes RegistryType, System.Object RegistryData)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember))
 			{
 				return RegFunctionResult.Error;
 			}
-			if (! _CheckPredefinedProperties())
+			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
+				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			if (RegistryData == null)
 			{
-				if (_DIAG_) {System.Console.WriteLine("ERROR: 'null' value detected in RegistryData object. Maybe invalid definition?"); }
+				if (_DIAG_) { System.Console.WriteLine("ERROR: 'null' value detected in RegistryData object. Maybe invalid definition?"); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryValueKind RegType_;
@@ -2076,7 +2203,7 @@ namespace ROOT
 			}
 			try
 			{
-				Microsoft.Win32.Registry.SetValue($"{_RootKey_}\\{_SubKey_}" , VariableRegistryMember , RegistryData , RegType_);
+				Microsoft.Win32.Registry.SetValue($"{_RootKey_}\\{_SubKey_}", VariableRegistryMember, RegistryData, RegType_);
 			}
 			catch (System.Exception EX)
 			{
@@ -2098,9 +2225,9 @@ namespace ROOT
 		public RegFunctionResult DeleteEntry(System.String VariableRegistryMember)
 		{
 			if (System.String.IsNullOrEmpty(VariableRegistryMember)) { return RegFunctionResult.Error; }
-			if (! _CheckPredefinedProperties())
+			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) {System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined.");}
+				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryKey ValueDelete;
@@ -2132,7 +2259,7 @@ namespace ROOT
 					}
 					return RegFunctionResult.Misdefinition_Error;
 			}
-			if (System.Convert.ToString(ValueDelete.GetValue(VariableRegistryMember , "_DNE_")) == "_DNE_")
+			if (System.Convert.ToString(ValueDelete.GetValue(VariableRegistryMember, "_DNE_")) == "_DNE_")
 			{
 				ValueDelete.Close();
 				return RegFunctionResult.Error;
@@ -2141,11 +2268,11 @@ namespace ROOT
 			ValueDelete.Close();
 			return RegFunctionResult.Success;
 		}
-		
+
 		/// <summary>
 		/// Use this Dispose method to clear up the current key that the class is working on and make it possible to set a new path to work on.
 		/// </summary>
-		public void Dispose() {DisposeRes();}
+		public void Dispose() { DisposeRes(); }
 
 		private protected void DisposeRes()
 		{
@@ -2217,12 +2344,12 @@ namespace ROOT
 			}
 		}
 
-        /// <summary>
-        /// AES Encryption class. It can also encrypt files.
-        /// NOTE: You are NOT allowed to override this class.
-        /// </summary>
-        /// <remarks>Only files with UTF-8 encoding can be sucessfully encrypted and decrypted for now.</remarks>
-        public sealed class AESEncryption : System.IDisposable
+		/// <summary>
+		/// AES Encryption class. It can also encrypt files.
+		/// NOTE: You are NOT allowed to override this class.
+		/// </summary>
+		/// <remarks>Only files with UTF-8 encoding can be sucessfully encrypted and decrypted for now.</remarks>
+		public sealed class AESEncryption : System.IDisposable
 		{
 			// Cryptographic Operations Class.
 			private System.Byte[] _EncryptionKey_;
@@ -2239,11 +2366,12 @@ namespace ROOT
 			/// </summary>
 			public System.Byte[] IV { set { _InitVec_ = value; } }
 
-			/// <summary>
-			/// Create a new random key and Initialisation vector to use.
-			/// </summary>
-			/// <returns>A new <see cref="KeyGenTable"/> containing the key and the IV.</returns>
-			public static KeyGenTable MakeNewKeyAndInitVector()
+            /// <summary>
+            /// Create a new random key and Initialisation vector to use.
+            /// </summary>
+            /// <returns>A new <see cref="KeyGenTable"/> containing the key and the IV.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static KeyGenTable MakeNewKeyAndInitVector()
 			{
 				System.Security.Cryptography.AesCng RETM;
 				KeyGenTable RDM = new();
@@ -2256,19 +2384,21 @@ namespace ROOT
 				return RDM;
 			}
 
-			private System.Boolean _CheckPredefinedProperties()
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            private System.Boolean _CheckPredefinedProperties()
 			{
 				if ((_EncryptionKey_ is null) || (_InitVec_ is null)) { return true; }
-				if ((_EncryptionKey_.Length <= 0) || (_InitVec_.Length <= 0))	{ return true; }
+				if ((_EncryptionKey_.Length <= 0) || (_InitVec_.Length <= 0)) { return true; }
 				return false;
 			}
 
-			/// <summary>
-			/// Encrypts the specified <see cref="System.String"/> plain text as <see cref="System.Byte"/>[] units.
-			/// </summary>
-			/// <param name="PlainText">The text to encrypt.</param>
-			/// <returns>The encrypted AES CNG message.</returns>
-			public System.Byte[] EncryptSpecifiedData(System.String PlainText)
+            /// <summary>
+            /// Encrypts the specified <see cref="System.String"/> plain text as <see cref="System.Byte"/>[] units.
+            /// </summary>
+            /// <param name="PlainText">The text to encrypt.</param>
+            /// <returns>The encrypted AES CNG message.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public System.Byte[] EncryptSpecifiedData(System.String PlainText)
 			{
 				if (System.String.IsNullOrEmpty(PlainText))
 				{
@@ -2304,6 +2434,7 @@ namespace ROOT
             /// </summary>
             /// <param name="UnderlyingStream">The <see cref="System.IO.FileStream"/> object to get data from.</param>
             /// <returns>The encrypted AES CNG message.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public System.Byte[] EncryptSpecifiedDataForFiles(System.IO.FileStream UnderlyingStream)
 			{
 				if (!(UnderlyingStream is System.IO.FileStream) || (UnderlyingStream.CanRead == false)) { return null; }
@@ -2331,12 +2462,13 @@ namespace ROOT
 				return EncryptedArray;
 			}
 
-			/// <summary>
-			/// Decrypts the encdoed AES CNG message to <see cref="System.String"/> units.
-			/// </summary>
-			/// <param name="EncryptedArray">The encrypted AES CNG message.</param>
-			/// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
-			public System.String DecryptSpecifiedData(System.Byte[] EncryptedArray)
+            /// <summary>
+            /// Decrypts the encdoed AES CNG message to <see cref="System.String"/> units.
+            /// </summary>
+            /// <param name="EncryptedArray">The encrypted AES CNG message.</param>
+            /// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public System.String DecryptSpecifiedData(System.Byte[] EncryptedArray)
 			{
 				if ((EncryptedArray is null) || (EncryptedArray.Length <= 0))
 				{
@@ -2365,10 +2497,11 @@ namespace ROOT
 
             /// <summary>
             /// Decrypts the encdoed AES CNG message from an alive <see cref="System.IO.FileStream"/> 
-			/// object to <see cref="System.String"/> units.
+            /// object to <see cref="System.String"/> units.
             /// </summary>
             /// <param name="EncasingStream">The <see cref="System.IO.FileStream"/> object which contains the encoded AES CNG message.</param>
             /// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public System.String DecryptSpecifiedDataForFiles(System.IO.FileStream EncasingStream)
 			{
 				if (EncasingStream.CanRead == false) { return null; }
@@ -2387,12 +2520,13 @@ namespace ROOT
 				return FinalString;
 			}
 
-			/// <summary>
-			/// Converts either the key or Initialisation Vector to a safety-secure Base64 <see cref="System.String"/>.
-			/// </summary>
-			/// <param name="ByteValue">The Key or Initalisation Vector to convert.</param>
-			/// <returns>A new Base64 <see cref="System.String"/> , which contains the encoded key or initialisation vector.</returns>
-			public static System.String ConvertTextKeyOrIvToString(System.Byte[] ByteValue)
+            /// <summary>
+            /// Converts either the key or Initialisation Vector to a safety-secure Base64 <see cref="System.String"/>.
+            /// </summary>
+            /// <param name="ByteValue">The Key or Initalisation Vector to convert.</param>
+            /// <returns>A new Base64 <see cref="System.String"/> , which contains the encoded key or initialisation vector.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static System.String ConvertTextKeyOrIvToString(System.Byte[] ByteValue)
 			{
 				if ((ByteValue is null) || (ByteValue.Length <= 0)) { return null; }
 				try
@@ -2404,10 +2538,11 @@ namespace ROOT
 
             /// <summary>
             /// Converts the converted key or Initialisation Vector from a Base64 <see cref="System.String"/> 
-			/// back to a <see cref="System.Byte"/>[] array.
+            /// back to a <see cref="System.Byte"/>[] array.
             /// </summary>
             /// <param name="StringValue">The Base64 encoded <see cref="System.String"/>.</param>
             /// <returns>The <see cref="System.Byte"/>[] before the conversion.</returns>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static System.Byte[] ConvertTextKeyOrIvFromStringToByteArray(System.String StringValue)
 			{
 				if (System.String.IsNullOrEmpty(StringValue)) { return null; }
@@ -2428,9 +2563,9 @@ namespace ROOT
 			{
 				_EncryptionKey_ = null;
 				_InitVec_ = null;
-				#pragma warning disable CS0219
+#pragma warning disable CS0219
 				System.Object CNGBaseObject = null;
-				#pragma warning restore CS0219
+#pragma warning restore CS0219
 			}
 		}
 
@@ -2466,10 +2601,10 @@ namespace ROOT
 					set { _KEY_ = value; }
 				}
 
-                /// <summary>
-                /// The Initialisation Vector that the function <see cref="EncryptAFile(string, string)"/> used.
-                /// </summary>
-                public System.Byte[] InitVectorUsed
+				/// <summary>
+				/// The Initialisation Vector that the function <see cref="EncryptAFile(string, string)"/> used.
+				/// </summary>
+				public System.Byte[] InitVectorUsed
 				{
 					get { return _IV_; }
 					set { _IV_ = value; }
@@ -2582,43 +2717,43 @@ namespace ROOT
 		/// </summary>
 		public class GZipArchives
 		{
-		  /* A Class that abstracts the GZIP archive format.
-			 USAGE NOTE: You can only add one file per archive each time.
-			 This style is adopted by the UNIX Systems and can be used to transfer data to an UNIX operating system.
-			 You can use this class with three ways:
-			  1 ->  Supply the file paths.
-					 You supply the file paths to the function and it will create or extract the archive respectively.
-			  2 -> Use GZ UNIX filename format.
-					  You only supply the filepath and the function creates automagically the Gzip archive filename.
-					  You can also extract from it with about the same way.
-			  3 -> Use an already initialised FileStream.
-					  Using this way , you can customize the file creation options , and how the file should be created or read.
-					  See http://learn.microsoft.com/en-us/dotnet/api/system.io?view=netframework-4.8 for more details on how exactly the 
-					  the files can be read or written.
-			NOTES: 
-			1: Using GZIP methods do not expose any exception to be thrown. Any found exception will be thrown to the console.
-			2: These methods are only allowed to return System.Boolean values , which means that only True or False values can be displayed only.
-			3: True determines that the operation was completed sucessfully; while False means that something broke up the execution and the file was not created OR
-			it was created the result , but it is empty.
-			4: Be careful when using the File Paths methods , because if one archive with the same name is already existing , it will be overwritten.
-		  */
+			/* A Class that abstracts the GZIP archive format.
+			   USAGE NOTE: You can only add one file per archive each time.
+			   This style is adopted by the UNIX Systems and can be used to transfer data to an UNIX operating system.
+			   You can use this class with three ways:
+				1 ->  Supply the file paths.
+					   You supply the file paths to the function and it will create or extract the archive respectively.
+				2 -> Use GZ UNIX filename format.
+						You only supply the filepath and the function creates automagically the Gzip archive filename.
+						You can also extract from it with about the same way.
+				3 -> Use an already initialised FileStream.
+						Using this way , you can customize the file creation options , and how the file should be created or read.
+						See http://learn.microsoft.com/en-us/dotnet/api/system.io?view=netframework-4.8 for more details on how exactly the 
+						the files can be read or written.
+			  NOTES: 
+			  1: Using GZIP methods do not expose any exception to be thrown. Any found exception will be thrown to the console.
+			  2: These methods are only allowed to return System.Boolean values , which means that only True or False values can be displayed only.
+			  3: True determines that the operation was completed sucessfully; while False means that something broke up the execution and the file was not created OR
+			  it was created the result , but it is empty.
+			  4: Be careful when using the File Paths methods , because if one archive with the same name is already existing , it will be overwritten.
+			*/
 
 			private static System.Boolean CheckFilePath(System.String Path)
 			{
-				if (System.String.IsNullOrEmpty(Path)) {return false;}
-				if (!(System.IO.File.Exists(Path))) {return false;}
+				if (System.String.IsNullOrEmpty(Path)) { return false; }
+				if (!(System.IO.File.Exists(Path))) { return false; }
 				return true;
 			}
-			
+
 			/// <summary>
 			/// Compress the specified file to GZIP format.
 			/// </summary>
 			/// <param name="FilePath">The file to compress.</param>
 			/// <param name="ArchivePath">The output file.</param>
 			/// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-			public static System.Boolean CompressTheSelectedFile(System.String FilePath ,System.String ArchivePath = null)
+			public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
 			{
-				if (!(CheckFilePath(FilePath))) {return false;}
+				if (!(CheckFilePath(FilePath))) { return false; }
 				System.String OutputFile;
 				if (System.String.IsNullOrEmpty(ArchivePath))
 				{
@@ -2626,7 +2761,7 @@ namespace ROOT
 					OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.gz";
 					FSIData = null;
 				}
-				else  {OutputFile = ArchivePath; }
+				else { OutputFile = ArchivePath; }
 				System.IO.FileStream FSI;
 				System.IO.FileStream FSO;
 				try { FSI = System.IO.File.OpenRead(FilePath); }
@@ -2644,9 +2779,9 @@ namespace ROOT
 					System.Console.WriteLine(EX.Message);
 					return false;
 				}
-				try 
+				try
 				{
-					using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(FSO , System.IO.Compression.CompressionMode.Compress))
+					using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(FSO, System.IO.Compression.CompressionMode.Compress))
 					{
 						FSI.CopyTo(CMP);
 					}
@@ -2658,11 +2793,11 @@ namespace ROOT
 				}
 				finally
 				{
-                    if ( FSI != null)
-                    {
-                        FSI.Close();
-                        FSI.Dispose();
-                    }
+					if (FSI != null)
+					{
+						FSI.Close();
+						FSI.Dispose();
+					}
 					if (FSO != null)
 					{
 						FSO.Close();
@@ -2671,7 +2806,7 @@ namespace ROOT
 				}
 				return true;
 			}
-			
+
 			/// <summary>
 			/// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
 			/// compress to another alive <see cref="System.IO.FileStream"/> object.
@@ -2679,13 +2814,13 @@ namespace ROOT
 			/// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
 			/// <param name="OutputFileStream">The compressed data.</param>
 			/// <returns></returns>
-			public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream ,System.IO.FileStream OutputFileStream)
+			public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
 			{
-				if (InputFileStream.CanRead == false) {return false;}
-				if (OutputFileStream.CanWrite == false) {return false;}
-				try 
+				if (InputFileStream.CanRead == false) { return false; }
+				if (OutputFileStream.CanWrite == false) { return false; }
+				try
 				{
-					using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(OutputFileStream , System.IO.Compression.CompressionMode.Compress))
+					using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(OutputFileStream, System.IO.Compression.CompressionMode.Compress))
 					{
 						InputFileStream.CopyTo(CMP);
 					}
@@ -2697,16 +2832,16 @@ namespace ROOT
 				}
 				return true;
 			}
-			
+
 			/// <summary>
 			/// Decompress a GZIP archive back to the file.
 			/// </summary>
 			/// <param name="ArchiveFile">The Archive file path.</param>
 			/// <param name="OutputPath">Path to put the decompressed data.</param>
 			/// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-			public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile ,System.String OutputPath = null)
+			public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
 			{
-				if (!(CheckFilePath(ArchiveFile))) {return false;}
+				if (!(CheckFilePath(ArchiveFile))) { return false; }
 				System.String OutputFile;
 				if (System.String.IsNullOrEmpty(OutputPath))
 				{
@@ -2720,7 +2855,7 @@ namespace ROOT
 					FinalPath = null;
 					TruncatePath = null;
 				}
-				else 
+				else
 				{
 					OutputFile = OutputPath;
 				}
@@ -2748,7 +2883,7 @@ namespace ROOT
 				}
 				try
 				{
-					using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(FSI , System.IO.Compression.CompressionMode.Decompress))
+					using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(FSI, System.IO.Compression.CompressionMode.Decompress))
 					{
 						DCMP.CopyTo(FSO);
 					}
@@ -2768,20 +2903,20 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
-            /// to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="ArchiveFileStream">The compressed data.</param>
-            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream,System.IO.FileStream DecompressedFileStream)
+			/// <summary>
+			/// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
+			/// to another alive <see cref="System.IO.FileStream"/> object.
+			/// </summary>
+			/// <param name="ArchiveFileStream">The compressed data.</param>
+			/// <param name="DecompressedFileStream">The decompressed data to put to.</param>
+			/// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
+			public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
 			{
-				if (ArchiveFileStream.CanRead == false) {return false;}
-				if (DecompressedFileStream.CanWrite == false) {return false;}
+				if (ArchiveFileStream.CanRead == false) { return false; }
+				if (DecompressedFileStream.CanWrite == false) { return false; }
 				try
 				{
-					using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(ArchiveFileStream , System.IO.Compression.CompressionMode.Decompress))
+					using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(ArchiveFileStream, System.IO.Compression.CompressionMode.Decompress))
 					{
 						DCMP.CopyTo(DecompressedFileStream);
 					}
@@ -2793,27 +2928,27 @@ namespace ROOT
 				}
 				return true;
 			}
-			
+
 		}
-		
+
 		/// <summary>
 		/// Archive files using the well-known ZIP format.
 		/// </summary>
 		public class ZipArchives
 		{
-            /// <summary>
-            /// Extract all the contents of a ZIP file to the specified directory path.
-            /// </summary>
-            /// <param name="PathOfZip">The archive file.</param>
-            /// <param name="PathToExtract">The directory to put the extracted data.</param>
-            /// <returns><c>true</c> if extraction succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean ExtractZipFileToSpecifiedLocation(System.String PathOfZip,System.String PathToExtract)
+			/// <summary>
+			/// Extract all the contents of a ZIP file to the specified directory path.
+			/// </summary>
+			/// <param name="PathOfZip">The archive file.</param>
+			/// <param name="PathToExtract">The directory to put the extracted data.</param>
+			/// <returns><c>true</c> if extraction succeeded; otherwise , <c>false</c>.</returns>
+			public static System.Boolean ExtractZipFileToSpecifiedLocation(System.String PathOfZip, System.String PathToExtract)
 			{
-				if (!(System.IO.File.Exists(PathOfZip))) {return false;}
-				if (!(System.IO.Directory.Exists(PathToExtract))) {return false;}
+				if (!(System.IO.File.Exists(PathOfZip))) { return false; }
+				if (!(System.IO.Directory.Exists(PathToExtract))) { return false; }
 				try
 				{
-					System.IO.Compression.ZipFile.ExtractToDirectory(PathOfZip , PathToExtract);
+					System.IO.Compression.ZipFile.ExtractToDirectory(PathOfZip, PathToExtract);
 				}
 				catch (System.Exception EX)
 				{
@@ -2823,19 +2958,19 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Create a new ZIP archive by capturing data from a specified directory.
-            /// </summary>
-            /// <param name="PathOfZipToMake">The file path that the archive will be created.</param>
-            /// <param name="PathToCollect">The directory path to capture data from.</param>
-            /// <returns><c>true</c> if the operation succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean MakeZipFromDir(System.String PathOfZipToMake ,System.String PathToCollect)
+			/// <summary>
+			/// Create a new ZIP archive by capturing data from a specified directory.
+			/// </summary>
+			/// <param name="PathOfZipToMake">The file path that the archive will be created.</param>
+			/// <param name="PathToCollect">The directory path to capture data from.</param>
+			/// <returns><c>true</c> if the operation succeeded; otherwise , <c>false</c>.</returns>
+			public static System.Boolean MakeZipFromDir(System.String PathOfZipToMake, System.String PathToCollect)
 			{
-				if (System.String.IsNullOrEmpty(PathOfZipToMake)) {return false;}
-				if (!(System.IO.Directory.Exists(PathToCollect))) {return false;}
+				if (System.String.IsNullOrEmpty(PathOfZipToMake)) { return false; }
+				if (!(System.IO.Directory.Exists(PathToCollect))) { return false; }
 				try
 				{
-					System.IO.Compression.ZipFile.CreateFromDirectory(PathToCollect , PathOfZipToMake);
+					System.IO.Compression.ZipFile.CreateFromDirectory(PathToCollect, PathOfZipToMake);
 				}
 				catch (System.Exception EX)
 				{
@@ -2845,13 +2980,13 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Create a new ZIP archive stream so as to customize it.
-            /// </summary>
-            /// <param name="PathofZipToCreate">The file path of the archive to be created , or the existing one , if modified.</param>
-            /// <param name="ArchModeSelector">One of the <see cref="ZipArchiveMode"/> enumerations which indicate at which mode the archive should be opened.</param>
-            /// <returns>A new <see cref="ZipArchive"/> object if the command was sucessfull ; otherwise , <c>null</c>.</returns>
-            public static System.IO.Compression.ZipArchive InitZipFileStream(System.String PathofZipToCreate,System.IO.Compression.ZipArchiveMode ArchModeSelector)
+			/// <summary>
+			/// Create a new ZIP archive stream so as to customize it.
+			/// </summary>
+			/// <param name="PathofZipToCreate">The file path of the archive to be created , or the existing one , if modified.</param>
+			/// <param name="ArchModeSelector">One of the <see cref="ZipArchiveMode"/> enumerations which indicate at which mode the archive should be opened.</param>
+			/// <returns>A new <see cref="ZipArchive"/> object if the command was sucessfull ; otherwise , <c>null</c>.</returns>
+			public static System.IO.Compression.ZipArchive InitZipFileStream(System.String PathofZipToCreate, System.IO.Compression.ZipArchiveMode ArchModeSelector)
 			{
 				if ((!(System.IO.File.Exists(PathofZipToCreate))) && (System.Convert.ToInt32(ArchModeSelector) != 2))
 				{
@@ -2860,7 +2995,7 @@ namespace ROOT
 				}
 				try
 				{
-					return System.IO.Compression.ZipFile.Open(PathofZipToCreate , ArchModeSelector);
+					return System.IO.Compression.ZipFile.Open(PathofZipToCreate, ArchModeSelector);
 				}
 				catch (System.Exception EX)
 				{
@@ -2868,7 +3003,7 @@ namespace ROOT
 					return null;
 				}
 			}
-			
+
 			/// <summary>
 			/// Add a new file to the root directory of the ZIP archive.
 			/// </summary>
@@ -2876,13 +3011,13 @@ namespace ROOT
 			/// <param name="ArchFileStream">The alive <see cref="ZipArchive"/> stream to write data to.</param>
 			/// <param name="CompLevel">The compression level that should be applied to the file.</param>
 			/// <returns><c>true</c> if the file was added to the stream; otherwise , <c>false</c>.</returns>
-			public static System.Boolean AddNewFileEntryToZip(System.String Path ,System.IO.Compression.ZipArchive ArchFileStream ,System.IO.Compression.CompressionLevel CompLevel)
+			public static System.Boolean AddNewFileEntryToZip(System.String Path, System.IO.Compression.ZipArchive ArchFileStream, System.IO.Compression.CompressionLevel CompLevel)
 			{
-				if (!(System.IO.File.Exists(Path))) {return false;}
+				if (!(System.IO.File.Exists(Path))) { return false; }
 				System.IO.FileInfo RDF = new System.IO.FileInfo(Path);
 				try
 				{
-					ArchFileStream.CreateEntryFromFile(RDF.FullName , RDF.Name , CompLevel);
+					ArchFileStream.CreateEntryFromFile(RDF.FullName, RDF.Name, CompLevel);
 				}
 				catch (System.Exception EX)
 				{
@@ -2892,23 +3027,23 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Add all the files detected in a <see cref="System.IO.FileSystemInfo"/>[] array to the root of the ZIP archive.
-            /// </summary>
-            /// <param name="PathofZipToCreate">The file path of the existing archive.</param>
-            /// <param name="InfoObject">The <see cref="System.IO.FileSystemInfo"/> array to purge and add the files to the archive.</param>
-            /// <param name="ENTCMPL">The compression level to apply while processing the files.</param>
-            /// <returns><c>true</c> if all the files were added to the archive.; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CreateZipArchiveViaFileSystemInfo(System.String PathofZipToCreate ,System.IO.FileSystemInfo[] InfoObject ,System.IO.Compression.CompressionLevel ENTCMPL )
+			/// <summary>
+			/// Add all the files detected in a <see cref="System.IO.FileSystemInfo"/>[] array to the root of the ZIP archive.
+			/// </summary>
+			/// <param name="PathofZipToCreate">The file path of the existing archive.</param>
+			/// <param name="InfoObject">The <see cref="System.IO.FileSystemInfo"/> array to purge and add the files to the archive.</param>
+			/// <param name="ENTCMPL">The compression level to apply while processing the files.</param>
+			/// <returns><c>true</c> if all the files were added to the archive.; otherwise , <c>false</c>.</returns>
+			public static System.Boolean CreateZipArchiveViaFileSystemInfo(System.String PathofZipToCreate, System.IO.FileSystemInfo[] InfoObject, System.IO.Compression.CompressionLevel ENTCMPL)
 			{
-				if (!(System.IO.File.Exists(PathofZipToCreate))) {return false;}
+				if (!(System.IO.File.Exists(PathofZipToCreate))) { return false; }
 				System.IO.FileStream Zipper = null;
 				try
 				{
-					Zipper = new(PathofZipToCreate , System.IO.FileMode.Open);
-					using (System.IO.Compression.ZipArchive ArchZip = new (Zipper , System.IO.Compression.ZipArchiveMode.Update))
+					Zipper = new(PathofZipToCreate, System.IO.FileMode.Open);
+					using (System.IO.Compression.ZipArchive ArchZip = new(Zipper, System.IO.Compression.ZipArchiveMode.Update))
 					{
-						foreach (System.IO.FileSystemInfo T in InfoObject) { if (T is System.IO.FileInfo) { ArchZip.CreateEntryFromFile(T.FullName , T.Name , ENTCMPL); } }
+						foreach (System.IO.FileSystemInfo T in InfoObject) { if (T is System.IO.FileInfo) { ArchZip.CreateEntryFromFile(T.FullName, T.Name, ENTCMPL); } }
 					}
 				}
 				catch (System.Exception EX)
@@ -2926,7 +3061,7 @@ namespace ROOT
 				}
 				return true;
 			}
-			
+
 		}
 
 		/// <summary>
@@ -2941,9 +3076,9 @@ namespace ROOT
 			/// <param name="DirToCapture">The directory to purge and add the files to the archive.</param>
 			/// <param name="OutputArchivePath">The archive output file path.</param>
 			/// <returns><c>true</c> if archiving succeeded; otherwise , <c>false</c>.</returns>
-			public static System.Boolean CompressFromDirectory(System.String DirToCapture , System.String OutputArchivePath)
-			{ 
-				if (! System.IO.Directory.Exists(DirToCapture)) { return false; }
+			public static System.Boolean CompressFromDirectory(System.String DirToCapture, System.String OutputArchivePath)
+			{
+				if (!System.IO.Directory.Exists(DirToCapture)) { return false; }
 				try
 				{
 					ExternalArchivingMethods.Cabinets.CabInfo CI = new(OutputArchivePath);
@@ -2953,7 +3088,7 @@ namespace ROOT
 					foreach (System.IO.FileSystemInfo FI in FileArray) { if (FI is System.IO.FileInfo) { FLT.Add(FI.Name); } }
 					CI.PackFiles(DirToCapture, FLT, FLT);
 					CI.Refresh();
-				} catch (System.Exception EX) 
+				} catch (System.Exception EX)
 				{
 					System.Console.WriteLine(EX.Message);
 					return false;
@@ -2961,21 +3096,21 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Decompresses all the files located in the archive to the specified directory.
-            /// </summary>
-            /// <param name="DestDir">The destination directory to unpack the files in.</param>
-            /// <param name="ArchiveFile">The archive file path from where the files will be extracted from.</param>
-            /// <returns><c>true</c> if decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressFromArchive(System.String DestDir , System.String ArchiveFile)
+			/// <summary>
+			/// Decompresses all the files located in the archive to the specified directory.
+			/// </summary>
+			/// <param name="DestDir">The destination directory to unpack the files in.</param>
+			/// <param name="ArchiveFile">The archive file path from where the files will be extracted from.</param>
+			/// <returns><c>true</c> if decompression succeeded; otherwise , <c>false</c>.</returns>
+			public static System.Boolean DecompressFromArchive(System.String DestDir, System.String ArchiveFile)
 			{
-				if (! System.IO.Directory.Exists(DestDir)) { return false; }
-				if (! System.IO.File.Exists(ArchiveFile)) { return false; }
+				if (!System.IO.Directory.Exists(DestDir)) { return false; }
+				if (!System.IO.File.Exists(ArchiveFile)) { return false; }
 				try
 				{
 					ExternalArchivingMethods.Cabinets.CabInfo CI = new(ArchiveFile);
 					CI.Unpack(DestDir);
-				} catch (System.Exception EX) 
+				} catch (System.Exception EX)
 				{
 					System.Console.WriteLine(EX.Message);
 					return false;
@@ -2983,24 +3118,24 @@ namespace ROOT
 				return true;
 			}
 
-            /// <summary>
-            /// Add a file to an existing archive. The archive must be valid and an existing one.
-            /// </summary>
-            /// <param name="FilePath">The file which you want to add.</param>
-            /// <param name="CabinetFile">The archive file to add the file to.</param>
-            /// <returns><c>true</c> if the file was added to the archive; otherwise , <c>false</c>.</returns>
-            public static System.Boolean AddAFileToCabinet(System.String FilePath ,  System.String CabinetFile)
+			/// <summary>
+			/// Add a file to an existing archive. The archive must be valid and an existing one.
+			/// </summary>
+			/// <param name="FilePath">The file which you want to add.</param>
+			/// <param name="CabinetFile">The archive file to add the file to.</param>
+			/// <returns><c>true</c> if the file was added to the archive; otherwise , <c>false</c>.</returns>
+			public static System.Boolean AddAFileToCabinet(System.String FilePath, System.String CabinetFile)
 			{
-				if (! System.IO.File.Exists(CabinetFile)) { return false; }
-				if (! System.IO.File.Exists(FilePath)) { return false; }
-				try 
+				if (!System.IO.File.Exists(CabinetFile)) { return false; }
+				if (!System.IO.File.Exists(FilePath)) { return false; }
+				try
 				{
 					System.IO.FileInfo FI = new System.IO.FileInfo(FilePath);
 					IList<System.String> IL = new List<System.String>();
 					IL.Add(FI.Name);
-					ExternalArchivingMethods.Cabinets.CabInfo CI = new (CabinetFile);
-					CI.PackFiles(FI.DirectoryName ,IL , IL);
-				} catch (System.Exception EX) 
+					ExternalArchivingMethods.Cabinets.CabInfo CI = new(CabinetFile);
+					CI.PackFiles(FI.DirectoryName, IL, IL);
+				} catch (System.Exception EX)
 				{
 					System.Console.WriteLine(EX.Message);
 					return false;
@@ -3009,29 +3144,29 @@ namespace ROOT
 			}
 
 		}
-	
+
 	}
-	
+
 	/// <summary>
 	/// This is used to mark an function when it is used to generate a warning that will be deprecated.
 	/// </summary>
 	internal class NoticeAttribute : System.Attribute
 	{
-		public NoticeAttribute(System.String FunctionName) 
+		public NoticeAttribute(System.String FunctionName)
 		{
 			MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
 				" for usage and will be obsoleted in the next release. Use instead the other one recommended.",
 				ConsoleColor.Red, ConsoleColor.Black);
 		}
 
-		public NoticeAttribute(System.String FunctionName , System.String Recommended)
+		public NoticeAttribute(System.String FunctionName, System.String Recommended)
 		{
 			MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
 				$" for usage and will be obsoleted in the next release. Use instead the {Recommended} function.",
 				ConsoleColor.Red, ConsoleColor.Black);
 		}
 
-		public override string ToString() 
+		public override string ToString()
 		{
 			return "#NOTICEATTRIBUTE#";
 		}
@@ -3044,25 +3179,25 @@ namespace ROOT
 	{
 		private System.DateTime _TimeEl_;
 		private System.Boolean _Init_ = false;
-		
+
 		/// <summary>
 		/// Use this method to clear and start counting.
 		/// </summary>
 		public void Init()
 		{
-			if (_Init_ == true) {return;}
+			if (_Init_ == true) { return; }
 			_TimeEl_ = Microsoft.VisualBasic.DateAndTime.Now;
 			_Init_ = true;
 			return;
 		}
-		
+
 		/// <summary>
 		/// Stop the counting and calculate the elapsed time.
 		/// </summary>
 		/// <returns>The time counted to milliseconds.</returns>
 		public System.Int32 CaculateTime()
 		{
-			if (_Init_ == false) {return -1;}
+			if (_Init_ == false) { return -1; }
 			try
 			{
 				_Init_ = false;
@@ -3074,22 +3209,22 @@ namespace ROOT
 				return -1;
 			}
 		}
-		
+
 		/// <summary>
 		/// Use the Dispose method to clear up the values so as to prepare it again to count up.
 		/// </summary>
-		public void Dispose() {DisposeResources();}
-		
+		public void Dispose() { DisposeResources(); }
+
 		private void DisposeResources()
 		{
-			#pragma warning disable CS0219
+#pragma warning disable CS0219
 			System.Object _TimeEl_ = null;
 			System.Object _Init_ = null;
-			#pragma warning restore CS0219
+#pragma warning restore CS0219
 		}
 	}
 
-    /*
+	/*
 	 *	This is a simple console progress bar. 
 	 * Had you ever wanted to represent to console a progress of an action?
 	 * Now you can with this easy-to-use and simple class.
@@ -3131,35 +3266,35 @@ namespace ROOT
 	   }
 	*/
 
-    internal class ProgressChangedArgs : System.EventArgs
-    {
-        private System.Int32 changedto;
-        private System.Boolean ch = false;
+	internal class ProgressChangedArgs : System.EventArgs
+	{
+		private System.Int32 changedto;
+		private System.Boolean ch = false;
 
-        public System.Boolean Changed
-        {
-            get { return ch; }
-            set { ch = value; }
-        }
+		public System.Boolean Changed
+		{
+			get { return ch; }
+			set { ch = value; }
+		}
 
-        public System.Int32 ChangedValueTo
-        {
-            get { return changedto; }
-            set { changedto = value; }
-        }
+		public System.Int32 ChangedValueTo
+		{
+			get { return changedto; }
+			set { changedto = value; }
+		}
 
-        public ProgressChangedArgs(System.Int32 ChangedValue)
-        {
-            Changed = true;
-            changedto = ChangedValue;
-        }
-    }
+		public ProgressChangedArgs(System.Int32 ChangedValue)
+		{
+			Changed = true;
+			changedto = ChangedValue;
+		}
+	}
 
 
-    /// <summary>
-    /// A simple and to-the-point console progress bar class.
-    /// </summary>
-    public class SimpleProgressBar
+	/// <summary>
+	/// A simple and to-the-point console progress bar class.
+	/// </summary>
+	public class SimpleProgressBar
 	{
 		private System.String Progr = "Completed";
 		private System.String Progm = "";
@@ -3246,7 +3381,7 @@ namespace ROOT
 			end = End;
 		}
 
-		
+
 		/// <summary>
 		/// The Progress char that will be used inside the bar ([...])
 		/// </summary>
@@ -3348,7 +3483,7 @@ namespace ROOT
 
 	namespace IntuitiveInteraction
 	{
-		#pragma warning disable CS1591
+#pragma warning disable CS1591
 		/// <summary>
 		/// An enumeration of <see cref="System.Int32" /> that hold valid icon images allowed be shown when the class 
 		/// <see cref="IntuitiveMessageBox"/> is invoked.
@@ -3397,12 +3532,12 @@ namespace ROOT
 			Ignore = 7,
 			NotAnAnswer = Error | Cancel
 		}
-		#pragma warning restore CS1591
+#pragma warning restore CS1591
 
-        /// <summary>
-        /// A class that extends the default <see cref="Microsoft.VisualBasic.Interaction.InputBox"/> method.
-        /// </summary>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// A class that extends the default <see cref="Microsoft.VisualBasic.Interaction.InputBox"/> method.
+		/// </summary>
+		[SupportedOSPlatform("windows")]
 		public class GetAStringFromTheUser : System.IDisposable
 		{
 			private Form Menu = new();
@@ -3424,13 +3559,14 @@ namespace ROOT
 			/// <remarks>Do not forget to invoke the dialog using the <see cref="Invoke"/> function.</remarks>
 			public GetAStringFromTheUser() { }
 
-			/// <summary>
-			/// Constructor Option 2: Define the arguments required at once , run the dialog and then dispose it.
-			/// </summary>
-			/// <param name="Prompt">A message prompting the User what he should type inside the input box.</param>
-			/// <param name="Title">The dialog's title.</param>
-			/// <param name="DefaultResponse">The default response or an example of the data to be provided by the User.</param>
-			public GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
+            /// <summary>
+            /// Constructor Option 2: Define the arguments required at once , run the dialog and then dispose it.
+            /// </summary>
+            /// <param name="Prompt">A message prompting the User what he should type inside the input box.</param>
+            /// <param name="Title">The dialog's title.</param>
+            /// <param name="DefaultResponse">The default response or an example of the data to be provided by the User.</param>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
 			{
 				Prompt_msg = Prompt;
 				Title_msg = Title;
@@ -3470,10 +3606,11 @@ namespace ROOT
 				set { Title_msg = value; }
 			}
 
-			/// <summary>
-			/// Invokes the User Input Box. Use it when you have used the parameterless constructor.
-			/// </summary>
-			public void Invoke()
+            /// <summary>
+            /// Invokes the User Input Box. Use it when you have used the parameterless constructor.
+            /// </summary>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public void Invoke()
 			{
 				HANDLE += Button_click;
 				Initiate();
@@ -3531,7 +3668,8 @@ namespace ROOT
 				return;
 			}
 
-			private protected void Initiate()
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            private protected void Initiate()
 			{
 				Label1.SuspendLayout();
 				Button1.SuspendLayout();
@@ -3589,7 +3727,6 @@ namespace ROOT
 				Menu.ShowDialog();
 			}
 		}
-
 		/// <summary>
 		/// A class that extends the <see cref="System.Windows.Forms.MessageBox"/> class by adding it new features.
 		/// </summary>
@@ -3613,14 +3750,15 @@ namespace ROOT
 
 			private event System.EventHandler ButtonHandle;
 
-			/// <summary>
-			/// Constructor Option 1:  Define all the arguments at once , run the dialog and dispose the class.
-			/// </summary>
-			/// <param name="Message">The text of the information to show to the user.</param>
-			/// <param name="Title">The message box title to show.</param>
-			/// <param name="Buttons">The buttons that will be shown to the User.</param>
-			/// <param name="Ic">The Icon that will be shown to the user. Can also be <see cref="IconSelection.None"/>.</param>
-			public IntuitiveMessageBox(System.String Message, System.String Title, ButtonSelection Buttons, IconSelection Ic)
+            /// <summary>
+            /// Constructor Option 1:  Define all the arguments at once , run the dialog and dispose the class.
+            /// </summary>
+            /// <param name="Message">The text of the information to show to the user.</param>
+            /// <param name="Title">The message box title to show.</param>
+            /// <param name="Buttons">The buttons that will be shown to the User.</param>
+            /// <param name="Ic">The Icon that will be shown to the user. Can also be <see cref="IconSelection.None"/>.</param>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public IntuitiveMessageBox(System.String Message, System.String Title, ButtonSelection Buttons, IconSelection Ic)
 			{
 				ButtonHandle += Button_Click;
 				_MSG = Message;
@@ -3652,11 +3790,12 @@ namespace ROOT
 				_TITLE = Title;
 			}
 
-			/// <summary>
-			/// The Dispose function clears up the resources used by the Message Box and then invalidates the class.
-			/// </summary>
-			/// <remarks>This function also implements the <see cref="System.IDisposable"/> interface.</remarks>
-			public void Dispose()
+            /// <summary>
+            /// The Dispose function clears up the resources used by the Message Box and then invalidates the class.
+            /// </summary>
+            /// <remarks>This function also implements the <see cref="System.IDisposable"/> interface.</remarks>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public void Dispose()
 			{
 				if (ButtonHandle != null) { ButtonHandle -= Button_Click; }
 				Label1.Dispose();
@@ -3704,46 +3843,46 @@ namespace ROOT
 				Menu.Close();
 				if (BSL == 0)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 1; }
+					if (sender == Button1) { BTR = (ButtonReturned)1; }
 				}
-				if (BSL == (ButtonSelection) 1)
+				if (BSL == (ButtonSelection)1)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 4; }
-					if (sender == Button2) { BTR = (ButtonReturned) 3; }
+					if (sender == Button1) { BTR = (ButtonReturned)4; }
+					if (sender == Button2) { BTR = (ButtonReturned)3; }
 				}
-				if (BSL == (ButtonSelection) 2)
+				if (BSL == (ButtonSelection)2)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 2; }
-					if (sender == Button2) { BTR = (ButtonReturned) 1; }
+					if (sender == Button1) { BTR = (ButtonReturned)2; }
+					if (sender == Button2) { BTR = (ButtonReturned)1; }
 				}
-				if (BSL == (ButtonSelection) 3)
+				if (BSL == (ButtonSelection)3)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 5; }
-					if (sender == Button2) { BTR = (ButtonReturned) 6; }
+					if (sender == Button1) { BTR = (ButtonReturned)5; }
+					if (sender == Button2) { BTR = (ButtonReturned)6; }
 				}
-				if (BSL == (ButtonSelection) 4)
+				if (BSL == (ButtonSelection)4)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 5; }
-					if (sender == Button2) { BTR = (ButtonReturned) 2; }
+					if (sender == Button1) { BTR = (ButtonReturned)5; }
+					if (sender == Button2) { BTR = (ButtonReturned)2; }
 				}
-				if (BSL == (ButtonSelection) 5)
+				if (BSL == (ButtonSelection)5)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 7; }
-					if (sender == Button2) { BTR = (ButtonReturned) 2; }
+					if (sender == Button1) { BTR = (ButtonReturned)7; }
+					if (sender == Button2) { BTR = (ButtonReturned)2; }
 				}
-				if (BSL == (ButtonSelection) 6)
+				if (BSL == (ButtonSelection)6)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 2; }
-					if (sender == Button2) { BTR = (ButtonReturned) 4; }
-					if (sender == Button3) { BTR = (ButtonReturned) 3; }
+					if (sender == Button1) { BTR = (ButtonReturned)2; }
+					if (sender == Button2) { BTR = (ButtonReturned)4; }
+					if (sender == Button3) { BTR = (ButtonReturned)3; }
 				}
-				if (BSL == (ButtonSelection) 7)
+				if (BSL == (ButtonSelection)7)
 				{
-					if (sender == Button1) { BTR = (ButtonReturned) 5; }
-					if (sender == Button2) { BTR = (ButtonReturned) 4; }
-					if (sender == Button3) { BTR = (ButtonReturned) 3; }
+					if (sender == Button1) { BTR = (ButtonReturned)5; }
+					if (sender == Button2) { BTR = (ButtonReturned)4; }
+					if (sender == Button3) { BTR = (ButtonReturned)3; }
 				}
-				if (BSL == (ButtonSelection) 8)
+				if (BSL == (ButtonSelection)8)
 				{
 					if (sender == Button1) { BTR = (ButtonReturned)6; }
 					if (sender == Button2) { BTR = (ButtonReturned)2; }
@@ -3752,18 +3891,20 @@ namespace ROOT
 				return;
 			}
 
-			/// <summary>
-			/// Invokes the Message Box based on the current settings done by the User.
-			/// </summary>
-			/// <remarks>Do not forget to dispose the class by using the <see cref="Dispose"/> function.</remarks>
-			public void InvokeInstance()
+            /// <summary>
+            /// Invokes the Message Box based on the current settings done by the User.
+            /// </summary>
+            /// <remarks>Do not forget to dispose the class by using the <see cref="Dispose"/> function.</remarks>
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public void InvokeInstance()
 			{
 				MakeAndInitDialog(BSL, SELI);
 				ButtonHandle -= Button_Click;
 				this.Dispose();
 			}
 
-			private protected void MakeAndInitDialog(ButtonSelection Butt, IconSelection Icon)
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            private protected void MakeAndInitDialog(ButtonSelection Butt, IconSelection Icon)
 			{
 				// The below statements select the appropriate image to be shown each time.
 				// Although that these are icons , 
@@ -3811,7 +3952,7 @@ namespace ROOT
 				System.Boolean CWC = false;
 				// A temporary value that will compare if the temporary one is larger than the other.
 				System.Int32 CWCM = 0;
-                for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++)
+				for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++)
 				{
 					// The required padding for Microsoft Sans Serif is 15.
 					if (FindNL_S[DI] == '\n') { CH += 15; CWC = true; } else { CWCM += 5; }
@@ -3821,12 +3962,12 @@ namespace ROOT
 				}
 				// Test if we don't have any '\n' s.
 				System.Boolean CWH = true;
-                for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++) { if (FindNL_S[DI] == '\n') { CWH = false; } }
+				for (System.Int32 DI = 0; DI < FindNL_S.Length; DI++) { if (FindNL_S[DI] == '\n') { CWH = false; } }
 				// This special case is executed when the above statement does not have detected any \n s.
 				// The numbers are really approximate; these were random math until the wanted situation was performed.
-				if (CWH) { CH = 14;  CW = (FindNL_S.Length + 10) * 4; }
+				if (CWH) { CH = 14; CW = (FindNL_S.Length + 10) * 4; }
 				CWH = false;
-                CWCM = 0;
+				CWCM = 0;
 				FindNL_S = null;
 				// -->
 				Label1.ResumeLayout();
@@ -3843,11 +3984,11 @@ namespace ROOT
 				Button3.SuspendLayout();
 				Button1.Location = new System.Drawing.Point(Label1.Location.X + CW - 18, Panel1.Location.Y + 10);
 				Button1.Size = new System.Drawing.Size(65, 20);
-                Button2.Location = new System.Drawing.Point(Button1.Left - 75, Button1.Top);
+				Button2.Location = new System.Drawing.Point(Button1.Left - 75, Button1.Top);
 				Button2.Size = Button1.Size;
-                Button3.Location = new System.Drawing.Point(Button2.Left - 75, Button1.Top);
+				Button3.Location = new System.Drawing.Point(Button2.Left - 75, Button1.Top);
 				Button3.Size = Button1.Size;
-                Panel1.Size = new System.Drawing.Size(PictureBox1.Size.Width + Label1.Location.X + CW + 35, 60);
+				Panel1.Size = new System.Drawing.Size(PictureBox1.Size.Width + Label1.Location.X + CW + 35, 60);
 				// Selection workflow; These statements select which buttons are shown , and determine the dialog.
 				if (Butt == 0)
 				{
@@ -3858,7 +3999,7 @@ namespace ROOT
 					Menu.Controls.Add(Button1);
 					Button1.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 1)
+				if (Butt == (ButtonSelection)1)
 				{
 					Button1.Text = "No";
 					Button2.Text = "Yes";
@@ -3868,7 +4009,7 @@ namespace ROOT
 					Button1.Click += ButtonHandle;
 					Button2.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 2)
+				if (Butt == (ButtonSelection)2)
 				{
 					Button1.Text = "Cancel";
 					Button2.Text = "OK";
@@ -3878,7 +4019,7 @@ namespace ROOT
 					Button1.Click += ButtonHandle;
 					Button2.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 3)
+				if (Butt == (ButtonSelection)3)
 				{
 					Button1.Text = "Retry";
 					Button2.Text = "Abort";
@@ -3888,7 +4029,7 @@ namespace ROOT
 					Button1.Click += ButtonHandle;
 					Button2.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 4)
+				if (Butt == (ButtonSelection)4)
 				{
 					Button1.Text = "Retry";
 					Button2.Text = "Cancel";
@@ -3898,7 +4039,7 @@ namespace ROOT
 					Button1.Click += ButtonHandle;
 					Button2.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 5)
+				if (Butt == (ButtonSelection)5)
 				{
 					Button1.Text = "Ignore";
 					Button2.Text = "Cancel";
@@ -3908,7 +4049,7 @@ namespace ROOT
 					Button1.Click += ButtonHandle;
 					Button2.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 6)
+				if (Butt == (ButtonSelection)6)
 				{
 					Button1.Text = "Cancel";
 					Button2.Text = "No";
@@ -3920,7 +4061,7 @@ namespace ROOT
 					Button2.Click += ButtonHandle;
 					Button3.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 7)
+				if (Butt == (ButtonSelection)7)
 				{
 					Button1.Text = "Retry";
 					Button2.Text = "No";
@@ -3932,7 +4073,7 @@ namespace ROOT
 					Button2.Click += ButtonHandle;
 					Button3.Click += ButtonHandle;
 				}
-				if (Butt == (ButtonSelection) 8)
+				if (Butt == (ButtonSelection)8)
 				{
 					Button1.Text = "Abort";
 					Button2.Text = "Cancel";
@@ -3971,6 +4112,215 @@ namespace ROOT
 		}
 	}
 
+	#pragma warning disable CS1584, CS1658, CS1001
+    /// <summary>
+    /// This <see langword="struct" /> bears a resemblance to the <see cref="System.Collections.ArrayList"/> , 
+    /// but this extends it's functionality and it's aim is to work only with <see cref="System.Byte"/> data.
+    /// It is useful also for interplaying between an array and a generic <see cref="IList{T}"/>
+    /// collection , which it combines the advantages that both provide.
+    /// </summary>
+    /// <remarks>
+    /// <para> This <see langword="struct" /> implements the <see cref="IList{T}"/> interface. </para>
+    /// <para> Note: <see cref="{T}"/> is <see cref="System.Byte"/>. </para>
+    /// </remarks>
+	#pragma warning restore CS1584, CS1658, CS1001
+    public struct ModifidableBuffer : System.Collections.Generic.IList<System.Byte>
+    {
+        private readonly System.Collections.Specialized.OrderedDictionary _dict = new();
+        private System.Int32 Iter = 0;
+
+		/// <summary>
+		/// Initialise a new modifidable buffer with no data in it.
+		/// </summary>
+        public ModifidableBuffer() { }
+
+        /// <summary>
+        /// Initialise a new modifidable buffer and populate it with data taken 
+        /// from a instantiated <see cref="System.Byte"/>[] array. 
+        /// </summary>
+        /// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ModifidableBuffer(System.Byte[] Value) { for (System.Int32 O = 0; O < Value.Length; O++) { Add(Value[O]); } }
+
+        /// <summary>
+        /// Initialise a new modifidable buffer and populate it with data taken 
+		/// from a instantiated <see cref="System.Byte"/>[] array. 
+        /// </summary>
+        /// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
+        /// <param name="Index">The index that this instance will start 
+		/// saving data from <paramref name="Value"/> parameter.</param>
+        /// <param name="Count">How many elements to 
+		/// copy from the <paramref name="Value"/> array.</param>
+        /// <exception cref="InvalidOperationException">Index parameter is not allowed to be more than Count parameter.</exception>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ModifidableBuffer(System.Byte[] Value, System.Int32 Index, System.Int32 Count)
+        {
+            if (Index >= Count) { throw new InvalidOperationException("Index parameter is not allowed to be more than Count parameter."); }
+            for (System.Int32 O = Index; O < Count; O++) { Add(Value[O]); }
+        }
+
+        /// <inheritdoc />
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public System.Int32 IndexOf(System.Byte Value)
+        {
+            foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+            {
+                if (DE.Value == Value) { return DE.Key; }
+            }
+            return -1;
+        }
+
+        /// <inheritdoc />
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public void Insert(System.Int32 Index, System.Byte Value)
+        {
+            try
+            {
+                System.Boolean Flag = false;
+                foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+                {
+                    if (DE.Key == Index) { Flag = true; }
+                }
+                if (Flag) { _dict[Index] = Value; } else { Add(Value); }
+            }
+            catch (System.Exception EX)
+            {
+                throw new System.AggregateException("Could not add the specified value to the dictionary.", EX);
+            }
+        }
+
+        /// <inheritdoc />
+		/// <remarks>Be careful when removing entries , this will make the whole data
+		/// array to shift by one and cover up the blank entry. Using this method
+		/// can result to data corruption.</remarks>
+        public void RemoveAt(System.Int32 Index) { _dict.Remove(Index); Iter--; }
+
+		/// <summary>
+		/// Adds a new entry to this instance.
+		/// </summary>
+		/// <param name="Value">The <see cref="System.Byte"/> value to add to the newly created entry.</param>
+		/// <exception cref="System.AggregateException">Thrown when the adding was failed for a reason.</exception>
+        public void Add(System.Byte Value)
+        {
+            try
+            {
+                _dict.Add(Iter, Value);
+                Iter++;
+            }
+            catch (System.Exception EX)
+            {
+                throw new System.AggregateException($"Could not add the specified value to the dictionary.", EX);
+            }
+        }
+
+        /// <inheritdoc />
+        public System.Byte this[System.Int32 Index]
+        {
+            get { return (System.Byte) _dict[Index]; }
+            set { Insert(Index, value); }
+        }
+
+		/// <summary>
+		/// Adds empty entries specified by the Times <see cref="System.Int32"/> .
+		/// </summary>
+		/// <param name="Times">The number of empty entries to add.</param>
+        public void AddEntries(System.Int32 Times) { for (System.Int32 I = 0; I < Times; I++) { _dict.Add(Iter++, 0); } }
+
+        /// <inheritdoc />
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public void CopyTo(System.Byte[] Array, System.Int32 Index)
+        {
+            System.Int32 tmp = 0;
+            for (System.Int32 I = Index; I < Iter; I++) { Array[tmp] = (System.Byte)_dict[I]; tmp++; }
+        }
+
+        /// <summary>
+        /// The <see cref="ToArray()"/> method gets all the data representing the current buffer , and returns them
+        /// as a one-dimensional and fixed <see cref="System.Byte"/>[] array.
+        /// </summary>
+        /// <returns>The data which this <see langword="struct"/> holds.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public System.Byte[] ToArray()
+        {
+            System.Byte[] bytes = new System.Byte[Iter];
+            CopyTo(bytes, 0);
+            return bytes;
+        }
+
+		/// <inheritdoc />
+        public System.Int32 Count { get { return Iter; } }
+
+        /// <inheritdoc />
+        public void Clear() { _dict.Clear(); Iter = 0; }
+
+        /// <inheritdoc />
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public System.Boolean Contains(System.Byte item)
+        {
+            foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+            {
+                if (DE.Value == item) { return true; }
+            }
+            return false;
+        }
+
+        /// <inheritdoc />
+		/// <remarks>Note: This property always returns <c>false</c>.</remarks>
+        public System.Boolean IsReadOnly { get { return false; } }
+
+        /// <inheritdoc />
+		/// <remarks>Be careful when removing entries , this will make the whole data
+		/// array to shift by one and cover up the blank entry. Using this method
+		/// can result to data corruption.</remarks>
+        public System.Boolean Remove(System.Byte item)
+        {
+            if (IndexOf(item) == -1) { return false; }
+            try
+            {
+                _dict.Remove(IndexOf(item));
+				Iter--;
+            }
+            catch { return false; }
+            return true;
+        }
+
+        IEnumerator<System.Byte> IEnumerable<System.Byte>.GetEnumerator()
+        {
+            System.Collections.Generic.IList<System.Byte> result = new System.Byte[_dict.Count];
+            for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
+            return result.GetEnumerator();
+        }
+
+        /// <inheritdoc />
+        public System.Collections.IEnumerator GetEnumerator()
+        {
+            System.Collections.IList result = new System.Byte[_dict.Count];
+            for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
+            return result.GetEnumerator();
+        }
+    
+		/// <summary>
+		/// Returns the byte data , but as an hexadecimal <see cref="System.String"/> , if it fits to one.
+		/// Otherwise , the <see cref="System.String"/> representation of this type.
+		/// </summary>
+		/// <returns>The <see cref="System.Byte"/> data kept by this instance as a 
+		/// <see cref="System.String"/> , otherwise 
+		/// the <see cref="System.String"/> representation of this type.</returns>
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public override System.String ToString()
+		{
+			System.String Thestring = null;
+			try
+			{
+				for (System.Int32 I = 0; I < Iter; I++)
+				{
+					Thestring += this[I].ToString("x2");
+				}
+				return Thestring;
+			} catch { return GetType().ToString(); }
+		}
+	}
+
 }
 
 namespace ExternalHashCaculators
@@ -3978,19 +4328,23 @@ namespace ExternalHashCaculators
     //A Collection Namespace for computing hash values from external generated libraries.
 
     /// <summary>
-    /// xxHash is a fast non-cryptographic hash digest. This is a wrapper for the unmanaged library.
+    /// <para> xxHash is a fast non-cryptographic hash digest. </para> 
+	/// <para>
+	/// This is a wrapper for the unmanaged library.
     /// Note that you can run this only on AMD64 machines and you must have the library where the 
     /// application's current directory is.
+	/// </para>
     /// </summary>
     [SupportedOSPlatform("windows")]
     public static class XXHash
 	{
-		// xxHash Hash caculator system.
-		// It is a fast , non-cryptographic algorithm , as described from Cyan4973.
-		// It is also used by the zstd archiving protocol , so as to check and the file integrity.
-		// The version imported here is 0.8.1.
-		
-		private static System.Boolean _CheckDLLVer()
+        // xxHash Hash caculator system.
+        // It is a fast , non-cryptographic algorithm , as described from Cyan4973.
+        // It is also used by the zstd archiving protocol , so as to check and the file integrity.
+        // The version imported here is 0.8.1.
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static System.Boolean _CheckDLLVer()
 		{
 			if (!(System.IO.File.Exists(@".\xxhash.dll"))) {return false;}
 			if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
@@ -4005,23 +4359,27 @@ namespace ExternalHashCaculators
 		private sealed class XXHASHMETHODS
 		{
 			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
+			[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 			public static extern System.Int32 XXH32(System.Byte[] buffer ,
 			System.Int32 size ,System.Int32 seed = 0);
 			
 			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
-			public static extern System.Int32 XXH64(System.Byte[] buffer ,
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 XXH64(System.Byte[] buffer ,
 			System.Int32 size ,System.Int32 seed = 0);
 			
 			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
-			public static extern System.Int32 XXH_versionNumber();
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 XXH_versionNumber();
 		}
-		
-		/// <summary>
-		/// Computes a file hash by using the XXH32 function.
-		/// </summary>
-		/// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
-		/// <returns>A caculated xxHash32 value written as an hexadecimal <see cref="System.String"/>.</returns>
-		public static System.String xxHash_32(System.IO.FileStream FileStream)
+
+        /// <summary>
+        /// Computes a file hash by using the XXH32 function.
+        /// </summary>
+        /// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+        /// <returns>A caculated xxHash32 value written as an hexadecimal <see cref="System.String"/>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String xxHash_32(System.IO.FileStream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
 			if (FileStream.Length < 20) {return "Error";}
@@ -4040,13 +4398,46 @@ namespace ExternalHashCaculators
 			return EFR.ToString("x2");
 		}
 
-		/// <summary>
-		/// Computes a file hash by using the XXH64 function.
-		/// </summary>
-		/// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
-		/// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
-		/// <remarks>This function performs well only on AMD64 machines; it's performance is degraded when working on IA32.</remarks>
-		public static System.String xxHash_64(System.IO.FileStream FileStream)
+        /// <summary>
+        /// Computes a <see cref="System.Byte"/>[] array by using the XXH32 function.
+        /// </summary>
+        /// <param name="Data">The <see cref="System.Byte"/>[] array to get the hash from.</param>
+        /// <param name="Length">The length of the <paramref name="Data"/> 
+        /// <see cref="System.Byte"/>[] .</param>
+        /// <param name="Seed">The Seed to use for calculating the hash. Can be 0.</param>
+        /// <returns>A caculated xxHash32 value written as an hexadecimal <see cref="System.String"/>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String xxHash_32(System.Byte[] Data , System.Int32 Length , System.Int32 Seed)
+		{
+			if (!(_CheckDLLVer())) { return "Error"; }
+            System.Int32 EFR = XXHASHMETHODS.XXH32(Data , Length, Seed);
+            return EFR.ToString("x2");
+        }
+
+        /// <summary>
+        /// Computes a <see cref="System.Byte"/>[] array by using the XXH64 function.
+        /// </summary>
+        /// <param name="Data">The <see cref="System.Byte"/>[] array to get the hash from.</param>
+        /// <param name="Length">The length of the <paramref name="Data"/> 
+        /// <see cref="System.Byte"/>[] .</param>
+        /// <param name="Seed">The Seed to use for calculating the hash. Can be 0.</param>
+        /// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String xxHash_64(System.Byte[] Data, System.Int32 Length, System.Int32 Seed)
+        {
+            if (!(_CheckDLLVer())) { return "Error"; }
+            System.Int32 EFR = XXHASHMETHODS.XXH64(Data, Length, Seed);
+            return EFR.ToString("x2");
+        }
+
+        /// <summary>
+        /// Computes a file hash by using the XXH64 function.
+        /// </summary>
+        /// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+        /// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
+        /// <remarks>This function performs well only on AMD64 machines; it's performance is degraded when working on IA32.</remarks>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String xxHash_64(System.IO.FileStream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
 			if (FileStream.Length < 20) {return "Error";}
@@ -4074,27 +4465,30 @@ namespace ExternalArchivingMethods
     // A Collection Namespace for making archives outside Microsoft's managed code.
 
     /// <summary>
-    /// zstd is a fast compression algorithm maintained by Facebook. This is a wrapper for the unmanaged library.
+    /// <para> zstd is a fast compression algorithm maintained by Facebook. </para> 
+	/// <para>
+	/// This is a wrapper for the unmanaged library.
     /// Note that you can run this only on AMD64 machines and you must have the library where the 
-    /// application's current directory is.
+    /// application's current directory is. </para>
     /// </summary>
     [SupportedOSPlatform("windows")]
     public static class ZstandardArchives
 	{
-		// Yes , this patch adds (Patch Version 1.5.4.0) the Zstandard Archive format.
-		// The runtime algorithm is built from the GitHub tree , version 1.5.2.0.
-		// This has the following advantages: 
-		//    1. The Dynamic-Link Library for the archive format is native C++.
-		//    2. This format is very efficient. It can compress and decompress data very fast.
-		//    3. The C algorithm that is comprised from is one of the most fast programming languages.
-		//    4. The project has only ported the original DLL. If you want to use this class , make sure
-		//    that you have ported that DLL to .\ . Note that you cannot run earlier versions than 1.5.2.0.
-		// NOTICE: the zstd.dll bundled with my API is being built by me.
-		// Because actually this API calls the library via unmanaged way (Not very safe)
-		// and requires the DLL path , use only updates which are either came from GitHub or other source that
-		// is reliable. However , it is still very safe and stable , of course.
-		
-		private static System.Boolean _CheckDLLVer()
+        // Yes , this patch adds (Patch Version 1.5.4.0) the Zstandard Archive format.
+        // The runtime algorithm is built from the GitHub tree , version 1.5.2.0.
+        // This has the following advantages: 
+        //    1. The Dynamic-Link Library for the archive format is native C++.
+        //    2. This format is very efficient. It can compress and decompress data very fast.
+        //    3. The C algorithm that is comprised from is one of the most fast programming languages.
+        //    4. The project has only ported the original DLL. If you want to use this class , make sure
+        //    that you have ported that DLL to .\ . Note that you cannot run earlier versions than 1.5.2.0.
+        // NOTICE: the zstd.dll bundled with my API is being built by me.
+        // Because actually this API calls the library via unmanaged way (Not very safe)
+        // and requires the DLL path , use only updates which are either came from GitHub or other source that
+        // is reliable. However , it is still very safe and stable , of course.
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static System.Boolean _CheckDLLVer()
 		{
 			if (System.IO.File.Exists(".\\zstd.dll") == false) { return false; }
 			if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
@@ -4148,45 +4542,55 @@ namespace ExternalArchivingMethods
 		{
 			// Proper API Calls defined in this class. DO NOT Modify.
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_compress(System.Byte[] dst ,System.Int32 dstCapacity , 
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_compress(System.Byte[] dst ,System.Int32 dstCapacity , 
 			System.Byte[] src ,System.Int32 srcCapacity ,ZSTDCMPLevel compressionLevel);
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_decompress(System.Byte[] dst ,System.Int32 dstCapacity , 
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_decompress(System.Byte[] dst ,System.Int32 dstCapacity , 
 			System.Byte[] src ,System.Int32 srcSize);
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int64 ZSTD_getFrameContentSize(System.Byte[] src ,System.Int32 srcSize);
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int64 ZSTD_getFrameContentSize(System.Byte[] src ,System.Int32 srcSize);
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_isError(System.Int32 code);
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_isError(System.Int32 code);
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_findFrameCompressedSize(System.Byte[] src ,System.Int32 srcSize);
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_findFrameCompressedSize(System.Byte[] src ,System.Int32 srcSize);
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_defaultCLevel();
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_defaultCLevel();
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_minCLevel();
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_minCLevel();
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_maxCLevel();
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_maxCLevel();
 			
 			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
-			public static extern System.Int32 ZSTD_versionNumber();
+            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+            public static extern System.Int32 ZSTD_versionNumber();
 			
 		}
-		
-		/// <summary>
-		/// Compress an alive <see cref="System.IO.FileStream"/> object that contains decompressed data and store the 
-		/// compressed data to another and empty <see cref="System.IO.FileStream"/> object.
-		/// </summary>
-		/// <param name="InputFile">The alive stream object containing the data to compress.</param>
-		/// <param name="ArchiveStream">The alive output stream which will contain the compressed data.</param>
-		/// <param name="CmpLevel">The compression level to apply.</param>
-		/// <returns><c>true</c> if the compression was succeeded; otherwise, <c>false</c>.</returns>
-		public static System.Boolean CompressAsFileStreams (System.IO.FileStream InputFile , 
+
+        /// <summary>
+        /// Compress an alive <see cref="System.IO.FileStream"/> object that contains decompressed data and store the 
+        /// compressed data to another and empty <see cref="System.IO.FileStream"/> object.
+        /// </summary>
+        /// <param name="InputFile">The alive stream object containing the data to compress.</param>
+        /// <param name="ArchiveStream">The alive output stream which will contain the compressed data.</param>
+        /// <param name="CmpLevel">The compression level to apply.</param>
+        /// <returns><c>true</c> if the compression was succeeded; otherwise, <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Boolean CompressAsFileStreams (System.IO.FileStream InputFile , 
 		System.IO.FileStream ArchiveStream, ZSTDCMPLevel CmpLevel)
 		{
 			// Start first by checking the DLL version.
@@ -4258,6 +4662,7 @@ namespace ExternalArchivingMethods
         /// <param name="ArchiveFileStream">The stream object that contains the compressed data.</param>
         /// <param name="DecompressedFileStream">The output file stream to save the data to.</param>
         /// <returns><c>true</c> if the decompression was succeeded; otherwise, <c>false</c>.</returns>
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.Boolean DecompressFileStreams (System.IO.FileStream ArchiveFileStream , System.IO.FileStream DecompressedFileStream)
 		{
 			// Start first by checking the DLL version.
@@ -4316,6 +4721,7 @@ namespace ExternalArchivingMethods
 			// Done.  All were sucessfully executed.
 			return true;
 		}
+	
 	}
 
 	// System.IO.FileStream DM = System.IO.File.OpenRead(@".\ZSEX.zst");

@@ -3,6 +3,10 @@
 // It is only a 3000-line code that makes it work.
 // And the best: Compiler is not complaining about the missing System.Resources.Extensions DLL , 
 // because it IS the DLL itself.
+// However , that triggers another problem: dotnet build does not work because msbuild
+// has not-preloaded the required data and the source code , something that happens only in
+// Visual Studio. Referencing the assembly will cause conflict errors; A solution will be found out
+// so as to tackle this problem.
 
 // License excerpt by .NET Foundation: 
 
