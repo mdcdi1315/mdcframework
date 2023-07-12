@@ -61,6 +61,7 @@ The project includes operations related to:
   - System.Memory
   - System.Resources.Extensions
   - System.Threading.Tasks.Extensions
+
   These packages are embedded in the Project and can be used like the normal NuGet packages.
   The documentation for these is kept by Microsoft , as well as how to use them.
 
