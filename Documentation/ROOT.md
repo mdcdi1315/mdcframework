@@ -3,17 +3,17 @@ It is the central namespace of this Framework and includes functions which are i
 
  It includes: Generic methods , Archiving and cryptography operations.
 ## The MAIN Class
+CSharp declaration:
 ```C#
 public static class ROOT.MAIN
 ```
+Description:
 The _MAIN_ Class contains static methods that assist a programmer develop quickly an application.
 
 ### Classes:
 The Classes nested inside this one are:
   
  1. The IntuitiveConsoleText class , which shows a message to a console formatted and colored properly.
- 2. _(.NET Framework and Windows Desktop builds only)_ The DialogsReturner class , which is a storage class used when one of the 
- file/directory dialogs is invoked.
 
 ### Methods:
 The Methods nested inside this one are (Sorted alphabetically):
@@ -122,7 +122,7 @@ ___NOTICE___!!! This function is available only for _.NET Framework_ and __Windo
   __Returns__: a new `ROOT.MAIN.DialogsReturner` instance.
 
   __Example__: make a file filter , invoke the function and get the values.
-  ~~~C#
+~~~C#
     using static ROOT.MAIN;
     //...
     string File_Filter = "Text Documents|*.txt;Zip Archives|*.zip;Settings Text Document|settings.txt";
@@ -133,7 +133,7 @@ ___NOTICE___!!! This function is available only for _.NET Framework_ and __Windo
     WriteConsoleText("The File Full path is " + DialogResult.FileNameFullPath);
     WriteConsoleText("Error Detected: " + DialogResult.ErrorCode);
     //...
-  ~~~
+~~~
 #### 9. The CreateSaveDialog:
 _Notice_: This function is not explained because it is the same with CreateLoadDialog.
 
@@ -245,18 +245,19 @@ ___NOTICE___!!! This function is available only for __.NET Framework__ and __Win
   A new `System.IO.FileSystemInfo[]` if it succeeded; otherwise , `null`.
   
   __Example__:
-  ~~~C#
+
+~~~C#
     using System;
     using System.IO;
     
-    FileSystemInfo[] Array = GetANewFileSystemInfo("C:\\files");
-    foreach(System.IO.FileSystemInfo FSI in Array)
-    {
-       //The below statement tests if the object took from the array is a file.
-       if (FSI is System.IO.FileInfo) {Console.WriteLine("File: " + FSI.FullName);}
-       //The below statement tests if the object took from the array is a directory.
-       if (FSI is System.IO.DirectoryInfo) {Console.WriteLine("Directory: " + FSI.FullName);}
-    }
+   FileSystemInfo[] Array = GetANewFileSystemInfo("C:\\files");
+   foreach(System.IO.FileSystemInfo FSI in Array)
+   {
+      //The below statement tests if the object took from the array is a file.
+      if (FSI.GetType() == typeof(System.IO.FileInfo)) {Console.WriteLine("File: " + FSI.FullName);}
+      //The below statement tests if the object took from the array is a directory.
+      if (FSI.GetType() == typeof(System.IO.DirectoryInfo)) {Console.WriteLine("Directory: " + FSI.FullName);}
+   }
     /* 
      * This will display output like the following:
      * Directory: C:\files\mdcframework
@@ -381,7 +382,7 @@ The function uses the Machine's Shell Context , and __NOT__ the .NET Context.
  4. Or , if sucessfull , `0` , and if the `WaitToClose` parameter is set to `true` , then the exit code of the child process.
  
  __Example__:
- ~~~C#
+~~~C#
  // Call a process using the guessing system.
  using ROOT;
  using static ROOT.MAIN;
@@ -441,7 +442,7 @@ public static System.String OSFramework()
 This function displays information about the OS Current Framework that the application called this function runs on.
 (For informational purposes only.)
 
-__Returns__: An System.String value which contains the current OS Framework information.
+__Returns__: An `System.String` value which contains the current OS Framework information.
 
 #### 28. The OSInformation:
 ~~~C#
@@ -450,7 +451,7 @@ public static System.String OSInformation()
 This function displays information about the OS that the application called this function runs on.
 (For informational purposes only.)
 
-__Returns__: An System.String value which contains the current OS information.
+__Returns__: An `System.String` value which contains the current OS information.
 
 #### 29. The OSProcessorArchitecture:
 ~~~C#
@@ -530,6 +531,439 @@ the result.
 
  __Parameters__:
 1. `System.String StringToClear`: The String whose the charaters defined in the `CharToClear` will be removed.
-1. `System.Char[] CharToClear`: An array of characters to clear from the string. Can also be one chararcter in the array.
+2. `System.Char[] CharToClear`: An array of characters to clear from the string. Can also be one chararcter in the array.
 
  __Returns__: The string after the defined chararcters were removed; if an error was found , `null`.
+
+#### 35. The FindFileFromPath:
+~~~C#
+public static ROOT.FileSearchResult FindFileFromPath(System.String FileName)
+~~~
+This function searches up a file from the %PATH% environment variable and returns a 
+new `ROOT.FileSearchResult` structure which contains whether the file was found , and
+if yes , the fully qualified path to it.
+
+Consult the `ROOT.FileSearchResult` structure for more information on how to get the
+data exposed by this function.
+
+ __Parameters__:
+1. `System.String FileName`: The File name (only) to search for. (Example: doskey.exe)
+
+ __Overloads__:
+ This function has an overload too:
+~~~C#
+public static ROOT.FileSearchResult FindFileFromPath(System.String FileName, System.String[] Extensions)
+~~~
+ __Parameters__:
+ 1. `System.String FileName`: The File name (only) without it's extension to search for. (Example: doskey)
+ 2. `System.String[] Extensions`: Possible file extensions to find. (Example: { "exe" , "dll" , "rs" , "uce" , "vbs" , "csproj" })
+
+__Returns__: A new `ROOT.FileSearchResult` structure.
+
+#### 36. The WriteConsoleText:
+~~~C#
+public static void WriteConsoleText(System.String Text)
+public static void WriteConsoleText(System.Char[] Text)
+~~~
+This function writes either as an `System.String` or an `System.Char[]` array the specified text to the application's console.
+
+ __Parameters__:
+ 1. `System.String Text`: The text to write to the console.
+ 
+ __Overloads__:
+ 1. `System.Char[] Text`: The text to write to the console.
+
+ __Returns__: The function is declared as `void` , so it does not return something.
+
+#### 37. The WriteCustomColoredText:
+~~~C#
+public static void WriteCustomColoredText(System.String Message, System.ConsoleColor ForegroundColor, System.ConsoleColor BackgroundColor)
+~~~
+This function also writes the specified text to the application's console , but colored as defined by the user.
+
+ __Parameters__:
+ 1. `System.String Message`: The colored text to write to the console.
+ 2. `System.ConsoleColor ForegroundColor`: The foreground color (text) color to use.
+ 3. `System.ConsoleColor BackgroundColor`: The background color to use.
+ 
+ __Returns__: The function is declared as `void` , so it does not return something.
+
+ ### The IntuitiveConsoleText Class:
+CSharp Declaration:
+~~~C#
+public static class ROOT.MAIN.IntuitiveConsoleText
+~~~
+IL Declaration:
+~~~IL
+.class abstract auto ansi sealed nested public beforefieldinit IntuitiveConsoleText
+       extends [mscorlib]System.Object
+~~~
+
+#### Description:
+A static class which creates console colored messages to differentiate the types of errors or information given.
+
+### Methods:
+
+#### 1. The InfoText:
+~~~C#
+public static void InfoText(System.String Text)
+~~~
+This function writes the data specified on the console. 
+These data are informational. The background color is black and the foreground color is gray.
+
+ __Parameters__:
+ 1. `System.String Text`: The text to write to the console.
+ 
+__Returns__: The function is declared as `void` , so it does not return something.
+ 
+#### 2. The WarningText:
+~~~C#
+public static void WarningText(System.String Text)
+~~~
+This function writes the data specified on the console. 
+These data are warnings. The background color is black and the foreground color is yellow.
+
+ __Parameters__:
+ 1. `System.String Text`: The text to write to the console.
+ 
+__Returns__: The function is declared as `void` , so it does not return something.
+
+
+#### 3. The ErrorText:
+~~~C#
+public static void ErrorText(System.String Text)
+~~~
+This function writes the data specified on the console. 
+These data are errors. The background color is black and the foreground color is red.
+
+ __Parameters__:
+ 1. `System.String Text`: The text to write to the console.
+ 
+__Returns__: The function is declared as `void` , so it does not return something.
+
+#### 4. The FatalText:
+~~~C#
+public static void FatalText(System.String Text)
+~~~
+This function writes the data specified on the console. 
+These data are fatal errors. The background color is black and the foreground color is magenta.
+
+ __Parameters__:
+ 1. `System.String Text`: The text to write to the console.
+ 
+__Returns__: The function is declared as `void` , so it does not return something.
+  
+  -- End of the `ROOT.MAIN.IntuitiveConsoleText` Class --
+
+  -- End of the `ROOT.MAIN` Class --
+
+## The DialogsReturner Structure:
+CSharp Declaration:
+~~~C#
+[SupportedOSPlatform("windows")]
+public struct DialogsReturner
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi sealed beforefieldinit ROOT.DialogsReturner
+       extends [mscorlib]System.ValueType
+{
+  .custom instance void System.Runtime.Versioning.SupportedOSPlatformAttribute::.ctor(string) = ( 01 00 07 77 69 6E 64 6F 77 73 00 00 )             // ...windows..
+}
+~~~
+Description:
+A storage class used by the file/dir dialogs to access the paths given (Full and name only) , the dialog type ran and if there was an error.
+
+Remarks:
+This class is used only by several functions in the MAIN class. It is not allowed to override this class.
+
+ ### Attributes:
+ 1. `System.Runtime.Versioning.SupportedOSPlatformAttribute("windows")`: This structure is only allowed to be used in the Windows platform.
+
+
+ ### Constructors:
+ You cannot use any constructor for this structure because all constructors are declared as `internal`.
+
+ ### Properties:
+
+ #### 1. DialogType:
+ The `DialogType` property gets the dialog function ran.
+ 
+ __Get__: Returns a value of the `ROOT.FileDialogType` enumeration. Consult it to find out the dialog types.
+
+ #### 2. DirPath: 
+ The `DirPath` property gets the directory selected by the user.
+ 
+ __Note__: This property can only be used when the `DialogType` property is `ROOT.FileDialogType.DirSelect` , 
+ otherwise it will throw an exception.
+
+ __Get__: Returns a `System.String` value containing the directory path selected.
+
+  #### 3. FileNameFullPath:
+  The `FileNameFullPath` property gets the fully qualified path of the selected file.
+
+  __Note__: This property can only be used when the `DialogType` property is _NOT_ `ROOT.FileDialogType.DirSelect` , 
+ otherwise it will throw an exception.
+  
+  __Get__: Returns a `System.String` value containing the file path.
+
+  #### 4. FileNameOnly:
+  The `FileNameOnly` property gets the file name with it's extension only.
+  
+  __Note__: This property can only be used when the `DialogType` property is _NOT_ `ROOT.FileDialogType.DirSelect` , 
+ otherwise it will throw an exception.
+  
+  __Get__: Returns a `System.String` value containing the file name only.
+  
+  #### 5. ErrorCode:
+  The `ErrorCode` property gets the error code (if any) when the function was invoked.
+
+  A generic error is suggested when this property returns the `"Error"` string.
+
+  __Get__: Returns a `System.String` indicating if there was an execution error.
+
+  -- End of `ROOT.FileDialogsReturner` structure --
+
+## The DialogType Enumeration:
+CSharp Declaration:
+~~~C#
+public enum FileDialogType : System.Int32
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.FileDialogType
+       extends [mscorlib]System.Enum
+~~~
+Description:
+`FileDialogType` is an enumeration of values which indicate which dialog was invoked.
+
+ ### Fields:
+ 
+ #### 1. CreateFile:
+ The `CreateFile` field suggests that the dialog is a Save File Dialog.
+ 
+ #### 2. LoadFile:
+ The `LoadFile` field suggests that the dialog is a Load File Dialog.
+
+ #### 3. DirSelect:
+ The `DirSelect` field suggests that the dialog is a Directory Selection Dialog.
+
+ -- End of `ROOT.FileDialogType` Enumeration --
+
+## The FileSearchResult Structure:
+CSharp Declaration:
+~~~C#
+public struct FileSearchResult
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi sealed beforefieldinit ROOT.FileSearchResult
+       extends [mscorlib]System.ValueType
+~~~
+Description: The FileSearchResult struct is the return type for the file
+	searcher functions defined in the `ROOT.MAIN` class.
+
+ ### Constructors:
+ You cannot use any constructor for this structure because all constructors are declared as `internal`.
+
+### Properties:
+
+  #### 1. Path:
+  The `Path` property gets the full file path , if the file requested was found.
+
+  __Get__: Returns a `System.String` containing the fully qualified path for the found file.
+
+  #### 2. Extension:
+   The `Extension` property gets the file's extension , if there is one.
+
+   __Get__: Returns a `System.String` containing the extension of the file without the first dot.
+
+
+  #### 3. MatchFound:
+  The `MatchFound` property gets whether a match found by the function.
+
+  __Get__: Returns a `System.Boolean` value containing whether a match was found.
+
+  -- End of the `ROOT.FileSearchResult` Structure --
+
+## The HW31 Structure:
+CSharp Declaration: 
+~~~C#
+[System.Serializable]
+public struct HW31 : System.IEquatable<HW31?>
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi serializable sealed beforefieldinit ROOT.HW31
+       extends [mscorlib]System.ValueType
+       implements class [mscorlib]System.IEquatable`1<valuetype [mscorlib]System.Nullable`1<valuetype ROOT.HW31>>
+{
+  .custom instance void System.Runtime.CompilerServices.NullableContextAttribute::.ctor(uint8) = ( 01 00 01 00 00 ) 
+  .custom instance void System.Runtime.CompilerServices.NullableAttribute::.ctor(uint8) = ( 01 00 00 00 00 ) 
+  .interfaceimpl type class [mscorlib]System.IEquatable`1<valuetype [mscorlib]System.Nullable`1<valuetype ROOT.HW31>>
+  .custom instance void System.Runtime.CompilerServices.NullableAttribute::.ctor(uint8) = ( 01 00 00 00 00 ) 
+}
+~~~
+Description: `HW31` is a simple and easy to use binary data converter which converts byte arrays to strings 
+and the opposite. This structure declares this format and expands it's usage.
+
+  ### Implementations:
+  This class implements the [`System.IEquatable`](http://learn.microsoft.com/en-us/dotnet/api/system.iequatable-1?view=netframework-4.8)
+  interface. The implemented is the HW31 structure , but it allows `null` values when used in a nullable context.
+
+  ### Attributes:
+  1. `System.Runtime.CompilerServices.NullableAttribute()`: This attribute is used in conjuction with the 
+  `System.IEquatable` interface stated above so as to implement the nullable structure.
+  
+  2. `System.Serializable()`: The runtime is allowed to serialize this structure , if required.
+  
+  ### Constructors:
+  1. `HW31.HW31()`: The default constructor. The structure is initialised without data in it.
+  However , you cannot add data to this structure. It should be used only in serialization
+  contexts.
+  
+  2. `HW31.HW31(System.String HW31)`: Initiate the structure with the specified `HW31` string.
+  
+  Be noted , the string given must be an `HW31` one , otherwise the [`System.InvalidOperationException`](http://learn.microsoft.com/en-us/dotnet/api/system.invalidoperationexception?view=netframework-4.8)
+  will be thrown.
+  
+  ### Methods:
+  
+  #### 1. The ClearLength:
+~~~C#
+public System.Int32 ClearLength()
+~~~
+  This function returns the number of characters (without the spaces) that are contained in this instance.
+
+  __Returns__: A `System.Int32` value , indicating the number of characters.
+
+  #### 2. The Equals:
+~~~C#
+public System.Boolean Equals(System.Object obj)
+public System.Boolean Equals(ROOT.HW31? Struct)
+~~~
+  This function determines whether this instance is equal to a bare `HW31` string or to another `ROOT.HW31` structure.
+
+  __Parameters__:
+  1. `System.Object obj`: The bare `HW31` string to compare against.
+
+  __Overloads__:
+  1. `ROOT.HW31? Struct`: The another initialised `ROOT.HW31` structure to compare against.
+  
+  __Returns__: `true` if the object and this instance are the same ; otherwise . `false`.
+
+  #### 3. The GetHashCode:
+~~~C#
+public System.Int32 GetHashCode()
+~~~
+   This function implements the basic usage of object value types.
+
+   See the [`System.Object`](http://learn.microsoft.com/en-us/dotnet/api/system.object?view=netframework-4.8)
+   documentation for more information.
+
+   #### 4. The IsHW31:
+~~~C#
+public static System.Boolean IsHW31(System.String HW31)
+~~~
+Test whether a bare string can be an `HW31` string.
+
+ Note: This function is static , which means that you can use it without instantiating a new structure.  
+
+ __Returns__: `true` if the bare string given can be an `HW31` one , otherwise , `false`.
+
+  #### 5. The IsInvalid:
+~~~C#
+public System.Boolean IsInvalid()
+~~~
+ Gets a `System.Boolean` value indicating that the structure is invalidated and should be disposed.
+
+ __Returns__: `true` if the structure is invalid and should be disposed; otherwise , `false`.
+
+  #### 6. The Length:
+  This method is identical as the `System.String.Length` property , because this function returns the length
+  of the kept HW31 string. 
+
+  Please see the [`System.String.Length`](http://learn.microsoft.com/en-us/dotnet/api/system.string.length?view=netframework-4.8) 
+  property documentation for more information.
+
+  #### 7. The ToString:
+~~~C#
+public System.String ToString()
+~~~
+  ___NOTE___: This method is to support the product infrastracture and not meant to be used directly in your code.
+
+  Returns the `HW31` string representation of this instance. 
+
+  __Exceptions__: `System.InvalidOperationException`: An attempt was made to access the invalidated structure.
+
+  __Returns__: The `HW31` string representation of this instance.
+
+  ### Operators:
+
+  ### Equality operators:
+~~~C#
+[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+public static System.Boolean operator ==(HW31 left, System.String right)
+
+[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+public static System.Boolean operator ==(HW31 lhs, HW31 rhs)
+~~~
+
+  #### Operator 1: 
+   Test the equality of an HW31 construct with a bare HW31 string.
+    
+   __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to offer speed in multiple `if` constructs.
+
+   __Parameters__: 
+    1. `ROOT.HW31 left`: The HW31 construct to compare against.
+    2. `System.String right`: The HW31 string to compare against.
+   
+  #### Operator 2:
+   Test the equality of two HW31 constructs.
+    
+   __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to offer speed in multiple `if` constructs.
+
+   __Parameters__: 
+    1. `ROOT.HW31 lhs`: The one HW31 construct to compare against.
+    2. `ROOT.HW31 rhs`: The other HW31 construct to compare against.
+
+   ### Inequality operators:
+~~~C#
+[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+public static System.Boolean operator !=(HW31 left, System.String right)
+
+[System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+public static System.Boolean operator !=(HW31 lhs, HW31 rhs)
+~~~
+
+#### Operator 1: 
+   Test the inequality of an HW31 construct with a bare HW31 string.
+    
+   __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to offer speed in multiple `if` constructs.
+
+   __Parameters__: 
+    1. `ROOT.HW31 left`: The HW31 construct to compare against.
+    2. `System.String right`: The HW31 string to compare against.
+   
+  #### Operator 2:
+   Test the inequality of two HW31 constructs.
+    
+   __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to offer speed in multiple `if` constructs.
+
+   __Parameters__: 
+    1. `ROOT.HW31 lhs`: The one HW31 construct to compare against.
+    2. `ROOT.HW31 rhs`: The other HW31 construct to compare against.
+
+
+  --- End of `ROOT.HW31` Structure ---
+
+  
+

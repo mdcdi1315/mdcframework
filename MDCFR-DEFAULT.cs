@@ -6,12 +6,12 @@
 
 // Global namespaces
 using System;
-using System.IO;
 using System.Drawing;
 using System.Windows.Forms;
 using System.IO.Compression;
 using System.Runtime.Versioning;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 
 namespace ROOT
@@ -1638,7 +1638,7 @@ namespace ROOT
 		{
 			for (System.Int32 I = 0; I < HW31Mapper.Mapper.Length; I++)
 			{
-				if (System.Convert.ToInt32(HW31Mapper.Mapper[I, 0]) == Value) { return $"{HW31Mapper.Mapper[I, 1]}"; }
+				if (((System.Int32) HW31Mapper.Mapper[I, 0]) == Value) { return $"{HW31Mapper.Mapper[I, 1]}"; }
 			}
 			return "Error";
 		}
@@ -1649,21 +1649,32 @@ namespace ROOT
 			if (Chars.Length > 2 && Chars.Length < 2) { return 0; }
 			for (System.Int32 I = 0; I < HW31Mapper.Mapper.Length; I++)
 			{
-				if ((System.String)HW31Mapper.Mapper[I, 1] == Chars) { return System.Convert.ToByte(HW31Mapper.Mapper[I, 0]); }
+				if ( (System.String) HW31Mapper.Mapper[I, 1] == Chars) { return (System.Byte) HW31Mapper.Mapper[I, 0]; }
 			}
 			return 0;
 		}
 
-		private static System.Boolean TestIfItIsAnHW31String(System.String HW31)
-		{
-			if (HW31 == null) { return false; }
-			if (HW31.Length < 3) { return false; }
-			System.Char[] HW31Arr = HW31.ToCharArray();
-			if (HW31Arr[2] != ' ') { return false; }
-			if (HW31Arr[HW31Arr.Length - 1] != ' ') { return false; }
-			HW31Arr = null;
-			return true;
-		}
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        private static System.Boolean TestIfItIsAnHW31String(System.String HW31)
+        {
+            if (HW31 == null) { return false; }
+            if (HW31.Length < 3) { return false; }
+            System.Char[] HW31Arr = HW31.ToCharArray();
+            if (HW31Arr[2] != ' ') { return false; }
+            if (HW31Arr[HW31Arr.Length - 1] != ' ') { return false; }
+            for (System.Int32 I = 0; I < HW31Arr.Length; I++)
+            {
+                try
+                {
+                    if (IsDigit(System.Convert.ToInt32(HW31Arr[I])) == true) { return false; }
+                }
+                catch { continue; }
+            }
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsDigit(System.Int32 I) { return (System.UInt32) (I - '0') <= ('9' - '0'); }
 
         /// <summary>
         /// Converts a <see cref="System.Byte"/>[] array to a new HW31 <see cref="System.String"/>. 
@@ -1678,9 +1689,9 @@ namespace ROOT
 			System.String Result = null;
 			for (System.Int32 I = 0; I < Array.Length; I++)
 			{
-				if (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) != "Error")
+				if (ByteToCorrespondingChars((System.Byte) HW31Mapper.Mapper[Array[I], 0]) != "Error")
 				{
-					Result += (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) + " ");
+					Result += (ByteToCorrespondingChars((System.Byte) HW31Mapper.Mapper[Array[I], 0]) + " ");
 				}
 				else { DC.SetOrGetError = true; return DC; }
 			}
@@ -1706,9 +1717,9 @@ namespace ROOT
 			System.String Result = null;
 			for (System.Int32 I = Start; I < Count; I++)
 			{
-				if (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) != "Error")
+				if (ByteToCorrespondingChars((System.Byte) HW31Mapper.Mapper[Array[I], 0]) != "Error")
 				{
-					Result += (ByteToCorrespondingChars(System.Convert.ToByte(HW31Mapper.Mapper[Array[I], 0])) + " ");
+					Result += (ByteToCorrespondingChars((System.Byte) HW31Mapper.Mapper[Array[I], 0]) + " ");
 				}
 				else { DC.SetOrGetError = true; return DC; }
 			}
@@ -3154,16 +3165,22 @@ namespace ROOT
 	{
 		public NoticeAttribute(System.String FunctionName)
 		{
-			MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
-				" for usage and will be obsoleted in the next release. Use instead the other one recommended.",
-				ConsoleColor.Red, ConsoleColor.Black);
-		}
+            System.CodeDom.Compiler.CompilerError ER = new();
+            ER.IsWarning = true;
+            ER.ErrorText = $"Notice - the function {FunctionName} is no longer recommended " +
+				" for usage and will be obsoleted in the next release. Use instead the other one recommended.";
+            ER.Line = 3168;
+            ER.FileName = "MDCFR.dll";
+        }
 
 		public NoticeAttribute(System.String FunctionName, System.String Recommended)
 		{
-			MAIN.WriteCustomColoredText($"Notice - the function {FunctionName} is no longer recommended " +
-				$" for usage and will be obsoleted in the next release. Use instead the {Recommended} function.",
-				ConsoleColor.Red, ConsoleColor.Black);
+			System.CodeDom.Compiler.CompilerError ER = new();
+			ER.IsWarning = true;
+			ER.ErrorText = $"Notice - the function {FunctionName} is no longer recommended " +
+				$" for usage and will be obsoleted in the next release. Use instead the {Recommended} function.";
+			ER.Line = 3168;
+			ER.FileName = "MDCFR.dll";
 		}
 
 		public override string ToString()
@@ -4221,7 +4238,7 @@ namespace ROOT
         }
 
 		/// <summary>
-		/// Adds empty entries specified by the Times <see cref="System.Int32"/> .
+		/// Adds empty entries specified by the <paramref name="Times"/> <see cref="System.Int32"/> .
 		/// </summary>
 		/// <param name="Times">The number of empty entries to add.</param>
         public void AddEntries(System.Int32 Times) { for (System.Int32 I = 0; I < Times; I++) { _dict.Add(Iter++, 0); } }
@@ -4321,6 +4338,699 @@ namespace ROOT
 		}
 	}
 
+	internal struct STDConstants
+	{
+		// Standard Text Definition constants and helper functions.
+		// The below characters define how the STD format will be read and written.
+
+		public static System.Char COMMENT = '#';
+
+		public static System.Char SEPERATOR = '$';
+
+		public static System.Char HDROPEN = '{';
+
+		public static System.Char HDRCLOSE = '}';
+
+		public static System.Char STRING = '\"';
+
+		public static System.Int32 VERSION = 1;
+
+		// The encoding table. 
+		// This table will be used so as to return and save the colors as one value 
+		// to the dictionary.
+		// Example: Array is at index 0.
+		// The Index 0 returns two values: 
+		// The first one is the foreground color.
+		// The second one is the background color.
+		// So , { 0 , 0 } means that the foreground and background colors will be black.
+		// Note: Consult the STDFrontColor and STDBackColor enums for more information about this
+		// generated table.
+		public static readonly System.Int32[,] EncodeTable = { { 0 , 0 } , { 0 , 1 } , { 0 , 2 } ,
+		{ 0 , 3 } , { 0 , 4 } , { 0 , 5 } , { 0 , 6 } , { 0 , 7 } , { 0 , 8 } , { 0 , 9 } , { 0 , 10 } ,
+		{ 0 , 11 } , { 0 , 12 } , { 0 , 13 } , { 0 , 14 } , { 0 , 15 } , { 1 , 0 } , { 1 , 1 } , { 1 , 2 } ,
+		{ 1 , 3 } , { 1 , 4 } , { 1 , 5 } , { 1 , 6 } , { 1 , 7 } , { 1 , 8 } , { 1 , 9 } , { 1 , 10 } ,
+		{ 1 , 11 } , { 1 , 12 } , { 1 , 13 } , { 1 , 14 } , { 1 , 15 } , { 2 , 0 } , { 2 , 1 } , { 2 , 2 } ,
+		{ 2 , 3 } , { 2 , 4 } , { 2 , 5 } , { 2 , 6 } , { 2 , 7 } , { 2 , 8 } , { 2 , 9 } , { 2 , 10 } ,
+		{ 2 , 11 } , { 2 , 12 } , { 2 , 13 } , { 2 , 14 } , { 2 , 15 } , { 3 , 0 } , { 3 , 1 } , { 3 , 2 } ,
+		{ 3 , 3 } , { 3 , 4 } , { 3 , 5 } , { 3 , 6 } , { 3 , 7 } , { 3 , 8 } , { 3 , 9 } , { 3 , 10 } ,
+		{ 3 , 11 } , { 3 , 12 } , { 3 , 13 } , { 3 , 14 } , { 3 , 15 } , { 4 , 0 } , { 4 , 1 } , { 4 , 2 } ,
+		{ 4 , 3 } , { 4 , 4 } , { 4 , 5 } , { 4 , 6 } , { 4 , 7 } , { 4 , 8 } , { 4 , 9 } , { 4 , 10 } ,
+		{ 4 , 11 } , { 4 , 12 } , { 4 , 13 } , { 4 , 14 } , { 4 , 15 } , { 5 , 0 } , { 5 , 1 } , { 5 , 2 } ,
+		{ 5 , 3 } , { 5 , 4 } , { 5 , 5 } , { 5 , 6 } , { 5 , 7 } , { 5 , 8 } , { 5 , 9 } , { 5 , 10 } ,
+		{ 5 , 11 } , { 5 , 12 } , { 5 , 13 } , { 5 , 14 } , { 5 , 15 } , { 6 , 0 } , { 6 , 1 } , { 6 , 2 } ,
+		{ 6 , 3 } , { 6 , 4 } , { 6 , 5 } , { 6 , 6 } , { 6 , 7 } , { 6 , 8 } , { 6 , 9 } , { 6 , 10 } ,
+		{ 6 , 11 } , { 6 , 12 } , { 6 , 13 } , { 6 , 14 } , { 6 , 15 } , { 7 , 0 } , { 7 , 1 } , { 7 , 2 } ,
+		{ 7 , 3 } , { 7 , 4 } , { 7 , 5 } , { 7 , 6 } , { 7 , 7 } , { 7 , 8 } , { 7 , 9 } , { 7 , 10 } ,
+		{ 7 , 11 } , { 7 , 12 } , { 7 , 13 } , { 7 , 14 } , { 7 , 15 } , { 8 , 0 } , { 8 , 1 } , { 8 , 2 } ,
+		{ 8 , 3 } , { 8 , 4 } , { 8 , 5 } , { 8 , 6 } , { 8 , 7 } , { 8 , 8 } , { 8 , 9 } , { 8 , 10 } ,
+		{ 8 , 11 } , { 8 , 12 } , { 8 , 13 } , { 8 , 14 } , { 8 , 15 } , { 9 , 0 } , { 9 , 1 } , { 9 , 2 } ,
+		{ 9 , 3 } , { 9 , 4 } , { 9 , 5 } , { 9 , 6 } , { 9 , 7 } , { 9 , 8 } , { 9 , 9 } , { 9 , 10 } ,
+		{ 9 , 11 } , { 9 , 12 } , { 9 , 13 } , { 9 , 14 } , { 9 , 15 } , { 10 , 0 } , { 10 , 1 } , { 10 , 2 } ,
+		{ 10 , 3 } , { 10 , 4 } , { 10 , 5 } , { 10 , 6 } , { 10 , 7 } , { 10 , 8 } , { 10 , 9 } , { 10 , 10 } ,
+		{ 10 , 11 } , { 10 , 12 } , { 10 , 13 } , { 10 , 14 } , { 10 , 15 } , { 11 , 0 } , { 11 , 1 } , { 11 , 2 } ,
+		{ 11 , 3 } , { 11 , 4 } , { 11 , 5 } , { 11 , 6 } , { 11 , 7 } , { 11 , 8 } , { 11 , 9 } , { 11 , 10 } ,
+		{ 11 , 11 } , { 11 , 12 } , { 11 , 13 } , { 11 , 14 } , { 11 , 15 } , { 12 , 0 } , { 12 , 1 } , { 12 , 2 } ,
+		{ 12 , 3 } , { 12 , 4 } , { 12 , 5 } , { 12 , 6 } , { 12 , 7 } , { 12 , 8 } , { 12 , 9 } , { 12 , 10 } ,
+		{ 12 , 11 } , { 12 , 12 } , { 12 , 13 } , { 12 , 14 } , { 12 , 15 } , { 13 , 0 } , { 13 , 1 } , { 13 , 2 } ,
+		{ 13 , 3 } , { 13 , 4 } , { 13 , 5 } , { 13 , 6 } , { 13 , 7 } , { 13 , 8 } , { 13 , 9 } , { 13 , 10 } ,
+		{ 13 , 11 } , { 13 , 12 } , { 13 , 13 } , { 13 , 14 } , { 13 , 15 } , { 14 , 0 } , { 14 , 1 } , { 14 , 2 } ,
+		{ 14 , 3 } , { 14 , 4 } , { 14 , 5 } , { 14 , 6 } , { 14 , 7 } , { 14 , 8 } , { 14 , 9 } , { 14 , 10 } ,
+		{ 14 , 11 } , { 14 , 12 } , { 14 , 13 } , { 14 , 14 } , { 14 , 15 } , { 15 , 0 } , { 15 , 1 } , { 15 , 2 } ,
+		{ 15 , 3 } , { 15 , 4 } , { 15 , 5 } , { 15 , 6 } , { 15 , 7 } , { 15 , 8 } , { 15 , 9 } , { 15 , 10 } ,
+		{ 15 , 11 } , { 15 , 12 } , { 15 , 13 } , { 15 , 14 } , { 15 , 15 } };
+
+		// This function encodes the two enum values accepted and then converts them as a single value.
+		// The value returned from this function is actually the index of the EncodeTable array that is equal
+		// to the values supplied against this function.
+		// Error handling: -1 suggests that the encoder failed for a reason.
+		// 0 is the first index of the EncodeTable array.
+		public static System.Int32 Encode(STDFrontColor Front, STDBackColor Back)
+		{
+			System.Int32 KeepFr = -1;
+			System.Int32 KeepBk = -1;
+
+			for (System.Int32 I = 0; I < EncodeTable.Length; I++)
+			{
+				if (EncodeTable[I, 0] == (System.Int32)Front) { KeepFr = I; }
+				if (EncodeTable[I, 1] == (System.Int32)Back) { KeepBk = I; }
+
+				if ((KeepFr != -1) && (KeepBk != -1))
+				{
+					if (KeepFr == KeepBk) { return KeepFr; } else { continue; }
+				}
+			}
+			return -1;
+		}
+
+		// This function decodes the single number given from the Encode function and then 
+		// returns the two colors.
+		public static STDColors Decode(System.Int32 Encoded)
+		{
+			return new STDColors(
+				(STDFrontColor)EncodeTable[Encoded, 0],
+				(STDBackColor)EncodeTable[Encoded, 1]);
+		}
+
+		public static System.Boolean DetectSlashR(System.String D)
+		{
+			if (D.IndexOf('\r') != -1) { return true; } else { return false; }
+		}
+	
+		public static System.String RemoveSlashR(System.String D)
+		{
+			return ROOT.MAIN.RemoveDefinedChars(D , new[] { '\r' });
+		}
+	
+	}
+
+    /// <summary>
+    /// Represents a new STD (Standard Text with color Definition) context , which is a storage type
+    /// which holds the STD data parsed , or the STD data to parse.
+    /// </summary>
+    public struct STDContext : System.IDisposable
+	{
+		/// <summary>
+		/// Initialise a new instance of the <see cref="STDContext"/> structure.
+		/// </summary>
+		public STDContext() { }
+
+		// Dictionary that keeps the string data to display.
+		private System.Collections.Generic.IDictionary<System.Int32, System.String> _dt1 = 
+			new System.Collections.Generic.SortedList<System.Int32 , System.String>();	
+		// Dictionary that keeps which colors to display to the user.
+		// The value set here is returned by the Encode function.
+		private System.Collections.Generic.IDictionary<System.Int32, System.Int32> _dt2 =
+            new System.Collections.Generic.SortedList<System.Int32, System.Int32>();
+        // Dictionary that keeps data determining the type of data written to it , so :
+        // 0 indicates a normal STD string , 
+        // 1 indicates the STD version block , 
+        // and 2 indicates a comment in the file.
+		// These values are also exposed at ROOT.STDType enum.
+        private System.Collections.Generic.IDictionary<System.Int32, System.Int32> _dt3 =
+            new System.Collections.Generic.SortedList<System.Int32, System.Int32>();
+        private System.Boolean addedheader = false;
+        private System.Int32 Count = -1;
+
+        /// <summary>
+        /// Adds a new STD (Standard Text with color Definition) Line to store in the dictionary.
+        /// </summary>
+        /// <param name="Fr">The foreground color.</param>
+        /// <param name="Bk">The background color.</param>
+        /// <param name="Data">The string data to save.</param>
+        /// <exception cref="InvalidOperationException" />
+        public void Add(STDFrontColor Fr, STDBackColor Bk, System.String Data)
+		{
+			Count++;
+			System.Int32 ER = STDConstants.Encode(Fr, Bk);
+			if (ER == -1)
+			{
+				throw new InvalidOperationException("The Color values given were out of bounds.");
+			}
+			_dt1.Add(Count, Data);
+			_dt2.Add(Count, ER);
+			_dt3.Add(Count, 0);
+		}
+
+        /// <summary>
+        /// Adds a new STD (Standard Text with color Definition) comment.
+        /// </summary>
+        /// <param name="Comment">The <see cref="System.String"/> comment data to pass.</param>
+        public void AddComment(System.String Comment)
+		{
+			Count++;
+			_dt1.Add(Count, Comment);
+			_dt2.Add(Count, 0);
+			_dt3.Add(Count, 2);
+		}
+
+        /// <summary>
+        /// Adds a new STD (Standard Text with color Definition) version block.
+        /// </summary>
+        public void AddVersionBlock()
+		{
+            if (addedheader)
+            {
+                throw new InvalidOperationException("A version block has already been added." +
+                "\nNo need to add the block two times.");
+            }
+            else { addedheader = true; }
+            Count++;
+			_dt1.Add(Count, $"{{Version${STDConstants.VERSION}}}");
+			_dt2.Add(Count, 0);
+			_dt3.Add(Count, 1);
+		}
+
+        /// <summary>
+        /// Clears the saved STD (Standard Text with color Definition) entries , which can make this instance reusable.
+        /// </summary>
+        public void Clear()
+		{
+			Count = -1;
+			addedheader = false;
+			_dt1.Clear();
+			_dt2.Clear();
+			_dt3.Clear();
+		}
+
+		/// <summary>
+		/// Disposes the current instance. This method is the same as <see cref="Clear()"/> , 
+		/// but invalidates the internal dictionaries too.
+		/// </summary>
+		/// <remarks>
+		/// It is not important to explicitly call <see cref="Dispose()"/> , because you can re-use this instance by calling
+		/// the <see cref="Clear()"/> method and you have the instance as it is was created.
+		/// </remarks>
+		public void Dispose() { Clear(); _dt1 = null; _dt2 = null; _dt3 = null; }
+
+		// Adds an invalid item to the dictionary.
+		// This is added so as to detect parser errors or code mistakes.
+		internal void AddInvalidItem(System.String Data) 
+		{
+            Count++;
+            _dt1.Add(Count, Data);
+            _dt2.Add(Count, 0);
+            _dt3.Add(Count, 3);
+        }
+
+        /// <summary>
+        /// Counts the found STD (Standard Text with color Definition) entries that are existing on this instance.
+        /// </summary>
+		/// <remarks>This property includes ALL STD entries , including the Version Block ,
+		/// Comments and STD entries.</remarks>
+        public System.Int32 ItemsCount { get { if (Count == -1) { return 0; } else { return Count + 1; } } }
+
+        /// <summary>
+        /// Gets the specified STD (Standard Text with color Definition) Line Entry at the specified index.
+        /// </summary>
+        /// <param name="Index">The index to get the entry from.</param>
+        /// <returns>A new <see cref="STDLine"/> <see langword="struct"/> which contains the STD data.</returns>
+        public STDLine Get(System.Int32 Index)
+		{
+			return new STDLine() 
+			{ 
+				Colors = STDConstants.Decode(_dt2[Index]) , 
+				Data = _dt1[Index] , Type = (STDType) _dt3[Index] 
+			};
+		}
+
+	}
+
+    /// <summary>
+    /// Represents an STD (Standard Text with color Definition) Line.
+    /// </summary>
+    [Serializable]
+	public struct STDLine
+	{
+		/// <summary>
+		/// The colors to use.
+		/// </summary>
+		public STDColors Colors;
+
+		/// <summary>
+		/// The <see cref="System.String"/> data to show.
+		/// </summary>
+		public System.String Data;
+
+		/// <summary>
+		/// The STD type that was got.
+		/// </summary>
+		public STDType Type;
+	}
+
+    /// <summary>
+    /// This structure keeps a record of STD colors that each line uses.
+    /// </summary>
+    [Serializable]
+    public readonly struct STDColors
+    {
+        /// <summary>
+        /// The foreground color to specify.
+        /// </summary>
+        public readonly STDFrontColor FrontColor;
+
+        /// <summary>
+        /// The background color to specify.
+        /// </summary>
+        public readonly STDBackColor BackColor;
+
+        /// <summary>
+        /// Initialise a new <see cref="STDColors"/> structure with the specified STD colors.
+        /// </summary>
+        /// <param name="FC">The foreground color to specify.</param>
+        /// <param name="BK">The background color to specify.</param>
+        public STDColors(STDFrontColor FC, STDBackColor BK)
+        {
+            FrontColor = FC;
+            BackColor = BK;
+        }
+    }
+
+#pragma warning disable CS1591
+    public enum STDFrontColor : System.Int32
+	{
+		INV = -2 , 
+		Black = 0 , 
+		White  = 1 ,
+		Blue = 2 , 
+		Red = 3 , 
+		Magenta = 4 ,
+		Cyan = 5 ,
+		Gray = 6 , 
+		Green = 7 ,
+		Yellow = 8 ,
+        DarkBlue = 9 ,
+        DarkCyan = 10 ,
+        DarkGray = 11 ,
+        DarkGreen = 12 ,
+        DarkMagenta = 13 ,
+		DarkRed = 14 , 
+		DarkYellow = 15
+    }
+
+    /// <summary>
+    /// The STD (Standard Text with color Definition) type that the entry you want to compare against is.
+    /// </summary>
+    public enum STDType
+	{
+		/// <summary>
+		/// The Entry is a normal STD string definition.
+		/// </summary>
+		STDString = 0 , 
+		/// <summary>
+		/// The Entry is a valid STD version block.
+		/// </summary>
+		VersionBlock = 1,
+		/// <summary>
+		/// The Entry is a comment.
+		/// </summary>
+		Comment = 2 ,
+		/// <summary>
+		/// Invalid Entry which should be ignored.
+		/// Normally , this occurs due to the parser incorrect readiness , but was not an error due to the following resons:
+		/// </summary>
+		/// <remarks>
+		/// New line , corrupt text , or unexpected characters returned.
+		/// </remarks>
+		Invalid = 3 
+	}
+
+    public enum STDBackColor : System.Int32
+    {
+		INV = -2,
+        Black = 0,
+        White = 1,
+        Blue = 2,
+        Red = 3,
+        Magenta = 4,
+        Cyan = 5,
+        Gray = 6,
+        Green = 7,
+        Yellow = 8,
+        DarkBlue = 9,
+        DarkCyan = 10,
+        DarkGray = 11,
+        DarkGreen = 12,
+        DarkMagenta = 13,
+        DarkRed = 14,
+        DarkYellow = 15
+    }
+
+#pragma warning restore CS1591
+
+	/// <summary>
+	/// The STD (Standard Text with color Definition) class gets data 
+	/// from strings that contain messages colored as specified.
+	/// </summary>
+	/// <remarks>The STD format is an easy style outlining definition which can be used to a number of applications.
+	/// Read more about it in the coding website.</remarks>
+    public static class STD
+	{
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static STDFrontColor ParseFrontColor(System.String C)
+		{
+			switch (C.ToUpperInvariant()) 
+			{
+				case "BLACK": return STDFrontColor.Black;
+				case "WHITE": return STDFrontColor.White;
+				case "BLUE": return STDFrontColor.Blue;
+				case "RED": return STDFrontColor.Red;
+				case "GREEN": return STDFrontColor.Green;
+				case "MAGENTA": return STDFrontColor.Magenta;
+				case "YELLOW": return STDFrontColor.Yellow;
+				case "CYAN": return STDFrontColor.Cyan;
+				case "DARK BLUE": return STDFrontColor.DarkBlue;
+				case "GRAY": return STDFrontColor.Gray;
+				case "DARK CYAN": return STDFrontColor.DarkCyan;
+				case "DARK GRAY": return STDFrontColor.DarkGray;
+				case "DARK GREEN": return STDFrontColor.DarkGreen;
+				case "DARK MAGENTA": return STDFrontColor.DarkMagenta;
+				case "DARK YELLOW": return STDFrontColor.DarkYellow;
+				case "DARK RED": return STDFrontColor.DarkRed;
+				default: return (STDFrontColor) (-2);
+			}
+		}
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static STDBackColor ParseBackColor(System.String C)
+        {
+            switch (C.ToUpperInvariant())
+            {
+                case "BLACK": return STDBackColor.Black;
+                case "WHITE": return STDBackColor.White;
+                case "BLUE": return STDBackColor.Blue;
+                case "RED": return STDBackColor.Red;
+                case "GREEN": return STDBackColor.Green;
+                case "MAGENTA": return STDBackColor.Magenta;
+                case "YELLOW": return STDBackColor.Yellow;
+                case "CYAN": return STDBackColor.Cyan;
+                case "DARK BLUE": return STDBackColor.DarkBlue;
+                case "GRAY": return STDBackColor.Gray;
+                case "DARK CYAN": return STDBackColor.DarkCyan;
+                case "DARK GRAY": return STDBackColor.DarkGray;
+                case "DARK GREEN": return STDBackColor.DarkGreen;
+                case "DARK MAGENTA": return STDBackColor.DarkMagenta;
+                case "DARK YELLOW": return STDBackColor.DarkYellow;
+                case "DARK RED": return STDBackColor.DarkRed;
+                default: return (STDBackColor) (-2);
+            }
+        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static System.String ParseFrontColorS(STDFrontColor C)
+		{
+			return C switch
+			{
+				STDFrontColor.Black => "Black",
+				STDFrontColor.White => "White",
+				STDFrontColor.Cyan => "Cyan",
+				STDFrontColor.Red => "Red",
+				STDFrontColor.Blue => "Blue",
+				STDFrontColor.Gray => "Gray",
+				STDFrontColor.Magenta => "Magenta",
+				STDFrontColor.Green => "Green",
+				STDFrontColor.Yellow => "Yellow",
+				STDFrontColor.DarkBlue => "Dark Blue",
+				STDFrontColor.DarkGreen => "Dark Green" ,
+				STDFrontColor.DarkRed => "Dark Red",
+				STDFrontColor.DarkYellow => "Dark Yellow" ,
+				STDFrontColor.DarkGray => "Dark Gray",
+				STDFrontColor.DarkCyan => "Dark Cyan",
+				STDFrontColor.DarkMagenta => "Dark Magenta",
+				_ => ""
+			};
+		}
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static System.String ParseBackColorS(STDBackColor C)
+		{
+            return C switch
+            {
+                STDBackColor.Black => "Black",
+                STDBackColor.White => "White",
+                STDBackColor.Cyan => "Cyan",
+                STDBackColor.Red => "Red",
+                STDBackColor.Blue => "Blue",
+                STDBackColor.Gray => "Gray",
+                STDBackColor.Magenta => "Magenta",
+                STDBackColor.Green => "Green",
+                STDBackColor.Yellow => "Yellow",
+                STDBackColor.DarkBlue => "Dark Blue",
+                STDBackColor.DarkGreen => "Dark Green",
+                STDBackColor.DarkRed => "Dark Red",
+                STDBackColor.DarkYellow => "Dark Yellow",
+                STDBackColor.DarkGray => "Dark Gray",
+                STDBackColor.DarkCyan => "Dark Cyan",
+                STDBackColor.DarkMagenta => "Dark Magenta",
+                _ => ""
+            };
+        }
+
+		/*
+#pragma warning disable CS8509
+		private static System.ConsoleColor AsConsoleColorFrnt(STDFrontColor C)
+		{
+			return C switch
+			{
+				STDFrontColor.Black => System.ConsoleColor.Black,
+				STDFrontColor.Magenta => System.ConsoleColor.Magenta,
+				STDFrontColor.White => System.ConsoleColor.White,
+				STDFrontColor.Blue => System.ConsoleColor.Blue,
+				STDFrontColor.Red => System.ConsoleColor.Red,
+				STDFrontColor.Cyan => System.ConsoleColor.Cyan,
+				STDFrontColor.Gray => System.ConsoleColor.Gray,
+				STDFrontColor.Green => System.ConsoleColor.Green,
+				STDFrontColor.Yellow => System.ConsoleColor.Yellow,
+				STDFrontColor.DarkBlue => System.ConsoleColor.DarkBlue,
+				STDFrontColor.DarkCyan => System.ConsoleColor.DarkCyan,
+				STDFrontColor.DarkGray => System.ConsoleColor.DarkGray,
+				STDFrontColor.DarkMagenta => System.ConsoleColor.DarkMagenta,
+				STDFrontColor.DarkGreen => System.ConsoleColor.DarkGreen,
+				STDFrontColor.DarkRed => System.ConsoleColor.DarkRed,
+				STDFrontColor.DarkYellow => System.ConsoleColor.DarkYellow
+			};
+		}
+
+		private static System.ConsoleColor AsConsoleColorBack(STDBackColor C)
+		{
+            return C switch
+            {
+                STDBackColor.Black => System.ConsoleColor.Black,
+                STDBackColor.Magenta => System.ConsoleColor.Magenta,
+                STDBackColor.White => System.ConsoleColor.White,
+                STDBackColor.Blue => System.ConsoleColor.Blue,
+                STDBackColor.Red => System.ConsoleColor.Red,
+                STDBackColor.Cyan => System.ConsoleColor.Cyan,
+                STDBackColor.Gray => System.ConsoleColor.Gray,
+                STDBackColor.Green => System.ConsoleColor.Green,
+                STDBackColor.Yellow => System.ConsoleColor.Yellow,
+                STDBackColor.DarkBlue => System.ConsoleColor.DarkBlue,
+                STDBackColor.DarkCyan => System.ConsoleColor.DarkCyan,
+                STDBackColor.DarkGray => System.ConsoleColor.DarkGray,
+                STDBackColor.DarkMagenta => System.ConsoleColor.DarkMagenta,
+                STDBackColor.DarkGreen => System.ConsoleColor.DarkGreen,
+                STDBackColor.DarkRed => System.ConsoleColor.DarkRed,
+                STDBackColor.DarkYellow => System.ConsoleColor.DarkYellow
+            };
+        }
+#pragma warning restore CS8509 */
+
+		/// <summary>
+		/// Deserialise the STD string data and convert them to a new STD Context.
+		/// </summary>
+		/// <param name="Data">The <see cref="System.String"/> data to parse.</param>
+		/// <returns>A new STD Context.</returns>
+		/// <exception cref="InvalidOperationException"></exception>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static STDContext Deserialize(System.String Data)
+		{
+			if (STDConstants.DetectSlashR(Data)) { Data = STDConstants.RemoveSlashR(Data); }
+			System.String[] _tmp = Data.Split('\n');
+			System.Boolean terminated = true;
+			System.String slicer = null;
+			System.Int32 Iterator0 = 0;
+            System.Int32 Iterator1 = 0;
+            System.String Temp = null;
+			System.String Front = null;
+			System.String Back = null;
+			System.Boolean GivenVersion = false;
+			STDContext STD = new();
+
+            foreach (System.String Runner in _tmp)
+			{
+				try
+				{
+
+					if (Runner.IndexOf(STDConstants.COMMENT, 0, 2) != -1)
+					{
+						// skip execution , it is a comment.
+						STD.AddComment(Runner.Substring(Runner.IndexOf(STDConstants.COMMENT) + 1));
+						terminated = true;
+						slicer = null;
+						continue;
+					}
+
+					if (Runner.Trim() == "") { break; }
+
+					// In normal practice , it would be expected that the parser should throw an error.
+					// However , this is done so as to parse as most as possible uncorrupted data.
+					// So , it instead adds an invalid item that can be examined by the programmer and detect the mistake or corruption.
+					if (((Runner.IndexOf(STDConstants.STRING) == -1) && (Runner.IndexOf(STDConstants.SEPERATOR) == -1)) &&
+						(Runner.IndexOf(STDConstants.COMMENT) == -1) && (Runner.IndexOf(STDConstants.HDRCLOSE) == -1) &&
+						(Runner.IndexOf(STDConstants.HDRCLOSE) == -1))
+					{
+						// Has none of the specified STD characters. In this case , add a new invalid item.
+						STD.AddInvalidItem(Runner);
+						continue;
+					}
+
+					if (Runner.IndexOf(STDConstants.HDROPEN, 0, 1) != -1)
+					{
+						// Start parsing the version block.
+						Temp = Runner.Substring(Runner.IndexOf(STDConstants.HDROPEN) + 1, Runner.IndexOf(STDConstants.SEPERATOR) - 1);
+						if (Temp.ToUpperInvariant() == "VERSION")
+						{
+							Temp = Runner.Substring(Runner.IndexOf(STDConstants.SEPERATOR) + 1, Runner.Length - Runner.IndexOf(STDConstants.HDRCLOSE));
+							if (System.Convert.ToInt32(Temp) == STDConstants.VERSION) { GivenVersion = true; STD.AddVersionBlock(); }
+						}
+						continue;
+					}
+
+					if ((Runner.IndexOf(STDConstants.STRING, 0, 1) != -1) && (terminated == true))
+					{
+						Temp = Runner.Substring(Runner.IndexOf(STDConstants.STRING) + 1);
+						slicer = Runner.Substring(Runner.IndexOf(STDConstants.STRING) + 1, Temp.IndexOf(STDConstants.STRING));
+						Iterator0 = Temp.IndexOf(STDConstants.STRING) + 1;
+						if (Temp.Substring(Iterator0, 1) != $"{STDConstants.SEPERATOR}") { terminated = false; continue; }
+						Temp = null;
+						Temp = Runner.Substring(Iterator0 + 3);
+						Iterator1 = Temp.IndexOf(STDConstants.STRING);
+						Front = Temp.Substring(0, Iterator1);
+						if (Temp.Substring(Iterator1 + 1, 1) != $"{STDConstants.SEPERATOR}") { terminated = false; continue; }
+						Back = MAIN.RemoveDefinedChars(Runner.Substring(Runner.LastIndexOf(STDConstants.SEPERATOR) + 1),
+							new[] { STDConstants.SEPERATOR, STDConstants.STRING });
+					}
+
+					if (terminated == false)
+					{
+						Front = null;
+						Back = null;
+						slicer = null;
+						throw new System.InvalidOperationException("Unterminated STD color string detected.");
+					}
+					else
+					{
+						STDFrontColor SS = ParseFrontColor(Front.Trim());
+						STDBackColor SD = ParseBackColor(Back.Trim());
+						if ((SS == STDFrontColor.INV) || (SD == STDBackColor.INV))
+						{
+							throw new System.InvalidOperationException(
+								$"The STD Color was not parsed. Invalid colors detected: [{Front}] [{Back}]");
+						}
+						STD.Add(SS, SD, slicer);
+						Front = null;
+						Back = null;
+						slicer = null;
+					}
+				} catch 
+				{
+                    // Parser error. In this case , add a new invalid item.
+                    STD.AddInvalidItem(Runner);
+                    continue;
+                }
+			}
+
+			if (GivenVersion == false)
+			{
+				throw new InvalidOperationException("The STD Version block was malformed. " +
+					"Please detect the error and fix it so as the data can be parsed again.");
+			}
+			_tmp = null;
+			return STD;
+		}
+
+		/// <summary>
+		/// Serialise from an STD Context the given data.
+		/// </summary>
+		/// <param name="Context">The STD Context to get data from.</param>
+		/// <returns>The STD encoded data as a single <see cref="System.String"/>.</returns>
+		/// <exception cref="AggregateException"></exception>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static System.String Serialize(STDContext Context)
+		{
+			System.String Result = null;
+			STDLine STDL = new();
+			System.String FR = null;
+			System.String BK = null;
+			for (System.Int32 I = 0; I < Context.ItemsCount; I++)
+			{
+				STDL = Context.Get(I);
+				if (STDL.Type == STDType.VersionBlock) 
+				{
+					Result += $"{STDL.Data}\n";
+					continue;
+				}
+				if (STDL.Type == STDType.Comment)
+				{
+					Result += $"#{STDL.Data}\n";
+                    continue;
+                }
+				if (STDL.Type == STDType.STDString)
+				{
+					FR = ParseFrontColorS(STDL.Colors.FrontColor);
+					BK = ParseBackColorS(STDL.Colors.BackColor);
+					if (FR == "") { throw new AggregateException("The Front Color string could not be parsed."); }
+                    if (BK == "") { throw new AggregateException("The Back Color string could not be parsed."); }
+                    Result += $"{STDConstants.STRING}{STDL.Data}{STDConstants.STRING}{STDConstants.SEPERATOR}{STDConstants.STRING}" +
+						$"{FR}{STDConstants.STRING}{STDConstants.SEPERATOR}{STDConstants.STRING}" +
+						$"{BK}{STDConstants.STRING}\n";
+					FR = null;
+					BK = null;
+                    continue;
+                }
+			}
+			return Result;
+		}
+
+		/*
+		/// <summary>
+		/// Displays the current data to the .NET running console.
+		/// </summary>
+		/// <param name="Context">The STD Context to display the data from.</param>
+		public static void DisplayToConsole(STDContext Context)
+		{
+            STDLine STDL = new();
+			for (System.Int32 I = 0; I < Context.ItemsCount - 1; I++)
+			{
+				if (STDL.Type == STDType.STDString)
+				{
+					ROOT.MAIN.WriteCustomColoredText(STDL.Data , 
+						AsConsoleColorFrnt(STDL.colors.FrontColor) , AsConsoleColorBack(STDL.colors.BackColor));
+					continue;
+				}
+			}
+        }
+		*/
+	}
+
+
+
 }
 
 namespace ExternalHashCaculators
@@ -4376,10 +5086,10 @@ namespace ExternalHashCaculators
         /// <summary>
         /// Computes a file hash by using the XXH32 function.
         /// </summary>
-        /// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+        /// <param name="FileStream">The alive <see cref="System.IO.Stream"/> object from which the data will be collected.</param>
         /// <returns>A caculated xxHash32 value written as an hexadecimal <see cref="System.String"/>.</returns>
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public static System.String xxHash_32(System.IO.FileStream FileStream)
+        public static System.String xxHash_32(System.IO.Stream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
 			if (FileStream.Length < 20) {return "Error";}
@@ -4422,6 +5132,7 @@ namespace ExternalHashCaculators
         /// <see cref="System.Byte"/>[] .</param>
         /// <param name="Seed">The Seed to use for calculating the hash. Can be 0.</param>
         /// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
+		/// <remarks>This function performs well only on AMD64 machines; it's performance is degraded when working on IA32.</remarks>
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.String xxHash_64(System.Byte[] Data, System.Int32 Length, System.Int32 Seed)
         {
@@ -4433,11 +5144,11 @@ namespace ExternalHashCaculators
         /// <summary>
         /// Computes a file hash by using the XXH64 function.
         /// </summary>
-        /// <param name="FileStream">The alive <see cref="System.IO.FileStream"/> object from which the data will be collected.</param>
+        /// <param name="FileStream">The alive <see cref="System.IO.Stream"/> object from which the data will be collected.</param>
         /// <returns>A caculated xxHash64 value written as an hexadecimal <see cref="System.String"/>.</returns>
         /// <remarks>This function performs well only on AMD64 machines; it's performance is degraded when working on IA32.</remarks>
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public static System.String xxHash_64(System.IO.FileStream FileStream)
+        public static System.String xxHash_64(System.IO.Stream FileStream)
 		{
 			if (!(_CheckDLLVer())) {return "Error";}
 			if (FileStream.Length < 20) {return "Error";}
@@ -4454,6 +5165,233 @@ namespace ExternalHashCaculators
 			System.Int32 EFR = XXHASHMETHODS.XXH64(FBM , FBM.Length ,0);
 			FBM = null;
 			return EFR.ToString("x2");
+		}
+	}
+
+	internal unsafe class XXhashm32
+	{
+
+		public const System.UInt32 MaxBufferSize = 15 + 1;
+		public const System.UInt32 Prime1 = 2654435761U;
+        public const System.UInt32 Prime2 = 2246822519U;
+        public const System.UInt32 Prime3 = 3266489917U;
+        public const System.UInt32 Prime4 = 668265263U;
+        public const System.UInt32 Prime5 = 374761393U;
+
+        [System.Runtime.CompilerServices.MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static System.UInt32 RotateLeft(System.UInt32 x, char bits)
+        {
+            return (x << bits) | (x >> (32 - bits));
+        }
+
+		public static void Process(System.Char* data, System.UInt32 state0, 
+			System.UInt32 state1, System.UInt32 state2, System.UInt32 state3)
+		{
+			System.UInt32* block = (System.UInt32*) data;
+			state0 = RotateLeft(state0 + block[0] * Prime2, (System.Char) 13) * Prime1;
+			state1 = RotateLeft(state1 + block[1] * Prime2, (System.Char) 13) * Prime1;
+			state2 = RotateLeft(state2 + block[2] * Prime2, (System.Char) 13) * Prime1;
+			state3 = RotateLeft(state3 + block[3] * Prime2, (System.Char) 13) * Prime1;
+		}
+
+		public static XXhashState State = new();
+        public static System.Char[] buffer = new System.Char[MaxBufferSize];
+        public static System.Int32 bufferSize = 0;
+		public static System.UInt64 totalLength = 0;
+	    public static System.IntPtr tm;
+
+		private static char* MarshalAspointer(System.Char[] data)
+		{
+			char* result;
+			if (tm != null) { Marshal.FreeHGlobal(tm); tm = System.IntPtr.Zero; }
+            tm = Marshal.AllocHGlobal(Marshal.SizeOf(data[0]) * data.Length);
+            System.Int32[] tr = new System.Int32[data.Length];
+            for (System.Int32 I = 0; I < data.Length; I++) { tr[I] = data[I]; }
+            Marshal.Copy(tr, 0, tm, data.Length);
+            result = (char*) tm.ToPointer();
+			return result;
+        }
+
+		public static System.Boolean Add(void* input, System.UInt64 length)
+		{
+			// no data ?
+			if (input == null || length == 0) return false;
+			totalLength += length;
+			// byte-wise access
+			System.Char* data = (System.Char*) input;
+			// unprocessed old data plus new data still fit in temporary buffer ?
+			if ((System.UInt64) bufferSize + length < MaxBufferSize)
+			{
+				// just add new data
+				while (length-- > 0) buffer[bufferSize++] = *data++;
+				return true;
+			}
+			// point beyond last byte
+			System.Char* stop = data + length;
+			System.Char* stopBlock = stop - MaxBufferSize;
+			// some data left from previous update ?
+			if (bufferSize > 0)
+			{
+				// make sure temporary buffer is full (16 bytes)
+				while (bufferSize < MaxBufferSize) buffer[bufferSize++] = *data++;
+				// process these 16 bytes (4x4)
+				Process(MarshalAspointer(buffer), State[0], State[1], State[2], State[3]);
+			}
+			// copying state to local variables helps optimizer A LOT
+			System.UInt32 s0 = State[0], s1 = State[1], s2 = State[2], s3 = State[3];
+			// 16 bytes at once
+			while (data <= stopBlock)
+			{
+				// local variables s0..s3 instead of state[0]..state[3] are much faster
+				Process(data, s0, s1, s2, s3);
+				data += 16;
+			}
+			// copy back
+			State[0] = s0; State[1] = s1; State[2] = s2; State[3] = s3;
+			// copy remainder to temporary buffer:
+			// To do that in .NET , we must initialise a ref variable , then copy the remainder to temporary buffer and then
+			// take the value , save it to the ref we initialised , and copy back the value to the original buffer size variable..
+			ref System.Int32 bse = ref System.Runtime.CompilerServices.Unsafe.AsRef<System.Int32>(bufferSize);
+            bse = (System.Int32) (stop - data);
+			bufferSize = bse;
+			for (System.Int32 i = 0; i < bufferSize; i++) buffer[i] = data[i];
+			// done
+			return true;
+		}
+
+		public static System.UInt32 Hash()
+		{
+			System.UInt32 result = (System.UInt32) totalLength;
+			// fold 128 bit state into one single 32 bit value
+			if (totalLength >= MaxBufferSize)
+			{
+				result += RotateLeft(State[0], (System.Char)1) +
+						  RotateLeft(State[1], (System.Char)7) +
+						  RotateLeft(State[2], (System.Char)12) +
+						  RotateLeft(State[3], (System.Char)18);
+			}
+			else
+			{
+				// internal state wasn't set in add(), therefore original seed is still stored in state2
+				result += State[2] + Prime5;
+			}
+			// process remaining bytes in temporary buffer
+			System.Char* data = MarshalAspointer(buffer);
+			// point beyond last byte
+			System.Char* stop = data + bufferSize;
+			// at least 4 bytes left ? => eat 4 bytes per step
+			for (; data + 4 <= stop; data += 4) { result = RotateLeft(result + *(System.UInt32*)data * Prime3, (System.Char)17) * Prime4; }
+			// take care of remaining 0..3 bytes, eat 1 byte per step
+			while (data != stop) { result = RotateLeft(result + (*data++) * Prime5, (System.Char)11) * Prime1; }
+			// mix bits
+			result ^= result >> 15;
+			result *= Prime2;
+			result ^= result >> 13;
+			result *= Prime3;
+			result ^= result >> 16;
+			return result;
+		}
+
+		public static System.Boolean AddImpl(System.Byte[] d , System.UInt64 len)
+		{
+            if (tm != null) { Marshal.FreeHGlobal(tm); tm = System.IntPtr.Zero; }
+            tm = Marshal.AllocHGlobal(Marshal.SizeOf(d[0]) * d.Length);
+			System.Int32[] tr = new System.Int32[len];
+			for (System.Int32 I = 0; I < d.Length; I++) { tr[I] = d[I]; tr[I] = System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(tr[I]);  }
+			Marshal.Copy(tr , 0 , tm , (System.Int32) len);
+			void* temp = tm.ToPointer();
+			return Add(temp, len);
+		}
+	}
+
+	internal struct XXhashState
+	{
+
+		public System.UInt32[] Data;
+
+		public XXhashState() { Data = new System.UInt32[4]; }
+
+		public System.UInt32 this[System.Int32 Index]
+		{
+			readonly get { return Data[Index]; }
+			set { Data[Index] = value; }
+		}
+
+	}
+
+	/// <summary>
+	/// <para>
+	/// An XXHash32 implementation based on Stephan's Brumme implementation
+	/// for C++. </para>
+	/// <para>Be noted that this implementation tries to wrap up that C++ implementation , 
+	/// so it contains also unmanaged code too , but without the need of the unmanaged library.</para>
+	/// <para>This class is theoritical; although that in practice it works , 
+	/// the runtime crashes after the hash is took.</para>
+	/// </summary>
+	[System.Obsolete("This class is not meant to be used directly by your code because it is in test phase.\n" +
+		"Please avoid using it so as to avoid runtime memory corruption." , false)]
+    public class XXHashManaged32 : System.IDisposable
+	{
+		private System.Boolean _disposed = false;
+
+		/// <summary>
+		/// Create a new XXHash Instance.
+		/// </summary>
+		/// <param name="Seed">The seed to use when the XXHash value will be computed.</param>
+		public XXHashManaged32(System.Int32 Seed)
+		{
+			XXhashm32.State[0] = (System.UInt32) Seed + XXhashm32.Prime1 + XXhashm32.Prime2;
+            XXhashm32.State[1] = (System.UInt32) Seed + XXhashm32.Prime2;
+            XXhashm32.State[2] = (System.UInt32) Seed;
+            XXhashm32.State[3] = (System.UInt32) Seed - XXhashm32.Prime1;
+        }
+		/// <summary>
+		/// This constructor always throws an <see cref="System.InvalidOperationException"/> exception.
+		/// </summary>
+		/// <exception cref="System.InvalidOperationException"></exception>
+		public XXHashManaged32() { throw new System.InvalidOperationException(
+			"The class should be at least initiated with a seed value. Can also be 0."); }
+
+		/// <summary>
+		/// Add data to process before hashing.
+		/// </summary>
+		/// <param name="Data">The Array to compute the data from.</param>
+		/// <param name="Length">The Length of the <paramref name="Data"/> array , 
+		/// or less than it's length so to compute a specific portion of the array. </param>
+		/// <returns>A <see cref="System.Boolean"/> value indicating that 
+		/// the data were sucessfully added to the stash for computing.</returns>
+		public System.Boolean Add(System.Byte[] Data , System.Int32 Length)
+		{
+			if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); }
+			return XXhashm32.AddImpl(Data, (System.UInt64) Length);
+		}
+
+		/// <summary>
+		/// Hash the stashed data.
+		/// </summary>
+		/// <returns>A <see cref="System.UInt64"/> containing the hashed data.</returns>
+		/// <remarks>NOTE: You should call Dispose() after hashing , because the code implemented is 
+		/// unmanaged and causes runtime crashes if this method is called again.</remarks>
+		public System.UInt64 Hash() 
+		{
+            if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); }
+			System.UInt64 Result = XXhashm32.Hash();
+			return Result;
+		}
+
+		/// <summary>
+		/// The destructor is equal to <see cref="Dispose()"/> method.
+		/// </summary>
+		~XXHashManaged32() { Dispose(); }
+
+		/// <summary>
+		/// Dispose this instance and invalidate it.
+		/// </summary>
+		public void Dispose() 
+		{
+			if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); } else { _disposed = true; }
+            Marshal.FreeHGlobal(XXhashm32.tm); 
+			XXhashm32.tm = System.IntPtr.Zero; 
 		}
 	}
 
