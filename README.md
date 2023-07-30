@@ -36,7 +36,9 @@ or included until now. The Library will be also updated with new features and bu
 ## Avaliable Platforms
  The Project is compiled as a Dynamic Link Library (DLL) and works on any platform (Not sure , but surely is compiled as MSIL).
  
- You can compile it for now only by using the Visual Studio Solution.
+ You can compile it with the `dotnet build` command or using the bundled Visual Studio solution.
+
+ See why the last version (1.5.5.0) could not be compiled using the `dotnet build` command [here](http://github.com/mdcdi1315/mdcframework/blob/main/BuildBehavior.md).
 
   __NOTE__ You can also compile this DLL on other .NET Versions and platforms , but it will need to refactor some code lines to work correctly.
    Also , you must know how to edit the project file in order to target it to another .NET Version and platform.
@@ -53,6 +55,15 @@ The project includes operations related to:
  
    __NOTE__: Zstandard archiving is only avaliable as a wrapper with limited functionality.
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
+
+  Additionally , it includes four NuGet packages:
+  - System.Buffers
+  - System.Memory
+  - System.Resources.Extensions
+  - System.Threading.Tasks.Extensions
+
+  These packages are embedded in the Project and can be used like the normal NuGet packages.
+  The documentation for these is kept by Microsoft , as well as how to use them.
 
 #### Documentation
 The Documentantion explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
@@ -74,4 +85,5 @@ Any questions relating bugs can be posted as a new Issue and marking them as 'Qu
 - Blake2s Checksum by sparkdustjoe at http://github.com/SparkDustJoe/Blake2 .
 - Cabinet Support by .NET Foundation (Taken from the WiX Toolset) at http://github.com/wixtoolset/wix .
 - Snappy Compression and Decompression native library by brantburnett at http://github.com/brantburnett/Snappier .
-- A Full and exact implementation of Brotli archiving on C# (version is 0.6.0.) by master131 at http://github.com/master131/BrotliSharpLib .  
+- A Full and exact implementation of Brotli archiving on C# (version is 0.6.0.) by master131 at http://github.com/master131/BrotliSharpLib .
+- The Packages used (NuGet) are creations of .NET Foundation located at http://github.com/dotnet .
