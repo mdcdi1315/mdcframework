@@ -59,7 +59,7 @@ http://learn.microsoft.com/en-us/dotnet/api/microsoft.visualbasic.interaction.in
 The Registry Editor was refactored and most of the problems were solved.
 However , it needs to be tested so as to be used in production.
 
-## Minor Version 1.5.5.2:
+## Minor Version 1.5.5.2 & 1.5.5.3:
 
  In this Version , more features are now added! As going ahead to 1.5.6.0 , 
  some features were added , while some others were removed (or are in process of it).
