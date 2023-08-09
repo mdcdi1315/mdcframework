@@ -53,15 +53,17 @@ namespace ROOT
 			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
 			public static void InfoText(System.String Text)
 			{
-				System.ConsoleColor FORE, BACK;
-				FORE = System.Console.ForegroundColor;
-				BACK = System.Console.BackgroundColor;
-				System.Console.ForegroundColor = System.ConsoleColor.Gray;
-				System.Console.BackgroundColor = System.ConsoleColor.Black;
-				System.Console.WriteLine(@"INFO: " + Text);
-				System.Console.ForegroundColor = FORE;
-				System.Console.BackgroundColor = BACK;
-			}
+                if (ROOT.ConsoleExtensions.Detached == true) { return; }
+                System.ConsoleColor FORE, BACK;
+                FORE = ConsoleExtensions.ForegroundColor;
+                BACK = ConsoleExtensions.BackgroundColor;
+                ConsoleExtensions.InitIfNotInitOut();
+                ConsoleExtensions.ForegroundColor = System.ConsoleColor.Gray;
+                ConsoleExtensions.BackgroundColor = System.ConsoleColor.Black;
+                WriteConsoleText(@"INFO: " + Text);
+                ConsoleExtensions.ForegroundColor = FORE;
+                ConsoleExtensions.BackgroundColor = BACK;
+            }
 
 			/// <summary>
 			/// This writes the data specified on the console. These data are warnings. The background is black and the foreground is yellow.
@@ -69,15 +71,17 @@ namespace ROOT
 			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
 			public static void WarningText(System.String Text)
 			{
-				System.ConsoleColor FORE, BACK;
-				FORE = System.Console.ForegroundColor;
-				BACK = System.Console.BackgroundColor;
-				System.Console.ForegroundColor = System.ConsoleColor.Yellow;
-				System.Console.BackgroundColor = System.ConsoleColor.Black;
-				System.Console.WriteLine(@"WARNING: " + Text);
-				System.Console.ForegroundColor = FORE;
-				System.Console.BackgroundColor = BACK;
-			}
+                if (ROOT.ConsoleExtensions.Detached == true) { return; }
+                System.ConsoleColor FORE, BACK;
+                FORE = ConsoleExtensions.ForegroundColor;
+                BACK = ConsoleExtensions.BackgroundColor;
+                ConsoleExtensions.InitIfNotInitOut();
+                ConsoleExtensions.ForegroundColor = System.ConsoleColor.Yellow;
+                ConsoleExtensions.BackgroundColor = System.ConsoleColor.Black;
+                WriteConsoleText(@"WARNING: " + Text);
+                ConsoleExtensions.ForegroundColor = FORE;
+                ConsoleExtensions.BackgroundColor = BACK;
+            }
 
 			/// <summary>
 			/// This writes the data specified on the console. These data are errors. The background is black and the foreground is red.
@@ -85,14 +89,16 @@ namespace ROOT
 			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
 			public static void ErrorText(System.String Text)
 			{
-				System.ConsoleColor FORE, BACK;
-				FORE = System.Console.ForegroundColor;
-				BACK = System.Console.BackgroundColor;
-				System.Console.ForegroundColor = System.ConsoleColor.Red;
-				System.Console.BackgroundColor = System.ConsoleColor.Black;
-				System.Console.WriteLine(@"ERROR: " + Text);
-				System.Console.ForegroundColor = FORE;
-				System.Console.BackgroundColor = BACK;
+                if (ROOT.ConsoleExtensions.Detached == true) { return; }
+                System.ConsoleColor FORE, BACK;
+                FORE = ConsoleExtensions.ForegroundColor;
+                BACK = ConsoleExtensions.BackgroundColor;
+                ConsoleExtensions.InitIfNotInitOut();
+                ConsoleExtensions.ForegroundColor = System.ConsoleColor.Red;
+                ConsoleExtensions.BackgroundColor = System.ConsoleColor.Black;
+                WriteConsoleText(@"ERROR: " + Text);
+                ConsoleExtensions.ForegroundColor = FORE;
+                ConsoleExtensions.BackgroundColor = BACK;
 			}
 
 			/// <summary>
@@ -101,14 +107,16 @@ namespace ROOT
 			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
 			public static void FatalText(System.String Text)
 			{
-				System.ConsoleColor FORE, BACK;
-				FORE = System.Console.ForegroundColor;
-				BACK = System.Console.BackgroundColor;
-				System.Console.ForegroundColor = System.ConsoleColor.Magenta;
-				System.Console.BackgroundColor = System.ConsoleColor.Black;
-				System.Console.WriteLine(@"FATAL: " + Text);
-				System.Console.ForegroundColor = FORE;
-				System.Console.BackgroundColor = BACK;
+                if (ROOT.ConsoleExtensions.Detached == true) { return; }
+                System.ConsoleColor FORE, BACK;
+                FORE = ConsoleExtensions.ForegroundColor;
+                BACK = ConsoleExtensions.BackgroundColor;
+                ConsoleExtensions.InitIfNotInitOut();
+				ConsoleExtensions.ForegroundColor = System.ConsoleColor.Magenta;
+				ConsoleExtensions.BackgroundColor = System.ConsoleColor.Black;
+				WriteConsoleText(@"FATAL: " + Text);
+				ConsoleExtensions.ForegroundColor = FORE;
+				ConsoleExtensions.BackgroundColor = BACK;
 			}
 
 		}
@@ -119,46 +127,90 @@ namespace ROOT
 		[SupportedOSPlatform("windows")]
 		public static void EmitBeepSound() { Microsoft.VisualBasic.Interaction.Beep(); }
 
-		/// <summary>
-		/// This is an exact implementation of <see cref="System.Console.WriteLine()"/> which just writes data to the console.
-		/// </summary>
-		/// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
-		public static void WriteConsoleText(System.String Text) { System.Console.WriteLine(Text); }
+        /// <summary>
+        /// This is a custom implementation of <see cref="System.Console.WriteLine()"/> which writes data to the console.
+        /// </summary>
+        /// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
+		/// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
+        [SupportedOSPlatform("windows")]
+        public static System.Boolean WriteConsoleText(System.String Text) 
+		{ return global::ConsoleInterop.WriteToConsole($"{Text}\r\n"); }
 
 		/// <summary>
-		/// This writes a <see cref="System.Char"/>[] to the console. <see cref="System.Console.WriteLine()"/> also 
-		/// contains such a method , but this one is different and has no any relationship with that one.
+		/// Detaches the running console.
 		/// </summary>
-		/// <param name="Text">The <see cref="System.Char"/>[] data to write.</param>
-		public static void WriteConsoleText(System.Char[] Text)
+		/// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
+		public static System.Boolean DetachConsole()
 		{
-			System.String Result = null;
-			for (System.Int32 D = 0; D < Text.Length; D++) { Result += Text[D]; }
-			System.Console.WriteLine(Result);
+			if (ConsoleInterop.DetachConsole() != 0) { ConsoleExtensions.Detached = true; return false; } else { return true; }
+		}
+
+        /// <summary>
+        /// Attach the current application to the specified console PID.
+        /// </summary>
+        /// <param name="ConsolePID">The Console's PID to attach to. If not defined , it will try to attach to the parent process console ,
+        /// if it exists and has spawned a console.</param>
+        /// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
+        public static System.Boolean AttachToConsole(System.Int32 ConsolePID = -1)
+		{
+			if (ConsoleInterop.AttachToConsole(ConsolePID) != 0) { ConsoleExtensions.Detached = false; return true; } else { return false; }
 		}
 
 		/// <summary>
-		/// This writes a custom colored text to console and returns to the current console color settings after written.
+		/// Read a text line from console. This uses a custom inplementation so as to get the data.
 		/// </summary>
-		/// <param name="Message">The <see cref="System.String"/> data to write to.</param>
-		/// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
-		/// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
-		public static void WriteCustomColoredText(System.String Message, System.ConsoleColor ForegroundColor, System.ConsoleColor BackgroundColor)
+		/// <param name="Opt">The Buffer Size to set. If left undefined , then it is <see cref="ConsoleExtensions.ConsoleReadBufferOptions.Default"/></param>
+		/// <returns>The data read from the console. If any error found , then it will return the <c>"Error"</c> <see cref="System.String"/> .</returns>
+        [SupportedOSPlatform("windows")]
+        public static System.String ReadConsoleText(ROOT.ConsoleExtensions.ConsoleReadBufferOptions Opt = 
+			ROOT.ConsoleExtensions.ConsoleReadBufferOptions.Default)
 		{
-			System.ConsoleColor FORE, BACK;
-			FORE = System.Console.ForegroundColor;
-			BACK = System.Console.BackgroundColor;
-			System.Console.ForegroundColor = ForegroundColor;
-			System.Console.BackgroundColor = BackgroundColor;
-			System.Console.WriteLine(Message);
-			System.Console.ForegroundColor = FORE;
-			System.Console.BackgroundColor = BACK;
+			return global::ConsoleInterop.ReadFromConsole(Opt);
 		}
+
+        /// <summary>
+        /// This writes a <see cref="System.Char"/>[] to the console. <see cref="System.Console.WriteLine()"/> also 
+        /// contains such a method , but this one is different and has no any relationship with that one.
+        /// </summary>
+        /// <param name="Text">The <see cref="System.Char"/>[] data to write.</param>
+        /// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
+		[SupportedOSPlatform("windows")]
+        public static System.Boolean WriteConsoleText(System.Char[] Text) 
+		{ 
+			List<System.Char> LST = new List<System.Char>(Text);
+			LST.Add('\r');
+			LST.Add('\n');
+			System.Boolean DS = ConsoleInterop.WriteToConsole(LST.ToArray());
+			LST.Clear();
+			LST = null;
+			return DS;
+		}
+
+        /// <summary>
+        /// This writes a custom colored text to console and returns to the current console color settings after written.
+        /// </summary>
+        /// <param name="Message">The <see cref="System.String"/> data to write to.</param>
+        /// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
+        /// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
+        [SupportedOSPlatform("windows")]
+        public static void WriteCustomColoredText(System.String Message, System.ConsoleColor ForegroundColor, System.ConsoleColor BackgroundColor)
+		{
+            System.ConsoleColor FORE, BACK;
+            FORE = ConsoleExtensions.ForegroundColor;
+            BACK = ConsoleExtensions.BackgroundColor;
+			ConsoleExtensions.InitIfNotInitOut();
+			ConsoleExtensions.SetForeColor(ForegroundColor);
+			ConsoleExtensions.SetBackColor(BackgroundColor);
+			ConsoleInterop.WriteToConsole($"{Message}\r\n");
+            ConsoleExtensions.SetForeColor(FORE);
+            ConsoleExtensions.SetBackColor(BACK);
+        }
 
 		/// <summary>
 		/// (For informational purposes only) The Current Visual Basic Runtime Library version that is used by the runtime.
 		/// </summary>
 		/// <returns>A <see cref="System.String"/> which contains the Visual Basic Runtime Library version.</returns>
+		[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version." , true)]
 		public static System.String GetVBRuntimeInfo()
 		{
 			return Microsoft.VisualBasic.Globals.ScriptEngine + " Engine , Version " +
@@ -226,6 +278,42 @@ namespace ROOT
 
 #endif
 
+		/// <summary>
+		/// Determines whether the caller has administrative permissions 
+		/// (That is , the caller was launched with the 'Run As Administrator' option).
+		/// </summary>
+		/// <returns>A <see cref="System.Boolean"/> value determining whether the caller has administrative priviledges.</returns>
+		[SupportedOSPlatform("windows")]
+		public static System.Boolean RunsAsAdmin()
+		{
+			System.Security.Principal.WindowsPrincipal DI = new(System.Security.Principal.WindowsIdentity.GetCurrent());
+			return DI.IsInRole(System.Security.Principal.WindowsBuiltInRole.Administrator);
+        }
+
+		/// <summary>
+		/// Change in a <see cref="System.String"/> the defined character with another one.
+		/// </summary>
+		/// <param name="Stringtoreplacechar">The <see cref="System.String"/> data to take from.</param>
+		/// <param name="Chartochange">The character that will be changed.</param>
+		/// <param name="Chartobechanged">The character that will replace the <paramref name="Chartochange"/> character.</param>
+		/// <returns>The <see cref="System.String"/> given to <paramref name="Stringtoreplacechar"/> ,
+		/// but with the defined character changed as specified by the <paramref name="Chartobechanged"/> parameter.</returns>
+		public static System.String ChangeDefinedChar(System.String Stringtoreplacechar , 
+			System.Char Chartochange , System.Char Chartobechanged)
+		{
+			System.Char[] array = Stringtoreplacechar.ToCharArray();
+			if (array == null || array.Length < 1) { return "Error"; }
+			System.String Result = null;
+			for (System.Int32 I = 0; I < array.Length; I++)
+			{
+				if (array[I] == Chartochange) 
+				{
+					Result += Chartobechanged;
+				} else { Result += array[I]; }
+			}
+			return Result;
+		}
+
         /// <summary>
         /// The method returns a new <see cref="System.String"/> defined from the <paramref name="StringToClear"/> parameter , 
         /// but it's characters removed defined by the <paramref name="CharToClear"/> parameter.
@@ -236,16 +324,16 @@ namespace ROOT
         /// <returns>A new <see cref="System.String"/> which is the 
         /// <paramref name="StringToClear"/> but with the defined characters removed.</returns>
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public static System.String RemoveDefinedChars(System.String StringToClear, System.Char[] CharToClear)
+        public static System.String RemoveDefinedChars(System.String StringToClear, params System.Char[] CharToClear)
 		{
 			System.Char[] CharString = StringToClear.ToCharArray();
 			if (CharString.Length <= 0) { return null; }
 			if (CharToClear.Length <= 0) { return null; }
 			System.Boolean Keeper = false;
 			System.String Result = null;
-			for (System.Int32 ITER = 1; ITER < CharString.Length; ITER++)
+			for (System.Int32 ITER = 0; ITER < CharString.Length; ITER++)
 			{
-				for (System.Int32 ILGITER = 1; ILGITER < CharToClear.Length; ILGITER++)
+				for (System.Int32 ILGITER = 0; ILGITER < CharToClear.Length; ILGITER++)
 				{
 					if (CharString[ITER] == CharToClear[ILGITER]) { Keeper = true; break; }
 				}
@@ -256,15 +344,15 @@ namespace ROOT
 			return Result;
 		}
 
-		/// <summary>
-		/// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
-		/// </summary>
-		/// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
-		/// <param name="Title">The window's title.</param>
-		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
-		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
-		[Notice("GetAStringFromTheUser", "GetAStringFromTheUserNew")]
-		[SupportedOSPlatform("windows")]
+        /// <summary>
+        /// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
+        /// </summary>
+        /// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
+        /// <param name="Title">The window's title.</param>
+        /// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
+        /// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
+        [System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version. Use instead the GetAStringFromTheUserNew function.", true)]
+        [SupportedOSPlatform("windows")]
 		public static System.String GetAStringFromTheUser(System.String Prompt,
 		System.String Title, System.String DefaultResponse)
 		{
@@ -1538,7 +1626,6 @@ namespace ROOT
 
 #endif
 
-
 	/// <summary>
 	/// An enumeration of values which help the function <see cref="MAIN.GetACryptographyHashForAFile(string, HashDigestSelection)"/> to properly select the algorithm requested.
 	/// </summary>
@@ -1776,7 +1863,7 @@ namespace ROOT
 		private System.Boolean Erro_r = false;
 
 		internal System.String ReturnHW31 { get { return BackField; } }
-		internal System.Boolean SetOrGetError { get { return Erro_r; } set { value = Erro_r; } }
+		internal System.Boolean SetOrGetError { get { return Erro_r; } set { Erro_r = value; } }
 
 		/// <summary>
 		/// Returns a <see cref="System.Boolean"/> value , indicating that this HW31 is invalid and should be destroyed.
@@ -2320,6 +2407,26 @@ namespace ROOT
 			}
 
 			/// <summary>
+			/// Create a new <see cref="AESEncryption"/> class , if the required data were got.
+			/// </summary>
+			public AESEncryption Create 
+			{
+				get 
+				{
+					if (CallerErroredOut == false)
+					{
+						AESEncryption EW = new();
+						EW.EncryptionKey = _EK_;
+						EW.IV = _IV_;
+						return EW;
+					} else
+					{
+						throw new InvalidOperationException("The data were not got , so it is not possible to instantiate a new AES Encryption class.");
+					}
+				} 
+			}
+			
+			/// <summary>
 			/// Returns a <see cref="System.Boolean"/> indicating whether the function or any function that uses this has errored out.
 			/// </summary>
 			public System.Boolean CallerErroredOut
@@ -2443,10 +2550,10 @@ namespace ROOT
             /// <summary>
             /// Encrypts the alive <see cref="System.IO.FileStream"/> with all of it's containing data as <see cref="System.Byte"/>[] units.
             /// </summary>
-            /// <param name="UnderlyingStream">The <see cref="System.IO.FileStream"/> object to get data from.</param>
+            /// <param name="UnderlyingStream">The <see cref="System.IO.Stream"/> object to get data from.</param>
             /// <returns>The encrypted AES CNG message.</returns>
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.Byte[] EncryptSpecifiedDataForFiles(System.IO.FileStream UnderlyingStream)
+            public System.Byte[] EncryptSpecifiedDataForFiles(System.IO.Stream UnderlyingStream)
 			{
 				if (!(UnderlyingStream is System.IO.FileStream) || (UnderlyingStream.CanRead == false)) { return null; }
 				if (_CheckPredefinedProperties()) { return null; }
@@ -2507,13 +2614,13 @@ namespace ROOT
 			}
 
             /// <summary>
-            /// Decrypts the encdoed AES CNG message from an alive <see cref="System.IO.FileStream"/> 
+            /// Decrypts the encdoed AES CNG message from an alive <see cref="System.IO.Stream"/> 
             /// object to <see cref="System.String"/> units.
             /// </summary>
-            /// <param name="EncasingStream">The <see cref="System.IO.FileStream"/> object which contains the encoded AES CNG message.</param>
+            /// <param name="EncasingStream">The <see cref="System.IO.Stream"/> object which contains the encoded AES CNG message.</param>
             /// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.String DecryptSpecifiedDataForFiles(System.IO.FileStream EncasingStream)
+            public System.String DecryptSpecifiedDataForFiles(System.IO.Stream EncasingStream)
 			{
 				if (EncasingStream.CanRead == false) { return null; }
 				if (_CheckPredefinedProperties()) { return null; }
@@ -2542,7 +2649,13 @@ namespace ROOT
 				if ((ByteValue is null) || (ByteValue.Length <= 0)) { return null; }
 				try
 				{
-					return System.Convert.ToBase64String(ByteValue, 0, ByteValue.Length, 0);
+					ReadOnlySpan<System.Byte> In = ByteValue;
+					Span<System.Byte> Out = new();
+					if (System.Buffers.Text.Base64.EncodeToUtf8(In, Out, out System.Int32 BG, 
+						out System.Int32 BW, true) == System.Buffers.OperationStatus.Done)
+					{
+						return System.Text.Encoding.UTF8.GetString(Out.ToArray());
+					} else { return null; }
 				}
 				catch (System.Exception) { return null; }
 			}
@@ -2559,7 +2672,13 @@ namespace ROOT
 				if (System.String.IsNullOrEmpty(StringValue)) { return null; }
 				try
 				{
-					return System.Convert.FromBase64String(StringValue);
+					ReadOnlySpan<System.Byte> In = System.Text.Encoding.UTF8.GetBytes(StringValue);
+					Span<System.Byte> Out = new();
+					if (System.Buffers.Text.Base64.DecodeFromUtf8(In , Out , out System.Int32 BG,
+						out System.Int32 ED , true) == System.Buffers.OperationStatus.Done) 
+					{
+						return Out.ToArray();
+					} else { return null; }
 				}
 				catch (System.Exception) { return null; }
 			}
@@ -2726,7 +2845,7 @@ namespace ROOT
 		/// <summary>
 		/// Archive files using the GZIP algorithm.
 		/// </summary>
-		public class GZipArchives
+		public static class GZipArchives
 		{
 			/* A Class that abstracts the GZIP archive format.
 			   USAGE NOTE: You can only add one file per archive each time.
@@ -2818,14 +2937,14 @@ namespace ROOT
 				return true;
 			}
 
-			/// <summary>
-			/// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
-			/// compress to another alive <see cref="System.IO.FileStream"/> object.
-			/// </summary>
-			/// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
-			/// <param name="OutputFileStream">The compressed data.</param>
-			/// <returns></returns>
-			public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
+            /// <summary>
+            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
+            /// compress to another alive <see cref="System.IO.FileStream"/> object.
+            /// </summary>
+            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
+            /// <param name="OutputFileStream">The compressed data.</param>
+            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
 			{
 				if (InputFileStream.CanRead == false) { return false; }
 				if (OutputFileStream.CanWrite == false) { return false; }
@@ -2838,7 +2957,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -2878,7 +2997,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				try
@@ -2889,7 +3008,7 @@ namespace ROOT
 				{
 					FSI.Close();
 					FSI.Dispose();
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				try
@@ -2901,7 +3020,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				finally
@@ -2934,7 +3053,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -2942,10 +3061,331 @@ namespace ROOT
 
 		}
 
+        /// <summary>
+        /// Archive files using the GZIP algorithm from the ZIP managed library. (Experimental class)
+        /// </summary>
+        public static class Experimental_GZipArchives
+		{
+
+            /// <summary>
+            /// Compress the specified file to GZIP format.
+            /// </summary>
+            /// <param name="FilePath">The file to compress.</param>
+            /// <param name="ArchivePath">The output file.</param>
+            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
+			{
+				if (MAIN.FileExists(FilePath) == false) { return false; }
+
+                System.String OutputFile;
+                if (System.String.IsNullOrEmpty(ArchivePath))
+                {
+                    System.IO.FileInfo FSIData = new System.IO.FileInfo(FilePath);
+                    OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.gz";
+                    FSIData = null;
+                } else { OutputFile = ArchivePath; }
+                System.IO.FileStream FSI;
+                System.IO.FileStream FSO;
+                try { FSI = System.IO.File.OpenRead(FilePath); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try { FSO = System.IO.File.OpenWrite(OutputFile); }
+                catch (System.Exception EX)
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try
+                {
+					ExternalArchivingMethods.SharpZipLib.GZip.Compress(FSI, FSO, false, 1024, 5);
+                }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                finally
+                {
+                    if (FSI != null)
+                    {
+                        FSI.Close();
+                        FSI.Dispose();
+                    }
+                    if (FSO != null)
+                    {
+                        FSO.Close();
+                        FSO.Dispose();
+                    }
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
+            /// compress to another alive <see cref="System.IO.FileStream"/> object.
+            /// </summary>
+            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
+            /// <param name="OutputFileStream">The compressed data.</param>
+            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
+            {
+                if (InputFileStream.CanRead == false) { return false; }
+                if (OutputFileStream.CanWrite == false) { return false; }
+                try
+                {
+					ExternalArchivingMethods.SharpZipLib.GZip.Compress(InputFileStream, OutputFileStream, false, 1024, 5);
+                }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Decompress a GZIP archive back a decompressed file.
+            /// </summary>
+            /// <param name="ArchiveFile">The Archive file path.</param>
+            /// <param name="OutputPath">Path to put the decompressed data.</param>
+            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
+            {
+                if (MAIN.FileExists(ArchiveFile) == false) { return false; }
+                System.String OutputFile;
+
+                if (System.String.IsNullOrEmpty(OutputPath))
+                {
+                    System.IO.FileInfo ArchInfo = new System.IO.FileInfo(ArchiveFile);
+                    System.String TruncatePath = ArchInfo.FullName.Substring(ArchInfo.DirectoryName.Length);
+                    System.String FPH = TruncatePath.Remove(TruncatePath.Length - 3);
+                    OutputFile = $"{ArchInfo.DirectoryName}\\{FPH}";
+                    FPH = null;
+                    ArchInfo = null;
+                    TruncatePath = null;
+                } else { OutputFile = OutputPath; }
+                System.IO.FileStream FSI;
+                System.IO.FileStream FSO;
+				try { FSI = System.IO.File.OpenRead(ArchiveFile); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+
+                try { FSO = System.IO.File.OpenWrite(OutputFile); }
+                catch (System.Exception EX)
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try { ExternalArchivingMethods.SharpZipLib.GZip.Decompress(FSI, FSO, false); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                finally
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    FSO.Close();
+                    FSO.Dispose();
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
+            /// to another alive <see cref="System.IO.FileStream"/> object.
+            /// </summary>
+            /// <param name="ArchiveFileStream">The compressed data.</param>
+            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
+            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
+            {
+                if (ArchiveFileStream.CanRead == false) { return false; }
+                if (DecompressedFileStream.CanWrite == false) { return false; }
+                try { ExternalArchivingMethods.SharpZipLib.GZip.Decompress(ArchiveFileStream, DecompressedFileStream , false); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                return true;
+            }
+
+        }
+
 		/// <summary>
-		/// Archive files using the well-known ZIP format.
+		/// Archive files using the BZip2 format (Experimental class).
 		/// </summary>
-		public class ZipArchives
+		public static class Experimental_BZip2Archives
+		{
+            /// <summary>
+            /// Compress the specified file to GZIP format.
+            /// </summary>
+            /// <param name="FilePath">The file to compress.</param>
+            /// <param name="ArchivePath">The output file.</param>
+            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
+            {
+                if (MAIN.FileExists(FilePath) == false) { return false; }
+
+                System.String OutputFile;
+                if (System.String.IsNullOrEmpty(ArchivePath))
+                {
+                    System.IO.FileInfo FSIData = new System.IO.FileInfo(FilePath);
+                    OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.bz2";
+                    FSIData = null;
+                }
+                else { OutputFile = ArchivePath; }
+                System.IO.FileStream FSI;
+                System.IO.FileStream FSO;
+                try { FSI = System.IO.File.OpenRead(FilePath); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try { FSO = System.IO.File.OpenWrite(OutputFile); }
+                catch (System.Exception EX)
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try { ExternalArchivingMethods.SharpZipLib.BZip2.Compress(FSI, FSO, false, 5); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                finally
+                {
+                    if (FSI != null)
+                    {
+                        FSI.Close();
+                        FSI.Dispose();
+                    }
+                    if (FSO != null)
+                    {
+                        FSO.Close();
+                        FSO.Dispose();
+                    }
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
+            /// compress to another alive <see cref="System.IO.FileStream"/> object.
+            /// </summary>
+            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
+            /// <param name="OutputFileStream">The compressed data.</param>
+            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
+            {
+                if (InputFileStream.CanRead == false) { return false; }
+                if (OutputFileStream.CanWrite == false) { return false; }
+                try { ExternalArchivingMethods.SharpZipLib.BZip2.Compress(InputFileStream, OutputFileStream, false, 5); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Decompress a GZIP archive back to the file.
+            /// </summary>
+            /// <param name="ArchiveFile">The Archive file path.</param>
+            /// <param name="OutputPath">Path to put the decompressed data.</param>
+            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
+            {
+                if (MAIN.FileExists(ArchiveFile) == false) { return false; }
+                System.String OutputFile;
+                if (System.String.IsNullOrEmpty(OutputPath))
+                {
+                    System.IO.FileInfo ArchInfo = new System.IO.FileInfo(ArchiveFile);
+                    System.String TruncatePath = ArchInfo.FullName.Substring(ArchInfo.DirectoryName.Length);
+                    System.String FPH = TruncatePath.Remove(TruncatePath.Length - 4);
+                    OutputFile = $"{ArchInfo.DirectoryName}\\{FPH}";
+                    FPH = null;
+                    ArchInfo = null;
+                    TruncatePath = null;
+                }
+                else { OutputFile = OutputPath; }
+                System.IO.FileStream FSI;
+                System.IO.FileStream FSO;
+
+                try { FSI = System.IO.File.OpenRead(ArchiveFile); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+
+                try { FSO = System.IO.File.OpenWrite(OutputFile); }
+                catch (System.Exception EX)
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                try { ExternalArchivingMethods.SharpZipLib.BZip2.Decompress(FSI, FSO, false); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                finally
+                {
+                    FSI.Close();
+                    FSI.Dispose();
+                    FSO.Close();
+                    FSO.Dispose();
+                }
+                return true;
+            }
+
+            /// <summary>
+            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
+            /// to another alive <see cref="System.IO.FileStream"/> object.
+            /// </summary>
+            /// <param name="ArchiveFileStream">The compressed data.</param>
+            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
+            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
+            {
+                if (ArchiveFileStream.CanRead == false) { return false; }
+                if (DecompressedFileStream.CanWrite == false) { return false; }
+                try { ExternalArchivingMethods.SharpZipLib.BZip2.Decompress(ArchiveFileStream, DecompressedFileStream, false); }
+                catch (System.Exception EX)
+                {
+                    MAIN.WriteConsoleText(EX.Message);
+                    return false;
+                }
+                return true;
+            }
+
+        }
+
+        /// <summary>
+        /// Archive files using the well-known ZIP format.
+        /// </summary>
+        public static class ZipArchives
 		{
 			/// <summary>
 			/// Extract all the contents of a ZIP file to the specified directory path.
@@ -2991,13 +3431,15 @@ namespace ROOT
 				return true;
 			}
 
-			/// <summary>
-			/// Create a new ZIP archive stream so as to customize it.
-			/// </summary>
-			/// <param name="PathofZipToCreate">The file path of the archive to be created , or the existing one , if modified.</param>
-			/// <param name="ArchModeSelector">One of the <see cref="ZipArchiveMode"/> enumerations which indicate at which mode the archive should be opened.</param>
-			/// <returns>A new <see cref="ZipArchive"/> object if the command was sucessfull ; otherwise , <c>null</c>.</returns>
-			public static System.IO.Compression.ZipArchive InitZipFileStream(System.String PathofZipToCreate, System.IO.Compression.ZipArchiveMode ArchModeSelector)
+            /// <summary>
+            /// Create a new ZIP archive stream so as to customize it.
+            /// </summary>
+            /// <param name="PathofZipToCreate">The file path of the archive to be created , or the existing one , if modified.</param>
+            /// <param name="ArchModeSelector">One of the <see cref="ZipArchiveMode"/> enumerations which indicate at which mode the archive should be opened.</param>
+            /// <returns>A new <see cref="ZipArchive"/> object if the command was sucessfull ; otherwise , <c>null</c>.</returns>
+            [System.Obsolete("Start using the Experimental_ZipArchives class functions instead. If you want a custom implementation , " +
+                "use the namespace ExternalArchivingMethods.SharpZipLib .", false)]
+            public static System.IO.Compression.ZipArchive InitZipFileStream(System.String PathofZipToCreate, System.IO.Compression.ZipArchiveMode ArchModeSelector)
 			{
 				if ((!(System.IO.File.Exists(PathofZipToCreate))) && (System.Convert.ToInt32(ArchModeSelector) != 2))
 				{
@@ -3022,6 +3464,8 @@ namespace ROOT
 			/// <param name="ArchFileStream">The alive <see cref="ZipArchive"/> stream to write data to.</param>
 			/// <param name="CompLevel">The compression level that should be applied to the file.</param>
 			/// <returns><c>true</c> if the file was added to the stream; otherwise , <c>false</c>.</returns>
+			[System.Obsolete("Start using the Experimental_ZipArchives class functions instead. If you want a custom implementation , " +
+                "use the namespace ExternalArchivingMethods.SharpZipLib ." , false)]
 			public static System.Boolean AddNewFileEntryToZip(System.String Path, System.IO.Compression.ZipArchive ArchFileStream, System.IO.Compression.CompressionLevel CompLevel)
 			{
 				if (!(System.IO.File.Exists(Path))) { return false; }
@@ -3076,6 +3520,285 @@ namespace ROOT
 		}
 
 		/// <summary>
+		/// Zip Files compression level.
+		/// </summary>
+		public enum ZipCompressionLevel : System.Int32
+		{
+			/// <summary>
+			/// The Compression level is set to zero (almost the files are stored.)
+			/// </summary>
+			Zero = 0,
+			/// <summary>
+			/// Low Compression Level.
+			/// </summary>
+			Low = 2,
+			/// <summary>
+			/// A medium compression level will be applied. It is the most casual case.
+			/// </summary>
+			Medium = 5,
+			/// <summary>
+			/// High compression level sacrifices performance for better compression.
+			/// </summary>
+			High = 8,
+			/// <summary>
+			/// The Ultra compression level uses as most as possible the available computer 
+			/// resources so as to achieve the best compression ratio as possible.
+			/// </summary>
+			Ultra = 9
+		}
+
+		/// <summary>
+		/// Experimental class that abstracts the methods of the ZIP managed library.
+		/// </summary>
+		public static class Experimental_ZipArchives
+		{
+
+            /// <summary>
+            /// Extract all the contents of a ZIP file to the specified directory path.
+            /// </summary>
+            /// <param name="InputArchivePath">The archive file.</param>
+            /// <param name="OutputPath">The directory to put the extracted data.</param>
+            /// <returns><c>true</c> if extraction succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean ExtractZipFileToSpecifiedLocation
+				(System.String InputArchivePath, System.String OutputPath) 
+			{ 
+				if (MAIN.FileExists(InputArchivePath) == false) { return false; }
+				if (MAIN.DirExists(OutputPath) == false) { MAIN.CreateADir(OutputPath); }
+				System.IO.FileStream FS = MAIN.ReadAFileUsingFileStream(InputArchivePath);
+				System.IO.FileStream DI;
+				if (FS == null) { return false; }
+				ExternalArchivingMethods.SharpZipLib.ZipFile CT = new(FS);
+                foreach (ExternalArchivingMethods.SharpZipLib.ZipEntry un in CT)
+				{
+					if (un.IsFile || un.IsDOSEntry)
+					{
+						System.String g = MAIN.ChangeDefinedChar(un.Name , '/' , '\\');
+                        System.String jk = null;
+						if (g.IndexOf('\\') != -1) 
+						{
+                            jk = g.Remove(g.LastIndexOf('\\'));
+							if (MAIN.DirExists($"{OutputPath}\\{jk}") == false)
+							{
+                                if (MAIN.CreateADir($"{OutputPath}\\{jk}") == false) { return false; }
+                            }
+							jk = null;
+                        }
+						DI = MAIN.CreateANewFile($"{OutputPath}\\{g}");
+						g = null;
+						if (DI == null) { FS.Close(); FS.Dispose(); return false; }
+						using (DI) { CT.GetInputStream(un).CopyTo(DI); }
+						DI = null;
+					}
+                }
+
+                FS.Close();
+				FS.Dispose();
+				return true;
+			}
+
+            /// <summary>
+            /// Create a new ZIP archive by capturing data from a specified directory.
+            /// </summary>
+            /// <param name="PathOfZipToMake">The file path that the archive will be created.</param>
+            /// <param name="PathToCollect">The directory path to capture data from.</param>
+			/// <param name="CmpLevel">The Compression level to apply. For migration reasons , 
+			/// it is optional and it's value is <see cref="ZipCompressionLevel.Medium"/> .</param>
+            /// <returns><c>true</c> if the operation succeeded; otherwise , <c>false</c>.</returns>
+            public static System.Boolean MakeZipFromDir
+                (System.String PathOfZipToMake, 
+				System.String PathToCollect  ,
+				ZipCompressionLevel CmpLevel = ZipCompressionLevel.Medium)
+			{
+                // Start up the Make ZIP from Directory procedure.
+
+                // Check if the parameters are correct:
+                // PathOfZipToMake is not NULL and
+				// PathToCollect is an existing directory.
+                if (System.String.IsNullOrEmpty(PathOfZipToMake)) { return false; }
+                if (System.IO.Directory.Exists(PathToCollect) == false) { return false; }
+				// Open a new FileStream to the desired path.
+				// Exit with FALSE if it could not be opened.
+				System.IO.FileStream EDI = ROOT.MAIN.CreateANewFile(PathOfZipToMake);
+				if (EDI == null) { return false; }
+				// This FileStream is a temporary FileStream that will open the files to compress
+				// in the ZIP.
+				System.IO.FileStream GDX = null;
+				// The fundamental ZIP class: The ZIP Stream that is being used for compression.
+				ExternalArchivingMethods.SharpZipLib.ZipOutputStream DI = new(EDI);
+				// Create a new DirectoryInfo class from the PathToCollect argument.
+                System.IO.DirectoryInfo E1 = new(PathToCollect);
+				// Set the Base Directory. This directory will be used so as to compare 
+				// the files to add against it.
+                System.String BaseDir = E1.FullName;
+                System.String TempPathConstructor = null;
+				// Begin execution Phase. Set the compression level to normal.
+                DI.SetLevel((System.Int32) CmpLevel);
+				// Internal string array that makes the recursion reality.
+                IList<System.String> dirs = new List<System.String>();
+                try
+				{
+					System.Int32 Count = 0;
+					System.Int32 Index = -1;
+
+					// First , the files on the directory set in PathToCollect will be added.
+                    foreach (System.IO.FileInfo DOI in E1.EnumerateFiles())
+					{
+						// Create a new entry.
+                        DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry(DOI.Name));
+						// Open the file to read it.
+                        GDX = MAIN.ReadAFileUsingFileStream(DOI.FullName);
+                        // Exit if the file could not be opened.
+                        if (GDX == null)
+                        {
+                            DI.Close();
+                            DI.Dispose();
+                            EDI.Close();
+                            EDI.Dispose();
+                            return false;
+                        }
+                        // Initialise a new Byte array with it's length to be set as the file's one. 
+                        System.Byte[] Array = new System.Byte[GDX.Length];
+						// Read the data.
+                        GDX.Read(Array, 0, Array.Length);
+						// Close the stream.
+                        GDX.Close();
+                        GDX.Dispose();
+						// Write back the data to the ZIP file. These will be automatically compressed.
+                        DI.Write(Array, 0, Array.Length);
+						// Close entry and invalidate any used variables.
+						Array = null;
+                        DI.CloseEntry();
+                        GDX = null;
+                    }
+
+					// The Directory recursion starts from this point.
+                    for (; ;)
+					{
+						//Recursion procedure:
+						foreach (System.IO.DirectoryInfo DX in E1.EnumerateDirectories())
+						{
+                            TempPathConstructor = ExternalArchivingMethods.SharpZipLib.ZipEntry.CleanName(DX.FullName.Substring(BaseDir.Length));
+                            // Add any files that the dir contains.
+							foreach (System.IO.FileInfo DOI in DX.EnumerateFiles())
+							{
+								if (TempPathConstructor == "")
+								{
+									DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry(DOI.Name));
+								}
+								else
+								{
+									DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry($"{TempPathConstructor}/{DOI.Name}"));
+								}
+								GDX = MAIN.ReadAFileUsingFileStream(DOI.FullName);
+                                if (GDX == null)
+                                {
+                                    DI.Close();
+                                    DI.Dispose();
+                                    EDI.Close();
+                                    EDI.Dispose();
+                                    return false;
+                                }
+                                System.Byte[] Array = new System.Byte[GDX.Length];
+								GDX.Read(Array, 0, Array.Length);
+								GDX.Close();
+								GDX.Dispose();
+								DI.Write(Array , 0 , Array.Length);
+                                Array = null;
+                                DI.CloseEntry();
+								GDX = null;
+							}
+							// Add this directory to the list , so it will be recursed in the next iteration.
+							dirs.Add(DX.FullName);
+							Count++;
+						}
+
+						// No more sub-directories; exit the procedure.
+						if (Count <= 0) { break; } else
+						{
+							// Change the value of the class from the argument given to the next index of the recursion list.
+							Index++;
+							E1 = new(dirs[Index]);
+						}
+					}
+
+                } catch (System.ArgumentOutOfRangeException) 
+				{ 
+					// It is expected. 
+					// This exception breaks the FOR statement and threrfore , the recursion.
+					// Any other execption it is good to be rethrown.
+				} catch (System.Exception EX) { throw EX; }
+				
+				dirs.Clear();
+				BaseDir = null;
+                GDX = null;
+                dirs = null;
+				DI.Close();
+				DI.Dispose();
+				EDI.Close();
+				EDI.Dispose();
+				return true;
+            }
+
+            /// <summary>
+            /// Add all the files detected in a <see cref="System.IO.FileSystemInfo"/>[] array to the root of the ZIP archive.
+            /// </summary>
+            /// <param name="PathofZipToCreate">The file path of the existing archive.</param>
+            /// <param name="InfoObject">The <see cref="System.IO.FileSystemInfo"/> array to purge and add the files to the archive.</param>
+            /// <param name="ENTCMPL">The compression level to apply while processing the files.</param>
+            /// <returns><c>true</c> if all the files were added to the archive.; otherwise , <c>false</c>.</returns>
+            public static System.Boolean CreateZipArchiveViaFileSystemInfo(System.String PathofZipToCreate, System.IO.FileSystemInfo[] InfoObject, ZipCompressionLevel ENTCMPL)
+			{
+				if (System.String.IsNullOrEmpty(PathofZipToCreate)) { return false; }
+                if (InfoObject == null || InfoObject.Length <= 0) { return false; }
+				System.IO.FileStream EDI = ROOT.MAIN.CreateANewFile(PathofZipToCreate);
+				if (EDI == null) { return false; }
+                ExternalArchivingMethods.SharpZipLib.ZipOutputStream DI = new(EDI);
+                System.IO.FileStream GDX = null;
+                foreach (System.IO.FileSystemInfo DF in InfoObject)
+				{
+					if (DF is System.IO.FileInfo)
+					{
+                        // Create a new entry.
+                        DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry(DF.Name));
+                        // Open the file to read it.
+                        GDX = MAIN.ReadAFileUsingFileStream(DF.FullName);
+                        // Exit if the file could not be opened.
+                        if (GDX == null) 
+						{
+                            DI.Close();
+                            DI.Dispose();
+                            EDI.Close();
+                            EDI.Dispose();
+							return false; 
+						}
+                        // Initialise a new Byte array with it's length to be set as the file's one. 
+                        System.Byte[] Array = new System.Byte[GDX.Length];
+                        // Read the data.
+                        GDX.Read(Array, 0, Array.Length);
+                        // Close the stream.
+                        GDX.Close();
+                        GDX.Dispose();
+                        // Write back the data to the ZIP file. These will be automatically compressed.
+                        DI.Write(Array, 0, Array.Length);
+                        // Close entry and invalidate any used variables.
+                        Array = null;
+                        DI.CloseEntry();
+                        GDX = null;
+                    }
+				}
+
+				GDX = null;
+				DI.Finish();
+				DI.Close();
+				DI.Dispose();
+				EDI.Close();
+				EDI.Dispose();
+				return true;
+            }
+
+        }
+
+		/// <summary>
 		/// Compress files and directories using the Microsoft's Cabinet format.
 		/// </summary>
 		[SupportedOSPlatform("windows")]
@@ -3101,7 +3824,7 @@ namespace ROOT
 					CI.Refresh();
 				} catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -3159,37 +3882,6 @@ namespace ROOT
 	}
 
 	/// <summary>
-	/// This is used to mark an function when it is used to generate a warning that will be deprecated.
-	/// </summary>
-	internal class NoticeAttribute : System.Attribute
-	{
-		public NoticeAttribute(System.String FunctionName)
-		{
-            System.CodeDom.Compiler.CompilerError ER = new();
-            ER.IsWarning = true;
-            ER.ErrorText = $"Notice - the function {FunctionName} is no longer recommended " +
-				" for usage and will be obsoleted in the next release. Use instead the other one recommended.";
-            ER.Line = 3168;
-            ER.FileName = "MDCFR.dll";
-        }
-
-		public NoticeAttribute(System.String FunctionName, System.String Recommended)
-		{
-			System.CodeDom.Compiler.CompilerError ER = new();
-			ER.IsWarning = true;
-			ER.ErrorText = $"Notice - the function {FunctionName} is no longer recommended " +
-				$" for usage and will be obsoleted in the next release. Use instead the {Recommended} function.";
-			ER.Line = 3168;
-			ER.FileName = "MDCFR.dll";
-		}
-
-		public override string ToString()
-		{
-			return "#NOTICEATTRIBUTE#";
-		}
-	}
-
-	/// <summary>
 	/// Calculates an estimated time required , for example , the time needed to execute a code excerpt.
 	/// </summary>
 	public sealed class TimeCaculator : System.IDisposable
@@ -3203,7 +3895,7 @@ namespace ROOT
 		public void Init()
 		{
 			if (_Init_ == true) { return; }
-			_TimeEl_ = Microsoft.VisualBasic.DateAndTime.Now;
+			_TimeEl_ = System.DateTime.Now;
 			_Init_ = true;
 			return;
 		}
@@ -3218,11 +3910,11 @@ namespace ROOT
 			try
 			{
 				_Init_ = false;
-				return System.Convert.ToInt32(Microsoft.VisualBasic.DateAndTime.Now.Subtract(_TimeEl_).TotalMilliseconds);
+				return (System.Int32) System.DateTime.Now.Subtract(_TimeEl_).TotalMilliseconds;
 			}
 			catch (System.Exception EX)
 			{
-				System.Console.WriteLine(EX.Message);
+				MAIN.WriteConsoleText(EX.Message);
 				return -1;
 			}
 		}
@@ -3400,14 +4092,14 @@ namespace ROOT
 
 
 		/// <summary>
-		/// The Progress char that will be used inside the bar ([...])
+		/// The Progress character that will be used inside the bar ([...])
 		/// </summary>
 		public System.Char ProgressChar
 		{
 			get { return Progc; }
 			set
 			{
-				System.Char[] InvalidChars = new System.Char[] { '\a', '\b', '\\', '\'', '\"', '\r', '\n', '\0' };
+				System.Char[] InvalidChars = new System.Char[] { '\a', '\b', '\\', '\'', '\"', '\r', '\n', '\0' , '\f' };
 				for (System.Int32 D = 0; D < InvalidChars.Length; D++)
 				{
 					if (InvalidChars[D] == value) { throw new System.ArgumentException("The character is illegal."); }
@@ -3452,7 +4144,7 @@ namespace ROOT
 		{
 			if (System.String.IsNullOrEmpty(Message)) { throw new System.ArgumentException("The Message is null."); }
 			Progr = Message;
-			System.Console.Write($"{Progr}: {iterator}% [{Progm}]\r");
+			System.Console.Write($"{Progr}: {iterator}/{end} [{Progm}]\r");
 		}
 
 		/// <summary>
@@ -3475,7 +4167,7 @@ namespace ROOT
 
 		private void ChangeBar(System.Object sender, ProgressChangedArgs e)
 		{
-			System.Console.Write($"{Progr}: {e.ChangedValueTo}% [{Progm}] \r");
+			System.Console.Write($"{Progr}: {e.ChangedValueTo}/{end} [{Progm}] \r");
 		}
 
 		/// <summary>
@@ -3485,7 +4177,7 @@ namespace ROOT
 		{
 			this.ChangeProgress += ChangeBar;
 			iterator = start;
-			System.Console.Write($"{Progr}: {iterator}% [{Progm}]\r");
+			System.Console.Write($"{Progr}: {iterator}/{end} [{Progm}]\r");
 			do
 			{
 				if (iterator >= end) { _Ended = true; }
@@ -3493,7 +4185,7 @@ namespace ROOT
 			} while (_Ended == false);
 			this.ChangeProgress -= ChangeBar;
 			this.ChangeProgress = null;
-			System.Console.WriteLine("\nCompleted.");
+			ROOT.MAIN.WriteConsoleText("\nCompleted.");
 			return;
 		}
 	}
@@ -3733,7 +4425,8 @@ namespace ROOT
 				Menu.MinimizeBox = false;
 				Menu.MaximizeBox = false;
 				Menu.TopMost = true;
-				Menu.ShowInTaskbar = false;
+                Menu.ControlBox = false;
+                Menu.ShowInTaskbar = false;
 				// All the redrawings are only valid for Microsoft Sans Serif font!!!
 				Menu.Font = new Font("Microsoft Sans Serif", (System.Single)9.10, FontStyle.Regular, GraphicsUnit.Point);
 				Menu.Size = new System.Drawing.Size(TextBox1.Location.X + TextBox1.Size.Width + 28, TextBox1.Location.Y + TextBox1.Size.Height + 42);
@@ -4111,6 +4804,7 @@ namespace ROOT
 				Menu.MinimizeBox = false;
 				Menu.MaximizeBox = false;
 				Menu.TopMost = true;
+				Menu.ControlBox = false;
 				Menu.ShowInTaskbar = false;
 				// All the redrawings are only valid for Microsoft Sans Serif font!!!
 				Menu.Font = new Font("Microsoft Sans Serif", (System.Single)8.25, FontStyle.Regular, GraphicsUnit.Point);
@@ -4129,7 +4823,6 @@ namespace ROOT
 		}
 	}
 
-	#pragma warning disable CS1584, CS1658, CS1001
     /// <summary>
     /// This <see langword="struct" /> bears a resemblance to the <see cref="System.Collections.ArrayList"/> , 
     /// but this extends it's functionality and it's aim is to work only with <see cref="System.Byte"/> data.
@@ -4138,184 +4831,178 @@ namespace ROOT
     /// </summary>
     /// <remarks>
     /// <para> This <see langword="struct" /> implements the <see cref="IList{T}"/> interface. </para>
-    /// <para> Note: <see cref="{T}"/> is <see cref="System.Byte"/>. </para>
+    /// <para> Note: &lt;T&gt; is <see cref="System.Byte"/>. </para>
     /// </remarks>
-	#pragma warning restore CS1584, CS1658, CS1001
     public struct ModifidableBuffer : System.Collections.Generic.IList<System.Byte>
-    {
-        private readonly System.Collections.Specialized.OrderedDictionary _dict = new();
-        private System.Int32 Iter = 0;
+	{
+		private readonly System.Collections.Specialized.OrderedDictionary _dict = new();
+		private System.Int32 Iter = 0;
 
 		/// <summary>
 		/// Initialise a new modifidable buffer with no data in it.
 		/// </summary>
-        public ModifidableBuffer() { }
+		public ModifidableBuffer() { }
 
-        /// <summary>
-        /// Initialise a new modifidable buffer and populate it with data taken 
-        /// from a instantiated <see cref="System.Byte"/>[] array. 
-        /// </summary>
-        /// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ModifidableBuffer(System.Byte[] Value) { for (System.Int32 O = 0; O < Value.Length; O++) { Add(Value[O]); } }
-
-        /// <summary>
-        /// Initialise a new modifidable buffer and populate it with data taken 
+		/// <summary>
+		/// Initialise a new modifidable buffer and populate it with data taken 
 		/// from a instantiated <see cref="System.Byte"/>[] array. 
-        /// </summary>
-        /// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
-        /// <param name="Index">The index that this instance will start 
+		/// </summary>
+		/// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ModifidableBuffer(System.Byte[] Value) { for (System.Int32 O = 0; O < Value.Length; O++) { Add(Value[O]); } }
+
+		/// <summary>
+		/// Initialise a new modifidable buffer and populate it with data taken 
+		/// from a instantiated <see cref="System.Byte"/>[] array. 
+		/// </summary>
+		/// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
+		/// <param name="Index">The index that this instance will start 
 		/// saving data from <paramref name="Value"/> parameter.</param>
-        /// <param name="Count">How many elements to 
+		/// <param name="Count">How many elements to 
 		/// copy from the <paramref name="Value"/> array.</param>
-        /// <exception cref="InvalidOperationException">Index parameter is not allowed to be more than Count parameter.</exception>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ModifidableBuffer(System.Byte[] Value, System.Int32 Index, System.Int32 Count)
-        {
-            if (Index >= Count) { throw new InvalidOperationException("Index parameter is not allowed to be more than Count parameter."); }
-            for (System.Int32 O = Index; O < Count; O++) { Add(Value[O]); }
-        }
+		/// <exception cref="InvalidOperationException">Index parameter is not allowed to be more than Count parameter.</exception>
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ModifidableBuffer(System.Byte[] Value, System.Int32 Index, System.Int32 Count)
+		{
+			if (Index >= Count) { throw new InvalidOperationException("Index parameter is not allowed to be more than Count parameter."); }
+			for (System.Int32 O = Index; O < Count; O++) { Add(Value[O]); }
+		}
 
-        /// <inheritdoc />
-        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public System.Int32 IndexOf(System.Byte Value)
-        {
-            foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
-            {
-                if (DE.Value == Value) { return DE.Key; }
-            }
-            return -1;
-        }
+		/// <inheritdoc />
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public System.Int32 IndexOf(System.Byte Value)
+		{
+			foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+			{
+				if (DE.Value == Value) { return DE.Key; }
+			}
+			return -1;
+		}
 
-        /// <inheritdoc />
-        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public void Insert(System.Int32 Index, System.Byte Value)
-        {
-            try
-            {
-                System.Boolean Flag = false;
-                foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
-                {
-                    if (DE.Key == Index) { Flag = true; }
-                }
-                if (Flag) { _dict[Index] = Value; } else { Add(Value); }
-            }
-            catch (System.Exception EX)
-            {
-                throw new System.AggregateException("Could not add the specified value to the dictionary.", EX);
-            }
-        }
+		/// <inheritdoc />
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public void Insert(System.Int32 Index, System.Byte Value)
+		{
+			try
+			{
+				System.Boolean Flag = false;
+				foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+				{
+					if (DE.Key == Index) { Flag = true; }
+				}
+				if (Flag) { _dict[Index] = Value; } else { Add(Value); }
+			}
+			catch (System.Exception EX)
+			{
+				throw new System.AggregateException("Could not add the specified value to the dictionary.", EX);
+			}
+		}
 
-        /// <inheritdoc />
+		/// <inheritdoc />
 		/// <remarks>Be careful when removing entries , this will make the whole data
 		/// array to shift by one and cover up the blank entry. Using this method
 		/// can result to data corruption.</remarks>
-        public void RemoveAt(System.Int32 Index) { _dict.Remove(Index); Iter--; }
+		public void RemoveAt(System.Int32 Index) { _dict.Remove(Index); Iter--; }
 
 		/// <summary>
 		/// Adds a new entry to this instance.
 		/// </summary>
 		/// <param name="Value">The <see cref="System.Byte"/> value to add to the newly created entry.</param>
 		/// <exception cref="System.AggregateException">Thrown when the adding was failed for a reason.</exception>
-        public void Add(System.Byte Value)
-        {
-            try
-            {
-                _dict.Add(Iter, Value);
-                Iter++;
-            }
-            catch (System.Exception EX)
-            {
-                throw new System.AggregateException($"Could not add the specified value to the dictionary.", EX);
-            }
-        }
+		public void Add(System.Byte Value)
+		{
+			try
+			{
+				_dict.Add(Iter, Value);
+				Iter++;
+			}
+			catch (System.Exception EX)
+			{
+				throw new System.AggregateException($"Could not add the specified value to the dictionary.", EX);
+			}
+		}
 
-        /// <inheritdoc />
-        public System.Byte this[System.Int32 Index]
-        {
-            get { return (System.Byte) _dict[Index]; }
-            set { Insert(Index, value); }
-        }
+		/// <inheritdoc />
+		public System.Byte this[System.Int32 Index]
+		{
+			get { return (System.Byte)_dict[Index]; }
+			set { Insert(Index, value); }
+		}
 
 		/// <summary>
 		/// Adds empty entries specified by the <paramref name="Times"/> <see cref="System.Int32"/> .
 		/// </summary>
 		/// <param name="Times">The number of empty entries to add.</param>
-        public void AddEntries(System.Int32 Times) { for (System.Int32 I = 0; I < Times; I++) { _dict.Add(Iter++, 0); } }
-
-        /// <inheritdoc />
-        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public void CopyTo(System.Byte[] Array, System.Int32 Index)
-        {
-            System.Int32 tmp = 0;
-            for (System.Int32 I = Index; I < Iter; I++) { Array[tmp] = (System.Byte)_dict[I]; tmp++; }
-        }
-
-        /// <summary>
-        /// The <see cref="ToArray()"/> method gets all the data representing the current buffer , and returns them
-        /// as a one-dimensional and fixed <see cref="System.Byte"/>[] array.
-        /// </summary>
-        /// <returns>The data which this <see langword="struct"/> holds.</returns>
-        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public System.Byte[] ToArray()
-        {
-            System.Byte[] bytes = new System.Byte[Iter];
-            CopyTo(bytes, 0);
-            return bytes;
-        }
+		public void AddEntries(System.Int32 Times) { for (System.Int32 I = 0; I < Times; I++) { _dict.Add(Iter++, 0); } }
 
 		/// <inheritdoc />
-        public System.Int32 Count { get { return Iter; } }
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public void CopyTo(System.Byte[] Array, System.Int32 Index)
+		{
+			System.Int32 tmp = 0;
+			for (System.Int32 I = Index; I < Iter; I++) { Array[tmp] = (System.Byte)_dict[I]; tmp++; }
+		}
 
-        /// <inheritdoc />
-        public void Clear() { _dict.Clear(); Iter = 0; }
+		/// <summary>
+		/// The <see cref="ToArray()"/> method gets all the data representing the current buffer , and returns them
+		/// as a one-dimensional and fixed <see cref="System.Byte"/>[] array.
+		/// </summary>
+		/// <returns>The data which this <see langword="struct"/> holds.</returns>
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public System.Byte[] ToArray()
+		{
+			System.Byte[] bytes = new System.Byte[Iter];
+			CopyTo(bytes, 0);
+			return bytes;
+		}
 
-        /// <inheritdoc />
-        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public System.Boolean Contains(System.Byte item)
-        {
-            foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
-            {
-                if (DE.Value == item) { return true; }
-            }
-            return false;
-        }
+		/// <inheritdoc />
+		public System.Int32 Count { get { return Iter; } }
 
-        /// <inheritdoc />
+		/// <inheritdoc />
+		public void Clear() { _dict.Clear(); Iter = 0; }
+
+		/// <inheritdoc />
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public System.Boolean Contains(System.Byte item)
+		{
+			foreach (System.Collections.Generic.KeyValuePair<System.Int32, System.Byte> DE in _dict)
+			{
+				if (DE.Value == item) { return true; }
+			}
+			return false;
+		}
+
+		/// <inheritdoc />
 		/// <remarks>Note: This property always returns <c>false</c>.</remarks>
-        public System.Boolean IsReadOnly { get { return false; } }
+		public System.Boolean IsReadOnly { get { return false; } }
 
-        /// <inheritdoc />
+		/// <inheritdoc />
 		/// <remarks>Be careful when removing entries , this will make the whole data
 		/// array to shift by one and cover up the blank entry. Using this method
 		/// can result to data corruption.</remarks>
-        public System.Boolean Remove(System.Byte item)
-        {
-            if (IndexOf(item) == -1) { return false; }
-            try
-            {
-                _dict.Remove(IndexOf(item));
+		public System.Boolean Remove(System.Byte item)
+		{
+			if (IndexOf(item) == -1) { return false; }
+			try
+			{
+				_dict.Remove(IndexOf(item));
 				Iter--;
-            }
-            catch { return false; }
-            return true;
-        }
+			}
+			catch { return false; }
+			return true;
+		}
 
-        IEnumerator<System.Byte> IEnumerable<System.Byte>.GetEnumerator()
-        {
-            System.Collections.Generic.IList<System.Byte> result = new System.Byte[_dict.Count];
-            for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
-            return result.GetEnumerator();
-        }
+		IEnumerator<System.Byte> IEnumerable<System.Byte>.GetEnumerator()
+		{
+			System.Collections.Generic.IList<System.Byte> result = new System.Byte[_dict.Count];
+			for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
+			return result.GetEnumerator();
+		}
 
-        /// <inheritdoc />
-        public System.Collections.IEnumerator GetEnumerator()
-        {
-            System.Collections.IList result = new System.Byte[_dict.Count];
-            for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
-            return result.GetEnumerator();
-        }
-    
+		/// <inheritdoc />
+		public System.Collections.IEnumerator GetEnumerator() { return _dict.GetEnumerator(); }
+
 		/// <summary>
 		/// Returns the byte data , but as an hexadecimal <see cref="System.String"/> , if it fits to one.
 		/// Otherwise , the <see cref="System.String"/> representation of this type.
@@ -4324,7 +5011,7 @@ namespace ROOT
 		/// <see cref="System.String"/> , otherwise 
 		/// the <see cref="System.String"/> representation of this type.</returns>
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-        public override System.String ToString()
+		public override System.String ToString()
 		{
 			System.String Thestring = null;
 			try
@@ -4336,6 +5023,19 @@ namespace ROOT
 				return Thestring;
 			} catch { return GetType().ToString(); }
 		}
+
+		/// <summary>
+		/// Convert immediately from an intitialised <see cref="ModifidableBuffer"/> structure as an new 
+		/// <see cref="System.Byte"/>[] array.
+		/// </summary>
+		/// <param name="instance">The <see cref="ModifidableBuffer"/> instance to take the data from.</param>
+		public static explicit operator System.Byte[](ModifidableBuffer instance) { return instance.ToArray(); }
+
+		/// <summary>
+		/// Convert the <see cref="System.Byte"/>[] data as an new <see cref="ModifidableBuffer"/>.
+		/// </summary>
+		/// <param name="Data">The <see cref="System.Byte"/>[] to take the data from.</param>
+		public static explicit operator ModifidableBuffer(System.Byte[] Data) { return new ModifidableBuffer(Data); }
 	}
 
 	internal struct STDConstants
@@ -4343,17 +5043,17 @@ namespace ROOT
 		// Standard Text Definition constants and helper functions.
 		// The below characters define how the STD format will be read and written.
 
-		public static System.Char COMMENT = '#';
+		public const System.Char COMMENT = '#';
 
-		public static System.Char SEPERATOR = '$';
+		public const System.Char SEPERATOR = '$';
 
-		public static System.Char HDROPEN = '{';
+		public const System.Char HDROPEN = '{';
 
-		public static System.Char HDRCLOSE = '}';
+		public const System.Char HDRCLOSE = '}';
 
-		public static System.Char STRING = '\"';
+		public const System.Char STRING = '\"';
 
-		public static System.Int32 VERSION = 1;
+		public const System.Int32 VERSION = 1;
 
 		// The encoding table. 
 		// This table will be used so as to return and save the colors as one value 
@@ -4430,16 +5130,6 @@ namespace ROOT
 				(STDFrontColor)EncodeTable[Encoded, 0],
 				(STDBackColor)EncodeTable[Encoded, 1]);
 		}
-
-		public static System.Boolean DetectSlashR(System.String D)
-		{
-			if (D.IndexOf('\r') != -1) { return true; } else { return false; }
-		}
-	
-		public static System.String RemoveSlashR(System.String D)
-		{
-			return ROOT.MAIN.RemoveDefinedChars(D , new[] { '\r' });
-		}
 	
 	}
 
@@ -4447,7 +5137,7 @@ namespace ROOT
     /// Represents a new STD (Standard Text with color Definition) context , which is a storage type
     /// which holds the STD data parsed , or the STD data to parse.
     /// </summary>
-    public struct STDContext : System.IDisposable
+    public struct STDContext : System.IDisposable , IEnumerable<STDLine>
 	{
 		/// <summary>
 		/// Initialise a new instance of the <see cref="STDContext"/> structure.
@@ -4470,6 +5160,7 @@ namespace ROOT
             new System.Collections.Generic.SortedList<System.Int32, System.Int32>();
         private System.Boolean addedheader = false;
         private System.Int32 Count = -1;
+		private System.Boolean _disposed = false;
 
         /// <summary>
         /// Adds a new STD (Standard Text with color Definition) Line to store in the dictionary.
@@ -4480,7 +5171,8 @@ namespace ROOT
         /// <exception cref="InvalidOperationException" />
         public void Add(STDFrontColor Fr, STDBackColor Bk, System.String Data)
 		{
-			Count++;
+            CheckIfDisposed();
+            Count++;
 			System.Int32 ER = STDConstants.Encode(Fr, Bk);
 			if (ER == -1)
 			{
@@ -4497,7 +5189,8 @@ namespace ROOT
         /// <param name="Comment">The <see cref="System.String"/> comment data to pass.</param>
         public void AddComment(System.String Comment)
 		{
-			Count++;
+            CheckIfDisposed();
+            Count++;
 			_dt1.Add(Count, Comment);
 			_dt2.Add(Count, 0);
 			_dt3.Add(Count, 2);
@@ -4508,6 +5201,7 @@ namespace ROOT
         /// </summary>
         public void AddVersionBlock()
 		{
+            CheckIfDisposed();
             if (addedheader)
             {
                 throw new InvalidOperationException("A version block has already been added." +
@@ -4525,7 +5219,8 @@ namespace ROOT
         /// </summary>
         public void Clear()
 		{
-			Count = -1;
+            CheckIfDisposed();
+            Count = -1;
 			addedheader = false;
 			_dt1.Clear();
 			_dt2.Clear();
@@ -4540,12 +5235,13 @@ namespace ROOT
 		/// It is not important to explicitly call <see cref="Dispose()"/> , because you can re-use this instance by calling
 		/// the <see cref="Clear()"/> method and you have the instance as it is was created.
 		/// </remarks>
-		public void Dispose() { Clear(); _dt1 = null; _dt2 = null; _dt3 = null; }
+		public void Dispose() { CheckIfDisposed(); Clear(); _dt1 = null; _dt2 = null; _dt3 = null; _disposed = true; }
 
 		// Adds an invalid item to the dictionary.
 		// This is added so as to detect parser errors or code mistakes.
 		internal void AddInvalidItem(System.String Data) 
 		{
+            CheckIfDisposed();
             Count++;
             _dt1.Add(Count, Data);
             _dt2.Add(Count, 0);
@@ -4557,7 +5253,7 @@ namespace ROOT
         /// </summary>
 		/// <remarks>This property includes ALL STD entries , including the Version Block ,
 		/// Comments and STD entries.</remarks>
-        public System.Int32 ItemsCount { get { if (Count == -1) { return 0; } else { return Count + 1; } } }
+        public System.Int32 ItemsCount { get { CheckIfDisposed(); if (Count == -1) { return 0; } else { return Count + 1; } } }
 
         /// <summary>
         /// Gets the specified STD (Standard Text with color Definition) Line Entry at the specified index.
@@ -4566,14 +5262,65 @@ namespace ROOT
         /// <returns>A new <see cref="STDLine"/> <see langword="struct"/> which contains the STD data.</returns>
         public STDLine Get(System.Int32 Index)
 		{
-			return new STDLine() 
+            CheckIfDisposed();
+            return new STDLine() 
 			{ 
 				Colors = STDConstants.Decode(_dt2[Index]) , 
 				Data = _dt1[Index] , Type = (STDType) _dt3[Index] 
 			};
 		}
 
+		System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { CheckIfDisposed(); return new STDENUM(this); }
+
+		/// <inheritdoc />
+		public IEnumerator<STDLine> GetEnumerator() { CheckIfDisposed(); return new STDENUM(this); }
+
+		/// <summary>
+		/// Return the data that an STD structure holds as a new <see cref="STDLine"/>[] array.
+		/// </summary>
+		/// <param name="context">The STD structure to get the data from.</param>
+		public static explicit operator STDLine[](STDContext context) 
+		{
+			STDLine[] output = new STDLine[context.ItemsCount];
+			for (System.Int32 I = 0; I < output.Length; I++) { output[I] = context.Get(I); }
+			return output;
+		}
+	
+		private void CheckIfDisposed() { if (_disposed) { throw new ObjectDisposedException(this.GetType().FullName , 
+			"Disposed STD contexts are not allowed to be reused.\n If you want to reuse an STD context, " +
+			$"then use the {this.GetType().FullName}.Clear() method."); } }
 	}
+
+	// The internal Enumerator implementation.
+	// This structure is needed so as the GetEnumerator() function can be exported.
+	// However , you might not need to use ever that function; On the other hand , 
+	// this kind of implementation is used in an 'foreach' ('For Each' for Visual Basic)
+	// context , which that one uses the GetEnumerator() function , which that keyword
+	// is really a nice way to iterate through the STD Context without hassle.
+    internal struct STDENUM : IEnumerator<STDLine>
+    {
+        System.Int32 POS = -1;
+        STDContext _context;
+
+		public STDENUM() { throw new AggregateException("This constructor cannot build the enumerator correctly.");  }
+
+        public STDENUM(STDContext context) { _context = context; }
+
+        public STDLine Current { get { return _context.Get(POS); } }
+
+        System.Object System.Collections.IEnumerator.Current { get { return _context.Get(POS); } }
+
+        public System.Boolean MoveNext()
+        {
+            POS++;
+            if (POS >= _context.ItemsCount) { return false; }
+            return true;
+        }
+
+        public void Reset() { POS = -1; }
+
+        public void Dispose() { _context.Dispose(); }
+    }
 
     /// <summary>
     /// Represents an STD (Standard Text with color Definition) Line.
@@ -4650,7 +5397,7 @@ namespace ROOT
     /// <summary>
     /// The STD (Standard Text with color Definition) type that the entry you want to compare against is.
     /// </summary>
-    public enum STDType
+    public enum STDType : System.Int32
 	{
 		/// <summary>
 		/// The Entry is a normal STD string definition.
@@ -4669,7 +5416,7 @@ namespace ROOT
 		/// Normally , this occurs due to the parser incorrect readiness , but was not an error due to the following resons:
 		/// </summary>
 		/// <remarks>
-		/// New line , corrupt text , or unexpected characters returned.
+		/// Unexpected new line , corrupt text , or unexpected characters returned.
 		/// </remarks>
 		Invalid = 3 
 	}
@@ -4698,8 +5445,13 @@ namespace ROOT
 #pragma warning restore CS1591
 
 	/// <summary>
+	/// <para>
 	/// The STD (Standard Text with color Definition) class gets data 
 	/// from strings that contain messages colored as specified.
+	/// </para>
+	/// <para>
+	/// This class contains static methods to do serialisation/deserialisation.
+	/// </para>
 	/// </summary>
 	/// <remarks>The STD format is an easy style outlining definition which can be used to a number of applications.
 	/// Read more about it in the coding website.</remarks>
@@ -4860,7 +5612,6 @@ namespace ROOT
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static STDContext Deserialize(System.String Data)
 		{
-			if (STDConstants.DetectSlashR(Data)) { Data = STDConstants.RemoveSlashR(Data); }
 			System.String[] _tmp = Data.Split('\n');
 			System.Boolean terminated = true;
 			System.String slicer = null;
@@ -4872,11 +5623,11 @@ namespace ROOT
 			System.Boolean GivenVersion = false;
 			STDContext STD = new();
 
+
             foreach (System.String Runner in _tmp)
 			{
-				try
+                try
 				{
-
 					if (Runner.IndexOf(STDConstants.COMMENT, 0, 2) != -1)
 					{
 						// skip execution , it is a comment.
@@ -4893,7 +5644,7 @@ namespace ROOT
 					// So , it instead adds an invalid item that can be examined by the programmer and detect the mistake or corruption.
 					if (((Runner.IndexOf(STDConstants.STRING) == -1) && (Runner.IndexOf(STDConstants.SEPERATOR) == -1)) &&
 						(Runner.IndexOf(STDConstants.COMMENT) == -1) && (Runner.IndexOf(STDConstants.HDRCLOSE) == -1) &&
-						(Runner.IndexOf(STDConstants.HDRCLOSE) == -1))
+						(Runner.IndexOf(STDConstants.HDROPEN) == -1))
 					{
 						// Has none of the specified STD characters. In this case , add a new invalid item.
 						STD.AddInvalidItem(Runner);
@@ -4904,10 +5655,10 @@ namespace ROOT
 					{
 						// Start parsing the version block.
 						Temp = Runner.Substring(Runner.IndexOf(STDConstants.HDROPEN) + 1, Runner.IndexOf(STDConstants.SEPERATOR) - 1);
-						if (Temp.ToUpperInvariant() == "VERSION")
+                        if (Temp.ToUpperInvariant() == "VERSION")
 						{
 							Temp = Runner.Substring(Runner.IndexOf(STDConstants.SEPERATOR) + 1, Runner.Length - Runner.IndexOf(STDConstants.HDRCLOSE));
-							if (System.Convert.ToInt32(Temp) == STDConstants.VERSION) { GivenVersion = true; STD.AddVersionBlock(); }
+                            if (System.Convert.ToInt32(Temp) == STDConstants.VERSION) { GivenVersion = true; STD.AddVersionBlock(); }
 						}
 						continue;
 					}
@@ -4975,12 +5726,10 @@ namespace ROOT
 		public static System.String Serialize(STDContext Context)
 		{
 			System.String Result = null;
-			STDLine STDL = new();
 			System.String FR = null;
 			System.String BK = null;
-			for (System.Int32 I = 0; I < Context.ItemsCount; I++)
+			foreach (STDLine STDL in Context)
 			{
-				STDL = Context.Get(I);
 				if (STDL.Type == STDType.VersionBlock) 
 				{
 					Result += $"{STDL.Data}\n";
@@ -4988,7 +5737,7 @@ namespace ROOT
 				}
 				if (STDL.Type == STDType.Comment)
 				{
-					Result += $"#{STDL.Data}\n";
+					Result += $"{STDConstants.COMMENT}{STDL.Data}\n";
                     continue;
                 }
 				if (STDL.Type == STDType.STDString)
@@ -5029,7 +5778,686 @@ namespace ROOT
 		*/
 	}
 
+	/// <summary>
+	/// The Write Mode to use when the <see cref="STDWriter"/> class is used.
+	/// </summary>
+    public enum STDWriteMode : System.Int32
+    {
+		/// <summary>
+		/// Serialise and return the data as an new <see cref="STDContext"/> structure.
+		/// </summary>
+        AsContext = 2,
+		/// <summary>
+		/// Serialise and return the data as an new <see cref="System.String"/> class.
+		/// </summary>
+        AsString = 3,
+		/// <summary>
+		/// Serialise and emit the produced STD data to a new file.
+		/// </summary>
+        AsFile = 4,
+		/// <summary>
+		/// Serialise and return the data as a new <see cref="System.Text.StringBuilder"/> class.
+		/// </summary>
+        AsStringBuilder = 5
+    }
 
+    /// <summary>
+    /// The STD Writer is another way to write directly either to a new STD context 
+    /// or as a raw string.
+    /// </summary>
+	/// <remarks>This class cannot be inherited.</remarks>
+    public sealed class STDWriter : System.IDisposable
+	{
+		private STDContext _context;
+		private STDWriteMode _mode = STDWriteMode.AsContext;
+		private System.IO.FileStream _stream = null;
+		private System.Text.StringBuilder _sb = null;
+		private STDLine _line = new();
+		private System.Boolean _closed = true;
+
+		/// <summary>
+		/// Start a new instance of the <see cref="STDWriter"/> class. This constructor implies that the mode used is 
+		/// the <see cref="STDWriteMode.AsContext"/> .
+		/// </summary>
+		public STDWriter() { _context = new STDContext(); _context.AddVersionBlock(); }
+
+        /// <summary>
+        /// Start a new instance of the <see cref="STDWriter"/> class. The mode that will be used is determined by the 
+		/// <paramref name="mode"/> parameter.
+        /// </summary>
+        /// <param name="mode">The Write mode to use.</param>
+        public STDWriter(STDWriteMode mode) { _mode = mode; InitWriter(); }
+
+		private void InitWriter()
+		{
+			_context = new();
+			if (_mode == STDWriteMode.AsFile) { _stream = default; }
+			if (_mode == STDWriteMode.AsStringBuilder) { _sb = new(); }
+			_context.AddVersionBlock();
+		}
+
+		/// <inheritdoc/>
+		public void Dispose() 
+		{ 
+			_context.Dispose(); 
+			if (_mode == STDWriteMode.AsFile) { _stream.Close(); _stream.Dispose(); }
+			if (_mode == STDWriteMode.AsStringBuilder) { _sb.Clear(); _sb = null; }
+			_line = default; //discard any data.
+		}
+
+		/// <summary>
+		/// Returns the underlying STD Context that is being used by the writer.
+		/// </summary>
+		public STDContext Context  { get { return _context; } }
+
+		/// <summary>
+		/// Adds a new STD entry.
+		/// </summary>
+		/// <param name="Data">The STD <see cref="System.String"/> text to add.</param>
+		public void AddSTDEntry(System.String Data) 
+		{
+            if (_closed == false)
+            {
+				throw new System.InvalidOperationException("Cannot add a new STD entry bacause it is not closed.\n" +
+					"To close an STD Entry , use the Colors property so as to close it.");
+            }
+            _line.Data = Data;
+			_line.Type = STDType.STDString;
+			_closed = false;
+		}
+
+		/// <summary>
+		/// The colors to set for a new STD Entry.
+		/// </summary>
+		public STDColors Colors 
+		{ 
+			set 
+			{ 
+				if (_closed)
+				{
+					throw new System.InvalidOperationException("A new STD Entry was not defined. Define one , then set it's colors.");
+				}
+				_line.Colors = value;
+				_context.Add(_line.Colors.FrontColor, _line.Colors.BackColor, _line.Data);
+				_closed = true;
+			}
+		}
+
+		/// <summary>
+		/// Append a new STD Comment.
+		/// </summary>
+		/// <param name="Comment">The Comment data to include too.</param>
+		public void AddComment(System.String Comment) { _context.AddComment(Comment); }
+
+        /// <summary>
+        /// Gets a new instance of <see cref="System.Text.StringBuilder"/> with the serialised 
+        /// STD data. Be noted , the class must be initialised with the <see cref="STDWriter(STDWriteMode)"/>
+        /// constructor with a value of <see cref="STDWriteMode.AsStringBuilder"/> so that this can work.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">The class was not initialised with the 
+        /// <see cref="STDWriteMode.AsStringBuilder"/> value.</exception>
+		/// <exception cref="AggregateException">Inherited from <see cref="STD.Serialize(STDContext)"/> . 
+		/// See the documentation on that function so as to learn more about this exception. </exception>
+        public System.Text.StringBuilder AsStringBuilder
+		{
+			get 
+			{
+				if (_mode != STDWriteMode.AsStringBuilder)
+				{
+					throw new InvalidOperationException("The instance was prepared for a different target. Use that method instead.");
+				}
+				_sb.AppendLine();
+				_sb.Append(STD.Serialize(_context));
+				return _sb;
+			}
+		}
+
+        /// <summary>
+        /// Gets the serialised data as a new <see cref="System.String"/>.
+        /// Be noted , the class must be initialised with the <see cref="STDWriter(STDWriteMode)"/>
+        /// constructor with a value of <see cref="STDWriteMode.AsString"/> so that this can work.
+        /// </summary>
+		/// <exception cref="InvalidOperationException">The class was not initialised with the 
+        /// <see cref="STDWriteMode.AsString"/> value.</exception>
+		/// <exception cref="AggregateException">Inherited from <see cref="STD.Serialize(STDContext)"/> . 
+		/// See the documentation on that function so as to learn more about this exception. </exception>
+        public System.String AsSingleString
+		{
+			get 
+			{
+                if (_mode != STDWriteMode.AsString)
+                {
+                    throw new InvalidOperationException("The instance was prepared for a different target. Use that method instead.");
+                }
+                System.String DI = null;
+				DI += " \n";
+				DI += STD.Serialize(_context);
+				return DI;
+			}
+		}
+
+        /// <summary>
+		/// <para>
+        /// Writes the emitted STD data to a new file , or if the <paramref name="OverwriteIfExists"/> parameter is set to 
+        /// <see langword="true"/> , and the file exists , it is overwrriten. </para>
+		/// <para>
+		/// Be noted , the class must be initialised with the <see cref="STDWriter(STDWriteMode)"/>
+        /// constructor with a value of <see cref="STDWriteMode.AsFile"/> so that this can work.
+		/// </para>
+        /// </summary>
+        /// <param name="PathToSave"></param>
+        /// <param name="OverwriteIfExists"></param>
+        /// <exception cref="System.IO.IOException"></exception>
+        /// <exception cref="System.AggregateException">Inherited from <see cref="STD.Serialize(STDContext)"/> . 
+        /// See the documentation on that function so as to learn more about this exception , or an file stream could
+		/// not be opened to complete this operation.</exception>
+		/// <exception cref="InvalidOperationException">The class was not initialised with the 
+        /// <see cref="STDWriteMode.AsFile"/> value.</exception>
+        public void AsANewFile(System.String PathToSave ,System.Boolean OverwriteIfExists = false)
+		{
+            if (_mode != STDWriteMode.AsFile)
+            {
+                throw new InvalidOperationException("The instance was prepared for a different target. Use that method instead.");
+            }
+            if (MAIN.FileExists(PathToSave) && (OverwriteIfExists == false)) 
+			{
+				throw new System.IO.IOException($"Could not save the file {PathToSave} because the OverwriteIfExists was \n" +
+					$"not set or set to \'false\'. To allow file overwriting , set the OverwriteIfExists parameter to \'true\'.");
+			} else if (MAIN.FileExists(PathToSave))
+			{
+				_stream = MAIN.ClearAndWriteAFile(PathToSave);
+			} else { _stream = MAIN.CreateANewFile(PathToSave); }
+			if (_stream == null) 
+			{
+				throw new System.AggregateException("A new file stream could not be opened. An unexpected error occured.");
+			}
+			MAIN.AppendNewContentsToFile($"\n{STD.Serialize(_context)}" , _stream);
+			_stream.Flush();
+		}
+
+	}
+
+    /// <summary>
+    /// The STD Reader is another way to get the STD serialised data back to a new STD Context.
+    /// </summary>
+    /// <remarks>This class cannot be inherited.</remarks>
+    public sealed class STDReader : System.IDisposable
+	{
+		private STDContext _context;
+		private System.String _serialised = null;
+
+		/// <summary>
+		/// Get the data from an simple <see cref="System.String"/> .
+		/// </summary>
+		/// <param name="STDText">The <see cref="System.String"/> class that contains the STD data.</param>
+		public STDReader(System.String STDText) { _serialised = STDText; }
+
+        /// <summary>
+        /// Get the data from an instantiated <see cref="System.Text.StringBuilder"/> class.
+        /// </summary>
+        /// <param name="builder">The <see cref="System.Text.StringBuilder"/> class that contains the STD data.</param>
+        public STDReader(System.Text.StringBuilder builder) { _serialised = builder.ToString(); }
+
+        /// <summary>
+        /// Get the data from an intialised <see cref="System.IO.Stream"/> .
+        /// </summary>
+        /// <param name="Stream">The <see cref="System.IO.Stream"/> class that contains the STD data.</param>
+        public STDReader(System.IO.Stream Stream) 
+		{
+			System.IO.StreamReader dk = new(Stream);
+			_serialised = dk.ReadToEnd();
+			dk.Close();
+			dk.Dispose();
+		}
+
+		/// <summary>
+		/// Calling this constructor always throws an <see cref="System.InvalidOperationException"/> exception.
+		/// </summary>
+		/// <exception cref="InvalidOperationException"></exception>
+		public STDReader() { throw new InvalidOperationException("The class must be initialised with at least one of the \n" +
+            "parameterized constructor variants provided."); }
+
+		/// <inheritdoc/>
+		public void Dispose() 
+		{
+			_context.Dispose();
+			_serialised = null;
+		}
+
+		/// <summary>
+		/// Returns the deserialised data given by the constructors.
+		/// </summary>
+		public STDContext Context 
+		{ 
+			get 
+			{
+				_context = STD.Deserialize(_serialised);
+				return _context; 
+			}
+		}
+	}
+
+	/// <summary>
+	/// This class contains the internal implementation extensions , which some of them are exposed publicly.
+	/// </summary>
+	public static class ConsoleExtensions
+	{
+        internal enum ConsoleHandleOptions : System.UInt32
+        {
+            Input = 0xFFFFFFF6,
+            Output = 0xFFFFFFF5,
+            Error = 0xFFFFFFF4
+        }
+
+		// This value indicates whether the console is detached , and therefore 
+		// it notifies the console functions to 'not' actually call the console code.
+		internal static System.Boolean Detached = false;
+
+		// An internal buffer for the Title commands.
+		internal static System.String T = T2;
+        internal const System.String T2 = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
+        
+		/// <summary>
+        /// Define the Buffer Size when using the function <see cref="ROOT.MAIN.ReadConsoleText(ConsoleReadBufferOptions)"/> .
+        /// </summary>
+        public enum ConsoleReadBufferOptions : System.Int32
+        {
+			/// <summary>
+			/// Buffer size is set to 1024.
+			/// </summary>
+            Small = 1024,
+            /// <summary>
+            /// Buffer size is set to 2048.
+            /// </summary>
+            Default = 2048,
+            /// <summary>
+            /// Buffer size is set to 3072.
+            /// </summary>
+            Large = 3072,
+            /// <summary>
+            /// Buffer size is set to 4096.
+            /// </summary>
+            VeryLarge = 4096,
+            /// <summary>
+            /// Buffer size is set to 8192.
+            /// </summary>
+            ExtravagantlyLarge = 8192
+        }
+
+		/// <summary>
+		/// Gets the underlying KERNEL32 handle which this implementation uses to write any kind of data to console.
+		/// </summary>
+		/// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for writing data to the console.</returns>
+		public static System.IntPtr GetOutputHandle()
+		{
+			if (ConsoleInterop.OutputHandle == System.IntPtr.Zero) 
+			{
+				ConsoleInterop.OutputHandle = ConsoleInterop.GetConsoleStream(ConsoleHandleOptions.Output);
+				return ConsoleInterop.OutputHandle;
+			} else { return ConsoleInterop.OutputHandle; }
+		}
+
+        /// <summary>
+        /// Gets the underlying KERNEL32 handle which this implementation uses to read from the console.
+        /// </summary>
+        /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for reading from the console.</returns>
+        public static System.IntPtr GetInputHandle()
+        {
+            if (ConsoleInterop.InputHandle == System.IntPtr.Zero)
+            {
+                ConsoleInterop.InputHandle = ConsoleInterop.GetConsoleStream(ConsoleHandleOptions.Output);
+                return ConsoleInterop.InputHandle;
+            }
+            else { return ConsoleInterop.InputHandle; }
+        }
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[System.Security.SecurityCritical]
+		internal static void InitIfNotInitOut()
+		{
+			if (ConsoleInterop.OutputHandle == System.IntPtr.Zero)
+			{
+				ConsoleInterop.OutputHandle = GetOutputHandle();
+			}
+			return;
+		}
+
+		/// <summary>
+		/// Globally set or get the console foreground color. This property is used for the exproted MDCFR functions , 
+		/// and this is equivalent to <see cref="System.Console.ForegroundColor"/> property.
+		/// </summary>
+		public static System.ConsoleColor ForegroundColor
+		{
+            [System.Security.SecurityCritical]
+            get 
+			{
+                if (ROOT.ConsoleExtensions.Detached == true) { return System.ConsoleColor.Gray; }
+                InitIfNotInitOut();
+				ConsoleInterop.GetBufferInfo(ConsoleInterop.OutputHandle, out CONSOLE_SCREEN_BUFFER_INFO CSBI);
+				return ColorAttributeToConsoleColor((System.Int16)(CSBI.wAttributes & (System.Int16)ConsoleControlChars.ForegroundMask));
+            }
+			[System.Security.SecurityCritical]
+			set 
+			{
+				InitIfNotInitOut();
+				SetForeColor(value);
+			}
+		}
+
+        /// <summary>
+        /// Globally set or get the console background color. This property is used for the exproted MDCFR functions , 
+        /// and this is equivalent to <see cref="System.Console.BackgroundColor"/> property.
+        /// </summary>
+        public static System.ConsoleColor BackgroundColor
+		{
+			[System.Security.SecurityCritical]
+			get 
+			{
+                if (ROOT.ConsoleExtensions.Detached == true) { return System.ConsoleColor.Black; }
+                InitIfNotInitOut();
+                ConsoleInterop.GetBufferInfo(ConsoleInterop.OutputHandle, out CONSOLE_SCREEN_BUFFER_INFO CSBI);
+                return ColorAttributeToConsoleColor((System.Int16)(CSBI.wAttributes & (System.Int16)ConsoleControlChars.BackgroundMask));
+            }
+            [System.Security.SecurityCritical]
+			set 
+			{
+				InitIfNotInitOut();
+				SetBackColor(value);
+			}
+        }
+
+		/// <summary>
+		/// Get or Set the Console's Output encoding as an <see cref="System.Text.Encoding"/> class.
+		/// </summary>
+		/// <exception cref="AggregateException">
+		/// Occurs when the Code Page defined to the 
+		/// console does not exist as an <see cref="System.Text.Encoding"/> class.</exception>
+		/// <exception cref="InvalidOperationException">
+		/// Occurs when the specified Code Page is invalid for the console.</exception>
+		public static System.Text.Encoding OutputEncoding
+		{
+            [System.Security.SecurityCritical]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get 
+			{
+				System.UInt32 CP = ConsoleInterop.GetOutputEnc();
+                if (CP == 0) 
+				{
+					throw new AggregateException("Error occured while getting the current code page!!!");
+				}
+				System.Text.Encoding TI = null;
+				TI = System.Text.CodePagesEncodingProvider.Instance.GetEncoding((System.Int32)CP);
+                if (TI == null)
+				{
+					try
+					{
+						TI = System.Text.Encoding.GetEncoding((System.Int32)CP);
+						return TI;
+					} catch (System.Exception EX)
+					{
+						throw new AggregateException($"Could not get the codepage set to the console: {CP} ." , EX);
+					}
+				} else { return TI; }
+			}
+
+            [System.Security.SecurityCritical]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set 
+			{
+				System.UInt32 CP = (System.UInt32) value.CodePage;
+				if (ConsoleInterop.SetInputEnc(CP) == 0) 
+				{
+					throw new InvalidOperationException("Cannot apply the specific code page as a console output encoding. \n" +
+						$"Code Page Identifier: {CP} \n" +
+						$"Code Page Name: {value.BodyName} \n" +
+						$"Code Page Web Name: {value.WebName} \n" +
+						$"Code Page Windows Name: {value.WindowsCodePage}");
+				}
+			}
+
+        }
+
+        /// <summary>
+        /// Get or Set the Console's Input encoding as an <see cref="System.Text.Encoding"/> class.
+        /// </summary>
+		/// <exception cref="AggregateException">
+		/// Occurs when the Code Page defined to the 
+		/// console does not exist as an <see cref="System.Text.Encoding"/> class.</exception>
+		/// <exception cref="InvalidOperationException">
+		/// Occurs when the specified Code Page is invalid for the console.</exception>
+        public static System.Text.Encoding InputEncoding
+        {
+            [System.Security.SecurityCritical]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            get
+            {
+                System.UInt32 CP = ConsoleInterop.GetInputEnc();
+                if (CP == 0)
+                {
+                    throw new AggregateException("Error occured while getting the current code page!!!");
+                }
+                System.Text.Encoding TI = null;
+                TI = System.Text.CodePagesEncodingProvider.Instance.GetEncoding((System.Int32)CP);
+                if (TI == null)
+                {
+                    try
+                    {
+                        TI = System.Text.Encoding.GetEncoding((System.Int32)CP);
+                        return TI;
+                    }
+                    catch (System.Exception EX)
+                    {
+                        throw new AggregateException($"Could not get the codepage set to the console: {CP} .", EX);
+                    }
+                }
+                else { return TI; }
+            }
+
+            [System.Security.SecurityCritical]
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            set
+            {
+                System.UInt32 CP = (System.UInt32)value.CodePage;
+                if (ConsoleInterop.SetInputEnc(CP) == 0)
+                {
+                    throw new InvalidOperationException("Cannot apply the specific code page as a console input encoding. \n" +
+                        $"Code Page Identifier: {CP} \n" +
+                        $"Code Page Name: {value.BodyName} \n" +
+                        $"Code Page Web Name: {value.WebName} \n" +
+                        $"Code Page Windows Name: {value.WindowsCodePage}");
+                }
+            }
+
+        }
+
+		/// <summary>
+		/// Get or Set the current console title. This property is equivalent to <see cref="System.Console.Title"/> property.
+		/// </summary>
+		public static System.String Title
+		{
+			[System.Security.SecurityCritical]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get
+			{
+				ConsoleInterop.GetTitle(T, T.Length);
+				System.String I = T;
+				T = T2;
+				return MAIN.RemoveDefinedChars(I, '\0');
+			}
+			[System.Security.SecurityCritical]
+			set { ConsoleInterop.SetTitle(value); }
+        }
+
+		/// <summary>
+		/// Gets the original title , when the application attached to the console.
+		/// </summary>
+		public static System.String OriginalTitle
+		{
+			[System.Security.SecurityCritical]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get 
+			{
+				ConsoleInterop.OriginalTitle(T, T.Length);
+				System.String I = T;
+				T = T2;
+				return MAIN.RemoveDefinedChars(I, '\0');
+			}
+		}
+
+		// Global Windows C structure defining the coordinates of an window.
+		// Interpreted as System.Int16 points.
+		[Serializable]
+		[StructLayout(LayoutKind.Sequential)]
+        internal struct COORD
+        {
+            internal short X;
+
+            internal short Y;
+        }
+
+        // Global Windows C structure defining the size of an window.
+        // Interpreted as System.Int16 points.
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct SMALL_RECT
+        {
+            internal short Left;
+
+            internal short Top;
+
+            internal short Right;
+
+            internal short Bottom;
+        }
+
+		// The Console Info for this console session. This table is filled by specific functions only.
+        [Serializable]
+        [StructLayout(LayoutKind.Sequential)]
+        internal struct CONSOLE_SCREEN_BUFFER_INFO
+        {
+            internal COORD dwSize;
+
+            internal COORD dwCursorPosition;
+
+            internal short wAttributes;
+
+            internal SMALL_RECT srWindow;
+
+            internal COORD dwMaximumWindowSize;
+        }
+
+		internal static void SetForeColor(System.ConsoleColor Color) 
+		{
+            new System.Security.Permissions.UIPermission(System.Security.Permissions.UIPermissionWindow.SafeTopLevelWindows).Demand();
+            CONSOLE_SCREEN_BUFFER_INFO INF = GetCBufferInfo(true, out System.Boolean SU);
+			System.Int16 attrs = INF.wAttributes;
+			attrs = (short)(attrs & -16);
+            attrs = (short)((ushort)attrs | (ushort) ConsoleColorToColorAttribute(Color , false));
+			ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, attrs);
+        }
+
+		internal static void SetBackColor(System.ConsoleColor Color)
+		{
+            new System.Security.Permissions.UIPermission(System.Security.Permissions.UIPermissionWindow.SafeTopLevelWindows).Demand();
+            CONSOLE_SCREEN_BUFFER_INFO INF = GetCBufferInfo(true, out System.Boolean SU);
+            System.Int16 attrs = INF.wAttributes;
+            attrs = (short)(attrs & -241);
+            attrs = (short)((ushort)attrs | (ushort)ConsoleColorToColorAttribute(Color, true));
+            ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, attrs);
+        }
+
+        [System.Security.SecuritySafeCritical]
+        private static CONSOLE_SCREEN_BUFFER_INFO GetCBufferInfo(bool throwOnNoConsole, out bool succeeded)
+        {
+            succeeded = false;
+            IntPtr consoleOutputHandle = ConsoleInterop.OutputHandle;
+            if (consoleOutputHandle == System.IntPtr.Zero)
+            {
+                if (!throwOnNoConsole)
+                {
+                    return default(CONSOLE_SCREEN_BUFFER_INFO);
+                }
+                throw new System.IO.IOException("There is not any Console Spawned! ");
+            }
+            if (!ConsoleInterop.GetBufferInfo(consoleOutputHandle, out var lpConsoleScreenBufferInfo))
+            {
+                System.Boolean consoleScreenBufferInfo = ConsoleInterop.GetBufferInfo(consoleOutputHandle, out lpConsoleScreenBufferInfo);
+                if (!consoleScreenBufferInfo)
+                {
+                    consoleScreenBufferInfo = ConsoleInterop.GetBufferInfo(consoleOutputHandle, out lpConsoleScreenBufferInfo);
+                }
+                if (!consoleScreenBufferInfo)
+                {
+                    System.Int32 lastWin32Error = Marshal.GetLastWin32Error();
+                    if (lastWin32Error == 6 && !throwOnNoConsole)
+                    {
+                        return default(CONSOLE_SCREEN_BUFFER_INFO);
+                    }
+                    throw new System.AggregateException($"Win32 Exception detected. HRESULT is {lastWin32Error} .");
+                }
+            }
+            return lpConsoleScreenBufferInfo;
+        }
+
+        internal enum ConsoleControlChars : System.Int32
+        {
+            FOREGROUND_BLUE = 0x0001, // text color contains blue.
+            FOREGROUND_GREEN = 0x0002, // text color contains green.
+            FOREGROUND_RED = 0x0004, // text color contains red.
+            FOREGROUND_INTENSITY = 0x0008, // text color is intensified.
+            BACKGROUND_BLUE = 0x0010, // background color contains blue.
+            BACKGROUND_GREEN = 0x0020, // background color contains green.
+            BACKGROUND_RED = 0x0040, // background color contains red.
+            BACKGROUND_INTENSITY = 0x0080, // background color is intensified.
+            COMMON_LVB_LEADING_BYTE = 0x0100, // Leading Byte of DBCS
+            COMMON_LVB_TRAILING_BYTE = 0x0200, // Trailing Byte of DBCS
+            COMMON_LVB_GRID_HORIZONTAL = 0x0400, // DBCS: Grid attribute: top horizontal.
+            COMMON_LVB_GRID_LVERTICAL = 0x0800, // DBCS: Grid attribute: left vertical.
+            COMMON_LVB_GRID_RVERTICAL = 0x1000, // DBCS: Grid attribute: right vertical.
+            COMMON_LVB_REVERSE_VIDEO = 0x4000, // DBCS: Reverse fore/back ground attribute.
+            COMMON_LVB_UNDERSCORE = 0x8000, // DBCS: Underscore.
+            ForegroundMask = 0xF,
+            BackgroundMask = 0xF0,
+            ColorMask = 0xFF
+        }
+
+        [System.Security.SecurityCritical]
+        internal static ConsoleControlChars ConsoleColorToColorAttribute(ConsoleColor color, bool isBackground)
+        {
+            if (((uint)color & 0xFFFFFFF0u) != 0)
+            {
+                throw new ArgumentException($"The Console Color specified , {color} , is invalid.");
+            }
+            ConsoleControlChars color2 = (ConsoleControlChars)color;
+            if (isBackground)
+            {
+                color2 = (ConsoleControlChars)((System.Int32)color2 << 4);
+            }
+            return color2;
+        }
+
+        [System.Security.SecurityCritical]
+        internal static ConsoleColor ColorAttributeToConsoleColor(System.Int16 c)
+        {
+            if ((c & (System.Int16) ConsoleControlChars.BackgroundMask) != 0)
+            {
+                c = (System.Int16) ((System.Int32)c >> 4);
+            }
+            return (ConsoleColor)c;
+        }
+    
+		/// <summary>
+		/// Revert the current implementation's back to default console colors , when it is initiated.
+		/// </summary>
+		public static void ToDefaultColors()
+		{
+			InitIfNotInitOut();
+            ConsoleControlChars F = ConsoleColorToColorAttribute(System.ConsoleColor.Black, true);
+            ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, (System.Int16) F);
+            F = ConsoleColorToColorAttribute(System.ConsoleColor.Gray, false);
+            ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, (System.Int16) F);
+        }
+	}
 
 }
 
@@ -5168,235 +6596,146 @@ namespace ExternalHashCaculators
 		}
 	}
 
-	internal unsafe class XXhashm32
-	{
-
-		public const System.UInt32 MaxBufferSize = 15 + 1;
-		public const System.UInt32 Prime1 = 2654435761U;
-        public const System.UInt32 Prime2 = 2246822519U;
-        public const System.UInt32 Prime3 = 3266489917U;
-        public const System.UInt32 Prime4 = 668265263U;
-        public const System.UInt32 Prime5 = 374761393U;
-
-        [System.Runtime.CompilerServices.MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static System.UInt32 RotateLeft(System.UInt32 x, char bits)
-        {
-            return (x << bits) | (x >> (32 - bits));
-        }
-
-		public static void Process(System.Char* data, System.UInt32 state0, 
-			System.UInt32 state1, System.UInt32 state2, System.UInt32 state3)
-		{
-			System.UInt32* block = (System.UInt32*) data;
-			state0 = RotateLeft(state0 + block[0] * Prime2, (System.Char) 13) * Prime1;
-			state1 = RotateLeft(state1 + block[1] * Prime2, (System.Char) 13) * Prime1;
-			state2 = RotateLeft(state2 + block[2] * Prime2, (System.Char) 13) * Prime1;
-			state3 = RotateLeft(state3 + block[3] * Prime2, (System.Char) 13) * Prime1;
-		}
-
-		public static XXhashState State = new();
-        public static System.Char[] buffer = new System.Char[MaxBufferSize];
-        public static System.Int32 bufferSize = 0;
-		public static System.UInt64 totalLength = 0;
-	    public static System.IntPtr tm;
-
-		private static char* MarshalAspointer(System.Char[] data)
-		{
-			char* result;
-			if (tm != null) { Marshal.FreeHGlobal(tm); tm = System.IntPtr.Zero; }
-            tm = Marshal.AllocHGlobal(Marshal.SizeOf(data[0]) * data.Length);
-            System.Int32[] tr = new System.Int32[data.Length];
-            for (System.Int32 I = 0; I < data.Length; I++) { tr[I] = data[I]; }
-            Marshal.Copy(tr, 0, tm, data.Length);
-            result = (char*) tm.ToPointer();
-			return result;
-        }
-
-		public static System.Boolean Add(void* input, System.UInt64 length)
-		{
-			// no data ?
-			if (input == null || length == 0) return false;
-			totalLength += length;
-			// byte-wise access
-			System.Char* data = (System.Char*) input;
-			// unprocessed old data plus new data still fit in temporary buffer ?
-			if ((System.UInt64) bufferSize + length < MaxBufferSize)
-			{
-				// just add new data
-				while (length-- > 0) buffer[bufferSize++] = *data++;
-				return true;
-			}
-			// point beyond last byte
-			System.Char* stop = data + length;
-			System.Char* stopBlock = stop - MaxBufferSize;
-			// some data left from previous update ?
-			if (bufferSize > 0)
-			{
-				// make sure temporary buffer is full (16 bytes)
-				while (bufferSize < MaxBufferSize) buffer[bufferSize++] = *data++;
-				// process these 16 bytes (4x4)
-				Process(MarshalAspointer(buffer), State[0], State[1], State[2], State[3]);
-			}
-			// copying state to local variables helps optimizer A LOT
-			System.UInt32 s0 = State[0], s1 = State[1], s2 = State[2], s3 = State[3];
-			// 16 bytes at once
-			while (data <= stopBlock)
-			{
-				// local variables s0..s3 instead of state[0]..state[3] are much faster
-				Process(data, s0, s1, s2, s3);
-				data += 16;
-			}
-			// copy back
-			State[0] = s0; State[1] = s1; State[2] = s2; State[3] = s3;
-			// copy remainder to temporary buffer:
-			// To do that in .NET , we must initialise a ref variable , then copy the remainder to temporary buffer and then
-			// take the value , save it to the ref we initialised , and copy back the value to the original buffer size variable..
-			ref System.Int32 bse = ref System.Runtime.CompilerServices.Unsafe.AsRef<System.Int32>(bufferSize);
-            bse = (System.Int32) (stop - data);
-			bufferSize = bse;
-			for (System.Int32 i = 0; i < bufferSize; i++) buffer[i] = data[i];
-			// done
-			return true;
-		}
-
-		public static System.UInt32 Hash()
-		{
-			System.UInt32 result = (System.UInt32) totalLength;
-			// fold 128 bit state into one single 32 bit value
-			if (totalLength >= MaxBufferSize)
-			{
-				result += RotateLeft(State[0], (System.Char)1) +
-						  RotateLeft(State[1], (System.Char)7) +
-						  RotateLeft(State[2], (System.Char)12) +
-						  RotateLeft(State[3], (System.Char)18);
-			}
-			else
-			{
-				// internal state wasn't set in add(), therefore original seed is still stored in state2
-				result += State[2] + Prime5;
-			}
-			// process remaining bytes in temporary buffer
-			System.Char* data = MarshalAspointer(buffer);
-			// point beyond last byte
-			System.Char* stop = data + bufferSize;
-			// at least 4 bytes left ? => eat 4 bytes per step
-			for (; data + 4 <= stop; data += 4) { result = RotateLeft(result + *(System.UInt32*)data * Prime3, (System.Char)17) * Prime4; }
-			// take care of remaining 0..3 bytes, eat 1 byte per step
-			while (data != stop) { result = RotateLeft(result + (*data++) * Prime5, (System.Char)11) * Prime1; }
-			// mix bits
-			result ^= result >> 15;
-			result *= Prime2;
-			result ^= result >> 13;
-			result *= Prime3;
-			result ^= result >> 16;
-			return result;
-		}
-
-		public static System.Boolean AddImpl(System.Byte[] d , System.UInt64 len)
-		{
-            if (tm != null) { Marshal.FreeHGlobal(tm); tm = System.IntPtr.Zero; }
-            tm = Marshal.AllocHGlobal(Marshal.SizeOf(d[0]) * d.Length);
-			System.Int32[] tr = new System.Int32[len];
-			for (System.Int32 I = 0; I < d.Length; I++) { tr[I] = d[I]; tr[I] = System.Buffers.Binary.BinaryPrimitives.ReverseEndianness(tr[I]);  }
-			Marshal.Copy(tr , 0 , tm , (System.Int32) len);
-			void* temp = tm.ToPointer();
-			return Add(temp, len);
-		}
-	}
-
-	internal struct XXhashState
-	{
-
-		public System.UInt32[] Data;
-
-		public XXhashState() { Data = new System.UInt32[4]; }
-
-		public System.UInt32 this[System.Int32 Index]
-		{
-			readonly get { return Data[Index]; }
-			set { Data[Index] = value; }
-		}
-
-	}
-
-	/// <summary>
-	/// <para>
-	/// An XXHash32 implementation based on Stephan's Brumme implementation
-	/// for C++. </para>
-	/// <para>Be noted that this implementation tries to wrap up that C++ implementation , 
-	/// so it contains also unmanaged code too , but without the need of the unmanaged library.</para>
-	/// <para>This class is theoritical; although that in practice it works , 
-	/// the runtime crashes after the hash is took.</para>
-	/// </summary>
-	[System.Obsolete("This class is not meant to be used directly by your code because it is in test phase.\n" +
-		"Please avoid using it so as to avoid runtime memory corruption." , false)]
-    public class XXHashManaged32 : System.IDisposable
-	{
-		private System.Boolean _disposed = false;
-
-		/// <summary>
-		/// Create a new XXHash Instance.
-		/// </summary>
-		/// <param name="Seed">The seed to use when the XXHash value will be computed.</param>
-		public XXHashManaged32(System.Int32 Seed)
-		{
-			XXhashm32.State[0] = (System.UInt32) Seed + XXhashm32.Prime1 + XXhashm32.Prime2;
-            XXhashm32.State[1] = (System.UInt32) Seed + XXhashm32.Prime2;
-            XXhashm32.State[2] = (System.UInt32) Seed;
-            XXhashm32.State[3] = (System.UInt32) Seed - XXhashm32.Prime1;
-        }
-		/// <summary>
-		/// This constructor always throws an <see cref="System.InvalidOperationException"/> exception.
-		/// </summary>
-		/// <exception cref="System.InvalidOperationException"></exception>
-		public XXHashManaged32() { throw new System.InvalidOperationException(
-			"The class should be at least initiated with a seed value. Can also be 0."); }
-
-		/// <summary>
-		/// Add data to process before hashing.
-		/// </summary>
-		/// <param name="Data">The Array to compute the data from.</param>
-		/// <param name="Length">The Length of the <paramref name="Data"/> array , 
-		/// or less than it's length so to compute a specific portion of the array. </param>
-		/// <returns>A <see cref="System.Boolean"/> value indicating that 
-		/// the data were sucessfully added to the stash for computing.</returns>
-		public System.Boolean Add(System.Byte[] Data , System.Int32 Length)
-		{
-			if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); }
-			return XXhashm32.AddImpl(Data, (System.UInt64) Length);
-		}
-
-		/// <summary>
-		/// Hash the stashed data.
-		/// </summary>
-		/// <returns>A <see cref="System.UInt64"/> containing the hashed data.</returns>
-		/// <remarks>NOTE: You should call Dispose() after hashing , because the code implemented is 
-		/// unmanaged and causes runtime crashes if this method is called again.</remarks>
-		public System.UInt64 Hash() 
-		{
-            if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); }
-			System.UInt64 Result = XXhashm32.Hash();
-			return Result;
-		}
-
-		/// <summary>
-		/// The destructor is equal to <see cref="Dispose()"/> method.
-		/// </summary>
-		~XXHashManaged32() { Dispose(); }
-
-		/// <summary>
-		/// Dispose this instance and invalidate it.
-		/// </summary>
-		public void Dispose() 
-		{
-			if (_disposed) { throw new System.ObjectDisposedException(GetType().FullName); } else { _disposed = true; }
-            Marshal.FreeHGlobal(XXhashm32.tm); 
-			XXhashm32.tm = System.IntPtr.Zero; 
-		}
-	}
-
 }
 
+[System.Security.SecurityCritical]
+[System.Security.SuppressUnmanagedCodeSecurity]
+internal static class ConsoleInterop
+{
+    [DllImport(Interop.Libraries.Kernel32 , EntryPoint = "FreeConsole", CallingConvention = CallingConvention.Winapi)]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.Int32 DetachConsole();
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "GetConsoleScreenBufferInfo", CallingConvention = CallingConvention.Winapi , SetLastError = true)]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.Boolean GetBufferInfo(System.IntPtr hConsoleOutput, out ROOT.ConsoleExtensions.CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
+
+    internal static volatile System.IntPtr InputHandle = System.IntPtr.Zero;
+	internal static volatile System.IntPtr OutputHandle = System.IntPtr.Zero;
+
+    [DllImport(Interop.Libraries.Kernel32 , EntryPoint = "AttachConsole", CallingConvention = CallingConvention.Winapi)]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.Int32 AttachToConsole(System.Int32 PID);
+
+	[DllImport(Interop.Libraries.Kernel32 , EntryPoint = "GetStdHandle" , CallingConvention = CallingConvention.Winapi)]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.IntPtr GetConsoleStream(ROOT.ConsoleExtensions.ConsoleHandleOptions Stream);
+
+	[DllImport(Interop.Libraries.Kernel32, EntryPoint = "WriteConsoleW" , CallingConvention = CallingConvention.Winapi)]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.Int32 WriteToConsoleUnmanaged(System.IntPtr Handle, 
+		[MarshalAs(UnmanagedType.LPWStr)] System.String Data,
+		System.Int32 NChars, [OptionalAttribute] out System.Int32 CharsWritten, System.IntPtr MustBeNull);
+
+	[DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi , EntryPoint = "GetConsoleOriginalTitleW")]
+	[System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+		Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+		UI = true)]
+	internal static extern System.Int32 OriginalTitle([MarshalAs(UnmanagedType.LPTStr)] System.String Title , System.Int32 Titlesize = 27500);
+
+    [DllImport(Interop.Libraries.Kernel32, BestFitMapping = true , CharSet = CharSet.Auto , CallingConvention = CallingConvention.Winapi, EntryPoint = "SetConsoleTitleW")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.Int32 SetTitle([MarshalAs(UnmanagedType.LPTStr)] System.String Title);
+
+    [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi, EntryPoint = "GetConsoleTitleW")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+	internal static extern System.Int32 GetTitle([MarshalAs(UnmanagedType.LPTStr)] System.String Title , System.Int32 Titlesize = 27500);
+
+    [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi, EntryPoint = "SetConsoleOutputCP")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+	internal static extern System.Int32 SetOutputEnc(System.UInt32 OutputEnc);
+
+	[DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi , EntryPoint = "SetConsoleCP")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+	internal static extern System.Int32 SetInputEnc(System.UInt32 InputEnc);
+
+    [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi, EntryPoint = "GetConsoleCP")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.UInt32 GetInputEnc();
+
+    [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi, EntryPoint = "GetConsoleOutputCP")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern System.UInt32 GetOutputEnc();
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "ReadConsoleW", CallingConvention = CallingConvention.Winapi)]
+	[System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+		Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+		UI = true)]
+	internal static extern System.Int32 ReadFromConsoleUnmanaged(System.IntPtr Handle ,
+		System.Byte[] Buffer , System.Int32 NumberOfCharsToRead , 
+		out System.UInt32 NumberOfCharsRead , System.IntPtr MustBeNull);
+
+	[System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert ,
+		Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt ,
+		UI = true)]
+	private static void SetOutputHandle() { OutputHandle = GetConsoleStream(ROOT.ConsoleExtensions.ConsoleHandleOptions.Output); }
+
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    private static void SetInputHandle() { InputHandle = GetConsoleStream(ROOT.ConsoleExtensions.ConsoleHandleOptions.Input); }
+
+	[DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi , EntryPoint = "SetConsoleTextAttribute")]
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    internal static extern void DefineNewAttributes(System.IntPtr Handle, System.Int16 Attributes);
+
+	[System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt , 
+		UI = true)]
+    public static System.Boolean WriteToConsole(System.Char[] data)
+	{
+		if (ROOT.ConsoleExtensions.Detached == true) { return true; }
+		System.String DI = null;
+		for (System.Int32 I = 0; I < data.Length; I++) { DI += data[I]; }
+        if (OutputHandle == System.IntPtr.Zero) { SetOutputHandle(); }
+		if (WriteToConsoleUnmanaged(OutputHandle , DI , 
+			data.Length , out System.Int32 CHARS , System.IntPtr.Zero) != 0)
+		{ return true; } else { return false;  }
+    }
+
+	public static System.Boolean WriteToConsole(System.String data) { return WriteToConsole(data.ToCharArray()); }
+
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+    public static System.String ReadFromConsole(ROOT.ConsoleExtensions.ConsoleReadBufferOptions BufSize)
+	{
+        if (ROOT.ConsoleExtensions.Detached == true) { return ""; }
+        if (InputHandle == System.IntPtr.Zero) { SetInputHandle(); }
+		System.Byte[] RF = new System.Byte[(System.Int32) BufSize];
+		if (ReadFromConsoleUnmanaged(InputHandle, RF , (System.Int32) BufSize, 
+			out System.UInt32 ED, System.IntPtr.Zero) == 0) { return "Error"; }
+		System.String Result = null;
+		for (System.Int32 I = 0; I < ED; I++) { if (
+				(RF[I] != (System.Byte) '\0') && (RF[I] != (System.Byte) '\r') 
+				&& (RF[I] != (System.Byte) '\n')) { Result += (System.Char) RF[I]; } }
+		return Result;
+	}
+}
 
 namespace ExternalArchivingMethods
 {
@@ -5662,11 +7001,43 @@ namespace ExternalArchivingMethods
 	
 	}
 
-	// System.IO.FileStream DM = System.IO.File.OpenRead(@".\ZSEX.zst");
-	// System.IO.FileStream VA = System.IO.File.OpenWrite(@".\Out.txt");
-	// System.Console.WriteLine(ZstandardArchives.DecompressFileStreams(DM , VA));
-	// VA.Close();
-	// VA.Dispose();
-	// DM.Close();
-	// DM.Dispose();
+    // System.IO.FileStream DM = System.IO.File.OpenRead(@".\ZSEX.zst");
+    // System.IO.FileStream VA = System.IO.File.OpenWrite(@".\Out.txt");
+    // System.Console.WriteLine(ZstandardArchives.DecompressFileStreams(DM , VA));
+    // VA.Close();
+    // VA.Dispose();
+    // DM.Close();
+    // DM.Dispose();
+}
+
+
+/// <summary>
+/// An internal class defining the author's reserved strings.
+/// </summary>
+internal static class mdcdi1315
+{
+	/// <summary>
+	/// An internal string defining the current product.
+	/// </summary>
+    public const System.String Product = "MDC Application Framework";
+
+	/// <summary>
+	/// An internal string deinfing the author of the product.
+	/// </summary>
+    public const System.String Author = "mdcdi1315";
+
+	/// <summary>
+	/// A small description of this product.
+	/// </summary>
+    public const System.String Description = "Portable Application Development Framework";
+
+	/// <summary>
+	/// The Copyright of the current product.
+	/// </summary>
+    public const System.String Copyright = "© MDCDI1315. All Rights Reserved.";
+
+	/// <summary>
+	/// A URL link which mentions the source code repository.
+	/// </summary>
+    public const System.String SourceLink = "https://github.com/mdcdi1315/mdcframework";
 }

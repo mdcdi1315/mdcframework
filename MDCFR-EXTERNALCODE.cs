@@ -8,16 +8,44 @@ using System.Diagnostics;
 using System.Buffers.Text;
 using System.ComponentModel;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Sources;
+using System;
 #if NET6_0_OR_GREATER
 	using System.Runtime.Intrinsics;
 	using System.Runtime.Intrinsics.X86;
 	using static System.Runtime.Intrinsics.X86.Ssse3;
 #endif
+
+namespace Microsoft.Win32.SafeHandles
+{
+    internal sealed class SafeAllocHHandle : SafeBuffer
+    {
+        internal static SafeAllocHHandle InvalidHandle => new SafeAllocHHandle(IntPtr.Zero);
+
+        public SafeAllocHHandle()
+            : base(ownsHandle: true)
+        {
+        }
+
+        internal SafeAllocHHandle(IntPtr handle)
+            : base(ownsHandle: true)
+        {
+            SetHandle(handle);
+        }
+
+        protected override bool ReleaseHandle()
+        {
+            if (handle != IntPtr.Zero)
+            {
+                Marshal.FreeHGlobal(handle);
+            }
+            return true;
+        }
+    }
+}
 
 namespace System
 {
@@ -622,7 +650,7 @@ namespace System
             #pragma warning disable CS8604
             /// <summary>Returns a value indicating whether this value is equal to a specified <see cref="ValueTask{TResult}"/> value.</summary>
             public bool Equals(ValueTask<TResult> other) => _obj != null || other._obj != null ? _obj == other._obj && _token == other._token :
-                    EqualityComparer<TResult>.Default.Equals(_result, other._result);
+                    System.Collections.Generic.EqualityComparer<TResult>.Default.Equals(_result, other._result);
             #pragma warning restore CS8604
 
             /// <summary>Returns a value indicating whether two <see cref="ValueTask{TResult}"/> values are equal.</summary>
@@ -907,6 +935,19 @@ namespace System
             }
         }
 
+    }
+
+    namespace Collections.Generic
+    {
+        internal interface IHashKeyCollection<in TKey>
+        {
+            IEqualityComparer<TKey> KeyComparer { get; }
+        }
+
+        internal interface ISortKeyCollection<in TKey>
+        {
+            IComparer<TKey> KeyComparer { get; }
+        }
     }
 
     namespace Runtime.CompilerServices
@@ -1452,8 +1493,6 @@ namespace System
         }
         #nullable disable
 
-
-
     }
 
     namespace Runtime.InteropServices.Marshalling
@@ -1587,10 +1626,621 @@ namespace System
 
     }
 
+    namespace Linq
+    {
+        using System.Collections.Generic;
+        using System.Collections.Immutable;
+
+        /// <summary>
+        /// LINQ extension method overrides that offer greater efficiency for <see cref="System.Collections.Immutable.ImmutableArray{T}" /> than the standard LINQ methods.
+        /// </summary>
+#nullable enable
+#pragma warning disable CS8600, CS8602, CS8603, CS8604
+        public static class ImmutableArrayExtensions
+        {
+            /// <summary>Projects each element of a sequence into a new form.</summary>
+            /// <param name="immutableArray">The immutable array to select items from.</param>
+            /// <param name="selector">A transform function to apply to each element.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <typeparam name="TResult">The type of the result element.</typeparam>
+            /// <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1" /> whose elements are the result of invoking the transform function on each element of source.</returns>
+            public static IEnumerable<TResult> Select<T, TResult>(this ImmutableArray<T> immutableArray, Func<T, TResult> selector)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                return immutableArray.array.Select(selector);
+            }
+
+            /// <summary>Projects each element of a sequence to an <see cref="T:System.Collections.Generic.IEnumerable`1" />,             flattens the resulting sequences into one sequence, and invokes a result             selector function on each element therein.</summary>
+            /// <param name="immutableArray">The immutable array.</param>
+            /// <param name="collectionSelector">A transform function to apply to each element of the input sequence.</param>
+            /// <param name="resultSelector">A transform function to apply to each element of the intermediate sequence.</param>
+            /// <typeparam name="TSource">The type of the elements of <paramref name="immutableArray" />.</typeparam>
+            /// <typeparam name="TCollection">The type of the intermediate elements collected by <paramref name="collectionSelector" />.</typeparam>
+            /// <typeparam name="TResult">The type of the elements of the resulting sequence.</typeparam>
+            /// <returns>An <see cref="T:System.Collections.Generic.IEnumerable`1" /> whose elements are the result             of invoking the one-to-many transform function <paramref name="collectionSelector" /> on each             element of <paramref name="immutableArray" /> and then mapping each of those sequence elements and their             corresponding source element to a result element.</returns>
+            public static IEnumerable<TResult> SelectMany<TSource, TCollection, TResult>(this ImmutableArray<TSource> immutableArray, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                if (collectionSelector == null || resultSelector == null)
+                {
+                    return Enumerable.SelectMany(immutableArray, collectionSelector, resultSelector);
+                }
+                if (immutableArray.Length != 0)
+                {
+                    return immutableArray.SelectManyIterator(collectionSelector, resultSelector);
+                }
+                return Enumerable.Empty<TResult>();
+            }
+
+            /// <summary>Filters a sequence of values based on a predicate.</summary>
+            /// <param name="immutableArray">The array to filter.</param>
+            /// <param name="predicate">The condition to use for filtering the array content.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>Returns <see cref="T:System.Collections.Generic.IEnumerable`1" /> that contains elements that meet the condition.</returns>
+            public static IEnumerable<T> Where<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                return immutableArray.array.Where(predicate);
+            }
+
+            /// <summary>Gets a value indicating whether the array contains any elements.</summary>
+            /// <param name="immutableArray">The array to check for elements.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>
+            ///   <see langword="true" /> if the array contains an elements; otherwise, <see langword="false" />.</returns>
+            public static bool Any<T>(this ImmutableArray<T> immutableArray)
+            {
+                return immutableArray.Length > 0;
+            }
+
+            /// <summary>Gets a value indicating whether the array contains any elements that match a specified condition.</summary>
+            /// <param name="immutableArray">The array to check for elements.</param>
+            /// <param name="predicate">The delegate that defines the condition to match to an element.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>
+            ///   <see langword="true" /> if an element matches the specified condition; otherwise, <see langword="false" />.</returns>
+            public static bool Any<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                Requires.NotNull(predicate, "predicate");
+                T[] array = immutableArray.array;
+                foreach (T arg in array)
+                {
+                    if (predicate(arg))
+                    {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            /// <summary>Gets a value indicating whether all elements in this array match a given condition.</summary>
+            /// <param name="immutableArray">The array to check for matches.</param>
+            /// <param name="predicate">The predicate.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>
+            ///   <see langword="true" /> if every element of the source sequence passes the test in the specified predicate; otherwise, <see langword="false" />.</returns>
+            public static bool All<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                Requires.NotNull(predicate, "predicate");
+                T[] array = immutableArray.array;
+                foreach (T arg in array)
+                {
+                    if (!predicate(arg))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            /// <summary>Determines whether two sequences are equal according to an equality comparer.</summary>
+            /// <param name="immutableArray">The array to use for comparison.</param>
+            /// <param name="items">The items to use for comparison.</param>
+            /// <param name="comparer">The comparer to use to check for equality.</param>
+            /// <typeparam name="TDerived">The type of element in the compared array.</typeparam>
+            /// <typeparam name="TBase">The type of element contained by the collection.</typeparam>
+            /// <returns>
+            ///   <see langword="true" /> to indicate the sequences are equal; otherwise, <see langword="false" />.</returns>
+            public static bool SequenceEqual<TDerived, TBase>(this ImmutableArray<TBase> immutableArray, IEnumerable<TDerived> items, IEqualityComparer<TBase>? comparer = null) where TDerived : TBase
+            {
+                Requires.NotNull(items, "items");
+                if (comparer == null)
+                {
+                    comparer = EqualityComparer<TBase>.Default;
+                }
+                int num = 0;
+                int length = immutableArray.Length;
+                foreach (TDerived item in items)
+                {
+                    if (num == length)
+                    {
+                        return false;
+                    }
+                    if (!comparer.Equals(immutableArray[num], (TBase)(object)item))
+                    {
+                        return false;
+                    }
+                    num++;
+                }
+                return num == length;
+            }
+
+            /// <summary>Applies a function to a sequence of elements in a cumulative way.</summary>
+            /// <param name="immutableArray">The collection to apply the function to.</param>
+            /// <param name="func">A function to be invoked on each element, in a cumulative way.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The final value after the cumulative function has been applied to all elements.</returns>
+            public static T? Aggregate<T>(this ImmutableArray<T> immutableArray, Func<T, T, T> func)
+            {
+                Requires.NotNull(func, "func");
+                if (immutableArray.Length == 0)
+                {
+                    return default(T);
+                }
+                T val = immutableArray[0];
+                int i = 1;
+                for (int length = immutableArray.Length; i < length; i++)
+                {
+                    val = func(val, immutableArray[i]);
+                }
+                return val;
+            }
+
+            /// <summary>Applies a function to a sequence of elements in a cumulative way.</summary>
+            /// <param name="immutableArray">The collection to apply the function to.</param>
+            /// <param name="seed">The initial accumulator value.</param>
+            /// <param name="func">A function to be invoked on each element, in a cumulative way.</param>
+            /// <typeparam name="TAccumulate">The type of the accumulated value.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The final accumulator value.</returns>
+            public static TAccumulate Aggregate<TAccumulate, T>(this ImmutableArray<T> immutableArray, TAccumulate seed, Func<TAccumulate, T, TAccumulate> func)
+            {
+                Requires.NotNull(func, "func");
+                TAccumulate val = seed;
+                T[] array = immutableArray.array;
+                foreach (T arg in array)
+                {
+                    val = func(val, arg);
+                }
+                return val;
+            }
+
+            /// <summary>Applies a function to a sequence of elements in a cumulative way.</summary>
+            /// <param name="immutableArray">The collection to apply the function to.</param>
+            /// <param name="seed">The initial accumulator value.</param>
+            /// <param name="func">A function to be invoked on each element, in a cumulative way.</param>
+            /// <param name="resultSelector">A function to transform the final accumulator value into the result type.</param>
+            /// <typeparam name="TAccumulate">The type of the accumulated value.</typeparam>
+            /// <typeparam name="TResult">The type of result returned by the result selector.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The final accumulator value.</returns>
+            public static TResult Aggregate<TAccumulate, TResult, T>(this ImmutableArray<T> immutableArray, TAccumulate seed, Func<TAccumulate, T, TAccumulate> func, Func<TAccumulate, TResult> resultSelector)
+            {
+                Requires.NotNull(resultSelector, "resultSelector");
+                return resultSelector(immutableArray.Aggregate(seed, func));
+            }
+
+            /// <summary>Returns the element at a specified index in the array.</summary>
+            /// <param name="immutableArray">The array to find an element in.</param>
+            /// <param name="index">The index for the element to retrieve.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The item at the specified index.</returns>
+            public static T ElementAt<T>(this ImmutableArray<T> immutableArray, int index)
+            {
+                return immutableArray[index];
+            }
+
+            /// <summary>Returns the element at a specified index in a sequence or a default value if the index is out of range.</summary>
+            /// <param name="immutableArray">The array to find an element in.</param>
+            /// <param name="index">The index for the element to retrieve.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The item at the specified index, or the default value if the index is not found.</returns>
+            public static T? ElementAtOrDefault<T>(this ImmutableArray<T> immutableArray, int index)
+            {
+                if (index < 0 || index >= immutableArray.Length)
+                {
+                    return default(T);
+                }
+                return immutableArray[index];
+            }
+
+            /// <summary>Returns the first element in a sequence that satisfies a specified condition.</summary>
+            /// <param name="immutableArray">The array to get an item from.</param>
+            /// <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
+            /// <returns>The first item in the list if it meets the condition specified by <paramref name="predicate" />.</returns>
+            public static T First<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                T[] array = immutableArray.array;
+                foreach (T val in array)
+                {
+                    if (predicate(val))
+                    {
+                        return val;
+                    }
+                }
+                return Enumerable.Empty<T>().First();
+            }
+
+            /// <summary>Returns the first element in an array.</summary>
+            /// <param name="immutableArray">The array to get an item from.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
+            /// <returns>The first item in the array.</returns>
+            public static T First<T>(this ImmutableArray<T> immutableArray)
+            {
+                if (immutableArray.Length <= 0)
+                {
+                    return immutableArray.array.First();
+                }
+                return immutableArray[0];
+            }
+
+            /// <summary>Returns the first element of a sequence, or a default value if the sequence contains no elements.</summary>
+            /// <param name="immutableArray">The array to retrieve items from.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+            public static T? FirstOrDefault<T>(this ImmutableArray<T> immutableArray)
+            {
+                if (immutableArray.array.Length == 0)
+                {
+                    return default(T);
+                }
+                return immutableArray.array[0];
+            }
+
+            /// <summary>Returns the first element of the sequence that satisfies a condition or a default value if no such element is found.</summary>
+            /// <param name="immutableArray">The array to retrieve elements from.</param>
+            /// <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+            public static T? FirstOrDefault<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                T[] array = immutableArray.array;
+                foreach (T val in array)
+                {
+                    if (predicate(val))
+                    {
+                        return val;
+                    }
+                }
+                return default(T);
+            }
+
+            /// <summary>Returns the last element of the array.</summary>
+            /// <param name="immutableArray">The array to retrieve items from.</param>
+            /// <typeparam name="T">The type of element contained by the array.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">The collection is empty.</exception>
+            /// <returns>The last element in the array.</returns>
+            public static T Last<T>(this ImmutableArray<T> immutableArray)
+            {
+                if (immutableArray.Length <= 0)
+                {
+                    return immutableArray.array.Last();
+                }
+                return immutableArray[immutableArray.Length - 1];
+            }
+
+            /// <summary>Returns the last element of a sequence that satisfies a specified condition.</summary>
+            /// <param name="immutableArray">The array to retrieve elements from.</param>
+            /// <param name="predicate">The delegate that defines the conditions of the element to retrieve.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">The collection is empty.</exception>
+            /// <returns>The last element of the array that satisfies the <paramref name="predicate" /> condition.</returns>
+            public static T Last<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                for (int num = immutableArray.Length - 1; num >= 0; num--)
+                {
+                    if (predicate(immutableArray[num]))
+                    {
+                        return immutableArray[num];
+                    }
+                }
+                return Enumerable.Empty<T>().Last();
+            }
+
+            /// <summary>Returns the last element of a sequence, or a default value if the sequence contains no elements.</summary>
+            /// <param name="immutableArray">The array to retrieve items from.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+            public static T? LastOrDefault<T>(this ImmutableArray<T> immutableArray)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                return immutableArray.array.LastOrDefault();
+            }
+
+            /// <summary>Returns the last element of a sequence that satisfies a condition or a default value if no such element is found.</summary>
+            /// <param name="immutableArray">The array to retrieve an element from.</param>
+            /// <param name="predicate">The delegate that defines the conditions of the element to search for.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+            public static T? LastOrDefault<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                for (int num = immutableArray.Length - 1; num >= 0; num--)
+                {
+                    if (predicate(immutableArray[num]))
+                    {
+                        return immutableArray[num];
+                    }
+                }
+                return default(T);
+            }
+
+            /// <summary>Returns the only element of a sequence, and throws an exception if there is not exactly one element in the sequence.</summary>
+            /// <param name="immutableArray">The array to retrieve the element from.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The element in the sequence.</returns>
+            public static T Single<T>(this ImmutableArray<T> immutableArray)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                return immutableArray.array.Single();
+            }
+
+            /// <summary>Returns the only element of a sequence that satisfies a specified condition, and throws an exception if more than one such element exists.</summary>
+            /// <param name="immutableArray">The immutable array to return a single element from.</param>
+            /// <param name="predicate">The function to test whether an element should be returned.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>Returns <see cref="T:System.Boolean" />.</returns>
+            public static T Single<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                bool flag = true;
+                T result = default(T);
+                T[] array = immutableArray.array;
+                foreach (T val in array)
+                {
+                    if (predicate(val))
+                    {
+                        if (!flag)
+                        {
+                            ImmutableArray.TwoElementArray.Single();
+                        }
+                        flag = false;
+                        result = val;
+                    }
+                }
+                if (flag)
+                {
+                    Enumerable.Empty<T>().Single();
+                }
+                return result;
+            }
+
+            /// <summary>Returns the only element of the array, or a default value if the sequence is empty; this method throws an exception if there is more than one element in the sequence.</summary>
+            /// <param name="immutableArray">The array.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">
+            ///   <paramref name="immutableArray" /> contains more than one element.</exception>
+            /// <returns>The element in the array, or the default value if the array is empty.</returns>
+            public static T? SingleOrDefault<T>(this ImmutableArray<T> immutableArray)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                return immutableArray.array.SingleOrDefault();
+            }
+
+            /// <summary>Returns the only element of a sequence that satisfies a specified condition or a default value if no such element exists; this method throws an exception if more than one element satisfies the condition.</summary>
+            /// <param name="immutableArray">The array to get the element from.</param>
+            /// <param name="predicate">The condition the element must satisfy.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">More than one element satisfies the condition in <paramref name="predicate" />.</exception>
+            /// <returns>The element if it satisfies the specified condition; otherwise the default element.</returns>
+            public static T? SingleOrDefault<T>(this ImmutableArray<T> immutableArray, Func<T, bool> predicate)
+            {
+                Requires.NotNull(predicate, "predicate");
+                bool flag = true;
+                T result = default(T);
+                T[] array = immutableArray.array;
+                foreach (T val in array)
+                {
+                    if (predicate(val))
+                    {
+                        if (!flag)
+                        {
+                            ImmutableArray.TwoElementArray.Single();
+                        }
+                        flag = false;
+                        result = val;
+                    }
+                }
+                return result;
+            }
+
+            /// <summary>Creates a dictionary based on the contents of this array.</summary>
+            /// <param name="immutableArray">The array to create a dictionary from.</param>
+            /// <param name="keySelector">The key selector.</param>
+            /// <typeparam name="TKey">The type of the key.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The newly initialized dictionary.</returns>
+            public static Dictionary<TKey, T> ToDictionary<TKey, T>(this ImmutableArray<T> immutableArray, Func<T, TKey> keySelector) where TKey : notnull
+            {
+                return immutableArray.ToDictionary(keySelector, EqualityComparer<TKey>.Default);
+            }
+
+            /// <summary>Creates a dictionary based on the contents of this array.</summary>
+            /// <param name="immutableArray">The array to create a dictionary from.</param>
+            /// <param name="keySelector">The key selector.</param>
+            /// <param name="elementSelector">The element selector.</param>
+            /// <typeparam name="TKey">The type of the key.</typeparam>
+            /// <typeparam name="TElement">The type of the element.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The newly initialized dictionary.</returns>
+            public static Dictionary<TKey, TElement> ToDictionary<TKey, TElement, T>(this ImmutableArray<T> immutableArray, Func<T, TKey> keySelector, Func<T, TElement> elementSelector) where TKey : notnull
+            {
+                return immutableArray.ToDictionary(keySelector, elementSelector, EqualityComparer<TKey>.Default);
+            }
+
+            /// <summary>Creates a dictionary based on the contents of this array.</summary>
+            /// <param name="immutableArray">The array to create a dictionary from.</param>
+            /// <param name="keySelector">The key selector.</param>
+            /// <param name="comparer">The comparer to initialize the dictionary with.</param>
+            /// <typeparam name="TKey">The type of the key.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The newly initialized dictionary.</returns>
+            public static Dictionary<TKey, T> ToDictionary<TKey, T>(this ImmutableArray<T> immutableArray, Func<T, TKey> keySelector, IEqualityComparer<TKey>? comparer) where TKey : notnull
+            {
+                Requires.NotNull(keySelector, "keySelector");
+                Dictionary<TKey, T> dictionary = new Dictionary<TKey, T>(immutableArray.Length, comparer);
+                ImmutableArray<T>.Enumerator enumerator = immutableArray.GetEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    T current = enumerator.Current;
+                    dictionary.Add(keySelector(current), current);
+                }
+                return dictionary;
+            }
+
+            /// <summary>Creates a dictionary based on the contents of this array.</summary>
+            /// <param name="immutableArray">The array to create a dictionary from.</param>
+            /// <param name="keySelector">The key selector.</param>
+            /// <param name="elementSelector">The element selector.</param>
+            /// <param name="comparer">The comparer to initialize the dictionary with.</param>
+            /// <typeparam name="TKey">The type of the key.</typeparam>
+            /// <typeparam name="TElement">The type of the element.</typeparam>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The newly initialized dictionary.</returns>
+            public static Dictionary<TKey, TElement> ToDictionary<TKey, TElement, T>(this ImmutableArray<T> immutableArray, Func<T, TKey> keySelector, Func<T, TElement> elementSelector, IEqualityComparer<TKey>? comparer) where TKey : notnull
+            {
+                Requires.NotNull(keySelector, "keySelector");
+                Requires.NotNull(elementSelector, "elementSelector");
+                Dictionary<TKey, TElement> dictionary = new Dictionary<TKey, TElement>(immutableArray.Length, comparer);
+                T[] array = immutableArray.array;
+                foreach (T arg in array)
+                {
+                    dictionary.Add(keySelector(arg), elementSelector(arg));
+                }
+                return dictionary;
+            }
+
+            /// <summary>Copies the contents of this array to a mutable array.</summary>
+            /// <param name="immutableArray">The immutable array to copy into a mutable one.</param>
+            /// <typeparam name="T">The type of element contained by the collection.</typeparam>
+            /// <returns>The newly instantiated array.</returns>
+            public static T[] ToArray<T>(this ImmutableArray<T> immutableArray)
+            {
+                immutableArray.ThrowNullRefIfNotInitialized();
+                if (immutableArray.array.Length == 0)
+                {
+                    return ImmutableArray<T>.Empty.array;
+                }
+                return (T[])immutableArray.array.Clone();
+            }
+
+            /// <summary>Returns the first element in the collection.</summary>
+            /// <param name="builder">The builder to retrieve an item from.</param>
+            /// <typeparam name="T">The type of items in the array.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">If the array is empty.</exception>
+            /// <returns>The first item in the list.</returns>
+            public static T First<T>(this ImmutableArray<T>.Builder builder)
+            {
+                Requires.NotNull(builder, "builder");
+                if (!builder.Any())
+                {
+                    throw new InvalidOperationException();
+                }
+                return builder[0];
+            }
+
+            /// <summary>Returns the first element in the collection, or the default value if the collection is empty.</summary>
+            /// <param name="builder">The builder to retrieve an element from.</param>
+            /// <typeparam name="T">The type of item in the builder.</typeparam>
+            /// <returns>The first item in the list, if found; otherwise the default value for the item type.</returns>
+            public static T? FirstOrDefault<T>(this ImmutableArray<T>.Builder builder)
+            {
+                Requires.NotNull(builder, "builder");
+                if (!builder.Any())
+                {
+                    return default(T);
+                }
+                return builder[0];
+            }
+
+            /// <summary>Returns the last element in the collection.</summary>
+            /// <param name="builder">The builder to retrieve elements from.</param>
+            /// <typeparam name="T">The type of item in the builder.</typeparam>
+            /// <exception cref="T:System.InvalidOperationException">The collection is empty.</exception>
+            /// <returns>The last element in the builder.</returns>
+            public static T Last<T>(this ImmutableArray<T>.Builder builder)
+            {
+                Requires.NotNull(builder, "builder");
+                if (!builder.Any())
+                {
+                    throw new InvalidOperationException();
+                }
+                return builder[builder.Count - 1];
+            }
+
+            /// <summary>Returns the last element in the collection, or the default value if the collection is empty.</summary>
+            /// <param name="builder">The builder to retrieve an element from.</param>
+            /// <typeparam name="T">The type of item in the builder.</typeparam>
+            /// <returns>The last element of a sequence, or a default value if the sequence contains no elements.</returns>
+            public static T? LastOrDefault<T>(this ImmutableArray<T>.Builder builder)
+            {
+                Requires.NotNull(builder, "builder");
+                if (!builder.Any())
+                {
+                    return default(T);
+                }
+                return builder[builder.Count - 1];
+            }
+
+            /// <summary>Returns a value indicating whether this collection contains any elements.</summary>
+            /// <param name="builder">The builder to check for matches.</param>
+            /// <typeparam name="T">The type of elements in the array.</typeparam>
+            /// <returns>
+            ///   <see langword="true" /> if the array builder contains any elements; otherwise, <see langword="false" />.</returns>
+            public static bool Any<T>(this ImmutableArray<T>.Builder builder)
+            {
+                Requires.NotNull(builder, "builder");
+                return builder.Count > 0;
+            }
+
+            private static IEnumerable<TResult> SelectManyIterator<TSource, TCollection, TResult>(this ImmutableArray<TSource> immutableArray, Func<TSource, IEnumerable<TCollection>> collectionSelector, Func<TSource, TCollection, TResult> resultSelector)
+            {
+                TSource[] array = immutableArray.array;
+                foreach (TSource item in array)
+                {
+                    foreach (TCollection item2 in collectionSelector(item))
+                    {
+                        yield return resultSelector(item, item2);
+                    }
+                }
+            }
+        }
+#pragma warning restore CS8600 , CS8602 , CS8603 , CS8604
+#nullable disable
+    }
+
     namespace Runtime.InteropServices
     {
+        /// <summary>
+        /// Provides methods to interoperate with <see cref="System.Memory{T}"/>, 
+        /// <see cref="System.ReadOnlySpan{T}"/>, <see cref="System.Span{T}"/>, and 
+        /// <see cref="System.ReadOnlyMemory{T}"/>.
+        /// </summary>
         public static class MemoryMarshal
         {
+
+            /// <summary>
+            /// Tries to get an array segment from the underlying memory buffer. 
+            /// The return value indicates the success of the operation.
+            /// </summary>
+            /// <typeparam name="T">The type of items in the read-only memory buffer.</typeparam>
+            /// <param name="memory">A read-only memory buffer.</param>
+            /// <param name="segment">When this method returns, contains the array segment retrieved from the underlying read-only memory buffer. 
+            /// If the method fails, the method returns a default array segment.</param>
+            /// <returns><c>true</c> if the method call succeeds; <c>false</c> otherwise.</returns>
+            /// <remarks>
+            /// CAUTION!!!! <see cref="System.ReadOnlyMemory{T}"/> is used to represent immutable data. 
+            /// <see cref="System.ArraySegment{T}"/> instances returned by this method should not be written to, 
+            /// and the wrapped array instance should only be passed to methods which treat the array contents as read-only.
+            /// </remarks>
             public static bool TryGetArray<T>(ReadOnlyMemory<T> memory, out ArraySegment<T> segment)
             {
                 int start;
@@ -1618,6 +2268,16 @@ namespace System
                 return false;
             }
 
+            /// <summary>
+            /// Tries to retrieve a <see cref="System.Buffers.MemoryManager{T}" /> 
+            /// from the underlying read-only memory buffer.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the read-only memory buffer.</typeparam>
+            /// <typeparam name="TManager">The type of the <see cref="System.Buffers.MemoryManager{T}"/> 
+            /// to retrieve.</typeparam>
+            /// <param name="memory">The read-only memory buffer for which to get the memory manager.</param>
+            /// <param name="manager">When the method returns, the manager of <paramref name="memory"/>.</param>
+            /// <returns><c>true</c> if the method retrieved the memory manager; otherwise, <c>false</c>.</returns>
             public static bool TryGetMemoryManager<T, TManager>(ReadOnlyMemory<T> memory, out TManager manager) where TManager : MemoryManager<T>
             {
                 int start;
@@ -1626,6 +2286,19 @@ namespace System
                 return manager != null;
             }
 
+            /// <summary>
+            /// Tries to retrieve a <see cref="System.Buffers.MemoryManager{T}" /> , 
+            /// start index, and length from the underlying read-only memory buffer.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the read-only memory buffer.</typeparam>
+            /// <typeparam name="TManager">The type of the <see cref="System.Buffers.MemoryManager{T}"/> </typeparam>
+            /// <param name="memory">The read-only memory buffer for which to get the memory manager.</param>
+            /// <param name="manager">When the method returns, the manager of <paramref name="memory"/>.</param>
+            /// <param name="start">When the method returns, the offset from the start of the <paramref name="manager"/> that the 
+            /// <paramref name="memory"/> represents.</param>
+            /// <param name="length">When the method returns, the length of the 
+            /// <paramref name="manager"/> that the <paramref name="memory"/> represents.</param>
+            /// <returns><c>true</c> if the method retrieved the memory manager; otherwise, <c>false</c>.</returns>
             public static bool TryGetMemoryManager<T, TManager>(ReadOnlyMemory<T> memory, out TManager manager, out int start, out int length) where TManager : MemoryManager<T>
             {
                 TManager val = (manager = memory.GetObjectStartLength(out start, out length) as TManager);
@@ -1639,7 +2312,7 @@ namespace System
                 return true;
             }
 
-            public static IEnumerable<T> ToEnumerable<T>(ReadOnlyMemory<T> memory)
+            public static System.Collections.Generic.IEnumerable<T> ToEnumerable<T>(ReadOnlyMemory<T> memory)
             {
                 for (int i = 0; i < memory.Length; i++)
                 {
@@ -1851,7 +2524,34 @@ namespace System
                 return sequence.TryGetString(out text, out start, out length);
             }
         }
-    
+
+        #nullable enable
+        [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+        internal sealed class LibraryImportAttribute : Attribute
+        {
+            public string LibraryName { get; }
+
+            public string? EntryPoint { get; set; }
+
+            public StringMarshalling StringMarshalling { get; set; }
+
+            public Type? StringMarshallingCustomType { get; set; }
+
+            public bool SetLastError { get; set; }
+
+            public LibraryImportAttribute(string libraryName)
+            {
+                LibraryName = libraryName;
+            }
+        }
+        #nullable disable
+        internal enum StringMarshalling
+        {
+            Custom,
+            Utf8,
+            Utf16
+        }
+
     }
 
     namespace Runtime.Versioning
@@ -3789,4 +4489,170 @@ namespace System
         }
     }
 
+}
+
+
+/// <summary>
+/// The subsetted clone of the global::Interop class used to 
+/// make the proper interopability between native methods and
+/// .NET code.
+/// </summary>
+// Do not modify it's contents since the Interop class is programmatically created and embedded in the
+// assembly. The only case now that this class should be modified is the new package or API
+// additions which use the Interop class.
+internal static class Interop
+{
+    internal static class Libraries
+    {
+        internal const string Activeds = "activeds.dll";
+
+        internal const string Advapi32 = "advapi32.dll";
+
+        internal const string Authz = "authz.dll";
+
+        internal const string BCrypt = "BCrypt.dll";
+
+        internal const string Credui = "credui.dll";
+
+        internal const string Crypt32 = "crypt32.dll";
+
+        internal const string CryptUI = "cryptui.dll";
+
+        internal const string Dnsapi = "dnsapi.dll";
+
+        internal const string Dsrole = "dsrole.dll";
+
+        internal const string Gdi32 = "gdi32.dll";
+
+        internal const string HttpApi = "httpapi.dll";
+
+        internal const string IpHlpApi = "iphlpapi.dll";
+
+        internal const string Kernel32 = "kernel32.dll";
+
+        internal const string Logoncli = "logoncli.dll";
+
+        internal const string Mswsock = "mswsock.dll";
+
+        internal const string NCrypt = "ncrypt.dll";
+
+        internal const string Netapi32 = "netapi32.dll";
+
+        internal const string Netutils = "netutils.dll";
+
+        internal const string NtDll = "ntdll.dll";
+
+        internal const string Odbc32 = "odbc32.dll";
+
+        internal const string Ole32 = "ole32.dll";
+
+        internal const string OleAut32 = "oleaut32.dll";
+
+        internal const string Pdh = "pdh.dll";
+
+        internal const string Secur32 = "secur32.dll";
+
+        internal const string Shell32 = "shell32.dll";
+
+        internal const string SspiCli = "sspicli.dll";
+
+        internal const string User32 = "user32.dll";
+
+        internal const string Version = "version.dll";
+
+        internal const string WebSocket = "websocket.dll";
+
+        internal const string Wevtapi = "wevtapi.dll";
+
+        internal const string WinHttp = "winhttp.dll";
+
+        internal const string WinMM = "winmm.dll";
+
+        internal const string Wkscli = "wkscli.dll";
+
+        internal const string Wldap32 = "wldap32.dll";
+
+        internal const string Ws2_32 = "ws2_32.dll";
+
+        internal const string Wtsapi32 = "wtsapi32.dll";
+
+        internal const string CompressionNative = "System.IO.Compression.Native";
+
+        internal const string GlobalizationNative = "System.Globalization.Native";
+
+        internal const string MsQuic = "msquic.dll";
+
+        internal const string HostPolicy = "hostpolicy.dll";
+
+        internal const string Ucrtbase = "ucrtbase.dll";
+
+        internal const string Xolehlp = "xolehlp.dll";
+    }
+
+    internal enum BOOL
+    {
+        FALSE,
+        TRUE
+    }
+
+    internal static class Kernel32
+    {
+        [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
+        private struct CPINFOEXW
+        {
+            internal uint MaxCharSize;
+
+            internal unsafe fixed byte DefaultChar[2];
+
+            internal unsafe fixed byte LeadByte[12];
+
+            internal char UnicodeDefaultChar;
+
+            internal uint CodePage;
+
+            internal unsafe fixed char CodePageName[260];
+        }
+
+        internal const int MAX_PATH = 260;
+
+        internal const uint CP_ACP = 0u;
+
+        internal const uint WC_NO_BEST_FIT_CHARS = 1024u;
+
+        [DllImport("kernel32.dll", CharSet = CharSet.Unicode, ExactSpelling = true)]
+        [LibraryImport("kernel32.dll", EntryPoint = "GetCPInfoExW", StringMarshalling = StringMarshalling.Utf16)]
+        private unsafe static extern BOOL GetCPInfoExW(uint CodePage, uint dwFlags, CPINFOEXW* lpCPInfoEx);
+
+        internal unsafe static int GetLeadByteRanges(int codePage, byte[] leadByteRanges)
+        {
+            int num = 0;
+            CPINFOEXW cPINFOEXW = default(CPINFOEXW);
+            if (GetCPInfoExW((uint)codePage, 0u, &cPINFOEXW) != 0)
+            {
+                for (int i = 0; i < 10 && leadByteRanges[i] != 0; i += 2)
+                {
+                    leadByteRanges[i] = cPINFOEXW.LeadByte[i];
+                    leadByteRanges[i + 1] = cPINFOEXW.LeadByte[i + 1];
+                    num++;
+                }
+            }
+            return num;
+        }
+
+        internal unsafe static bool TryGetACPCodePage(out int codePage)
+        {
+            CPINFOEXW cPINFOEXW = default(CPINFOEXW);
+            if (GetCPInfoExW(0u, 0u, &cPINFOEXW) != 0)
+            {
+                codePage = (int)cPINFOEXW.CodePage;
+                return true;
+            }
+            codePage = 0;
+            return false;
+        }
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        [LibraryImport("kernel32.dll")]
+        internal unsafe static extern int WideCharToMultiByte(uint CodePage, uint dwFlags, char* lpWideCharStr, int cchWideChar, byte* lpMultiByteStr, int cbMultiByte, byte* lpDefaultChar, BOOL* lpUsedDefaultChar);
+    }
 }

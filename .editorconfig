@@ -1,0 +1,16 @@
+﻿[*.cs]
+
+# Proper warning overrides for ALL the files. PLEASE do not put here
+# any important warnings.
+dotnet_diagnostic.IDE0251.severity = none 
+
+[MDCFR-SYSCOLIMUT.cs]
+
+# Proper warning overrides for MDCFR-SYSCOLIMUT.cs file
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8618.severity = none
+
+[MDCFR-EXTERNALCODE.cs]
+
+# Proper warning overrides for MDCFR-EXTERNALCODE.cs file
+dotnet_diagnostic.CS0169.severity = none

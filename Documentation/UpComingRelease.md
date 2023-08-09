@@ -1,7 +1,7 @@
 # Upcoming Releases
 Everything that will be added to new releases will be here for anyone to see.
 
-## The upcoming version: 1.5.5.0
+## Major Version 1.5.5.0:
 This version will make general changes to almost everything on the library.
 - The `ROOT.MAIN.GetACryptographyHashForAFile` function has changed it's behavior and will have 1 more overload:
 ```C#
@@ -58,3 +58,32 @@ http://learn.microsoft.com/en-us/dotnet/api/microsoft.visualbasic.interaction.in
 
 The Registry Editor was refactored and most of the problems were solved.
 However , it needs to be tested so as to be used in production.
+
+## Minor Version 1.5.5.2:
+
+ In this Version , more features are now added! As going ahead to 1.5.6.0 , 
+ some features were added , while some others were removed (or are in process of it).
+ 
+ - Added a native ZIP C# Library that supports ZIP , GZIP and BZIP2 formats
+   
+   (For now it will remain experimental , so expect changes or even an removal 
+   due to incorrect inefficiencies - code errors.)
+
+ - Console Support for Windows is translated directly to the KERNEL32 library.
+   
+   (This means that it does not use the System.Console class.)
+   
+ - Added two more NuGet packages : 
+   
+   [`System.Text.Encoding.CodePages`](http://learn.microsoft.com/en-us/dotnet/api/system.text.codepagesencodingprovider?view=net-7.0) :
+    
+   This is a package that contains more encoding pages for your applications that do not exist in .NET 4.8.
+   
+    [`System.Collections.Immutable`](http://learn.microsoft.com/en-us/dotnet/api/system.collections.immutable?view=net-7.0) : 
+    
+    This package allows the programmer to create immutable collections , like arrays or lists.
+
+  - The Visual Basic Runtime Library will be REMOVED.
+   
+    -- Any functions that used the library are also deprecated , except for some that can be migrated
+    by using some functions of mscorlib.
