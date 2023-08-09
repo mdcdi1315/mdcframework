@@ -23,6 +23,6 @@ jobs:
     - name: Restore MDCFR.dll dependencies
       run: dotnet restore --verbosity normal
     - name: Attempt to build the MDCFR.dll
-      run: dotnet build --verbosity normal --configuration Release --os Windows --no-restore
+      run: dotnet build --verbosity normal --configuration Release --no-restore
     - name: Test the output MDCFR.dll with "dotnet test" for IL errors
       run: dotnet test --os Windows --verbosity normal --no-build
