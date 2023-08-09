@@ -270,10 +270,15 @@ ___NOTICE___!!! This function is available only for __.NET Framework__ and __Win
  
  #### 18. The GetAStringFromTheUser:
  ~~~C#
+[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version. Use instead the GetAStringFromTheUserNew function.", true)]
  public static System.String GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
  ~~~
  This function is an exact implementation of the [`Microsoft.VisualBasic.Interaction.InputBox`](https://learn.microsoft.com/dotnet/api/microsoft.visualbasic.interaction.inputbox?view=netframework-4.7.2),
  which is imported here if you want to use it , but it is not needed to reference the `Microsoft.VisualBasic` DLL.
+
+  __Attributes__: `System.Obsolete(message , true)`:
+  Someone who attempts to use this method will always throw a compiler error because in the next major version the library 
+  the Visual Basic Runtime Library will be removed.
  
   __Parameters__:
   1. `System.String Prompt`: This is the prompt message shown to the user.
@@ -965,5 +970,86 @@ public static System.Boolean operator !=(HW31 lhs, HW31 rhs)
 
   --- End of `ROOT.HW31` Structure ---
 
-  
+## The HW31Strings Class:
+
+~~~C#
+public static class HW31Strings
+~~~
+IL Declaration:
+~~~IL
+.class public abstract auto ansi sealed beforefieldinit ROOT.HW31Strings
+       extends [mscorlib]System.Object
+~~~
+
+Description: The HW31Strings is the static class which has the methods to convert a byte array
+to strings and the opposite.
+
+### Methods:
+
+#### 1. The ByteArrayToHW31String:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static HW31 ByteArrayToHW31String(System.Byte[] Array)
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static HW31 ByteArrayToHW31String(System.Byte[] Array, System.Int32 Start, System.Int32 Count)
+~~~
+Converts the given byte array to a new `ROOT.HW31` structure.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+ 1. `System.Byte[] Array`: The byte array data to convert.
+
+ __Overloads__:
+ 
+ 2. `System.Int32 Start`: The index of the `Array` parameter which the function will start converting data to HW31 symbols.
+ 
+ 3. `System.Int32 Count`: The items to copy from the `Array` parameter.
+
+ __Returns__:
+
+ If the `Start` parameter was `Start < Count - 1` , the Count parameter was less than the length of the array and execution suceeeded , 
+ a new uninvalidated `HW31` structure; otherwise , the structure returned is invalidated and should be disposed immediately.
+
+#### 2. The EstimateHW31StringLength:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static System.Int64 EstimateHW31StringLength(System.Byte[] Array)
+~~~
+Estimate the HW31 string length before it is even produced.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to decrease the execution time.
+
+__Parameters__:
+ 1. `System.Byte[] Array`: The byte array data to get the length from.
+
+__Returns__:
+ A `System.Int64` value that is the estimated HW31 length.
+
+#### 3. The HW31StringToByteArray:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static System.Byte[] HW31StringToByteArray(HW31 HW31String)
+~~~
+Return the byte array data back from an encoded HW31 structure.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+This method is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+ 1. `ROOT.HW31 HW31String`: The `HW31` structure to get the data from.
+
+ __Returns__: if the structure was an HW31 string and execution was finished sucessfully , then
+ it returns the de-coded array; otherwise , `null`.
+
+  -- End of class `ROOT.HW31Strings` --
+
 
