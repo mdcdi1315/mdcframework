@@ -4595,6 +4595,7 @@ internal static class Interop
         TRUE
     }
 
+    [System.Security.SuppressUnmanagedCodeSecurity]
     internal static class Kernel32
     {
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
@@ -4654,5 +4655,78 @@ internal static class Interop
         [DllImport("kernel32.dll", ExactSpelling = true)]
         [LibraryImport("kernel32.dll")]
         internal unsafe static extern int WideCharToMultiByte(uint CodePage, uint dwFlags, char* lpWideCharStr, int cchWideChar, byte* lpMultiByteStr, int cbMultiByte, byte* lpDefaultChar, BOOL* lpUsedDefaultChar);
+
+        [DllImport("kernel32.dll", EntryPoint = "Beep")]
+        [System.Security.Permissions.HostProtection(
+            Action = System.Security.Permissions.SecurityAction.Assert,
+            Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+            UI = true)]
+        internal static extern System.Int32 ConsoleBeep(System.Int16 Frequency, System.Int16 Timeout);
     }
+
+    [System.Security.SecurityCritical]
+    [System.Security.SuppressUnmanagedCodeSecurity]
+    internal static class Shell32
+    {
+        [DllImport(Libraries.Shell32 , EntryPoint = "ShellAboutW" , CallingConvention = CallingConvention.Winapi)]
+        [System.Security.Permissions.HostProtection(
+            Action = System.Security.Permissions.SecurityAction.Assert, 
+            Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt, 
+            UI = true)]
+        private static extern System.Int32 Shownetframeworkinfo(System.IntPtr Handle, 
+            [MarshalAs(UnmanagedType.LPWStr)] System.String Title, 
+            [MarshalAs(UnmanagedType.LPWStr)] System.String desc, System.IntPtr IHandle);
+
+        public static System.Boolean ShowDotNetFrameworkInfo()
+        {
+            if (Shownetframeworkinfo(
+                System.IntPtr.Zero , 
+                "Microsoft ® .NET Framework" , 
+                ".NET Framework is a product of Microsoft Corporation.\n" +
+                $"Common Language Runtime Version: {ROOT.MAIN.GetRuntimeVersion()} \n" +
+                $"Current Machine Architecture: {ROOT.MAIN.OSProcessorArchitecture()}" ,
+                System.IntPtr.Zero) != 0) { return true; } else { return false; }
+        }
+
+        public static System.Boolean ShowDotNetFrameworkInfo(System.Windows.Forms.IWin32Window hwnd)
+        {
+            if (Shownetframeworkinfo(
+                hwnd.Handle,
+                "Microsoft ® .NET Framework",
+                ".NET Framework is a product of Microsoft Corporation.\n" +
+                $"Common Language Runtime Version: {ROOT.MAIN.GetRuntimeVersion()} \n" +
+                $"Current Machine Architecture: {ROOT.MAIN.OSProcessorArchitecture()}",
+                System.IntPtr.Zero) != 0) { return true; } else { return false; }
+        }
+
+        [DllImport(Libraries.Shell32, CallingConvention = CallingConvention.Winapi, EntryPoint = "ShellExecuteW")]
+        [System.Security.Permissions.HostProtection(
+            Action = System.Security.Permissions.SecurityAction.Assert,
+            Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+            UI = true)]
+        internal static extern System.Int16 ExecuteApp(System.IntPtr winHandle,
+            [MarshalAs(UnmanagedType.LPWStr)] System.String Verb,
+            [MarshalAs(UnmanagedType.LPWStr)] System.String Path,
+            [MarshalAs(UnmanagedType.LPWStr)] System.String Parameters,
+            [MarshalAs(UnmanagedType.LPWStr)] System.String WorkDir,
+            System.Int32 WinShowArgs);
+
+        internal struct ExecuteVerbs 
+        {
+            public const System.String RunAs = "runas";
+
+            public const System.String Print = "print";
+
+            public const System.String Explore = "explore";
+
+            public const System.String Find = "find";
+
+            public const System.String Edit = "edit";
+
+            public const System.String Open = "open";
+        }
+
+
+    }
+
 }

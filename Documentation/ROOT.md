@@ -334,6 +334,7 @@ This function returns the specified runtime version. For informational purposes 
  
 #### 22. The GetVBRuntimeInfo: 
 ~~~C#
+[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version." , true)]
 public static System.String GetVBRuntimeInfo()
 ~~~
 This function gets the version of the currently loaded assembly `Microsoft.VisualBasic`. For informational purposes only.
@@ -342,6 +343,9 @@ This function gets the version of the currently loaded assembly `Microsoft.Visua
  
  __Returns__: The `System.String` describing the `Microsoft.VisualBasic` assembly version.
  
+ __NOTICE__: The Visual Basic Runtime Library will be removed in the next major version , so calling this function always
+throws a compiler error.
+
  #### 23. The HaltApplicationThread:
  ~~~C#
  public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
@@ -412,7 +416,9 @@ __NOTE__: When moving files , the filename with the path is required at both arg
 
 #### 26. The NewMessageBoxToUser:
 ~~~C#
-public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , System.Windows.Forms.MessageBoxButtons MessageButton = MessageBoxButtons.OK , System.Windows.Forms.MessageBoxIcon MessageIcon = MessageBoxIcon.None)
+public static System.Int32 NewMessageBoxToUser(System.String MessageString , System.String Title , 
+System.Windows.Forms.MessageBoxButtons MessageButton = MessageBoxButtons.OK , 
+System.Windows.Forms.MessageBoxIcon MessageIcon = MessageBoxIcon.None)
 ~~~
 This function shows a new Message Box window to user and prompts him to do an action , based on the buttons selected.
 
@@ -422,7 +428,8 @@ This function shows a new Message Box window to user and prompts him to do an ac
  3. `System.Windows.Forms.MessageBoxButtons MessageButton = MessageBoxButtons.OK`: This selects the buttons that will exist as options to do in that window.
  4. `System.Windows.Forms.MessageBoxIcon MessageIcon = MessageBoxIcon.None`: This selects and a icon too to show among with the message.
  
- The valid values for the button and icon selection are [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxbuttons?view=netframework-4.7.2) and [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxicon?view=netframework-4.7.2) , respectively.
+ The valid values for the button and icon selection are [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxbuttons?view=netframework-4.7.2) and 
+ [here](http://learn.microsoft.com/dotnet/api/system.windows.forms.messageboxicon?view=netframework-4.7.2) , respectively.
  
  __Returns__:
  An `System.Int32` value , which indicates that:
@@ -433,7 +440,7 @@ This function shows a new Message Box window to user and prompts him to do an ac
  5. `5` when 'Ignore' button pressed.
  6. `6` when 'Yes' button pressed.
  7. `7` when 'No' button pressed.
- 8. `0` indicates an error or the [System.Windows.Forms](http://learn.microsoft.com/dotnet/api/system.windows.forms?view=netframework-4.7.2) DLL version deprecation.
+ 8. `0` indicates an error or the [`System.Windows.Forms`](http://learn.microsoft.com/dotnet/api/system.windows.forms?view=netframework-4.7.2) DLL version deprecation.
  
 #### 27. The OSFramework:
 ~~~C#
@@ -965,5 +972,85 @@ public static System.Boolean operator !=(HW31 lhs, HW31 rhs)
 
   --- End of `ROOT.HW31` Structure ---
 
-  
+  ## The HW31Strings Class:
+
+~~~C#
+public static class HW31Strings
+~~~
+IL Declaration:
+~~~IL
+.class public abstract auto ansi sealed beforefieldinit ROOT.HW31Strings
+       extends [mscorlib]System.Object
+~~~
+
+Description: The HW31Strings is the static class which has the methods to convert a byte array
+to strings and the opposite.
+
+### Methods:
+
+#### 1. The ByteArrayToHW31String:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static HW31 ByteArrayToHW31String(System.Byte[] Array)
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static HW31 ByteArrayToHW31String(System.Byte[] Array, System.Int32 Start, System.Int32 Count)
+~~~
+Converts the given byte array to a new `ROOT.HW31` structure.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+ 1. `System.Byte[] Array`: The byte array data to convert.
+
+ __Overloads__:
+ 
+ 2. `System.Int32 Start`: The index of the `Array` parameter which the function will start converting data to HW31 symbols.
+ 
+ 3. `System.Int32 Count`: The items to copy from the `Array` parameter.
+
+ __Returns__:
+
+ If the `Start` parameter was `Start < Count - 1` , the Count parameter was less than the length of the array and execution suceeeded , 
+ a new uninvalidated `HW31` structure; otherwise , the structure returned is invalidated and should be disposed immediately.
+
+#### 2. The EstimateHW31StringLength:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static System.Int64 EstimateHW31StringLength(System.Byte[] Array)
+~~~
+Estimate the HW31 string length before it is even produced.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+   This method is aggressively inlined so as to decrease the execution time.
+
+__Parameters__:
+ 1. `System.Byte[] Array`: The byte array data to get the length from.
+
+__Returns__:
+ A `System.Int64` value that is the estimated HW31 length.
+
+#### 3. The HW31StringToByteArray:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public static System.Byte[] HW31StringToByteArray(HW31 HW31String)
+~~~
+Return the byte array data back from an encoded HW31 structure.
+
+ __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+This method is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+ 1. `ROOT.HW31 HW31String`: The `HW31` structure to get the data from.
+
+ __Returns__: if the structure was an HW31 string and execution was finished sucessfully , then
+ it returns the de-coded array; otherwise , `null`.
+
+  -- End of class `ROOT.HW31Strings` --
 

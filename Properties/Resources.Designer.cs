@@ -1928,6 +1928,177 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to ms-actionbar://.
+        /// </summary>
+        internal static string MDCFR_LINK_ACTIONBAR {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_ACTIONBAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-actioncenter:controlcenter/&amp;suppressAnimations=false&amp;showFooter=true&amp;allowPageNavigation=true&amp;edgeGestureOffset=0&amp;inputAnimationSourceId=0&amp;inputAnimationProviderId=0.
+        /// </summary>
+        internal static string MDCFR_LINK_ACTIONBAR2 {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_ACTIONBAR2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-calculator://.
+        /// </summary>
+        internal static string MDCFR_LINK_CALC {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_CALC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to outlookcal://.
+        /// </summary>
+        internal static string MDCFR_LINK_CALENDAR {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_CALENDAR", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to microsoft.windows.camera://.
+        /// </summary>
+        internal static string MDCFR_LINK_CAMERA {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_CAMERA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-clock://.
+        /// </summary>
+        internal static string MDCFR_LINK_CLOCK {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_CLOCK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-wxh://.
+        /// </summary>
+        internal static string MDCFR_LINK_GETSTARTED {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_GETSTARTED", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to outlookmail://.
+        /// </summary>
+        internal static string MDCFR_LINK_MAIL {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_MAIL", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to bingmaps://.
+        /// </summary>
+        internal static string MDCFR_LINK_MAPS {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_MAPS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to mswindowsmusic://.
+        /// </summary>
+        internal static string MDCFR_LINK_MUSIC {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_MUSIC", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-officeapp://.
+        /// </summary>
+        internal static string MDCFR_LINK_OFFICE {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_OFFICE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-people://.
+        /// </summary>
+        internal static string MDCFR_LINK_PEOPLE {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_PEOPLE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-phone://.
+        /// </summary>
+        internal static string MDCFR_LINK_PHONELINK {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_PHONELINK", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-photos://.
+        /// </summary>
+        internal static string MDCFR_LINK_PHOTOS {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_PHOTOS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-screenclip://.
+        /// </summary>
+        internal static string MDCFR_LINK_SCREENCLIP {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_SCREENCLIP", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to zune://.
+        /// </summary>
+        internal static string MDCFR_LINK_STORE {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_STORE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-get-started://.
+        /// </summary>
+        internal static string MDCFR_LINK_TIPS {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_TIPS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to windowsdefender://.
+        /// </summary>
+        internal static string MDCFR_LINK_WINDEFENDER {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_WINDEFENDER", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ms-settings://.
+        /// </summary>
+        internal static string MDCFR_LINK_WINSETTINGS {
+            get {
+                return ResourceManager.GetString("MDCFR_LINK_WINSETTINGS", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Memory&lt;T&gt; has been disposed..
         /// </summary>
         internal static string MemoryDisposed {

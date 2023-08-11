@@ -25,12 +25,100 @@ namespace ROOT
 	public static class MAIN
 	{
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		private static System.String ToURL(SystemLinks link)
+		{
+            return link switch
+            {
+                SystemLinks.Settings => MDCFR.Properties.Resources.MDCFR_LINK_WINSETTINGS,
+                SystemLinks.Store => MDCFR.Properties.Resources.MDCFR_LINK_STORE,
+                SystemLinks.ActionBar => MDCFR.Properties.Resources.MDCFR_LINK_ACTIONBAR,
+                SystemLinks.FastSettings => MDCFR.Properties.Resources.MDCFR_LINK_ACTIONBAR2,
+                SystemLinks.WindowsSecurity => MDCFR.Properties.Resources.MDCFR_LINK_WINDEFENDER,
+                SystemLinks.MailApp => MDCFR.Properties.Resources.MDCFR_LINK_MAIL,
+                SystemLinks.Calendar => MDCFR.Properties.Resources.MDCFR_LINK_CALENDAR,
+                SystemLinks.GetStarted => MDCFR.Properties.Resources.MDCFR_LINK_GETSTARTED,
+                SystemLinks.MapsApp => MDCFR.Properties.Resources.MDCFR_LINK_MAPS,
+                SystemLinks.PhoneLink => MDCFR.Properties.Resources.MDCFR_LINK_PHONELINK,
+                SystemLinks.ScreenSnippingTool => MDCFR.Properties.Resources.MDCFR_LINK_SCREENCLIP,
+                SystemLinks.Camera => MDCFR.Properties.Resources.MDCFR_LINK_CAMERA,
+                SystemLinks.MusicApp => MDCFR.Properties.Resources.MDCFR_LINK_MUSIC,
+                SystemLinks.Calculator => MDCFR.Properties.Resources.MDCFR_LINK_CALC,
+                SystemLinks.PeopleApp => MDCFR.Properties.Resources.MDCFR_LINK_PEOPLE,
+                SystemLinks.ClockApp => MDCFR.Properties.Resources.MDCFR_LINK_CLOCK,
+                _ => null,
+            };
+        }
+
+        [SupportedOSPlatform("windows")]
+        private static System.Boolean StartUWPApp(System.String URL)
+		{
+			return Interop.Shell32.ExecuteApp(System.IntPtr.Zero,
+				Interop.Shell32.ExecuteVerbs.Open, URL, "", null, 9) >= 32;
+		}
+
+        [SupportedOSPlatform("windows")]
+        private static System.Boolean StartUWPApp(System.String URL , IWin32Window window)
+        {
+            return Interop.Shell32.ExecuteApp(window.Handle,
+                Interop.Shell32.ExecuteVerbs.Open, URL, "", null, 9) >= 32;
+        }
+
 		/// <summary>
-		/// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
+		/// Opens a Windows UWP App.
 		/// </summary>
-		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
-		/// <returns>The full file path returned by the dialog.</returns>
+		/// <param name="link">One of the values of the <see cref="SystemLinks"/> enumeration.</param>
+		/// <returns>A <see cref="System.Boolean"/> determining whether the 
+		/// specified UWP App was opened or restored.</returns>
 		[SupportedOSPlatform("windows")]
+		public static System.Boolean OpenSystemApp(SystemLinks link) { return StartUWPApp(ToURL(link)); }
+
+        /// <summary>
+        /// Opens a Windows UWP App.
+        /// </summary>
+        /// <param name="link">One of the values of the <see cref="SystemLinks"/> enumeration.</param>
+		/// <param name="Window">The function will show messages to the specified window , if needed.</param>
+        /// <returns>A <see cref="System.Boolean"/> determining whether the 
+        /// specified UWP App was opened or restored.</returns>
+        [SupportedOSPlatform("windows")]
+        public static System.Boolean OpenSystemApp(SystemLinks link , IWin32Window Window) { return StartUWPApp(ToURL(link) , Window); }
+
+        /// <summary>
+        /// Opens a Windows UWP App from a custom link.
+        /// </summary>
+        /// <param name="link">The custom link that points to an UWP app that does 
+		/// not exist in the <see cref="SystemLinks"/> eumeration.</param>
+        /// <returns>A <see cref="System.Boolean"/> determining whether the 
+        /// specified UWP App was opened or restored.</returns>
+        [SupportedOSPlatform("windows")]
+        public static System.Boolean OpenSystemApp(System.String link)
+		{
+			if (link.EndsWith("://") == false) { return false; }
+			return StartUWPApp(link);
+		}
+
+        /// <summary>
+        /// Opens a Windows UWP App from a custom link.
+        /// </summary>
+        /// <param name="link">The custom link that points to an UWP app that does 
+        /// not exist in the <see cref="SystemLinks"/> eumeration.</param>
+		/// <param name="Window">The function will show messages to the 
+		/// specified window , if needed.</param>
+        /// <returns>A <see cref="System.Boolean"/> determining whether the 
+        /// specified UWP App was opened or restored.</returns>
+        [SupportedOSPlatform("windows")]
+        public static System.Boolean OpenSystemApp(System.String link , IWin32Window Window) 
+		{
+            if (link.EndsWith("://") == false) { return false; }
+            return StartUWPApp(link , Window);
+        }
+
+        /// <summary>
+        /// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
+        /// </summary>
+        /// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
+        /// <returns>The full file path returned by the dialog.</returns>
+        [SupportedOSPlatform("windows")]
 		public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
 
 		/// <summary>
@@ -125,7 +213,7 @@ namespace ROOT
 		/// This method plays a sound to the computer.
 		/// </summary>
 		[SupportedOSPlatform("windows")]
-		public static void EmitBeepSound() { Microsoft.VisualBasic.Interaction.Beep(); }
+		public static void EmitBeepSound() { Interop.Kernel32.ConsoleBeep(800 , 200); }
 
         /// <summary>
         /// This is a custom implementation of <see cref="System.Console.WriteLine()"/> which writes data to the console.
@@ -1468,6 +1556,77 @@ namespace ROOT
 			return FSR;
 		}
 
+	}
+
+	/// <summary>
+	/// This enumeration has valid System links that exist across all Windows computers.
+	/// </summary>
+	public enum SystemLinks
+	{
+		/// <summary>
+		/// Open the Settings Menu.
+		/// </summary>
+		Settings = 2,
+		/// <summary>
+		/// Open the Microsoft Store.
+		/// </summary>
+		Store = 3,
+		/// <summary>
+		/// Open the Action Bar (Control Center).
+		/// </summary>
+		ActionBar = 4,
+		/// <summary>
+		/// Open the Quick Settings Action bar (That is , WI-FI settings , BlueTooth settings and sound settings.)
+		/// </summary>
+		FastSettings = 5,
+		/// <summary>
+		/// Start the Print-Screen Snipping Tool.
+		/// </summary>
+		ScreenSnippingTool = 6,
+		/// <summary>
+		/// Open the Phone Link tool.
+		/// </summary>
+		PhoneLink = 7,
+		/// <summary>
+		/// Open The Get Started tool.
+		/// </summary>
+		GetStarted = 8,
+		/// <summary>
+		/// Opens the default Windows Music App.
+		/// </summary>
+		MusicApp = 9,
+		/// <summary>
+		/// Opens the Windows Security App.
+		/// </summary>
+		WindowsSecurity = 10,
+		/// <summary>
+		/// Opens the Mail App.
+		/// </summary>
+		MailApp = 11,
+		/// <summary>
+		/// Opens the Calendar App.
+		/// </summary>
+		Calendar = 12,
+		/// <summary>
+		/// Opens the People App.
+		/// </summary>
+		PeopleApp = 13,
+		/// <summary>
+		/// Opens the Camera App.
+		/// </summary>
+		Camera = 14,
+		/// <summary>
+		/// Opens the Maps App.
+		/// </summary>
+		MapsApp = 15,
+		/// <summary>
+		/// Opens the Calculator App.
+		/// </summary>
+		Calculator = 16,
+		/// <summary>
+		/// Opens the Clock App.
+		/// </summary>
+		ClockApp = 17
 	}
 
 	/// <summary>
