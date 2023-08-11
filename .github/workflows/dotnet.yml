@@ -8,6 +8,7 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,3 +28,7 @@ jobs:
       run: dotnet build --verbosity normal --configuration Release --no-restore
     - name: Test the output MDCFR.dll with "dotnet test" for IL errors
       run: dotnet test --os Windows --verbosity normal --no-build
+
+
+
+
