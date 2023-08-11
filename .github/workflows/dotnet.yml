@@ -21,7 +21,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Setup and prepare .NET
-      run: D:\DOTNET.cmd -version 7.0
+      run: D:\DOTNET_INSTALL.cmd -version 7.0
     - name: Restore MDCFR.dll dependencies
       run: D:\Command.cmd dotnet restore --verbosity normal
     - name: Attempt to build the MDCFR.dll
