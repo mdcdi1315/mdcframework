@@ -16,12 +16,13 @@ jobs:
     runs-on: internalhost
 
 
+
+    env:
+      NUGET_PACKAGES: ${{ github.workspace }}\.nuget\packages
     steps:
     - uses: actions/checkout@v3
     - name: Setup and prepare .NET
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 7.0.x
+      run: D:\DOTNET.cmd -version 7.0
     - name: Restore MDCFR.dll dependencies
       run: dotnet restore --verbosity normal
     - name: Attempt to build the MDCFR.dll
