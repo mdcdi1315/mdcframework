@@ -270,10 +270,15 @@ ___NOTICE___!!! This function is available only for __.NET Framework__ and __Win
  
  #### 18. The GetAStringFromTheUser:
  ~~~C#
+[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version. Use instead the GetAStringFromTheUserNew function.", true)]
  public static System.String GetAStringFromTheUser(System.String Prompt, System.String Title, System.String DefaultResponse)
  ~~~
  This function is an exact implementation of the [`Microsoft.VisualBasic.Interaction.InputBox`](https://learn.microsoft.com/dotnet/api/microsoft.visualbasic.interaction.inputbox?view=netframework-4.7.2),
  which is imported here if you want to use it , but it is not needed to reference the `Microsoft.VisualBasic` DLL.
+
+  __Attributes__: `System.Obsolete(message , true)`:
+  Someone who attempts to use this method will always throw a compiler error because in the next major version the library 
+  the Visual Basic Runtime Library will be removed.
  
   __Parameters__:
   1. `System.String Prompt`: This is the prompt message shown to the user.
