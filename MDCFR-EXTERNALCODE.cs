@@ -12,7 +12,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Sources;
-using System;
 #if NET6_0_OR_GREATER
 	using System.Runtime.Intrinsics;
 	using System.Runtime.Intrinsics.X86;
@@ -23,14 +22,14 @@ namespace Microsoft.Win32.SafeHandles
 {
     internal sealed class SafeAllocHHandle : SafeBuffer
     {
-        internal static SafeAllocHHandle InvalidHandle => new SafeAllocHHandle(IntPtr.Zero);
+        internal static SafeAllocHHandle InvalidHandle => new SafeAllocHHandle(System.IntPtr.Zero);
 
         public SafeAllocHHandle()
             : base(ownsHandle: true)
         {
         }
 
-        internal SafeAllocHHandle(IntPtr handle)
+        internal SafeAllocHHandle(System.IntPtr handle)
             : base(ownsHandle: true)
         {
             SetHandle(handle);
@@ -38,7 +37,7 @@ namespace Microsoft.Win32.SafeHandles
 
         protected override bool ReleaseHandle()
         {
-            if (handle != IntPtr.Zero)
+            if (handle != System.IntPtr.Zero)
             {
                 Marshal.FreeHGlobal(handle);
             }
@@ -47,11 +46,379 @@ namespace Microsoft.Win32.SafeHandles
     }
 }
 
+
+namespace Internal
+{
+    [StructLayout(LayoutKind.Explicit, Size = 124)]
+    internal struct PaddingFor32 { }
+
+    internal static class PaddingHelpers { internal const int CACHE_LINE_SIZE = 128; }
+}
+
 namespace System
 {
     #nullable enable
     namespace Threading.Tasks
     {
+        using Internal;
+        using System.Collections;
+        using System.Collections.Generic;
+        using System.Collections.Concurrent;
+
+
+
+        internal interface IProducerConsumerQueue<T> : IEnumerable<T>, System.Collections.IEnumerable
+        {
+            bool IsEmpty { get; }
+
+            int Count { get; }
+
+            void Enqueue(T item);
+
+            bool TryDequeue([MaybeNullWhen(false)] out T result);
+
+            int GetCountSafe(object syncObj);
+        }
+
+        [DebuggerDisplay("Count = {Count}")]
+        internal sealed class MultiProducerMultiConsumerQueue<T> : ConcurrentQueue<T>, System.Threading.Tasks.IProducerConsumerQueue<T>, IEnumerable<T>, IEnumerable
+        {
+            bool System.Threading.Tasks.IProducerConsumerQueue<T>.IsEmpty => base.IsEmpty;
+
+            int System.Threading.Tasks.IProducerConsumerQueue<T>.Count => base.Count;
+
+            void System.Threading.Tasks.IProducerConsumerQueue<T>.Enqueue(T item)
+            {
+                Enqueue(item);
+            }
+
+            bool System.Threading.Tasks.IProducerConsumerQueue<T>.TryDequeue([MaybeNullWhen(false)] out T result)
+            {
+                return TryDequeue(out result);
+            }
+
+            int System.Threading.Tasks.IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
+            {
+                return base.Count;
+            }
+        }
+
+#pragma warning disable CS8600 , CS8618 , CS8601
+        [DebuggerDisplay("Count = {Count}")]
+        [DebuggerTypeProxy(typeof(SingleProducerSingleConsumerQueue<>.SingleProducerSingleConsumerQueue_DebugView))]
+        internal sealed class SingleProducerSingleConsumerQueue<T> : System.Threading.Tasks.IProducerConsumerQueue<T>, IEnumerable<T>, IEnumerable
+        {
+            [StructLayout(LayoutKind.Sequential)]
+            private sealed class Segment
+            {
+                internal Segment _next;
+
+                internal readonly T[] _array;
+
+                internal SegmentState _state;
+
+                internal Segment(int size)
+                {
+                    _array = new T[size];
+                }
+            }
+
+            private struct SegmentState
+            {
+                internal PaddingFor32 _pad0;
+
+                internal volatile int _first;
+
+                internal int _lastCopy;
+
+                internal PaddingFor32 _pad1;
+
+                internal int _firstCopy;
+
+                internal volatile int _last;
+
+                internal PaddingFor32 _pad2;
+            }
+
+            private sealed class SingleProducerSingleConsumerQueue_DebugView
+            {
+                private readonly System.Threading.Tasks.SingleProducerSingleConsumerQueue<T> _queue;
+
+                [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+                public T[] Items
+                {
+                    get
+                    {
+                        List<T> list = new List<T>();
+                        foreach (T item in _queue)
+                        {
+                            list.Add(item);
+                        }
+                        return list.ToArray();
+                    }
+                }
+
+                public SingleProducerSingleConsumerQueue_DebugView(System.Threading.Tasks.SingleProducerSingleConsumerQueue<T> queue)
+                {
+                    _queue = queue;
+                }
+            }
+
+            private const int INIT_SEGMENT_SIZE = 32;
+
+            private const int MAX_SEGMENT_SIZE = 16777216;
+
+            private volatile Segment _head;
+
+            private volatile Segment _tail;
+
+            public bool IsEmpty
+            {
+                get
+                {
+                    Segment head = _head;
+                    if (head._state._first != head._state._lastCopy)
+                    {
+                        return false;
+                    }
+                    if (head._state._first != head._state._last)
+                    {
+                        return false;
+                    }
+                    return head._next == null;
+                }
+            }
+
+            public int Count
+            {
+                get
+                {
+                    int num = 0;
+                    for (Segment segment = _head; segment != null; segment = segment._next)
+                    {
+                        int num2 = segment._array.Length;
+                        int first;
+                        int last;
+                        do
+                        {
+                            first = segment._state._first;
+                            last = segment._state._last;
+                        }
+                        while (first != segment._state._first);
+                        num += (last - first) & (num2 - 1);
+                    }
+                    return num;
+                }
+            }
+
+            internal SingleProducerSingleConsumerQueue()
+            {
+                _head = (_tail = new Segment(32));
+            }
+
+            public void Enqueue(T item)
+            {
+                Segment segment = _tail;
+                T[] array = segment._array;
+                int last = segment._state._last;
+                int num = (last + 1) & (array.Length - 1);
+                if (num != segment._state._firstCopy)
+                {
+                    array[last] = item;
+                    segment._state._last = num;
+                }
+                else
+                {
+                    EnqueueSlow(item, ref segment);
+                }
+            }
+
+            private void EnqueueSlow(T item, ref Segment segment)
+            {
+                if (segment._state._firstCopy != segment._state._first)
+                {
+                    segment._state._firstCopy = segment._state._first;
+                    Enqueue(item);
+                    return;
+                }
+                int num = _tail._array.Length << 1;
+                if (num > 16777216)
+                {
+                    num = 16777216;
+                }
+                Segment segment2 = new Segment(num);
+                segment2._array[0] = item;
+                segment2._state._last = 1;
+                segment2._state._lastCopy = 1;
+                try
+                {
+                }
+                finally
+                {
+                    Volatile.Write(ref _tail._next, segment2);
+                    _tail = segment2;
+                }
+            }
+
+            public bool TryDequeue([MaybeNullWhen(false)] out T result)
+            {
+                Segment segment = _head;
+                T[] array = segment._array;
+                int first = segment._state._first;
+                if (first != segment._state._lastCopy)
+                {
+                    result = array[first];
+                    array[first] = default(T);
+                    segment._state._first = (first + 1) & (array.Length - 1);
+                    return true;
+                }
+                return TryDequeueSlow(ref segment, ref array, out result);
+            }
+
+            private bool TryDequeueSlow(ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
+            {
+                if (segment._state._last != segment._state._lastCopy)
+                {
+                    segment._state._lastCopy = segment._state._last;
+                    return TryDequeue(out result);
+                }
+                if (segment._next != null && segment._state._first == segment._state._last)
+                {
+                    segment = segment._next;
+                    array = segment._array;
+                    _head = segment;
+                }
+                int first = segment._state._first;
+                if (first == segment._state._last)
+                {
+                    result = default(T);
+                    return false;
+                }
+                result = array[first];
+                array[first] = default(T);
+                segment._state._first = (first + 1) & (segment._array.Length - 1);
+                segment._state._lastCopy = segment._state._last;
+                return true;
+            }
+
+            public bool TryPeek([MaybeNullWhen(false)] out T result)
+            {
+                Segment segment = _head;
+                T[] array = segment._array;
+                int first = segment._state._first;
+                if (first != segment._state._lastCopy)
+                {
+                    result = array[first];
+                    return true;
+                }
+                return TryPeekSlow(ref segment, ref array, out result);
+            }
+
+            private bool TryPeekSlow(ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
+            {
+                if (segment._state._last != segment._state._lastCopy)
+                {
+                    segment._state._lastCopy = segment._state._last;
+                    return TryPeek(out result);
+                }
+                if (segment._next != null && segment._state._first == segment._state._last)
+                {
+                    segment = segment._next;
+                    array = segment._array;
+                    _head = segment;
+                }
+                int first = segment._state._first;
+                if (first == segment._state._last)
+                {
+                    result = default(T);
+                    return false;
+                }
+                result = array[first];
+                return true;
+            }
+
+            public bool TryDequeueIf(Predicate<T> predicate, [MaybeNullWhen(false)] out T result)
+            {
+                Segment segment = _head;
+                T[] array = segment._array;
+                int first = segment._state._first;
+                if (first != segment._state._lastCopy)
+                {
+                    result = array[first];
+                    if (predicate == null || predicate(result))
+                    {
+                        array[first] = default(T);
+                        segment._state._first = (first + 1) & (array.Length - 1);
+                        return true;
+                    }
+                    result = default(T);
+                    return false;
+                }
+                return TryDequeueIfSlow(predicate, ref segment, ref array, out result);
+            }
+
+            private bool TryDequeueIfSlow(Predicate<T> predicate, ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
+            {
+                if (segment._state._last != segment._state._lastCopy)
+                {
+                    segment._state._lastCopy = segment._state._last;
+                    return TryDequeueIf(predicate, out result);
+                }
+                if (segment._next != null && segment._state._first == segment._state._last)
+                {
+                    segment = segment._next;
+                    array = segment._array;
+                    _head = segment;
+                }
+                int first = segment._state._first;
+                if (first == segment._state._last)
+                {
+                    result = default(T);
+                    return false;
+                }
+                result = array[first];
+                if (predicate == null || predicate(result))
+                {
+                    array[first] = default(T);
+                    segment._state._first = (first + 1) & (segment._array.Length - 1);
+                    segment._state._lastCopy = segment._state._last;
+                    return true;
+                }
+                result = default(T);
+                return false;
+            }
+
+            public void Clear()
+            {
+                T result;
+                while (TryDequeue(out result)) { }
+            }
+
+            public IEnumerator<T> GetEnumerator()
+            {
+                for (Segment segment = _head; segment != null; segment = segment._next)
+                {
+                    for (int pt = segment._state._first; pt != segment._state._last; pt = (pt + 1) & (segment._array.Length - 1))
+                    {
+                        yield return segment._array[pt];
+                    }
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            int System.Threading.Tasks.IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
+            {
+                lock (syncObj)
+                {
+                    return Count;
+                }
+            }
+        }
+#pragma warning restore CS8600 , CS8618 , CS8601
 
         namespace Sources
         {
@@ -948,6 +1315,66 @@ namespace System
         {
             IComparer<TKey> KeyComparer { get; }
         }
+
+        #pragma warning disable CS8601
+        internal static class EnumerableHelpers
+        {
+            internal static T[] ToArray<T>(IEnumerable<T> source)
+            {
+                int length;
+                T[] array = ToArray(source, out length);
+                Array.Resize(ref array, length);
+                return array;
+            }
+
+            internal static T[] ToArray<T>(IEnumerable<T> source, out int length)
+            {
+                if (source is ICollection<T> collection)
+                {
+                    int count = collection.Count;
+                    if (count != 0)
+                    {
+                        T[] array = new T[count];
+                        collection.CopyTo(array, 0);
+                        length = count;
+                        return array;
+                    }
+                }
+                else
+                {
+                    using IEnumerator<T> enumerator = source.GetEnumerator();
+                    if (enumerator.MoveNext())
+                    {
+                        T[] array2 = new T[4]
+                        {
+                        enumerator.Current,
+                        default(T),
+                        default(T),
+                        default(T)
+                        };
+                        int num = 1;
+                        while (enumerator.MoveNext())
+                        {
+                            if (num == array2.Length)
+                            {
+                                int num2 = num << 1;
+                                if ((uint)num2 > 2146435071u)
+                                {
+                                    num2 = ((2146435071 <= num) ? (num + 1) : 2146435071);
+                                }
+                                Array.Resize(ref array2, num2);
+                            }
+                            array2[num++] = enumerator.Current;
+                        }
+                        length = num;
+                        return array2;
+                    }
+                }
+                length = 0;
+                return Array.Empty<T>();
+            }
+        }
+        #pragma warning restore CS8601
     }
 
     namespace Runtime.CompilerServices
@@ -1135,7 +1562,7 @@ namespace System
 
                 public string ParameterName { get; }
             }
-#endif
+        #endif
 
         // Special internal struct that we use to signify that we are not interested in
         // a Task<VoidTaskResult>'s result.
@@ -1491,7 +1918,19 @@ namespace System
                 }
             }
         }
-        #nullable disable
+#nullable disable
+
+        [CompilerGenerated]
+        [AttributeUsage(AttributeTargets.Module, AllowMultiple = false, Inherited = false)]
+        internal sealed class NullablePublicOnlyAttribute : Attribute
+        {
+            public readonly bool IncludesInternals;
+
+            public NullablePublicOnlyAttribute(bool includes_internals)
+            {
+                IncludesInternals = includes_internals;
+            }
+        }
 
     }
 
@@ -1634,8 +2073,8 @@ namespace System
         /// <summary>
         /// LINQ extension method overrides that offer greater efficiency for <see cref="System.Collections.Immutable.ImmutableArray{T}" /> than the standard LINQ methods.
         /// </summary>
-#nullable enable
-#pragma warning disable CS8600, CS8602, CS8603, CS8604
+        #nullable enable
+        #pragma warning disable CS8600, CS8602, CS8603, CS8604
         public static class ImmutableArrayExtensions
         {
             /// <summary>Projects each element of a sequence into a new form.</summary>
@@ -2213,8 +2652,8 @@ namespace System
                 }
             }
         }
-#pragma warning restore CS8600 , CS8602 , CS8603 , CS8604
-#nullable disable
+        #pragma warning restore CS8600 , CS8602 , CS8603 , CS8604
+        #nullable disable
     }
 
     namespace Runtime.InteropServices
@@ -2312,14 +2751,30 @@ namespace System
                 return true;
             }
 
+            /// <summary>
+            /// Creates an <see cref="System.Collections.Generic.IEnumerable{T}"/> view of the given read-only memory buffer.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the read-only memory buffer.</typeparam>
+            /// <param name="memory">A read-only memory buffer.</param>
+            /// <returns>An enumerable view of <paramref name="memory"/>.</returns>
+            /// <remarks>
+            /// This method allows a read-only memory buffer to be used in 
+            /// existing APIs that require a parameter of type 
+            /// <see cref="System.Collections.Generic.IEnumerable{T}"/>.</remarks>
             public static System.Collections.Generic.IEnumerable<T> ToEnumerable<T>(ReadOnlyMemory<T> memory)
             {
-                for (int i = 0; i < memory.Length; i++)
-                {
-                    yield return memory.Span[i];
-                }
+                for (int i = 0; i < memory.Length; i++) { yield return memory.Span[i]; }
             }
 
+            /// <summary>
+            /// Tries to get the underlying string from a <see cref="System.ReadOnlyMemory{T}"/>.
+            /// T is <see cref="System.Char"/> .
+            /// </summary>
+            /// <param name="memory">Read-only memory containing a block of characters.</param>
+            /// <param name="text">When the method returns, the string contained in the memory buffer.</param>
+            /// <param name="start">The starting location in <paramref name="text"/>.</param>
+            /// <param name="length">The number of characters in <paramref name="text"/>.</param>
+            /// <returns><c>true</c> if the method successfully retrieves the underlying string; otherwise, <c>false</c>.</returns>
             public static bool TryGetString(ReadOnlyMemory<char> memory, out string text, out int start, out int length)
             {
                 if (memory.GetObjectStartLength(out var start2, out var length2) is string text2)
@@ -2335,6 +2790,23 @@ namespace System
                 return false;
             }
 
+            /// <summary>
+            /// Reads a structure of type <typeparamref name="T"/> out of a read-only span of bytes.
+            /// </summary>
+            /// <typeparam name="T">The type of the item to retrieve from the read-only span.</typeparam>
+            /// <param name="source">A read-only span.</param>
+            /// <returns>The structure retrieved from the read-only span.</returns>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="Read{T}(ReadOnlySpan{byte})"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method initializes an instance of <typeparamref name="T"/>, including private instance fields and other 
+            /// implementation details, from the raw binary contents of the source span. Callers must ensure that the contents of the 
+            /// source span are well-formed with regard to <typeparamref name="T"/>'s internal invariants.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static T Read<T>(ReadOnlySpan<byte> source) where T : struct
             {
@@ -2349,6 +2821,24 @@ namespace System
                 return Unsafe.ReadUnaligned<T>(ref GetReference(source));
             }
 
+            /// <summary>
+            /// Tries to read a structure of type <typeparamref name="T"/> from a read-only span of bytes.
+            /// </summary>
+            /// <typeparam name="T">The type of the structure to retrieve.</typeparam>
+            /// <param name="source">A read-only span of bytes.</param>
+            /// <param name="value">When the method returns, an instance of <typeparamref name="T"/>.</param>
+            /// <returns><c>true</c> if the method succeeds in retrieving an instance of the structure; otherwise, <c>false</c>.</returns>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="TryRead{T}(ReadOnlySpan{byte}, out T)"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method initializes an instance of <typeparamref name="T"/>, including private instance fields and other 
+            /// implementation details, from the raw binary contents of the source span. Callers must ensure that the contents of the 
+            /// source span are well-formed with regard to <typeparamref name="T"/>'s internal invariants.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool TryRead<T>(ReadOnlySpan<byte> source, out T value) where T : struct
             {
@@ -2365,6 +2855,23 @@ namespace System
                 return true;
             }
 
+            /// <summary>
+            /// Writes a structure of type <typeparamref name="T"/> into a span of bytes.
+            /// </summary>
+            /// <typeparam name="T">The type of the structure.</typeparam>
+            /// <param name="destination">The span of bytes to contain the structure.</param>
+            /// <param name="value">The structure to be written to the span.</param>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="Write{T}(Span{byte}, ref T)"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method initializes an instance of <typeparamref name="T"/>, including private instance fields and other 
+            /// implementation details, from the raw binary contents of the source span. Callers must ensure that the contents of the 
+            /// source span are well-formed with regard to <typeparamref name="T"/>'s internal invariants.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static void Write<T>(Span<byte> destination, ref T value) where T : struct
             {
@@ -2379,6 +2886,26 @@ namespace System
                 Unsafe.WriteUnaligned(ref GetReference(destination), value);
             }
 
+            /// <summary>
+            /// Tries to write a structure of type <typeparamref name="T"/> into a span of bytes.
+            /// </summary>
+            /// <typeparam name="T">The type of the structure.</typeparam>
+            /// <param name="destination">The span of bytes to contain the structure.</param>
+            /// <param name="value">The structure to be written to the span.</param>
+            /// <returns><c>true</c> if the write operation succeeded; otherwise, <c>false</c>. 
+            /// The method returns <c>false</c> if the span is too small to contain <typeparamref name="T"/>
+            /// .</returns>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="Write{T}(Span{byte}, ref T)"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method initializes an instance of <typeparamref name="T"/>, including private instance fields and other 
+            /// implementation details, from the raw binary contents of the source span. Callers must ensure that the contents of the 
+            /// source span are well-formed with regard to <typeparamref name="T"/>'s internal invariants.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool TryWrite<T>(Span<byte> destination, ref T value) where T : struct
             {
@@ -2394,6 +2921,25 @@ namespace System
                 return true;
             }
 
+            /// <summary>
+            /// Creates a new memory buffer over the portion of the pre-pinned target array 
+            /// beginning at the <paramref name="start"/> index and consisting of <paramref name="length"/> items.
+            /// </summary>
+            /// <typeparam name="T">The type of the array.</typeparam>
+            /// <param name="array">The pre-pinned source array.</param>
+            /// <param name="start">The index of <paramref name="array"/> 
+            /// at which to begin the memory block.</param>
+            /// <param name="length">The number of items to include in the
+            /// memory block.</param>
+            /// <returns>A block of memory over the specified elements of <paramref name="array"/>. 
+            /// If <paramref name="array"/> is <c>null</c>, or if <paramref name="start"/> and 
+            /// <paramref name="length"/> are 0, the method returns a <see cref="Memory{T}"/> 
+            /// instance of Length zero.</returns>
+            /// <remarks>
+            /// The array must already be pinned before this method is called, and that array must not 
+            /// be unpinned while the <see cref="Memory{T}"/> buffer that it returns is still in use. 
+            /// Calling this method on an unpinned array could result in memory corruption.
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Memory<T> CreateFromPinnedArray<T>(T[] array, int start, int length)
             {
@@ -2403,7 +2949,7 @@ namespace System
                     {
                         System.ThrowHelper.ThrowArgumentOutOfRangeException();
                     }
-                    return default(Memory<T>);
+                    return default;
                 }
                 if (default(T) == null && array.GetType() != typeof(T[]))
                 {
@@ -2416,6 +2962,23 @@ namespace System
                 return new Memory<T>((System.Object)array, start, length | int.MinValue);
             }
 
+            /// <summary>
+            /// Casts a <see cref="Span{T}"/> of one primitive type, <typeparamref name="T"/>, to a Span&lt;Byte&gt; .
+            /// </summary>
+            /// <typeparam name="T">The type of items in the span.</typeparam>
+            /// <param name="span">The source slice to convert.</param>
+            /// <returns>A span of type <see cref="System.Byte"/>.</returns>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="AsBytes{T}(Span{T})"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method provides a raw binary projection over the original span, including private instance fields and other 
+            /// implementation details of type <typeparamref name="T"/>. Callers should ensure that their code is resilient 
+            /// to changes in the internal layout of <typeparamref name="T"/>.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static Span<byte> AsBytes<T>(Span<T> span) where T : struct
             {
@@ -2427,6 +2990,23 @@ namespace System
                 return new Span<byte>(Unsafe.As<Pinnable<byte>>(span.Pinnable), span.ByteOffset, length);
             }
 
+            /// <summary>
+            /// Casts a <see cref="ReadOnlySpan{T}"/> of one primitive type, <typeparamref name="T"/>, to a ReadOnlySpan&lt;Byte&gt; .
+            /// </summary>
+            /// <typeparam name="T">The type of items in the read-only span.</typeparam>
+            /// <param name="span">The source slice to convert.</param>
+            /// <returns>A read-only span of type <see cref="System.Byte"/>.</returns>
+            /// <remarks>
+            /// <para>
+            /// <typeparamref name="T"/> cannot contain managed object references. The <see cref="AsBytes{T}(Span{T})"/> 
+            /// method performs this check at runtime and throws <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// CAUTION: This method provides a raw binary projection over the original span, including private instance fields and other 
+            /// implementation details of type <typeparamref name="T"/>. Callers should ensure that their code is resilient 
+            /// to changes in the internal layout of <typeparamref name="T"/>.
+            /// </para>
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static ReadOnlySpan<byte> AsBytes<T>(ReadOnlySpan<T> span) where T : struct
             {
@@ -2438,11 +3018,32 @@ namespace System
                 return new ReadOnlySpan<byte>(Unsafe.As<Pinnable<byte>>(span.Pinnable), span.ByteOffset, length);
             }
 
+            /// <summary>
+            /// Creates a <see cref="Memory{T}"/> instance from a <see cref="ReadOnlyMemory{T}"/>.
+            /// </summary>
+            /// <typeparam name="T">The type of items in the read-only memory buffer.</typeparam>
+            /// <param name="memory">The read-only memory buffer.</param>
+            /// <returns>A memory block that represents the same memory as the <see cref="ReadOnlyMemory{T}"/>.</returns>
+            /// <remarks>
+            /// CAUTION!!! This method must be used with extreme caution. <see cref="ReadOnlyMemory{T}"/> is used to represent 
+            /// immutable data and other memory that is not meant to be written to. <see cref="Memory{T}"/> instances created by 
+            /// this method should not be written to. The purpose of this method is to allow variables typed as <see cref="Memory{T}"/> 
+            /// but only used for reading to store a <see cref="ReadOnlyMemory{T}"/>. 
+            /// </remarks>
             public static Memory<T> AsMemory<T>(ReadOnlyMemory<T> memory)
             {
                 return Unsafe.As<ReadOnlyMemory<T>, Memory<T>>(ref memory);
             }
 
+            /// <summary>Returns a reference to the element of the span at index 0. </summary>
+            /// <typeparam name="T">The type of items in the span.</typeparam>
+            /// <param name="span">The span from which the reference is retrieved.</param>
+            /// <returns>A reference to the element at index 0.</returns>
+            /// <remarks>
+            /// If the span is empty, this method returns a reference to the location where the element at index 0 would have been stored. 
+            /// Such a reference may or may not be <c>null</c>. 
+            /// The returned reference can be used for pinning, but it must never be dereferenced.
+            /// </remarks>
             public unsafe static ref T GetReference<T>(Span<T> span)
             {
                 if (span.Pinnable == null)
@@ -2452,6 +3053,15 @@ namespace System
                 return ref Unsafe.AddByteOffset(ref span.Pinnable.Data, span.ByteOffset);
             }
 
+            /// <summary>Returns a reference to the element of the read-only span at index 0. </summary>
+            /// <typeparam name="T">The type of items in the read-only span.</typeparam>
+            /// <param name="span">The read-only span from which the reference is retrieved.</param>
+            /// <returns>A reference to the element at index 0.</returns>
+            /// <remarks>
+            /// If the read-only span is empty, this method returns a reference to the location where the element at index 0 
+            /// would have been stored.  Such a reference may or may not be <c>null</c>. 
+            /// The returned reference can be used for pinning, but it must never be dereferenced.
+            /// </remarks>
             public unsafe static ref T GetReference<T>(ReadOnlySpan<T> span)
             {
                 if (span.Pinnable == null)
@@ -2461,6 +3071,38 @@ namespace System
                 return ref Unsafe.AddByteOffset(ref span.Pinnable.Data, span.ByteOffset);
             }
 
+            /// <summary>Casts a span of one primitive type to a span of another primitive type. </summary>
+            /// <typeparam name="TFrom">The type of the source span.</typeparam>
+            /// <typeparam name="TTo">The type of the target span.</typeparam>
+            /// <param name="span">The source slice to convert.</param>
+            /// <returns>The converted span.</returns>
+            /// <remarks>
+            /// <para>
+            /// Neither <typeparamref name="TFrom"/> nor <typeparamref name="TTo"/> can contain managed object references. 
+            /// The <see cref="Cast{TFrom, TTo}(Span{TFrom})"/> method performs this check at runtime and throws 
+            /// <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// If the sizes of the two types are different, the cast combines or splits values, which leads to a change in length.
+            /// </para>
+            /// <para>
+            /// For example, if <typeparamref name="TFrom"/> is <see cref="System.Int64"/>, the ReadOnlySpan&lt;Int64&gt; contains 
+            /// a single value, 0x0100001111110F0F, and <typeparamref name="TTo"/> is <see cref="System.Int32"/>, the resulting 
+            /// ReadOnlySpan&lt;Int32&gt; contains two values. The values are 0x11110F0F and 0x01000011 on a little-endian 
+            /// architecture, such as x86. On a big-endian architecture, the order of the two values is reversed, i.e. 0x01000011, 
+            /// followed by 0x11110F0F.
+            /// </para>
+            /// <para>
+            /// As another example, if <typeparamref name="TFrom"/> is <see cref="System.Int32"/>, the ReadOnlySpan&lt;Int32&gt; 
+            /// contains the values of 1, 2 and 3, and <typeparamref name="TTo"/> is <see cref="System.Int64"/>, the resulting 
+            /// ReadOnlySpan&lt;Int64&gt; contains a single value: 0x0000000200000001 on a little-endian architecture 
+            /// and 0x0000000100000002 on a big-endian architecture.
+            /// </para>
+            /// <para>
+            /// This method is supported only on platforms that support misaligned memory 
+            /// access or when the memory block is aligned by other means.
+            /// </para>
+            /// </remarks>
             public static Span<TTo> Cast<TFrom, TTo>(Span<TFrom> span) where TFrom : struct where TTo : struct
             {
                 if (SpanHelpers.IsReferenceOrContainsReferences<TFrom>())
@@ -2478,6 +3120,22 @@ namespace System
                 }
             }
 
+            /// <summary>Casts a read-only span of one primitive type to a read-only span of another primitive type. </summary>
+            /// <typeparam name="TFrom">The type of the source span.</typeparam>
+            /// <typeparam name="TTo">The type of the target span.</typeparam>
+            /// <param name="span">The source slice to convert.</param>
+            /// <returns>The converted read-only span.</returns>
+            /// <remarks>
+            /// <para>
+            /// Neither <typeparamref name="TFrom"/> nor <typeparamref name="TTo"/> can contain managed object references. 
+            /// The <see cref="Cast{TFrom, TTo}(Span{TFrom})"/> method performs this check at runtime and throws 
+            /// <see cref="ArgumentException"/> if the check fails.
+            /// </para>
+            /// <para>
+            /// This method is supported only on platforms that support misaligned memory 
+            /// access or when the memory block is aligned by other means.
+            /// </para>
+            /// </remarks>
             public static ReadOnlySpan<TTo> Cast<TFrom, TTo>(ReadOnlySpan<TFrom> span) where TFrom : struct where TTo : struct
             {
                 if (SpanHelpers.IsReferenceOrContainsReferences<TFrom>())
@@ -2496,18 +3154,49 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Provides a collection of methods for interoperating with <see cref="ReadOnlySequence{T}"/>.
+        /// </summary>
         public static class SequenceMarshal
         {
-            public static bool TryGetReadOnlySequenceSegment<T>(ReadOnlySequence<T> sequence, out ReadOnlySequenceSegment<T> startSegment, out int startIndex, out ReadOnlySequenceSegment<T> endSegment, out int endIndex)
+
+            /// <summary>
+            /// Attempts to retrieve a read-only sequence segment from the specified read-only sequence.
+            /// </summary>
+            /// <typeparam name="T">The type of the read-only sequence.</typeparam>
+            /// <param name="sequence">The read-only sequence from which the read-only sequence segment will be retrieved.</param>
+            /// <param name="startSegment">The beginning read-only sequence segment.</param>
+            /// <param name="startIndex">The initial position.</param>
+            /// <param name="endSegment">The ending read-only sequence segment.</param>
+            /// <param name="endIndex">The final position.</param>
+            /// <returns><c>true</c> if the read-only sequence segment can be retrieved; otherwise, <c>false</c>.</returns>
+            public static bool TryGetReadOnlySequenceSegment<T>(ReadOnlySequence<T> sequence, 
+                out ReadOnlySequenceSegment<T> startSegment, out int startIndex, 
+                out ReadOnlySequenceSegment<T> endSegment, out int endIndex)
             {
                 return sequence.TryGetReadOnlySequenceSegment(out startSegment, out startIndex, out endSegment, out endIndex);
             }
 
+            /// <summary>
+            /// Gets an array segment from the underlying read-only sequence.
+            /// </summary>
+            /// <typeparam name="T">The type of the read-only sequence.</typeparam>
+            /// <param name="sequence">The read-only sequence from which the array segment will be retrieved.</param>
+            /// <param name="segment">The returned array segment.</param>
+            /// <returns><c>true</c> if it's possible to retrieve the array segment; 
+            /// otherwise, <c>false</c> and a default array segment is returned.</returns>
             public static bool TryGetArray<T>(ReadOnlySequence<T> sequence, out ArraySegment<T> segment)
             {
                 return sequence.TryGetArray(out segment);
             }
 
+            /// <summary>
+            /// Attempts to retrieve a read-only memory from the specified read-only sequence.
+            /// </summary>
+            /// <typeparam name="T">The type of the read-only sequence.</typeparam>
+            /// <param name="sequence">The read-only sequence from which the memory will be retrieved.</param>
+            /// <param name="memory">The returned read-only memory of type <typeparamref name="T"/> .</param>
+            /// <returns><c>true</c> if the read-only memory can be retrieved; otherwise, <c>false</c>.</returns>
             public static bool TryGetReadOnlyMemory<T>(ReadOnlySequence<T> sequence, out ReadOnlyMemory<T> memory)
             {
                 if (!sequence.IsSingleSegment)
@@ -4386,30 +5075,55 @@ namespace System
         }
     }
 
+    /// <summary>
+    /// Represents a position in a non-contiguous set of memory. 
+    /// Properties of this type should not be interpreted by anything but the type that created it.
+    /// </summary>
     public readonly struct SequencePosition : IEquatable<SequencePosition>
     {
         private readonly object _object;
 
         private readonly int _integer;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <param name="object">A non-contiguous set of memory.</param>
+        /// <param name="integer">The position in <paramref name="object"/>.</param>
         public SequencePosition(object @object, int integer)
         {
             _object = @object;
             _integer = integer;
         }
 
+        /// <summary>
+        /// Returns the object part of this <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <returns>The object part of this sequence position.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public object GetObject()
         {
             return _object;
         }
 
+        /// <summary>
+        /// Returns the integer part of this <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <returns>The integer part of this sequence position.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public int GetInteger()
         {
             return _integer;
         }
 
+        /// <summary>
+        /// Indicates whether the current instance is equal to another <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <param name="other">The sequence position to compare with the current instance.</param>
+        /// <returns><c>true</c> if the two instances are equal; <c>false</c> otherwise.</returns>
+        /// <remarks>
+        /// Equality does not guarantee that the two instances point to the same location in a <see cref="ReadOnlySequence{T}"/>.
+        /// </remarks>
         public bool Equals(SequencePosition other)
         {
             if (_integer == other._integer)
@@ -4419,6 +5133,12 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether the current instance is equal to another object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is of type <see cref="SequencePosition"/>
+        /// and is equal to the current instance; otherwise, <c>false</c>.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object obj)
         {
@@ -4429,6 +5149,7 @@ namespace System
             return false;
         }
 
+        /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode()
         {

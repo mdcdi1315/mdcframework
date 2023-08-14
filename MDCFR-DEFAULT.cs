@@ -13,15 +13,18 @@ using System.Runtime.Versioning;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using static System.Windows.Forms.AxHost;
+using System.Security.Policy;
 
 namespace ROOT
 {
-	// A Collection Namespace which includes Microsoft's Managed code.
-	// Many methods here , however , are controlled and built by me at all.
+    // A Collection Namespace which includes Microsoft's Managed code.
+    // Many methods here , however , are controlled and built by me at all.
 
-	/// <summary>
-	/// Contains a lot and different static methods for different usages.
-	/// </summary>
+    /// <summary>
+    /// Contains a lot and different static methods for different usages.
+    /// </summary>
 	public static class MAIN
 	{
 
@@ -4982,6 +4985,172 @@ namespace ROOT
 		}
 	}
 
+	namespace RandomNumbers
+	{
+
+		/// <summary>
+		/// <see cref="IRandomBase"/> is an interface which allows the random number generators
+		/// to easily implement the random number generation mechanism.
+		/// </summary>
+		public interface IRandomBase : System.IDisposable
+		{
+			/// <summary>
+			/// Inherited from <see cref="System.IDisposable"/> interface.
+			/// The random instance must dispose the seed and the state instances.
+			/// </summary>
+			public new abstract void Dispose();
+
+			/// <summary>
+			/// Produces a new random number. Expressed as <see cref="System.UInt64"/> code points.
+			/// </summary>
+			/// <returns>A new random number.</returns>
+			public abstract System.UInt64 Next();
+
+			/// <summary>
+			/// Gets or sets the Seed for the instance. Can be private for that class
+			/// and just implement a constructor which would allow to set an seed.
+			/// </summary>
+			public abstract System.Int32 Seed { get; set; }
+
+		}
+
+        /// <summary>
+        /// <para>
+        /// This is xoroshiro128++ 1.0, one of our all-purpose, rock-solid,
+        /// small-state generators. It is extremely (sub-ns) fast and it passes all
+        /// tests we are aware of, but its state space is large enough only for
+        /// mild parallelism.
+        /// </para>
+        /// <para>
+        /// For generating just floating-point numbers, xoroshiro128+ is even
+        /// faster(but it has a very mild bias, see notes in the comments).
+		/// </para>
+        /// </summary>
+        public class Xoroshiro128PP : IRandomBase
+		{
+			private System.UInt64[] _STATE = new System.UInt64[2];
+			private static System.UInt64[] JUMP = { 0x2bd7a6a6e99c2ddc, 0x0992ccaf6a6fca05 };
+			private static System.UInt64[] LONG_JUMP = { 0x360fd5f2cf8d5d99, 0x9c6e6877736c46e3 };
+			private System.UInt64 _SEED = 0;
+
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private System.UInt64 rotl(System.UInt64 x, int k) {
+				return (x << k) | (x >> (64 - k));
+			}
+
+			/// <summary>
+			/// Create a new instance of <see cref="Xoroshiro128PP"/> with a default seed value of 0.
+			/// </summary>
+			public Xoroshiro128PP() { _STATE[0] = 2; _STATE[1] = 0; _STATE[1] -= 2; }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro128PP"/> with the seed value specified.
+            /// </summary>
+            /// <param name="Seed"></param>
+            public Xoroshiro128PP(System.Int32 Seed)
+			{
+				_SEED = (System.UInt64) Seed;
+				if ((Seed / 2) != 0) { _STATE[0] = (System.UInt64) Seed / 2; } else { _STATE[0] = _SEED * 2; }
+				_STATE[1] = (_STATE[0] + (System.UInt64) Seed) ^ 2;
+			}
+
+			/// <summary>
+			/// Sets or gets the SEED number for this instance.
+			/// </summary>
+			public System.Int32 Seed 
+			{
+				get { return (System.Int32) _SEED; }
+				set
+				{
+					_SEED = (System.UInt64) value;
+                    if ((_SEED / 2) != 0) { _STATE[0] = _SEED / 2; } else { _STATE[0] = _SEED * 2; }
+                    _STATE[1] = (_STATE[0] + _SEED) ^ 2;
+                }
+			}
+
+			/// <summary>
+			/// Disposes the <see cref="Xoroshiro128PP"/> instance.
+			/// </summary>
+			public void Dispose()
+			{
+				_STATE = null;
+				JUMP = null;
+				LONG_JUMP = null;
+			}
+
+            /// <summary>
+            /// Produce a new <see cref="Xoroshiro128PP"/> random number.
+            /// </summary>
+            /// <returns>A new <see cref="Xoroshiro128PP"/> random number.</returns>
+            public System.UInt64 Next()
+            {
+                System.UInt64 s0 = _STATE[0];
+                System.UInt64 s1 = _STATE[1];
+                System.UInt64 result = rotl(s0 + s1, 17) + s0;
+
+                s1 ^= s0;
+                _STATE[0] = rotl(s0, 49) ^ s1 ^ (s1 << 21); // a, b
+                _STATE[1] = rotl(s1, 28); // c
+
+                return result;
+            }
+
+            /// <summary>
+            /// This is the jump function for the generator. It is equivalent
+            /// to 2^64 calls to Next(); it can be used to generate 2^64
+			/// non-overlapping subsequences for parallel computations.
+			/// </summary>
+			public void Jump()
+			{
+				System.UInt64 s0 = 0;
+				System.UInt64 s1 = 0;
+				for (int i = 0; i < JUMP.Length; i++)
+				{ 
+					for (int b = 0; b < 64; b++)
+					{
+						if ((JUMP[i] & (System.UInt64) (1 << b)) != 0)
+						{
+							s0 ^= _STATE[0];
+							s1 ^= _STATE[1];
+						}
+						Next();
+					}
+				}
+
+                _STATE[0] = s0;
+                _STATE[1] = s1;
+            }
+
+			/// <summary>
+			/// This is the long-jump function for the generator. It is equivalent to
+			/// 2^96 calls to <see cref="Next"/>; it can be used to generate 2^32 starting points,
+			/// from each of which <see cref="Jump"/> will generate 2^32 non-overlapping
+			/// subsequences for parallel distributed computations.
+			/// </summary>
+			public void LongJump()
+			{
+				System.UInt64 s0 = 0;
+                System.UInt64 s1 = 0;
+				for (int i = 0; i < LONG_JUMP.Length; i++) 
+				{ 
+					for (int b = 0; b < 64; b++)
+					{
+						if ((LONG_JUMP[i] & (System.UInt64) (1 << b)) != 0)
+						{
+							s0 ^= _STATE[0];
+							s1 ^= _STATE[1];
+						}
+						Next();
+					}
+				}
+                _STATE[0] = s0;
+                _STATE[1] = s1;
+            }
+
+        }
+
+    }
+
     /// <summary>
     /// This <see langword="struct" /> bears a resemblance to the <see cref="System.Collections.ArrayList"/> , 
     /// but this extends it's functionality and it's aim is to work only with <see cref="System.Byte"/> data.
@@ -6197,7 +6366,7 @@ namespace ROOT
 	}
 
 	/// <summary>
-	/// This class contains the internal implementation extensions , which some of them are exposed publicly.
+	/// This class contains the internal console implementation extensions , which some of them are exposed publicly.
 	/// </summary>
 	public static class ConsoleExtensions
 	{
@@ -6243,11 +6412,12 @@ namespace ROOT
             ExtravagantlyLarge = 8192
         }
 
-		/// <summary>
-		/// Gets the underlying KERNEL32 handle which this implementation uses to write any kind of data to console.
-		/// </summary>
-		/// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for writing data to the console.</returns>
-		public static System.IntPtr GetOutputHandle()
+        /// <summary>
+        /// Gets the underlying KERNEL32 handle which this implementation uses to write any kind of data to console.
+        /// </summary>
+        /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for writing data to the console.</returns>
+        [System.Security.SecurityCritical]
+        public static System.IntPtr GetOutputHandle()
 		{
 			if (ConsoleInterop.OutputHandle == System.IntPtr.Zero) 
 			{
@@ -6260,6 +6430,7 @@ namespace ROOT
         /// Gets the underlying KERNEL32 handle which this implementation uses to read from the console.
         /// </summary>
         /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for reading from the console.</returns>
+        [System.Security.SecurityCritical]
         public static System.IntPtr GetInputHandle()
         {
             if (ConsoleInterop.InputHandle == System.IntPtr.Zero)

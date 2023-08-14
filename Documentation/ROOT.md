@@ -362,7 +362,7 @@ throws a compiler error.
   1. `System.Int32 TimeoutEpoch`: The Timeout time specified. Maximum value that it accepts is [here](http://learn.microsoft.com/dotnet/api/System.Int32.MaxValue?view=netframework-4.7.2).
 
   __Returns__:
-  This function is declared as `void` , so it does not return nothing. That it does is to stop only the application thread for the time specified.
+  This function is declared as `void` , so it does not return nothing. What it does is to stop only the application thread for the time specified.
   
 #### 24. The LaunchProcess:
 ~~~C#
@@ -1058,4 +1058,255 @@ This method is aggressively inlined so as to decrease the execution time.
  it returns the de-coded array; otherwise , `null`.
 
   -- End of class `ROOT.HW31Strings` --
+
+## The HashDigesetSeletion Enumeration:
+CSharp Declaration:
+~~~C#
+public enum HashDigestSelection
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.HashDigestSelection
+       extends [mscorlib]System.Enum
+~~~
+Description:
+This enumeration provides values so as these can be used in the `ROOT.MAIN.GetACryptographyHashForAFile(System.String , 
+ROOT.HashDigestSelection)` overload.
+
+It provides the available cryptography algorithms.
+
+### Fields:
+
+   #### 1. The SHA1: 
+   This field selects the SHA1 algorithm. Using this field will produce a SHA1 hash algorithm.
+   __NOTICE__: Microsoft has found out that this hash algorithm has the possibility to provide
+   the same hash values if the files are almost the same. 
+
+   If your case is the integrity , then you must use the `SHA256` field or a better algorithm 
+   provided herein.
+
+   #### 2. The SHA256:
+   This field selects the SHA256 algorithm. Using this field will produce a SHA256 hash algorithm.
+
+   #### 3. The SHA384:
+   This field selects the SHA384 algorithm. Using this field will produce a SHA384 hash algorithm.
+
+   #### 4. The SHA512:
+   This field selects the SHA512 algorithm. Using this field will produce a SHA512 hash algorithm.
+
+   #### 5. The MD5:
+   This field selects the MD5 algorithm. Using this field will produce a MD5 hash algorithm.
+
+ -- End of `ROOT.HashDigestSelection` enumeration --
+
+## The ModifidableBuffer Structure: 
+CSharp Declaration:
+~~~C#
+public struct ModifidableBuffer : System.Collections.Generic.IList<System.Byte>
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi sealed beforefieldinit ROOT.ModifidableBuffer
+       extends [mscorlib]System.ValueType
+       implements class [mscorlib]System.Collections.Generic.IList`1<uint8>,
+                  class [mscorlib]System.Collections.Generic.ICollection`1<uint8>,
+                  class [mscorlib]System.Collections.Generic.IEnumerable`1<uint8>,
+                  [mscorlib]System.Collections.IEnumerable
+{
+  .custom instance void [mscorlib]System.Reflection.DefaultMemberAttribute::.ctor(string) = ( 01 00 04 49 74 65 6D 00 00 ) 
+}
+~~~
+Description: The `ModifidableBuffer` structure was designed to provide a modifidable byte array , 
+which is used for transferring byte data to streams. 
+
+This structure implements both the `System.Collections.Generic.IList` and the functionality that byte arrays
+offer.
+
+ __Implementations__: 
+
+   1. `System.Collections.Generic.IList<System.Byte>`: This structure implements the 
+    [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+    interface and it is the main abstraction type for this structure.
+    
+   2. `System.Collections.Generic.ICollection<System.Byte>`: This structure implements the
+   [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+   interface since [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+   is implemented from it.
+   
+   3. `System.Collections.Generic.IEnumerable<System.Byte>`: This structure implements the
+   [IEnumerable](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=netframework-4.8)
+   interface since [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+   implements this interface.
+
+   4. `System.Collections.IEnumerable`: This structure implements the 
+   [IEnumerable](http://learn.microsoft.com/en-us/dotnet/api/system.collections.ienumerable?view=netframework-4.8)
+   interface since the [IEnumerable<System.Byte>](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=netframework-4.8)
+   interface is implemented from this interface.
+
+### Constructors:
+
+#### Parameterless Constructor:
+
+CSharp Declaration:
+~~~C#
+public ModifidableBuffer()
+~~~
+Initiates a new `ModifidableBuffer` structure with no data in it.
+
+#### Constructor 2:
+
+CSharp Declaration:
+~~~C#
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public ModifidableBuffer(System.Byte[] Value)
+~~~
+Initiates a new `ModifidableBuffer` structure and flushes it with data taken from a byte array.
+
+  __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+  This constructor is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+   1. `System.Byte[] Value`: The byte array to flush data to the newly created structure.
+
+#### Constructor 3:
+
+CSharp Declaration:
+~~~C#
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public ModifidableBuffer(System.Byte[] Value, System.Int32 Index, System.Int32 Count)
+~~~
+Initiates a new `ModifidableBuffer` structure and flushes it with data taken from a byte array , 
+
+starting from an specified index in the array and copies the specified items.
+
+  __Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+  This constructor is aggressively inlined so as to decrease the execution time.
+
+ __Parameters__:
+   1. `System.Byte[] Value`: The byte array to flush data to the newly created structure.
+   2. `System.Int32 Index`: The index inside the array to start copying data to the structure.
+   3. `System.Int32 Count`: The items from the array to copy to the structure.
+   
+### Properties:
+
+#### The `this[System.Int32 Index]` property:
+
+CSharp Declaration:
+~~~C#
+public System.Byte this[System.Int32 Index]
+~~~
+
+This property is an implemented member of the  [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Indexer Property](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1.item?view=netframework-4.8)
+for more information about it.
+
+#### The Count Property:
+
+CSharp Declaration:
+~~~C#
+public System.Int32 Count
+~~~
+This property is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Count Property](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.count?view=netframework-4.8)
+for more information about it.
+
+#### The IsReadOnly Property:
+
+CSharp Declaration:
+~~~C#
+public System.Boolean IsReadOnly
+~~~
+This property is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[IsReadOnly Property](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.isreadonly?view=netframework-4.8)
+for more information about it.
+
+__NOTICE__: This property will always return `false`.
+
+### Methods:
+
+#### 1. The Add method:
+CSharp Declaration:
+~~~C#
+public void Add(System.Byte Value)
+~~~
+
+This method is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Add Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.add?view=netframework-4.8)
+for more information about it.
+
+#### 2. The AddEntries method:
+CSharp Declaration:
+~~~C#
+public void AddEntries(System.Int32 Times)
+~~~
+Adds new , blank entries in the instance , the number of them is specified by the Times parameter.
+
+ __Parameters__:
+ 1. `System.Int32 Times`: The number of blank entries to add.
+
+__Returns__: This function is declared as `void` , so it does not return nothing.
+   What it does is to add the specified blank entries to the instance.
+
+#### 3. The Clear method:
+CSharp Declaration:
+~~~C#
+public void Clear()
+~~~
+
+This method is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Clear Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.clear?view=netframework-4.8)
+for more information about it.
+
+#### 4. The Contains method:
+CSharp Declaration:
+~~~C#
+public System.Boolean Contains(System.Byte item)
+~~~
+
+This method is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Contains Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.contains?view=netframework-4.8)
+for more information about it.
+
+#### 5. The CopyTo method:
+CSharp Declaration:
+~~~C#
+public void CopyTo(System.Byte[] Array, System.Int32 Index)
+~~~
+
+This method is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[CopyTo Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.copyto?view=netframework-4.8)
+for more information about it.
+
+#### 6. The GetEnumerator method:
+CSharp Declaration:
+~~~C#
+public System.Collections.IEnumerator GetEnumerator()
+~~~
+
+This method is an implemented member of the [IEnumerable](http://learn.microsoft.com/en-us/dotnet/api/system.collections.ienumerable?view=netframework-4.8)
+interface. Please see the documentation of the 
+[GetEnumerator Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.ienumerable.getenumerator?view=netframework-4.8)
+for more information about it.
+
+
+#### 7. The IndexOf method:
+CSharp Declaration:
+~~~C#
+public System.Int32 IndexOf(System.Byte Value)
+~~~
+
+This method is an implemented member of the  [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[IndexOf Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1.indexof?view=netframework-4.8)
+for more information about it.
+
 

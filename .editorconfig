@@ -14,3 +14,4 @@ dotnet_diagnostic.CS8618.severity = none
 
 # Proper warning overrides for MDCFR-EXTERNALCODE.cs file
 dotnet_diagnostic.CS0169.severity = none
+

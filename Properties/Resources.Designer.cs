@@ -133,11 +133,29 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to BoundedCapacity must be Unbounded or -1 for this dataflow block..
+        /// </summary>
+        internal static string Argument_BoundedCapacityNotSupported {
+            get {
+                return ResourceManager.GetString("Argument_BoundedCapacityNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Characters following the format symbol must be a number of {0} or less..
         /// </summary>
         internal static string Argument_CannotParsePrecision {
             get {
                 return ResourceManager.GetString("Argument_CannotParsePrecision", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The argument must be false if no source from which to consume is specified..
+        /// </summary>
+        internal static string Argument_CantConsumeFromANullSource {
+            get {
+                return ResourceManager.GetString("Argument_CantConsumeFromANullSource", resourceCulture);
             }
         }
         
@@ -205,11 +223,38 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The DataflowMessageHeader instance does not represent a valid message header..
+        /// </summary>
+        internal static string Argument_InvalidMessageHeader {
+            get {
+                return ResourceManager.GetString("Argument_InvalidMessageHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to To construct a DataflowMessageHeader instance, either pass a non-zero value or use the parameterless constructor..
+        /// </summary>
+        internal static string Argument_InvalidMessageId {
+            get {
+                return ResourceManager.GetString("Argument_InvalidMessageId", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot use type &apos;{0}&apos;. Only value types without pointers or references are supported..
         /// </summary>
         internal static string Argument_InvalidTypeWithPointersNotSupported {
             get {
                 return ResourceManager.GetString("Argument_InvalidTypeWithPointersNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Greedy must be true for this dataflow block..
+        /// </summary>
+        internal static string Argument_NonGreedyNotSupported {
+            get {
+                return ResourceManager.GetString("Argument_NonGreedyNotSupported", resourceCulture);
             }
         }
         
@@ -277,6 +322,24 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Number must be no greater than the value specified in BoundedCapacity..
+        /// </summary>
+        internal static string ArgumentOutOfRange_BatchSizeMustBeNoGreaterThanBoundedCapacity {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_BatchSizeMustBeNoGreaterThanBoundedCapacity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number must be positive..
+        /// </summary>
+        internal static string ArgumentOutOfRange_GenericPositive {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_GenericPositive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Too many characters. The resulting number of bytes is larger than what can be returned as an int..
         /// </summary>
         internal static string ArgumentOutOfRange_GetByteCountOverflow {
@@ -336,6 +399,15 @@ namespace MDCFR.Properties {
         internal static string ArgumentOutOfRange_NeedNonNegNum {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_NeedNonNegNum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number must be either non-negative and less than or equal to Int32.MaxValue or -1.
+        /// </summary>
+        internal static string ArgumentOutOfRange_NeedNonNegOrNegative1 {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_NeedNonNegOrNegative1", resourceCulture);
             }
         }
         
@@ -1865,6 +1937,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The source completed without providing data to receive..
+        /// </summary>
+        internal static string InvalidOperation_DataNotAvailableForReceive {
+            get {
+                return ResourceManager.GetString("InvalidOperation_DataNotAvailableForReceive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Enumeration already finished..
         /// </summary>
         internal static string InvalidOperation_EnumEnded {
@@ -1879,6 +1960,33 @@ namespace MDCFR.Properties {
         internal static string InvalidOperation_EnumNotStarted {
             get {
                 return ResourceManager.GetString("InvalidOperation_EnumNotStarted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while linking up the target or during the cleanup after completion..
+        /// </summary>
+        internal static string InvalidOperation_ErrorDuringCleanup {
+            get {
+                return ResourceManager.GetString("InvalidOperation_ErrorDuringCleanup", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target block failed to consume a message it had successfully reserved..
+        /// </summary>
+        internal static string InvalidOperation_FailedToConsumeReservedMessage {
+            get {
+                return ResourceManager.GetString("InvalidOperation_FailedToConsumeReservedMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The target does not have the message reserved..
+        /// </summary>
+        internal static string InvalidOperation_MessageNotReservedByTarget {
+            get {
+                return ResourceManager.GetString("InvalidOperation_MessageNotReservedByTarget", resourceCulture);
             }
         }
         
@@ -2140,6 +2248,15 @@ namespace MDCFR.Properties {
         internal static string NotSupported_CannotCallGetHashCodeOnSpan {
             get {
                 return ResourceManager.GetString("NotSupported_CannotCallGetHashCodeOnSpan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This member is not supported on this dataflow block. The block is intended for a specific purpose that does not utilize this member..
+        /// </summary>
+        internal static string NotSupported_MemberNotNeeded {
+            get {
+                return ResourceManager.GetString("NotSupported_MemberNotNeeded", resourceCulture);
             }
         }
         

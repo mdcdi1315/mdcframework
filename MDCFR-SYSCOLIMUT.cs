@@ -10837,9 +10837,7 @@ namespace System.Collections.Immutable
     }
 
 
-    /// <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedDictionary`2" /> class.  
-    ///
-    ///  NuGet package: System.Collections.Immutable (about immutable collections and how to install)</summary>
+    /// <summary>Provides a set of initialization methods for instances of the <see cref="T:System.Collections.Immutable.ImmutableSortedDictionary`2" /> class.</summary>
     public static class ImmutableSortedDictionary
     {
         /// <summary>Creates an empty immutable sorted dictionary.</summary>
