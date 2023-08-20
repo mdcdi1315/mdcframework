@@ -1,10 +1,13 @@
 # MDC (.NET Application Development Library)
-MDC (Called __MDCFR__) is a .NET Application Development Library which aims to include an all-in-one solution for your .NET projects
+MDC (Called __MDCFR__) is a .NET Framework Application Development Library which aims to include an 
+all-in-one solution for your .NET Framework projects
 (It works on any app , even if it is written in C# , Visual Basic or F#).
 
 ## Detailed Description
-This .NET Library (__MDCFR__ called) contains anything needed to start and develop easily .NET applications without
-learning , finding or implementing something very specific in .NET . It is a single library which allows someone to easily
+This .NET Framework Library (__MDCFR__ called) contains anything needed to start 
+and develop easily .NET Framework applications without
+learning , finding or implementing something very specific in .NET Framework . 
+It is a single library which allows someone to easily
 include it in the project he works on. Additionally , it provides methods that everyone can use. Just Code ! 
 
 Usage Example:
@@ -28,9 +31,16 @@ Usage Example:
 ```
 
 ## The Project History
-This Project was developed for a need to develop easily .NET Applications , and started as of my own idea.
+This Project was developed for a need to develop easily .NET Framework Applications , and started as of my own idea.
 The intention at the first place was not to post it on GitHub , but it is important to have some code 
-foundation to start your new .NET project. So , this repository contains all of the source code developed
+foundation to start your new .NET Framework project. 
+
+Additionally , .NET Framework support is starting now to wipe out of the map because .NET 6 , 7 and the upcoming 8
+have changed and added a lot of new sets of API's and libraries too. 
+This project aims , as most as possible , to bridge this created gap between .NET Framework 4.8 and
+.NET >= 6 in a single library.
+
+So , this repository contains all of the source code developed
 or included until now. The Library will be also updated with new features and bug fixes as the months come.
 
 ## Avaliable Platforms
@@ -56,19 +66,20 @@ The project includes operations related to:
    __NOTE__: Zstandard archiving is only avaliable as a wrapper with limited functionality.
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
 
-  Additionally , it includes six NuGet packages:
+  Additionally , it includes seven NuGet packages:
   - System.Buffers
   - System.Memory
   - System.Resources.Extensions
   - System.Threading.Tasks.Extensions
   - System.Text.Encoding.CodePages
   - System.Collections.Immutable
+  - System.Threading.Tasks.Dataflow
 
   These packages are embedded in the Project and can be used like the normal NuGet packages.
   The documentation for these is kept by Microsoft , as well as how to use them.
 
 #### Documentation
-The Documentantion explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
+The Documentation explaining how to use this framework is [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/Main.md).
 
 #### Contribution
 Anyone can contribute to this Project.
@@ -77,6 +88,13 @@ However , other contributor not approved by me is not allowed to add new feature
 #### Contact
 For any considerations , ideas or a question relating to the Project can be submitted to the Project's tab "Discussions".
 Any questions relating bugs can be posted as a new Issue and marking them as 'Question'.
+
+#### Adding to this Project your own , and unique project
+I really want to add your own project to this Project , beacuse it may help more people like you!
+
+However , of course , adding a Project has restrictions too. For a set of requirements , see 
+[here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/AddingAProject_Requirements.md) 
+for more information.
 
 #### Source code used in the Project (Licenses for all the used code , among with the Project's one , are located to LICENSE file):
 - Http Library by j6mes at http://github.com/j6mes/httplib .

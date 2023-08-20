@@ -15,3 +15,20 @@ dotnet_diagnostic.CS8618.severity = none
 # Proper warning overrides for MDCFR-EXTERNALCODE.cs file
 dotnet_diagnostic.CS0169.severity = none
 
+[MDCFR-SYSTTD.cs]
+
+# Proper warning overrides for MDCFR-SYSTTD.cs file
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CS8767.severity = none
+dotnet_diagnostic.CS8769.severity = none
+
+[MDCFR-HTTPLIB.cs]
+
+# Proper warning overrides for MDCFR-HTTPLIB.cs file
+dotnet_diagnostic.CS1591.severity = none

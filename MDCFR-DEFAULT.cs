@@ -13,9 +13,7 @@ using System.Runtime.Versioning;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using static System.Windows.Forms.AxHost;
-using System.Security.Policy;
+
 
 namespace ROOT
 {
@@ -254,10 +252,7 @@ namespace ROOT
 		/// <returns>The data read from the console. If any error found , then it will return the <c>"Error"</c> <see cref="System.String"/> .</returns>
         [SupportedOSPlatform("windows")]
         public static System.String ReadConsoleText(ROOT.ConsoleExtensions.ConsoleReadBufferOptions Opt = 
-			ROOT.ConsoleExtensions.ConsoleReadBufferOptions.Default)
-		{
-			return global::ConsoleInterop.ReadFromConsole(Opt);
-		}
+			ROOT.ConsoleExtensions.ConsoleReadBufferOptions.Default) { return global::ConsoleInterop.ReadFromConsole(Opt); }
 
         /// <summary>
         /// This writes a <see cref="System.Char"/>[] to the console. <see cref="System.Console.WriteLine()"/> also 
@@ -2369,15 +2364,12 @@ namespace ROOT
 		/// <summary>
 		/// Enable the Console Diagnostic debugging.
 		/// </summary>
-		public System.Boolean DiagnosticMessages
-		{
-			set { _DIAG_ = value; }
-		}
+		public System.Boolean DiagnosticMessages { set { _DIAG_ = value; } }
 
 		private System.Boolean _CheckPredefinedProperties()
 		{
-			if ((System.String.IsNullOrEmpty(_RootKey_) == false) && (System.String.IsNullOrEmpty(_SubKey_) == false))
-			{ return true; } else { return false; }
+			if ((System.String.IsNullOrEmpty(_RootKey_) == false) && 
+				(System.String.IsNullOrEmpty(_SubKey_) == false)) { return true; } else { return false; }
 		}
 
 		/// <summary>
@@ -2390,7 +2382,7 @@ namespace ROOT
 			if (System.String.IsNullOrEmpty(VariableRegistryMember)) { return "Error"; }
 			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
+				if (_DIAG_) { MAIN.WriteConsoleText("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return "UNDEF_ERR";
 			}
 			System.Object RegEntry = Microsoft.Win32.Registry.GetValue($"{_RootKey_}\\{_SubKey_}", VariableRegistryMember, "_ER_C_");
@@ -2408,8 +2400,8 @@ namespace ROOT
 				{
 					if (_DIAG_)
 					{
-						System.Console.WriteLine("Error - Could not translate the object returned by the procedure.");
-						System.Console.WriteLine("Please check that the entry is not broken , incorrect or in format that is not supported by this editor.");
+						MAIN.WriteConsoleText("Error - Could not translate the object returned by the procedure.");
+						MAIN.WriteConsoleText("Please check that the entry is not broken , incorrect or in format that is not supported by this editor.");
 					}
 					return "Error";
 				}
@@ -2431,12 +2423,12 @@ namespace ROOT
 			}
 			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
+				if (_DIAG_) { MAIN.WriteConsoleText("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			if (RegistryData == null)
 			{
-				if (_DIAG_) { System.Console.WriteLine("ERROR: 'null' value detected in RegistryData object. Maybe invalid definition?"); }
+				if (_DIAG_) { MAIN.WriteConsoleText("ERROR: 'null' value detected in RegistryData object. Maybe invalid definition?"); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryValueKind RegType_;
@@ -2457,7 +2449,7 @@ namespace ROOT
 			{
 				if (_DIAG_)
 				{
-					System.Console.WriteLine($"ERROR: Unknown registry value type argument in the object creator was given: {RegistryType}");
+					MAIN.WriteConsoleText($"ERROR: Unknown registry value type argument in the object creator was given: {RegistryType}");
 				}
 				return RegFunctionResult.InvalidRootKey;
 			}
@@ -2469,8 +2461,8 @@ namespace ROOT
 			{
 				if (_DIAG_)
 				{
-					System.Console.WriteLine($"ERROR: Could not create key {VariableRegistryMember} . Invalid name maybe?");
-					System.Console.WriteLine($"Error Raw Data: {EX}");
+					MAIN.WriteConsoleText($"ERROR: Could not create key {VariableRegistryMember} . Invalid name maybe?");
+					MAIN.WriteConsoleText($"Error Raw Data: {EX}");
 				}
 				return RegFunctionResult.Error;
 			}
@@ -2487,7 +2479,7 @@ namespace ROOT
 			if (System.String.IsNullOrEmpty(VariableRegistryMember)) { return RegFunctionResult.Error; }
 			if (!_CheckPredefinedProperties())
 			{
-				if (_DIAG_) { System.Console.WriteLine("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
+				if (_DIAG_) { MAIN.WriteConsoleText("Error - Cannot initiate the Internal editor due to an error: Properties that point the searcher are undefined."); }
 				return RegFunctionResult.Misdefinition_Error;
 			}
 			Microsoft.Win32.RegistryKey ValueDelete;
@@ -2514,8 +2506,8 @@ namespace ROOT
 				default:
 					if (_DIAG_)
 					{
-						System.Console.WriteLine("Error - Registry root key could not be get. Incorrect Root Key Detected.");
-						System.Console.WriteLine("Error while getting the root key: Root Key " + _RootKey_ + "Is invalid.");
+						MAIN.WriteConsoleText("Error - Registry root key could not be get. Incorrect Root Key Detected.");
+						MAIN.WriteConsoleText("Error while getting the root key: Root Key " + _RootKey_ + "Is invalid.");
 					}
 					return RegFunctionResult.Misdefinition_Error;
 			}
@@ -2939,7 +2931,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					DMF.ErrorCode = "Error";
 					return DMF;
 				}
@@ -2981,7 +2973,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return;
 				}
 				MDA.Dispose();
@@ -3059,7 +3051,7 @@ namespace ROOT
 				try { FSI = System.IO.File.OpenRead(FilePath); }
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				try
@@ -3068,7 +3060,7 @@ namespace ROOT
 				{
 					FSI.Close();
 					FSI.Dispose();
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				try
@@ -3080,7 +3072,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				finally
@@ -3565,7 +3557,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -3587,7 +3579,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -3605,7 +3597,7 @@ namespace ROOT
 			{
 				if ((!(System.IO.File.Exists(PathofZipToCreate))) && (System.Convert.ToInt32(ArchModeSelector) != 2))
 				{
-					System.Console.WriteLine("Cannot Call 'InitZipFileStream' method with the argument ArchModeSelector set to " + ArchModeSelector + " and PathOfZipToMake: " + PathofZipToCreate + " resolves to False.");
+					MAIN.WriteConsoleText("Cannot Call 'InitZipFileStream' method with the argument ArchModeSelector set to " + ArchModeSelector + " and PathOfZipToMake: " + PathofZipToCreate + " resolves to False.");
 					return null;
 				}
 				try
@@ -3614,7 +3606,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return null;
 				}
 			}
@@ -3638,7 +3630,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -3665,7 +3657,7 @@ namespace ROOT
 				}
 				catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				finally
@@ -4008,7 +4000,7 @@ namespace ROOT
 					CI.Unpack(DestDir);
 				} catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -4033,7 +4025,7 @@ namespace ROOT
 					CI.PackFiles(FI.DirectoryName, IL, IL);
 				} catch (System.Exception EX)
 				{
-					System.Console.WriteLine(EX.Message);
+					MAIN.WriteConsoleText(EX.Message);
 					return false;
 				}
 				return true;
@@ -4104,17 +4096,18 @@ namespace ROOT
 	 * 
 	 * Create a new variable that represents this class with one of the available constructors.
 	 * then , make a new thread like this:
-	 * \\ System.Threading.Thread ClassThread = new Thread(new ThreadStart(ClassInitalisator.Invoke));
+	 * -> System.Threading.Thread ClassThread = new Thread(new ThreadStart(ClassInitailizator.Invoke));
 	 * which will register the thread. Be noted that the thread must only be invoked by the Invoke() function.
 	 * Use then the ClassThread.Start();
 	 * to show the progress bar to the user.
-	 * use then each time ClassThread.UpdateProgress(); to update the progress indicator specified by the step given.
+	 * Use then each time ClassThread.UpdateProgress(); to update the progress indicator specified by the step given.
 	 * This will finished when the value presented is equal or more to the stop barrier(Which of this case is the end)
 	 * But this class has many , many other features ,like changing the progress message at executing time ,
 	 * breaking the bar before it ends , and setting the min/max values allowed and the step , which is also allowed to be
 	 * a negative number.
 	 *
-	 * I have also here an function example , which defines and controls the message itself.
+	 * I have also here an function example , which defines and controls the message itself. 
+	 * ->
 	 * using ROOT;
 	 * 
 	 * public static void Test()
@@ -4135,6 +4128,7 @@ namespace ROOT
 		   FG = null;
 		   CB = null;
 	   }
+		<-
 	*/
 
 	internal class ProgressChangedArgs : System.EventArgs
@@ -4988,14 +4982,24 @@ namespace ROOT
 	namespace RandomNumbers
 	{
 
-		/// <summary>
-		/// <see cref="IRandomBase"/> is an interface which allows the random number generators
-		/// to easily implement the random number generation mechanism.
-		/// </summary>
-		public interface IRandomBase : System.IDisposable
+       /* 
+         * Written in 2018 by David Blackman and Sebastiano Vigna (vigna@acm.org)
+         *
+		 * To the extent possible under law, the author has dedicated all copyright
+		 * and related and neighboring rights to this software to the public domain
+		 * worldwide. This software is distributed without any warranty.
+		 *
+		 *	See <http://creativecommons.org/publicdomain/zero/1.0/>. 
+		 */
+
+        /// <summary>
+        /// <see cref="IRandomBase"/> is an interface which allows the random number generators
+        /// to easily implement the random number generation mechanism.
+        /// </summary>
+        public interface IRandomBase : System.IDisposable
 		{
 			/// <summary>
-			/// Inherited from <see cref="System.IDisposable"/> interface.
+			/// Inherited from the <see cref="System.IDisposable"/> interface.
 			/// The random instance must dispose the seed and the state instances.
 			/// </summary>
 			public new abstract void Dispose();
@@ -5011,6 +5015,13 @@ namespace ROOT
 			/// and just implement a constructor which would allow to set an seed.
 			/// </summary>
 			public abstract System.Int32 Seed { get; set; }
+			
+			/// <summary>
+			/// Gets a value whether the algorithm is optimized for 32-Bit machines.
+			/// If <see langword="false"/> , it indicates that the random 
+			/// algorithm is optimized for 64-Bit machines.
+			/// </summary>
+			public abstract System.Boolean Is32Bit { get; }
 
 		}
 
@@ -5026,7 +5037,7 @@ namespace ROOT
         /// faster(but it has a very mild bias, see notes in the comments).
 		/// </para>
         /// </summary>
-        public class Xoroshiro128PP : IRandomBase
+        public sealed class Xoroshiro128PP : IRandomBase
 		{
 			private System.UInt64[] _STATE = new System.UInt64[2];
 			private static System.UInt64[] JUMP = { 0x2bd7a6a6e99c2ddc, 0x0992ccaf6a6fca05 };
@@ -5034,9 +5045,10 @@ namespace ROOT
 			private System.UInt64 _SEED = 0;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private System.UInt64 rotl(System.UInt64 x, int k) {
-				return (x << k) | (x >> (64 - k));
-			}
+            private System.UInt64 rotl(System.UInt64 x, int k) { return (x << k) | (x >> (64 - k)); }
+
+			/// <inheritdoc />
+			public System.Boolean Is32Bit { get { return true; } }
 
 			/// <summary>
 			/// Create a new instance of <see cref="Xoroshiro128PP"/> with a default seed value of 0.
@@ -5046,7 +5058,7 @@ namespace ROOT
             /// <summary>
             /// Create a new instance of <see cref="Xoroshiro128PP"/> with the seed value specified.
             /// </summary>
-            /// <param name="Seed"></param>
+            /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
             public Xoroshiro128PP(System.Int32 Seed)
 			{
 				_SEED = (System.UInt64) Seed;
@@ -5147,6 +5159,426 @@ namespace ROOT
                 _STATE[1] = s1;
             }
 
+        }
+
+        /// <summary>
+        /// <para>
+        /// This is xoshiro128+ 1.0, our best and fastest 32-bit generator for 32-bit
+        /// floating-point numbers.We suggest to use its upper bits for
+        /// floating-point generation, as it is slightly faster than xoshiro128**.
+        /// It passes all tests we are aware of except for
+        /// linearity tests, as the lowest four bits have low linear complexity, so
+        /// if low linear complexity is not considered an issue (as it is usually
+        /// the case) it can be used to generate 32-bit outputs, too.
+        /// </para>
+        /// <para>
+        /// We suggest to use a sign test to extract a random Boolean value, and right shifts to extract subsets of bits.
+        /// </para>
+        /// </summary>
+        public sealed class Xoroshiro128P : IRandomBase
+		{
+			private static System.UInt32[] JUMP = { 0x8764000b, 0xf542d2d3, 0x6fa035c3, 0x77f2db5b };
+			private static System.UInt32[] LONG_JUMP = { 0xb523952e, 0x0b6f099f, 0xccf5a0ef, 0x1c580662 };
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private System.UInt32 rotl(System.UInt32 x, int k) { return (x << k) | (x >> (32 - k)); }
+			private static System.UInt32[] STATE = new System.UInt32[4];
+            private System.UInt32 _SEED = 0;
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro128P"/> with a default seed value of 0.
+            /// </summary>
+            public Xoroshiro128P() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro128P"/> with the seed value specified.
+            /// </summary>
+            /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
+            public Xoroshiro128P(System.Int32 Seed)
+            {
+                _SEED = (System.UInt32) Seed;
+                if ((Seed / 2) != 0) { STATE[0] = (System.UInt32) Seed / 2; } else { STATE[0] = _SEED * 2; }
+                STATE[1] = (STATE[0] + (System.UInt32) Seed) ^ 2;
+            }
+
+            /// <summary>
+            /// Sets or gets the SEED number for this instance.
+            /// </summary>
+            public System.Int32 Seed
+            {
+                get { return (System.Int32)_SEED; }
+                set
+                {
+                    _SEED = (System.UInt32) value;
+                    if ((_SEED / 2) != 0) { STATE[0] = _SEED / 2; } else { STATE[0] = _SEED * 2; }
+                    STATE[1] = (STATE[0] + _SEED) ^ 2;
+                }
+            }
+
+            /// <summary>
+            /// Produce a new <see cref="Xoroshiro128P"/> random number.
+            /// </summary>
+            /// <returns>A new <see cref="Xoroshiro128P"/> random number.</returns>
+            public System.UInt64 Next()
+			{
+                System.UInt32 result = STATE[0] + STATE[3];
+                System.UInt32 t = STATE[1] << 9;
+                STATE[2] ^= STATE[0];
+                STATE[3] ^= STATE[1];
+                STATE[1] ^= STATE[2];
+                STATE[0] ^= STATE[3];
+                STATE[2] ^= t;
+                STATE[3] = rotl(STATE[3], 11);
+                return result;
+            }
+
+            /// <summary>
+            /// This is the jump function for the generator. It is equivalent
+            /// to 2^64 calls to Next(); it can be used to generate 2^64
+			/// non-overlapping subsequences for parallel computations.
+			/// </summary>
+			public void Jump()
+			{
+                System.UInt32 s0 = 0;
+                System.UInt32 s1 = 0;
+                System.UInt32 s2 = 0;
+                System.UInt32 s3 = 0;
+				for (int i = 0; i < JUMP.Length; i++)
+				{
+					for (int b = 0; b < 32; b++)
+					{
+						if ((JUMP[i] & 1 << b) != 0)
+						{
+							s0 ^= STATE[0];
+							s1 ^= STATE[1];
+							s2 ^= STATE[2];
+							s3 ^= STATE[3];
+						}
+						Next();
+					}
+				}
+                STATE[0] = s0;
+                STATE[1] = s1;
+                STATE[2] = s2;
+                STATE[3] = s3;
+            }
+
+            /// <inheritdoc />
+            public System.Boolean Is32Bit { get { return true; } }
+
+            /// <summary>
+            /// This is the long-jump function for the generator. It is equivalent to
+            /// 2^96 calls to Next(); it can be used to generate 2^32 starting points,
+            /// from each of which Jump() will generate 2^32 non-overlapping
+            /// subsequences for parallel distributed computations.
+            /// </summary>
+            public void Long_Jump() 
+			{
+                System.UInt32 s0 = 0;
+                System.UInt32 s1 = 0;
+                System.UInt32 s2 = 0;
+                System.UInt32 s3 = 0;
+				for (int i = 0; i < LONG_JUMP.Length; i++)
+				{
+					for (int b = 0; b < 32; b++)
+					{
+						if ((LONG_JUMP[i] & 1 << b) != 0)
+						{
+							s0 ^= STATE[0];
+							s1 ^= STATE[1];
+							s2 ^= STATE[2];
+							s3 ^= STATE[3];
+						}
+						Next();
+					}
+				}
+                STATE[0] = s0;
+                STATE[1] = s1;
+                STATE[2] = s2;
+                STATE[3] = s3;
+            }
+
+            /// <summary>
+            /// Disposes the <see cref="Xoroshiro128P"/> instance.
+            /// </summary>
+            public void Dispose() { STATE = null; JUMP = null; LONG_JUMP = null; }
+
+        }
+
+        /// <summary>
+        /// <para>
+        /// This is xoroshiro128** 1.0, one of our all-purpose, rock-solid,
+        /// small-state generators.It is extremely (sub-ns) fast and it passes all
+        /// tests we are aware of, but its state space is large enough only for
+        /// mild parallelism.
+        /// </para>
+        /// <para>
+        /// For generating just floating-point numbers, xoroshiro128+ is even
+        /// faster(but it has a very mild bias, see notes in the comments).
+		/// </para>
+		/// </summary>
+		public sealed class Xoroshiro128SS : IRandomBase
+		{
+            private System.UInt64[] STATE = new System.UInt64[2];
+			private static System.UInt64[] JUMP = { 0xdf900294d8f554a5, 0x170865df4b3201fc };
+			private static System.UInt64[] LONG_JUMP = { 0xd2a98b26625eee7b, 0xdddf9b1090aa7ac1 };
+            private System.UInt64 _SEED = 0;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private System.UInt64 rotl(System.UInt64 x, int k) { return (x << k) | (x >> (64 - k)); }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro128SS"/> with a default seed value of 0.
+            /// </summary>
+            public Xoroshiro128SS() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro128SS"/> with the seed value specified.
+            /// </summary>
+            /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
+            public Xoroshiro128SS(System.Int32 Seed)
+            {
+                _SEED = (System.UInt32) Seed;
+                if ((Seed / 2) != 0) { STATE[0] = (System.UInt32)Seed / 2; } else { STATE[0] = _SEED * 2; }
+                STATE[1] = (STATE[0] + (System.UInt32)Seed) ^ 2;
+            }
+
+            /// <inheritdoc />
+            public System.Boolean Is32Bit { get { return true; } }
+
+            /// <summary>
+            /// Sets or gets the SEED number for this instance.
+            /// </summary>
+            public System.Int32 Seed
+            {
+                get { return (System.Int32) _SEED; }
+                set
+                {
+                    _SEED = (System.UInt64) value;
+                    if ((_SEED / 2) != 0) { STATE[0] = _SEED / 2; } else { STATE[0] = _SEED * 2; }
+                    STATE[1] = (STATE[0] + _SEED) ^ 2;
+                }
+            }
+
+            /// <summary>
+            /// Produce a new <see cref="Xoroshiro128SS"/> random number.
+            /// </summary>
+            /// <returns>A new <see cref="Xoroshiro128SS"/> random number.</returns>
+            public System.UInt64 Next()
+			{
+                System.UInt64 s0 = STATE[0];
+                System.UInt64 s1 = STATE[1];
+                System.UInt64 result = rotl(s0 * 5, 7) * 9;
+
+                s1 ^= s0;
+                STATE[0] = rotl(s0, 24) ^ s1 ^ (s1 << 16); // a, b
+                STATE[1] = rotl(s1, 37); // c
+
+                return result;
+            }
+
+            /// <summary>
+			/// This is the jump function for the generator. It is equivalent
+			/// to 2^64 calls to Next(); it can be used to generate 2^64
+			/// non-overlapping subsequences for parallel computations.
+			/// </summary>
+            public void Jump()
+			{
+                System.UInt64 s0 = 0;
+                System.UInt64 s1 = 0;
+				for (int i = 0; i < JUMP.Length; i++)
+				{
+					for (int b = 0; b < 64; b++)
+					{
+						if ((JUMP[i] & (System.UInt64) (1 << b)) != 0)
+						{
+							s0 ^= STATE[0];
+							s1 ^= STATE[1];
+						}
+						Next();
+					}
+				}
+                STATE[0] = s0;
+                STATE[1] = s1;
+            }
+
+			/// <summary>
+			/// This is the long-jump function for the generator. It is equivalent to
+			/// 2^96 calls to Next(); it can be used to generate 2^32 starting points,
+			/// from each of which Jump() will generate 2^32 non-overlapping
+			/// subsequences for parallel distributed computations
+            /// </summary>
+            public void Long_Jump()
+			{
+				System.UInt64 s0 = 0;
+                System.UInt64 s1 = 0;
+				for (int i = 0; i < LONG_JUMP.Length; i++)
+				{
+					for (int b = 0; b < 64; b++)
+					{
+						if ((LONG_JUMP[i] & (System.UInt64)(1 << b)) != 0)
+						{
+							s0 ^= STATE[0];
+							s1 ^= STATE[1];
+						}
+						Next();
+					}
+				}
+                STATE[0] = s0;
+                STATE[1] = s1;
+            }
+
+            /// <summary>
+            /// Disposes the <see cref="Xoroshiro128SS"/> instance.
+            /// </summary>
+            public void Dispose() { STATE = null; JUMP = null; LONG_JUMP = null; }
+		}
+
+        /// <summary>
+        /// <para>
+        /// This is xoroshiro64* 1.0, our best and fastest 32-bit small-state
+        /// generator for 32-bit floating-point numbers.We suggest to use its
+        /// upper bits for floating-point generation, as it is slightly faster than
+        /// xoroshiro64**. It passes all tests we are aware of except for linearity
+        /// tests, as the lowest six bits have low linear complexity, so if low
+        /// linear complexity is not considered an issue (as it is usually the
+        /// case) it can be used to generate 32-bit outputs, too.
+        /// </para>
+        /// <para>
+        /// We suggest to use a sign test to extract a random Boolean value, and right shifts to extract subsets of bits.
+        /// </para>
+        /// </summary>
+        public sealed class Xoroshiro64S : IRandomBase
+		{
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private System.UInt32 rotl(System.UInt32 x, int k) { return (x << k) | (x >> (32 - k)); }
+            private static System.UInt32[] STATE = new System.UInt32[2];
+            private System.UInt32 _SEED = 0;
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro64S"/> with a default seed value of 0.
+            /// </summary>
+            public Xoroshiro64S() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
+
+            /// <summary>
+            /// Produce a new <see cref="Xoroshiro64S"/> random number.
+            /// </summary>
+            /// <returns>A new <see cref="Xoroshiro64S"/> random number.</returns>
+            public System.UInt64 Next()
+			{
+                System.UInt32 s0 = STATE[0];
+                System.UInt32 s1 = STATE[1];
+                System.UInt32 result = s0 * 0x9E3779BB;
+
+                s1 ^= s0;
+                STATE[0] = rotl(s0, 26) ^ s1 ^ (s1 << 9); // a, b
+                STATE[1] = rotl(s1, 13); // c
+
+                return result;
+            }
+
+            /// <summary>
+            /// Sets or gets the SEED number for this instance.
+            /// </summary>
+            public System.Int32 Seed
+            {
+                get { return (System.Int32)_SEED; }
+                set
+                {
+                    _SEED = (System.UInt32)value;
+                    if ((_SEED / 2) != 0) { STATE[0] = _SEED / 2; } else { STATE[0] = _SEED * 2; }
+                    STATE[1] = (STATE[0] + _SEED) ^ 2;
+                }
+            }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro64S"/> with the seed value specified.
+            /// </summary>
+            /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
+            public Xoroshiro64S(System.Int32 Seed)
+            {
+                _SEED = (System.UInt32)Seed;
+                if ((Seed / 2) != 0) { STATE[0] = (System.UInt32)Seed / 2; } else { STATE[0] = _SEED * 2; }
+                STATE[1] = (STATE[0] + (System.UInt32)Seed) ^ 2;
+            }
+
+            /// <summary>
+            /// Disposes the <see cref="Xoroshiro64S"/> instance.
+            /// </summary>
+            public void Dispose() { STATE = null; _SEED = 0; }
+
+            /// <inheritdoc />
+            public System.Boolean Is32Bit { get { return true; } }
+
+        }
+
+        /// <summary>
+        /// <para>
+        /// This is xoroshiro64** 1.0, our 32-bit all-purpose, rock-solid,
+        /// small-state generator.It is extremely fast and it passes all tests we
+        /// are aware of, but its state space is not large enough for any parallel
+        /// application.
+        /// </para>
+        /// <para>
+        /// For generating just single-precision (i.e., 32-bit) floating-point numbers, xoroshiro64* is even faster.
+        /// </para>
+        /// </summary>
+        public sealed class Xoroshiro64SS : IRandomBase 
+		{
+            [MethodImpl(MethodImplOptions.AggressiveInlining)] private System.UInt32 rotl(System.UInt32 x, int k) { return (x << k) | (x >> (32 - k)); }
+            private static System.UInt32[] STATE = new System.UInt32[2];
+            private System.UInt32 _SEED = 0;
+
+			/// <summary>
+			/// Create a new instance of <see cref="Xoroshiro64SS"/> with a default seed value of 0.
+			/// </summary>
+			public Xoroshiro64SS() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
+
+            /// <summary>
+            /// Create a new instance of <see cref="Xoroshiro64SS"/> with the seed value specified.
+            /// </summary>
+            /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
+            public Xoroshiro64SS(System.Int32 Seed)
+            {
+                _SEED = (System.UInt32) Seed;
+                if ((Seed / 2) != 0) { STATE[0] = (System.UInt32) Seed / 2; } else { STATE[0] = _SEED * 2; }
+                STATE[1] = (STATE[0] + (System.UInt32) Seed) ^ 2;
+            }
+
+            /// <summary>
+            /// Produce a new <see cref="Xoroshiro64SS"/> random number.
+            /// </summary>
+            /// <returns>A new <see cref="Xoroshiro64SS"/> random number.</returns>
+            public System.UInt64 Next()
+			{
+				System.UInt32 s0 = STATE[0];
+                System.UInt32 s1 = STATE[1];
+                System.UInt32 result = rotl(s0 * 0x9E3779BB, 5) * 5;
+
+                s1 ^= s0;
+                STATE[0] = rotl(s0, 26) ^ s1 ^ (s1 << 9); // a, b
+                STATE[1] = rotl(s1, 13); // c
+
+                return result;
+            }
+
+            /// <summary>
+            /// Sets or gets the SEED number for this instance.
+            /// </summary>
+            public System.Int32 Seed
+            {
+                get { return (System.Int32)_SEED; }
+                set
+                {
+                    _SEED = (System.UInt32)value;
+                    if ((_SEED / 2) != 0) { STATE[0] = _SEED / 2; } else { STATE[0] = _SEED * 2; }
+                    STATE[1] = (STATE[0] + _SEED) ^ 2;
+                }
+            }
+
+            /// <summary>
+            /// Disposes the <see cref="Xoroshiro64SS"/> instance.
+            /// </summary>
+            public void Dispose() { STATE = null; _SEED = 0; }
+
+            /// <inheritdoc />
+            public System.Boolean Is32Bit { get { return true; } }
         }
 
     }
@@ -5261,6 +5693,9 @@ namespace ROOT
 		/// Adds empty entries specified by the <paramref name="Times"/> <see cref="System.Int32"/> .
 		/// </summary>
 		/// <param name="Times">The number of empty entries to add.</param>
+		[System.Runtime.ConstrainedExecution.ReliabilityContract(
+			System.Runtime.ConstrainedExecution.Consistency.MayCorruptAppDomain , 
+			System.Runtime.ConstrainedExecution.Cer.MayFail)]
 		public void AddEntries(System.Int32 Times) { for (System.Int32 I = 0; I < Times; I++) { _dict.Add(Iter++, 0); } }
 
 		/// <inheritdoc />
@@ -5693,11 +6128,7 @@ namespace ROOT
         /// </summary>
         /// <param name="FC">The foreground color to specify.</param>
         /// <param name="BK">The background color to specify.</param>
-        public STDColors(STDFrontColor FC, STDBackColor BK)
-        {
-            FrontColor = FC;
-            BackColor = BK;
-        }
+        public STDColors(STDFrontColor FC, STDBackColor BK) { FrontColor = FC; BackColor = BK; }
     }
 
 #pragma warning disable CS1591
@@ -5778,7 +6209,7 @@ namespace ROOT
 	/// from strings that contain messages colored as specified.
 	/// </para>
 	/// <para>
-	/// This class contains static methods to do serialisation/deserialisation.
+	/// This class contains static methods to do serialisation/deserialisation of this format.
 	/// </para>
 	/// </summary>
 	/// <remarks>The STD format is an easy style outlining definition which can be used to a number of applications.
@@ -5809,7 +6240,8 @@ namespace ROOT
 				default: return (STDFrontColor) (-2);
 			}
 		}
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static STDBackColor ParseBackColor(System.String C)
         {
             switch (C.ToUpperInvariant())
@@ -5833,7 +6265,8 @@ namespace ROOT
                 default: return (STDBackColor) (-2);
             }
         }
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static System.String ParseFrontColorS(STDFrontColor C)
 		{
 			return C switch
@@ -5857,7 +6290,8 @@ namespace ROOT
 				_ => ""
 			};
 		}
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static System.String ParseBackColorS(STDBackColor C)
 		{
             return C switch
@@ -6027,7 +6461,12 @@ namespace ROOT
 						Back = null;
 						slicer = null;
 					}
-				} catch 
+				} catch (System.InvalidOperationException EX) 
+				{
+					// For fatal parser errors , rethrow the particular exception.
+					throw new InvalidOperationException("Could not deserialise the given data.\n", EX);
+				}
+				catch 
 				{
                     // Parser error. In this case , add a new invalid item.
                     STD.AddInvalidItem(Runner);
@@ -6074,7 +6513,8 @@ namespace ROOT
 					BK = ParseBackColorS(STDL.Colors.BackColor);
 					if (FR == "") { throw new AggregateException("The Front Color string could not be parsed."); }
                     if (BK == "") { throw new AggregateException("The Back Color string could not be parsed."); }
-                    Result += $"{STDConstants.STRING}{STDL.Data}{STDConstants.STRING}{STDConstants.SEPERATOR}{STDConstants.STRING}" +
+                    Result += $"{STDConstants.STRING}{STDL.Data}{STDConstants.STRING}" +
+						$"{STDConstants.SEPERATOR}{STDConstants.STRING}" +
 						$"{FR}{STDConstants.STRING}{STDConstants.SEPERATOR}{STDConstants.STRING}" +
 						$"{BK}{STDConstants.STRING}\n";
 					FR = null;
@@ -6429,7 +6869,8 @@ namespace ROOT
         /// <summary>
         /// Gets the underlying KERNEL32 handle which this implementation uses to read from the console.
         /// </summary>
-        /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for reading from the console.</returns>
+        /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for reading data 
+		/// from the console.</returns>
         [System.Security.SecurityCritical]
         public static System.IntPtr GetInputHandle()
         {
@@ -6521,7 +6962,7 @@ namespace ROOT
 				{
 					try
 					{
-						TI = System.Text.Encoding.GetEncoding((System.Int32)CP);
+						TI = System.Text.Encoding.GetEncoding((System.Int32) CP);
 						return TI;
 					} catch (System.Exception EX)
 					{
@@ -6535,7 +6976,7 @@ namespace ROOT
 			set 
 			{
 				System.UInt32 CP = (System.UInt32) value.CodePage;
-				if (ConsoleInterop.SetInputEnc(CP) == 0) 
+				if (ConsoleInterop.SetOutputEnc(CP) == 0) 
 				{
 					throw new InvalidOperationException("Cannot apply the specific code page as a console output encoding. \n" +
 						$"Code Page Identifier: {CP} \n" +
@@ -6796,12 +7237,10 @@ namespace ExternalHashCaculators
     //A Collection Namespace for computing hash values from external generated libraries.
 
     /// <summary>
-    /// <para> xxHash is a fast non-cryptographic hash digest. </para> 
+    /// <para> xxHash is a really fast non-cryptographic hash digest. </para> 
 	/// <para>
 	/// This is a wrapper for the unmanaged library.
-    /// Note that you can run this only on AMD64 machines and you must have the library where the 
-    /// application's current directory is.
-	/// </para>
+    /// Note that you can run this only on AMD64 machines only. </para>
     /// </summary>
     [SupportedOSPlatform("windows")]
     public static class XXHash
@@ -6814,29 +7253,24 @@ namespace ExternalHashCaculators
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         private static System.Boolean _CheckDLLVer()
 		{
-			if (!(System.IO.File.Exists(@".\xxhash.dll"))) {return false;}
 			if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
-			if (XXHASHMETHODS.XXH_versionNumber() < 00801) 
-			{
-				return false;
-			}
-			else
-			{return true;}
+			if (XXHASHMETHODS.XXH_versionNumber() < 00801) { return false; } else { return true; }
 		}
-		
-		private sealed class XXHASHMETHODS
+
+        [System.Security.SuppressUnmanagedCodeSecurity]
+        private sealed class XXHASHMETHODS
 		{
-			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.XXHash)]
 			[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 			public static extern System.Int32 XXH32(System.Byte[] buffer ,
 			System.Int32 size ,System.Int32 seed = 0);
 			
-			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.XXHash)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 XXH64(System.Byte[] buffer ,
 			System.Int32 size ,System.Int32 seed = 0);
 			
-			[System.Runtime.InteropServices.DllImport(@".\xxhash.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.XXHash)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 XXH_versionNumber();
 		}
@@ -7072,11 +7506,53 @@ namespace ExternalArchivingMethods
     // A Collection Namespace for making archives outside Microsoft's managed code.
 
     /// <summary>
+    /// Zstandard archiving compression level.
+    /// </summary>
+    public enum ZSTDCMPLevel : System.Int32
+    {
+        /// <summary>
+        /// Fast compression.
+        /// </summary>
+        Fast = 1,
+        /// <summary>
+        /// Fast compression , but compresses slightly better than <see cref="ZSTDCMPLevel.Fast"/>.
+        /// </summary>
+        Fast2 = 2,
+        /// <summary>
+        /// Good compression.
+        /// </summary>
+        Efficient = 3,
+        /// <summary>
+        /// A bit better from the <see cref="Efficient"/> compression level.
+        /// </summary>
+        Lazy = 4,
+        /// <summary>
+        /// An balanced compression level. This one is the most popular option.
+        /// </summary>
+        Lazy2 = 5,
+        /// <summary>
+        /// The files are compressed about an estimated 62-71% ratio.
+        /// </summary>
+        LazyOptimized = 6,
+        /// <summary>
+        /// The files are compressed about an estimated 71-80% ratio.
+        /// </summary>
+        Optimal = 7,
+        /// <summary>
+        /// The files are compressed about an estimated 80-85% ratio.
+        /// </summary>
+        Ultra = 8,
+        /// <summary>
+        /// The Zstandard algorithm will consume as much as possible resources to compress the target as much as possible.
+        /// </summary>
+        FullCompressPower = 9,
+    }
+
+    /// <summary>
     /// <para> zstd is a fast compression algorithm maintained by Facebook. </para> 
 	/// <para>
 	/// This is a wrapper for the unmanaged library.
-    /// Note that you can run this only on AMD64 machines and you must have the library where the 
-    /// application's current directory is. </para>
+    /// Note that you can run this only on AMD64 machines only. </para>
     /// </summary>
     [SupportedOSPlatform("windows")]
     public static class ZstandardArchives
@@ -7087,9 +7563,8 @@ namespace ExternalArchivingMethods
         //    1. The Dynamic-Link Library for the archive format is native C++.
         //    2. This format is very efficient. It can compress and decompress data very fast.
         //    3. The C algorithm that is comprised from is one of the most fast programming languages.
-        //    4. The project has only ported the original DLL. If you want to use this class , make sure
-        //    that you have ported that DLL to .\ . Note that you cannot run earlier versions than 1.5.2.0.
-        // NOTICE: the zstd.dll bundled with my API is being built by me.
+        //    4. Note that you cannot run earlier versions than 1.5.2.0.
+        // NOTICE: the zstd.dll bundled with my library is being built by me.
         // Because actually this API calls the library via unmanaged way (Not very safe)
         // and requires the DLL path , use only updates which are either came from GitHub or other source that
         // is reliable. However , it is still very safe and stable , of course.
@@ -7097,92 +7572,49 @@ namespace ExternalArchivingMethods
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         private static System.Boolean _CheckDLLVer()
 		{
-			if (System.IO.File.Exists(".\\zstd.dll") == false) { return false; }
 			if (ROOT.MAIN.OSProcessorArchitecture() != "AMD64") { return false; }
 			if (ZSTD.ZSTD_versionNumber() < 10502) { return false; } else  { return true; }
 		}
-		
-		/// <summary>
-		/// Zstandard archiving compression level.
-		/// </summary>
-		public enum ZSTDCMPLevel : System.Int32
-		{
-			/// <summary>
-			/// Fast compression.
-			/// </summary>
-			Fast = 1,
-			/// <summary>
-			/// Fast compression , but compresses slightly better than <see cref="ZSTDCMPLevel.Fast"/>.
-			/// </summary>
-			Fast2 = 2,
-			/// <summary>
-			/// Good compression.
-			/// </summary>
-			Efficient = 3,
-			/// <summary>
-			/// A bit better from the <see cref="Efficient"/> compression level.
-			/// </summary>
-			Lazy = 4,
-			/// <summary>
-			/// An balanced compression level. This one is the most popular option.
-			/// </summary>
-			Lazy2 = 5,
-			/// <summary>
-			/// The files are compressed about an estimated 62-71% ratio.
-			/// </summary>
-			LazyOptimized = 6,
-            /// <summary>
-            /// The files are compressed about an estimated 71-80% ratio.
-            /// </summary>
-            Optimal = 7,
-            /// <summary>
-            /// The files are compressed about an estimated 80-85% ratio.
-            /// </summary>
-            Ultra = 8,
-			/// <summary>
-			/// The Zstandard algorithm will consume as much as possible resources to compress the target as much as possible.
-			/// </summary>
-			FullCompressPower = 9,
-		}
-		
-		private sealed class ZSTD
+
+        [System.Security.SuppressUnmanagedCodeSecurity]
+        private sealed class ZSTD
 		{
 			// Proper API Calls defined in this class. DO NOT Modify.
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_compress(System.Byte[] dst ,System.Int32 dstCapacity , 
 			System.Byte[] src ,System.Int32 srcCapacity ,ZSTDCMPLevel compressionLevel);
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_decompress(System.Byte[] dst ,System.Int32 dstCapacity , 
 			System.Byte[] src ,System.Int32 srcSize);
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int64 ZSTD_getFrameContentSize(System.Byte[] src ,System.Int32 srcSize);
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_isError(System.Int32 code);
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_findFrameCompressedSize(System.Byte[] src ,System.Int32 srcSize);
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_defaultCLevel();
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_minCLevel();
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_maxCLevel();
 			
-			[System.Runtime.InteropServices.DllImport(@".\zstd.dll")]
+			[System.Runtime.InteropServices.DllImport(Interop.Libraries.Zstd)]
             [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
             public static extern System.Int32 ZSTD_versionNumber();
 			
@@ -7369,5 +7801,5 @@ internal static class mdcdi1315
 	/// <summary>
 	/// A URL link which mentions the source code repository.
 	/// </summary>
-    public const System.String SourceLink = "https://github.com/mdcdi1315/mdcframework";
+    public const System.String SourceLink = "http://github.com/mdcdi1315/mdcframework";
 }

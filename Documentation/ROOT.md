@@ -1309,4 +1309,823 @@ interface. Please see the documentation of the
 [IndexOf Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1.indexof?view=netframework-4.8)
 for more information about it.
 
+#### 8. The Insert method:
+CSharp Declaration:
+~~~C#
+public void Insert(System.Int32 Index, System.Byte Value)
+~~~
 
+This method is an implemented member of the  [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Insert Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1.insert?view=netframework-4.8)
+for more information about it.
+
+#### 9. The Remove method:
+CSharp Declaration:
+~~~C#
+public System.Boolean Remove(System.Byte item)
+~~~
+
+This method is an implemented member of the [ICollection](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[Remove Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.icollection-1.remove?view=netframework-4.8)
+for more information about it.
+
+#### 10. The RemoveAt method:
+CSharp Declaration:
+~~~C#
+public void RemoveAt(System.Int32 Index)
+~~~
+
+This method is an implemented member of the  [IList](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1?view=netframework-4.8)
+interface. Please see the documentation of the 
+[RemoveAt Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ilist-1.removeat?view=netframework-4.8)
+for more information about it.
+
+#### 11. The ToArray method:
+CSharp Declaration:
+~~~C#
+public void System.Byte[] ToArray()
+~~~
+This method creates a new byte array that contains the data that the instance contains.
+
+ __Returns__: A new `System.Byte[]` containing the instance data.
+
+#### 12. The ToString method:
+CSharp Declaration:
+~~~C#
+[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+public override System.String ToString()
+~~~
+Attempts to return the byte array data as an hexadecimal string.
+
+If the data do not fit in an string , then it returns the type of this instance.
+
+__Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+  This method is aggressively inlined so as to decrease the execution time.
+
+ __Returns__: If the instance data can fit to an string , then it returns the data as an hexadcimal string.
+Otherwise , the type of this instance.
+
+### Explicit Operators:
+
+#### Operator 1:
+CSharp Declaration:
+~~~C#
+public static explicit operator System.Byte[](ModifidableBuffer instance)
+~~~
+Converts an `ROOT.ModifidableBuffer` instance to an byte array.
+This operator is equal to calling the `ROOT.ModifidableBuffer.ToArray()` method.
+
+ __Parameters__: 
+ 1. `ROOT.ModifidableBuffer instance`: The `ModifidableBuffer` instance to take the array from.
+ 
+ __Returns__: The converted byte array data.
+
+#### Operator 2:
+CSharp Declaration:
+~~~C#
+public static explicit operator ModifidableBuffer(System.Byte[] Data)
+~~~
+Converts the specified byte array data to a new `ROOT.ModifidableBuffer` structure.
+
+This operator is equal to calling the `ROOT.ModifidableBuffer..ctor(System.Byte[] Data)` constructor.
+
+ __Parameters__:
+ 1. `System.Byte[] Data`: The byte array data that will be passed to a new `ROOT.ModifidableBuffer` structure.
+ 
+ __Returns__: A new `ROOT.ModifidableBuffer` structure containing the given byte array data.
+
+ -- End of `ROOT.ModifidableBuffer` structure --
+
+## The RegEditor class:
+CSharp Declaration:
+~~~C#
+[SupportedOSPlatform("windows")]
+public class RegEditor : System.IDisposable
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi beforefieldinit ROOT.RegEditor
+       extends [mscorlib]System.Object
+       implements [mscorlib]System.IDisposable
+{
+  .custom instance void System.Runtime.Versioning.SupportedOSPlatformAttribute::.ctor(string) = ( 01 00 07 77 69 6E 64 6F 77 73 00 00 )             // ...windows..
+}
+~~~
+Description: This is an easy-to-use Windows Registry Editor , based on the top of 
+[`Microsoft.Win32.Registry`](http://learn.microsoft.com/en-us/dotnet/api/microsoft.win32.registry?view=netframework-4.8) class.
+
+### Attributes:
+ 1. `System.Runtime.Versioning.SupportedOSPlatformAttribute("windows")`: This class is only allowed to be used in the Windows platform.
+
+### Constructors:
+
+#### Parameterless constructor:
+CSharp Declaration:
+~~~C#
+public RegEditor() { }
+~~~
+Creates a new instance of `ROOT.RegEditor` , but without any Key path data to get or set.
+The Key paths must be set by the RootKey and SubKey properties.
+
+#### Constructor 1:
+CSharp Declaration:
+~~~C#
+public RegEditor(RegRootKeyValues KeyValue, System.String SubKey)
+~~~
+Creates a new instance of `ROOT.RegEditor` with the specified Key paths.
+
+### Properties:
+
+#### 1. The RootKey property:
+CSharp Declaration:
+~~~C#
+public RegRootKeyValues RootKey { get; set; }
+~~~
+
+This sets or gets the Root Registry Key. 
+For a list of possible values , see the `ROOT.RegRootKeyValues` enumeration.
+
+- __Get__: Gets the current set root registry key.
+- __Set__: Sets a new root registry key.
+
+#### 2. The SubKey property:
+CSharp Declaration:
+~~~C#
+public System.String SubKey
+~~~
+
+This sets or gets the registry sub-key , the next key from the root one.
+
+- __Get__: Gets the current set sub-key.
+- __Set__: Sets a new registry sub-key key.
+
+#### 3. The DiagnosticMessages property:
+CSharp Declaration:
+~~~C#
+public System.Boolean DiagnosticMessages
+~~~
+Sets a `System.Boolean` value which determines if exception messages should be thrown on console.
+
+__Set__: Setting to `true` enables the exception messages to be thrown; `false` prohibits them to be shown.
+
+### Methods:
+
+#### 1. The DeleteEntry method:
+CSharp Declaration:
+~~~C#
+public RegFunctionResult DeleteEntry(System.String VariableRegistryMember)
+~~~
+Deletes a registry value defined by the `VariableRegistryMember` parameter.
+
+__Parameters__: 
+ 1. `System.String VariableRegistryMember`: The name of the registry value to delete.
+
+ __Returns__: One of the `ROOT.RegFunctionResult` enum values.
+Consult the `ROOT.RegFunctionResult` enumeration for more information.
+
+#### 2. The GetEntry method:
+CSharp Declaration:
+~~~C#
+public System.Object GetEntry(System.String VariableRegistryMember)
+~~~
+Gets the registry value defined by the `VariableRegistryMember` parameter.
+
+__Parameters__: 
+ 1. `System.String VariableRegistryMember`: The name of the registry value to get.
+ 
+__Returns__: The registry value data. Must be converted to an `System.String` if the value is set as
+of type REG_SZ .
+
+#### 3. The SetEntry method:
+CSharp Declaration:
+~~~C#
+public RegFunctionResult SetEntry(System.String VariableRegistryMember, RegTypes RegistryType, System.Object RegistryData)
+~~~
+Sets a new value in the registry value. It's name is defined by the `VariableRegistryMember` , it's type
+by the `ROOT.RegTypes` enumeration , and it's data defined by the  `RegistryData` parameter.
+
+If the registry value does not exist , it is created.
+
+__Parameters__: 
+
+ 1. `System.String VariableRegistryMember`: The name of the registry value to get.
+ 2. `RegTypes RegistryType`: The registry value type to set. This value will determine which type the value will be.
+ 3. `System.Object RegistryData`: The data to set to the registry value.
+ 
+  __Returns__: One of the `ROOT.RegFunctionResult` enum values.
+Consult the `ROOT.RegFunctionResult` enumeration for more information.
+
+#### 4. The Dispose method:
+CSharp Declaration:
+~~~C#
+public void Dispose()
+~~~
+The Dispose method clears the key paths set and makes this class reusuable.
+
+ __Returns__:
+  This function is declared as `void` , so it does return nothing.
+  What it does is to make the instance reusuable.
+
+ -- End of `ROOT.RegEditor` Class --
+
+## The RegFunctionResult Enumeration:
+CSharp Declaration:
+~~~C#
+public enum RegFunctionResult
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.RegFunctionResult
+       extends [mscorlib]System.Enum
+~~~
+Description: This enumeration is used in some of the methods of the `ROOT.RegEditor` class
+, which is the return type.
+
+### Fields:
+
+  #### 1. The Error Field:
+   When one of the functions return this field , it suggests that the operation failed for unknown reason.
+  
+  #### 2. The Misdefinition_Error Field:
+   When one of the functions return this field , it suggests that the operation failed because 
+   the root and sub-key paths were incorrectly formed or invalid.
+  
+  #### 3. The InvalidRootKey Field:
+   When one of the functions return this field , it suggests that the operation failed because
+   the root key was invalid.
+
+  #### 4. The Success Field:
+   When one of the functions return this field , it means that the function 
+   was executed sucessfully.
+
+ -- End of the `ROOT.RegFunctionResult` enumeration --
+
+## The RegRootKeyValues Enumeration:
+CSharp Declaration:
+~~~C#
+public enum RegRootKeyValues
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.RegRootKeyValues
+       extends [mscorlib]System.Enum
+~~~
+Description: This enumeration has default Registry Root key values to be used for the
+Root Key value in the `ROOT.RegEditor` class.
+
+### Fields: 
+   
+#### 1. The CurrentClassesRoot Field:
+   This field is the `"HKEY_CLASSES_ROOT"` root key represented in the registry.
+
+   In that root key there are usually the executable-file associations (A 'D' file is opened by an 'G' executable).
+
+#### 2. The LocalMachine Field:
+   This field is the `"HKEY_LOCAL_MACHINE"` root key represented in the registry.
+
+   You cannot modify values or sub-keys of this root key and in normal cases , 
+   it should NOT be accessed at all ,
+
+   because this root key contains the Windows settings and any change can cause system instability.
+   
+#### 3. The CurrentUser Field:
+  This field is the `"HKEY_CURRENT_USER"` root key represented in the registry.
+
+  This field is a dynamic one , because applications usually save their data there 
+  
+  and it changes for every user (The name also implies that is a sortcut for the
+  settings data of the current user.)
+
+#### 4. The CurrentConfig Field:
+  This field is the `"HKEY_CURRENT_CONFIG"` root key represented in the registry.
+
+  This root key is almost deprecated , just only defines some default settings for
+  Windows and nothing else.
+
+#### 5. The PerfData Field:
+  This field is the `"HKEY_PERFORMANCE_DATA"` root key represented in the registry.
+
+  Be noted , this root key is deprecated; provided for legacy compatibility.
+
+#### 6. The UsersStore Field: 
+   This field is the `"HKEY_USERS"` root key represented in the registry.
+
+   This root key contains all the registered Windows users defined in this computer.
+
+  -- End of `ROOT.RegRootKeyValues` Enumeration --
+
+## The RegTypes Enumeration:
+CSharp Declaration:
+~~~C#
+public enum RegTypes
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.RegTypes
+       extends [mscorlib]System.Enum
+~~~
+Description: The `RegTypes` enumeration defines common registry data types
+for the value of a registry value. You will only need this enumeration in the 
+`SetValue()` method in the `ROOT.RegEditor` class.
+
+### Fields:
+
+#### 1. The String Field: 
+This field specifies that the data type will be a string value.
+
+#### 2. The ExpandString Field: 
+This field specifies that the data type will be a string value with environment variables.
+
+#### 3. The QuadWord Field:
+This field specifies that the data type will be a quad-word length byte array.
+
+#### 4. The DoubleWord Field:
+This field specifies that the data type will be a double-word length byte array.
+
+ -- End of `ROOT.RegTypes` Enumeration --
+
+## The STD Class:
+CSharp Declaration:
+~~~C#
+public static class STD
+~~~
+IL Declaration:
+~~~IL
+.class public abstract auto ansi sealed beforefieldinit ROOT.STD
+       extends [mscorlib]System.Object
+~~~
+Description: The STD Format is an message-color pair definition pseudo-progamming language 
+intended to save and later show messages in an application. Where the data would be applied 
+to does not matter , but it's goal is to save messages that either will be loaded later or
+will be used in a resource-style format , by accessing the index of each message.
+
+The files that are saved under this format have the extension ".std" .
+
+Example:
+~~~
+# This is a comment.
+# The below line is a version block.
+{Version$01}
+# The below line is a new STD Message with the foregorund color
+# set to White , and the background color set to Black.
+"A new message"$"White"$"Black"
+~~~
+
+Reserved Characters: 
+
+`{` , `}` : The Opening and Closing Brakets specify a special data block.
+
+`#` : Signifies a new STD Comment.
+
+`$` : Data Seperator , like in the STD message you have seen above.
+
+`"` : Double quote , seperates the STD data , which are literal values.
+
+__STD Messages , and their syntax__.
+
+An STD Message is comprised of the message data themselves , 
+the foreground and the background colors.
+
+Syntax:
+~~~
+"Your-Message"$"foreground-color"$"background-color"
+~~~
+
+Where `foreground-color` and `background-color` are literal colors , 
+like "Cyan" or "Dark Blue" .
+
+Both colors are case-insensitive , like "DARK Blue" or "CyAN" .
+
+These above will be again translated as "Dark Blue" and "Cyan" .
+
+__STD Special Data Blocks__.
+
+The Open Braket and the Closed Braket specify a new , and special data block.
+
+For the current STD version , 1 , only the Version block exists , which has the format:
+~~~
+{Version$'Version-Number'}
+~~~
+The Version block is a requirement for all STD serialised data or files .
+
+Without it , an parser exception will be thrown.
+
+The Version block specifies the STD Format version , which the parser can correctly 
+translate the given input into STD Entries.
+
+__STD Comments__
+
+STD Comments are starting with an `#` character , and finish until just before the next line.
+
+STD Comments are only single-line , and are not allowed to be in or after STD Messages or Data blocks.
+
+Examples:
+~~~
+# This comment will be parsed sucessfully.
+"# This is not a comment , because the character is in an STD message."$"Dark Cyan"$"Black"
+"A Man tries to climb up a mountain."$"Dark Magenta"$"Dark Red" # This will be completely invalidated.
+~~~
+
+__STD Parser behavior__:
+The behavior of the STD parser is simple and to the point:
+
+"If the first or second character in the line is a `#` , then it is a comment."
+
+"If the first or second character in the line is a `{` and closes with a `}` , then it is a data block."
+
+"If the first or second character in the line is a `"` , then it might probably be an STD Message."
+
+"If I cannot determine something , I will not throw an exception. Instead , it will be saved as an invalid sequence."
+
+"If I cannot find an Version Block , then I will throw an exception , since I do not know which STD version to parse."
+
+"Any reserved character found inside of an STD message , except for the colors , which are used in this format , 
+it will be passed literally instead. I care to parse sucessfully the message , and not how to 
+determine why it shouldn't be there actually."
+
+These simple six clauses define the STD parser behavior. 
+
+STD does ignore the reserved characters inside the strings , because someone might need them 
+for a message.
+
+__Parsed STD Data Handling__:
+
+When serializing-deserialising data using the STD format , an intermediate structure called STD Context
+is the temporary "buffer" for saving there the STD data before they are used or serialized again.
+
+You can add or get STD entries from it. 
+
+The rest of the stuff will be now explained while describing the classes that are
+involved in this format.
+
+### Methods:
+
+#### 1. The Deserialize method:
+CSharp Declaration:
+~~~C#
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public static STDContext Deserialize(System.String Data)
+~~~
+This method deserialises the data from an string and returns them
+as a new STD Context.
+
+__Attributes__: `System.Runtime.CompilerServices.MethodImplAttribute(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)`:
+
+  This method is aggressively inlined so as to decrease the execution time.
+
+__Parameters__:
+    1.  `System.String Data`: The STD data to deserialise. Can be locally created in the application
+session or from an external read file.
+
+__Returns__: A new `ROOT.STDContext` structure containing the deserialised data.
+
+Remarks: This method will throw an `System.InvalidOperationException` in one of these cases:
+
+1. The method has not found an valid Version block.
+2. The method could not deserialise a color specified in the STD Message.
+3. The STD message was unterminated (invalid , corrupted).
+
+#### 2. The Serialize method:
+CSharp Declaration:
+~~~C#
+[MethodImpl(MethodImplOptions.AggressiveInlining)]
+public static System.String Serialize(STDContext Context)
+~~~
+
+This method serialises the given data from an STD Context and converts them
+back to the STD Format.
+
+__Parameters__:
+   1. `ROOT.STDContext Context`: The STD Context to get the data from.
+   
+__Returns__: The serialised STD Format data.
+
+ -- End of `ROOT.STD` Class --
+
+## The STDColors Structure:
+CSharp Declaration:
+~~~C#
+[Serializable]
+public readonly struct STDColors
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi serializable sealed beforefieldinit ROOT.STDColors
+       extends [mscorlib]System.ValueType
+{
+  .custom instance void [mscorlib]System.Runtime.CompilerServices.IsReadOnlyAttribute::.ctor() = ( 01 00 00 00 ) 
+}
+~~~
+Description: This structure is used to store the STD Message Colors as a single value type.
+
+__Attributes__:
+
+ 1. `System.Serializable()`: The runtime is allowed to serialise this structure , if needed.
+
+### Constructors:
+
+#### Constructor 1:
+CSharp Declaration:
+~~~C#
+public STDColors(STDFrontColor FC, STDBackColor BK)
+~~~
+Initialises a new instance of this structure with the specified colors.
+
+__Parameters__:
+
+1. `ROOT.STDFrontColor FC`: The foreground color to set for this instance.
+2. `ROOT.STDBackColor BK`: The background color to set for this instance.
+
+### Fields:
+
+#### 1. The FrontColor Field:
+CSharp Declaration:
+~~~C#
+public readonly STDFrontColor FrontColor;
+~~~
+Gets or sets the foreground color for this instance.
+
+#### 2. The BackColor Field:
+CSharp Declaration:
+~~~C#
+public readonly STDBackColor BackColor;
+~~~
+Gets or sets the background color for this instance.
+
+ -- End of `ROOT.STDColors` Structure -- 
+
+## The STDContext Structure:
+CSharp Declaration:
+~~~C#
+public struct STDContext : System.IDisposable , IEnumerable<STDLine>
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi sealed beforefieldinit ROOT.STDContext
+       extends [mscorlib]System.ValueType
+       implements [mscorlib]System.IDisposable,
+                  class [mscorlib]System.Collections.Generic.IEnumerable`1<valuetype ROOT.STDLine>,
+                  [mscorlib]System.Collections.IEnumerable
+~~~
+Description: The STD Context is the intermediate storage type which holds temporarily the parsed
+STD data which are ready to be read by the application or the STD data created to parse and
+format as of STD.
+
+It's internal implementation uses dictionaries to store and retrieve the STD data, while it has proper
+support for adding and retrieving STD parsed data in the proper way. 
+This helps the STD format to work efficiently , and give to the user 
+the ability to even detect parsing errors in the data that has written.
+
+Remarks: This could be possibly implemented as an collection , but some of the methods
+the collections provide make it no suitable to implement it as an collection at all.
+
+__Implementations__:
+ 1. `System.IDisposable`: This interface allows disposing and clearing the data that the instance contains.
+   Additionally , it prepars the instance after used , for garbage collection.
+ 2. `System.Collections.Generic.IEnumerable<STDLine>`: This interface allows the user to use the foreach 
+('For Each' in Visual Basic) keyword. This is useful for a couple of reasons and it's usage is not only
+that , because the structure can be used to a number of applications.
+
+
+### Constructors:
+
+#### Parameterless constructor:
+CSharp Declaration:
+~~~C#
+public STDContext() { }
+~~~
+Initialises a new instance of STDContext.
+
+
+### Properties:
+
+#### The ItemsCount Property:
+CSharp Declaration:
+~~~C#
+public System.Int32 ItemsCount { get; }
+~~~
+Returns the number of entries contained in this structure.
+
+This property could be considered equal of the 
+[Count Property](http://learn.microsoft.com/en-us/dotnet/api/system.collections.icollection.count?view=netframework-4.8)
+of the ICollection interface.
+
+__Get__: The number of STD entries contained in this instance.
+
+### Methods:
+
+#### 1. The Add method:
+CSharp Declaration:
+~~~C#
+public void Add(STDFrontColor Fr, STDBackColor Bk, System.String Data)
+~~~
+Adds a new STD Message Entry in the structure , with the specified message data , 
+and front/back colors.
+
+__Parameters__:
+
+1. `ROOT.STDFrontColor Fr`: The Foreground Color of the message to specify.
+2. `ROOT.STDBackColor Bk`: The Background Color of the message to specify.
+3. `System.String Data`: The STD Message body itself.
+
+__Returns__:
+   This function is declared as `void` , so it does return nothing.
+   What it does is to add a new STD Message Entry to the structure.
+
+#### 2. The AddComment method:
+CSharp Declaration:
+~~~C#
+public void AddComment(System.String Comment)
+~~~
+Adds a new and valid STD comment with the specified comment message.
+
+__Parameters__: 1. `System.String Comment`: The comment message to apply too.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to add the specified STD comment.
+
+#### 3. The AddVersionBlock method:
+CSharp Declaration:
+~~~C#
+public void AddVersionBlock()
+~~~
+Adds a new and valid STD Version Block.
+The Version number written when the structure data
+are serialised is the latest one version available.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to add a new STD Version Block.
+
+#### 4. The Clear method:
+CSharp Declaration:
+~~~C#
+public void Clear()
+~~~
+The Clear() method clears all the STD entries until just before this function was called.
+Using this method can make this instance reusuable , which it means that it is not needed
+to create a new instance of this structure so as to use it somewhere two times.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to remove all the STD Entries added before.
+
+
+#### 5. The Dispose method:
+CSharp Declaration:
+~~~C#
+public void Dispose()
+~~~
+The Dispose() method disposes all of the resources that the current instance uses.
+
+After calling this method , in all instance members a 
+[`System.ObjectDisposedException`](http://learn.microsoft.com/en-us/dotnet/api/system.objectdisposedexception?view=netframework-4.8) will be thrown.
+
+If you want to reuse the instance for completely other 
+reason , then use the `Clear()` method instead.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to dispose this instance of the structure.
+
+#### 6. The Get method:
+CSharp Declaration:
+~~~C#
+public STDLine Get(System.Int32 Index)
+~~~
+Gets the specified STD Entry at the specified index.
+
+For usual development , however , it is recommended to use the GetEnumerator() function or 
+the `foreach` keyword for iterating through the context.
+
+__Returns__: A new `ROOT.STDLine` structure containing the entry data located at the specified index location.
+
+#### 6. The GetEnumerator method:
+CSharp Declaration:
+~~~C#
+public System.Collections.Generic.IEnumerator<ROOT.STDLine> GetEnumerator()
+~~~
+
+This method is an implemented member of the [IEnumerable](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1?view=netframework-4.8) 
+interface. Please the the documentation of the 
+[GetEnumerator Method](http://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ienumerable-1.getenumerator?view=netframework-4.8) 
+for more information about this method.
+
+### Operators:
+
+#### Explicit Operator 1:
+CSharp Declaration:
+~~~C#
+public static explicit operator STDLine[](STDContext context) 
+~~~
+Returns the data that an STD Context structure holds as a new 
+array of STD entries , which in fact the STD Context is comprised
+of.
+
+__Parameter__: `ROOT.STDContext context`: An initialised STD context to get the data from.
+
+__Returns__: A new `ROOT.STDLine[]` array that contains the context data.
+
+ -- End of the `ROOT.STDContext` Structure -- 
+
+## The STDLine Structure:
+CSharp Declaration:
+~~~C#
+[System.Serializable]
+public struct STDLine
+~~~
+IL Declaration:
+~~~IL
+.class public sequential ansi serializable sealed beforefieldinit ROOT.STDLine
+       extends [mscorlib]System.ValueType
+~~~
+Description: This structure defines itself the most fundamental 
+component in STD , the STD Line Entry.
+The STD Line Entry defines the data that has each STD Entry , which type of data is
+and which colors a STD Line Entry has.
+
+The `ROOT.STDContext` structure described above can be considered a collection
+of such structures.
+
+This structure is kept so simple that has only three fields for a couple of reasons:
+
+ - Less memory occupation of each structure.
+ - Fast construction or deconstruction.
+ - Intended to be simple , so simple that it's layout is even familiar to C/C++ developers.
+ 
+### Attributes:
+
+1. `System.Serializable()`: The runtime is allowed to serialize this structure , if required.
+
+### Fields:
+
+#### 1. The Colors Field:
+CSharp Declaration:
+~~~C#
+public STDColors Colors;
+~~~
+The Colors of the STD Entry to get or set.
+
+See the `ROOT.STDColors` structure for more information on how 
+to set or get the colors.
+
+#### 2. The Data Field:
+CSharp Declaration:
+~~~C#
+public System.String Data;
+~~~
+Gets or sets the literal STD Entry data.
+In a new STD Message Entry , it is the message itself.
+In a new STD Comment , it is the comment description.
+In a new STD Version Block , this contains the literal version block.
+
+#### 3. The Type Field:
+CSharp Declaration:
+~~~C#
+public STDType Type;
+~~~
+Gets or Sets the STD Entry that this structure holds.
+This value can be anything of the values that the `ROOT.STDType`
+enumeration has , so please consult it so as to determine
+it's value.
+
+ -- End of the `ROOT.STDLine` Structure --
+
+## The STDType Enumeration:
+CSharp Declaration:
+~~~C#
+public enum STDType : System.Int32
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.STDType
+       extends [mscorlib]System.Enum
+~~~
+Description: Defines the possible STD Entry types.
+
+### Fields:
+
+#### 1. The STDString Field:
+This field indicates that the STD Entry type is
+a new STD Message.
+
+#### 2. The VersionBlock Field:
+This field indicates that the STD Entry type is
+a STD Version Block.
+
+#### 3. The Comment Field:
+This field indicates that the STD Entry type is
+a valid STD Comment.
+
+#### 4. The Invalid Field:
+This field indicates that an entry was found in the file
+which was nothing of the three fields above.
+This one field exists only and only to assist the
+programmer in the try to determine which STD Line 
+cannot be correctly parsed.
+
+ -- End of the `ROOT.STDType` Enumeration --

@@ -2316,10 +2316,7 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private unsafe static bool LessThanEqual(this IntPtr index, UIntPtr length)
         {
-            if (sizeof(UIntPtr) != 4)
-            {
-                return (long)index <= (long)(ulong)length;
-            }
+            if (sizeof(UIntPtr) != 4) { return (long)index <= (long)(ulong)length; }
             return (int)index <= (int)(uint)length;
         }
     }
@@ -2353,111 +2350,75 @@ namespace System
 
         public static ReadOnlySpan<char> TrimStart(this ReadOnlySpan<char> span)
         {
-            int i;
-            for (i = 0; i < span.Length && char.IsWhiteSpace(span[i]); i++)
-            {
-            }
+            System.Int32 i;
+            for (i = 0; i < span.Length && char.IsWhiteSpace(span[i]); i++) { }
             return span.Slice(i);
         }
 
         public static ReadOnlySpan<char> TrimEnd(this ReadOnlySpan<char> span)
         {
             int num = span.Length - 1;
-            while (num >= 0 && char.IsWhiteSpace(span[num]))
-            {
-                num--;
-            }
+            while (num >= 0 && char.IsWhiteSpace(span[num])) { num--; }
             return span.Slice(0, num + 1);
         }
 
-        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span, char trimChar)
-        {
-            return span.TrimStart(trimChar).TrimEnd(trimChar);
-        }
+        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span, char trimChar) { return span.TrimStart(trimChar).TrimEnd(trimChar); }
 
         public static ReadOnlySpan<char> TrimStart(this ReadOnlySpan<char> span, char trimChar)
         {
             int i;
-            for (i = 0; i < span.Length && span[i] == trimChar; i++)
-            {
-            }
+            for (i = 0; i < span.Length && span[i] == trimChar; i++) { }
             return span.Slice(i);
         }
 
         public static ReadOnlySpan<char> TrimEnd(this ReadOnlySpan<char> span, char trimChar)
         {
             int num = span.Length - 1;
-            while (num >= 0 && span[num] == trimChar)
-            {
-                num--;
-            }
+            while (num >= 0 && span[num] == trimChar) { num--; }
             return span.Slice(0, num + 1);
         }
 
-        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span, ReadOnlySpan<char> trimChars)
-        {
-            return span.TrimStart(trimChars).TrimEnd(trimChars);
-        }
+        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span, ReadOnlySpan<char> trimChars) { return span.TrimStart(trimChars).TrimEnd(trimChars); }
 
         public static ReadOnlySpan<char> TrimStart(this ReadOnlySpan<char> span, ReadOnlySpan<char> trimChars)
         {
-            if (trimChars.IsEmpty)
-            {
-                return span.TrimStart();
-            }
+            if (trimChars.IsEmpty) { return span.TrimStart(); }
             int i;
             for (i = 0; i < span.Length; i++)
             {
                 int num = 0;
                 while (num < trimChars.Length)
                 {
-                    if (span[i] != trimChars[num])
-                    {
-                        num++;
-                        continue;
-                    }
-                    goto IL_003c;
+                    if (span[i] != trimChars[num]) { num++; continue; }
+                    goto Continue;
                 }
                 break;
-            IL_003c:;
+                Continue:;
             }
             return span.Slice(i);
         }
 
         public static ReadOnlySpan<char> TrimEnd(this ReadOnlySpan<char> span, ReadOnlySpan<char> trimChars)
         {
-            if (trimChars.IsEmpty)
-            {
-                return span.TrimEnd();
-            }
+            if (trimChars.IsEmpty) { return span.TrimEnd(); }
             int num;
             for (num = span.Length - 1; num >= 0; num--)
             {
                 int num2 = 0;
                 while (num2 < trimChars.Length)
                 {
-                    if (span[num] != trimChars[num2])
-                    {
-                        num2++;
-                        continue;
-                    }
-                    goto IL_0044;
+                    if (span[num] != trimChars[num2]) { num2++; continue; }
+                    goto Continue;
                 }
                 break;
-            IL_0044:;
+                Continue:;
             }
             return span.Slice(0, num + 1);
         }
 
         public static bool IsWhiteSpace(this ReadOnlySpan<char> span)
         {
-            for (int i = 0; i < span.Length; i++)
-            {
-                if (!char.IsWhiteSpace(span[i]))
-                {
-                    return false;
-                }
-            }
+            for (int i = 0; i < span.Length; i++) { if (char.IsWhiteSpace(span[i]) == false) { return false; } }
             return true;
         }
 
@@ -2823,35 +2784,23 @@ namespace System
         public static void Reverse<T>(this Span<T> span)
         {
             ref T reference = ref MemoryMarshal.GetReference(span);
-            int num = 0;
-            int num2 = span.Length - 1;
+            int num = 0; int num2 = span.Length - 1;
             while (num < num2)
             {
                 T val = Unsafe.Add(ref reference, num);
                 Unsafe.Add(ref reference, num) = Unsafe.Add(ref reference, num2);
-                Unsafe.Add(ref reference, num2) = val;
-                num++;
-                num2--;
+                Unsafe.Add(ref reference, num2) = val; num++; num2--;
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<T> AsSpan<T>(this T[] array)
-        {
-            return new Span<T>(array);
-        }
+        public static Span<T> AsSpan<T>(this T[] array) { return new Span<T>(array); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<T> AsSpan<T>(this T[] array, int start, int length)
-        {
-            return new Span<T>(array, start, length);
-        }
+        public static Span<T> AsSpan<T>(this T[] array, int start, int length) { return new Span<T>(array, start, length); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Span<T> AsSpan<T>(this ArraySegment<T> segment)
-        {
-            return new Span<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        public static Span<T> AsSpan<T>(this ArraySegment<T> segment) { return new Span<T>(segment.Array, segment.Offset, segment.Count); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this ArraySegment<T> segment, int start)
@@ -2877,25 +2826,13 @@ namespace System
             return new Span<T>(segment.Array, segment.Offset + start, length);
         }
 
-        public static Memory<T> AsMemory<T>(this T[] array)
-        {
-            return new Memory<T>(array);
-        }
+        public static Memory<T> AsMemory<T>(this T[] array) { return new Memory<T>(array); }
 
-        public static Memory<T> AsMemory<T>(this T[] array, int start)
-        {
-            return new Memory<T>(array, start);
-        }
+        public static Memory<T> AsMemory<T>(this T[] array, int start) { return new Memory<T>(array, start); }
 
-        public static Memory<T> AsMemory<T>(this T[] array, int start, int length)
-        {
-            return new Memory<T>(array, start, length);
-        }
+        public static Memory<T> AsMemory<T>(this T[] array, int start, int length) { return new Memory<T>(array, start, length); }
 
-        public static Memory<T> AsMemory<T>(this ArraySegment<T> segment)
-        {
-            return new Memory<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        public static Memory<T> AsMemory<T>(this ArraySegment<T> segment) { return new Memory<T>(segment.Array, segment.Offset, segment.Count); }
 
         public static Memory<T> AsMemory<T>(this ArraySegment<T> segment, int start)
         {
@@ -2920,28 +2857,16 @@ namespace System
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyTo<T>(this T[] source, Span<T> destination)
-        {
-            new ReadOnlySpan<T>(source).CopyTo(destination);
-        }
+        public static void CopyTo<T>(this T[] source, Span<T> destination) { new ReadOnlySpan<T>(source).CopyTo(destination); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void CopyTo<T>(this T[] source, Memory<T> destination)
-        {
-            source.CopyTo(destination.Span);
-        }
+        public static void CopyTo<T>(this T[] source, Memory<T> destination) { source.CopyTo(destination.Span); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other)
-        {
-            return ((ReadOnlySpan<T>)span).Overlaps(other);
-        }
+        public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other) { return ((ReadOnlySpan<T>)span).Overlaps(other); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other, out int elementOffset)
-        {
-            return ((ReadOnlySpan<T>)span).Overlaps(other, out elementOffset);
-        }
+        public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other, out int elementOffset) { return ((ReadOnlySpan<T>)span).Overlaps(other, out elementOffset); }
 
         public static bool Overlaps<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other)
         {
@@ -2967,76 +2892,44 @@ namespace System
 
         public static bool Overlaps<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other, out int elementOffset)
         {
-            if (span.IsEmpty || other.IsEmpty)
-            {
-                elementOffset = 0;
-                return false;
-            }
+            if (span.IsEmpty || other.IsEmpty) { elementOffset = 0; return false; }
             IntPtr intPtr = Unsafe.ByteOffset(ref MemoryMarshal.GetReference(span), ref MemoryMarshal.GetReference(other));
             if (Unsafe.SizeOf<IntPtr>() == 4)
             {
                 if ((uint)(int)intPtr < (uint)(span.Length * Unsafe.SizeOf<T>()) || (uint)(int)intPtr > (uint)(-(other.Length * Unsafe.SizeOf<T>())))
                 {
-                    if ((int)intPtr % Unsafe.SizeOf<T>() != 0)
-                    {
-                        System.ThrowHelper.ThrowArgumentException_OverlapAlignmentMismatch();
-                    }
-                    elementOffset = (int)intPtr / Unsafe.SizeOf<T>();
-                    return true;
+                    if ((int)intPtr % Unsafe.SizeOf<T>() != 0) { System.ThrowHelper.ThrowArgumentException_OverlapAlignmentMismatch(); }
+                    elementOffset = (int)intPtr / Unsafe.SizeOf<T>(); return true;
                 }
-                elementOffset = 0;
-                return false;
+                elementOffset = 0; return false;
             }
             if ((ulong)(long)intPtr < (ulong)((long)span.Length * (long)Unsafe.SizeOf<T>()) || (ulong)(long)intPtr > (ulong)(-((long)other.Length * (long)Unsafe.SizeOf<T>())))
             {
-                if ((long)intPtr % Unsafe.SizeOf<T>() != 0L)
-                {
-                    System.ThrowHelper.ThrowArgumentException_OverlapAlignmentMismatch();
-                }
-                elementOffset = (int)((long)intPtr / Unsafe.SizeOf<T>());
-                return true;
+                if ((long)intPtr % Unsafe.SizeOf<T>() != 0L) { System.ThrowHelper.ThrowArgumentException_OverlapAlignmentMismatch(); }
+                elementOffset = (int)((long)intPtr / Unsafe.SizeOf<T>()); return true;
             }
-            elementOffset = 0;
-            return false;
+            elementOffset = 0; return false;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BinarySearch<T>(this Span<T> span, IComparable<T> comparable)
-        {
-            return span.BinarySearch<T, IComparable<T>>(comparable);
-        }
+        public static int BinarySearch<T>(this Span<T> span, IComparable<T> comparable) { return span.BinarySearch<T, IComparable<T>>(comparable); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BinarySearch<T, TComparable>(this Span<T> span, TComparable comparable) where TComparable : IComparable<T>
-        {
-            return BinarySearch((ReadOnlySpan<T>)span, comparable);
-        }
+        public static int BinarySearch<T, TComparable>(this Span<T> span, TComparable comparable) where TComparable : IComparable<T> { return BinarySearch((ReadOnlySpan<T>)span, comparable); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BinarySearch<T, TComparer>(this Span<T> span, T value, TComparer comparer) where TComparer : IComparer<T>
-        {
-            return ((ReadOnlySpan<T>)span).BinarySearch(value, comparer);
-        }
+        public static int BinarySearch<T, TComparer>(this Span<T> span, T value, TComparer comparer) where TComparer : IComparer<T> { return ((ReadOnlySpan<T>)span).BinarySearch(value, comparer); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BinarySearch<T>(this ReadOnlySpan<T> span, IComparable<T> comparable)
-        {
-            return MemoryExtensions.BinarySearch<T, IComparable<T>>(span, comparable);
-        }
+        public static int BinarySearch<T>(this ReadOnlySpan<T> span, IComparable<T> comparable) { return BinarySearch<T, IComparable<T>>(span, comparable); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static int BinarySearch<T, TComparable>(this ReadOnlySpan<T> span, TComparable comparable) where TComparable : IComparable<T>
-        {
-            return SpanHelpers.BinarySearch(span, comparable);
-        }
+        public static int BinarySearch<T, TComparable>(this ReadOnlySpan<T> span, TComparable comparable) where TComparable : IComparable<T> { return SpanHelpers.BinarySearch(span, comparable); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T, TComparer>(this ReadOnlySpan<T> span, T value, TComparer comparer) where TComparer : IComparer<T>
         {
-            if (comparer == null)
-            {
-                System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.comparer);
-            }
+            if (comparer == null) { System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.comparer); }
             SpanHelpers.ComparerComparable<T, TComparer> comparable = new SpanHelpers.ComparerComparable<T, TComparer>(value, comparer);
             return BinarySearch(span, comparable);
         }
@@ -3044,39 +2937,17 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsTypeComparableAsBytes<T>(out NUInt size)
         {
-            if (typeof(T) == typeof(byte) || typeof(T) == typeof(sbyte))
-            {
-                size = (NUInt)1;
-                return true;
-            }
-            if (typeof(T) == typeof(char) || typeof(T) == typeof(short) || typeof(T) == typeof(ushort))
-            {
-                size = (NUInt)2;
-                return true;
-            }
-            if (typeof(T) == typeof(int) || typeof(T) == typeof(uint))
-            {
-                size = (NUInt)4;
-                return true;
-            }
-            if (typeof(T) == typeof(long) || typeof(T) == typeof(ulong))
-            {
-                size = (NUInt)8;
-                return true;
-            }
+            if (typeof(T) == typeof(byte) || typeof(T) == typeof(sbyte)) { size = (NUInt)1; return true; }
+            if (typeof(T) == typeof(char) || typeof(T) == typeof(short) || typeof(T) == typeof(ushort)) { size = (NUInt)2; return true; }
+            if (typeof(T) == typeof(int) || typeof(T) == typeof(uint)) { size = (NUInt)4; return true; }
+            if (typeof(T) == typeof(long) || typeof(T) == typeof(ulong)) { size = (NUInt)8; return true; }
             size = default(NUInt);
             return false;
         }
 
-        public static Span<T> AsSpan<T>(this T[] array, int start)
-        {
-            return Span<T>.Create(array, start);
-        }
+        public static Span<T> AsSpan<T>(this T[] array, int start) { return Span<T>.Create(array, start); }
 
-        public static bool Contains(this ReadOnlySpan<char> span, ReadOnlySpan<char> value, StringComparison comparisonType)
-        {
-            return span.IndexOf(value, comparisonType) >= 0;
-        }
+        public static bool Contains(this ReadOnlySpan<char> span, ReadOnlySpan<char> value, StringComparison comparisonType) { return span.IndexOf(value, comparisonType) >= 0; }
 
         public static bool Equals(this ReadOnlySpan<char> span, ReadOnlySpan<char> other, StringComparison comparisonType)
         {
@@ -3085,10 +2956,7 @@ namespace System
                 case StringComparison.Ordinal:
                     return span.SequenceEqual(other);
                 case StringComparison.OrdinalIgnoreCase:
-                    if (span.Length != other.Length)
-                    {
-                        return false;
-                    }
+                    if (span.Length != other.Length) { return false; }
                     return EqualsOrdinalIgnoreCase(span, other);
                 default:
                     return span.ToString().Equals(other.ToString(), comparisonType);
@@ -3098,10 +2966,7 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool EqualsOrdinalIgnoreCase(ReadOnlySpan<char> span, ReadOnlySpan<char> other)
         {
-            if (other.Length == 0)
-            {
-                return true;
-            }
+            if (other.Length == 0) { return true; }
             return CompareToOrdinalIgnoreCase(span, other) == 0;
         }
 
@@ -3117,45 +2982,22 @@ namespace System
 
         private unsafe static int CompareToOrdinalIgnoreCase(ReadOnlySpan<char> strA, ReadOnlySpan<char> strB)
         {
-            int num = Math.Min(strA.Length, strB.Length);
-            int num2 = num;
+            int num = Math.Min(strA.Length, strB.Length); int num2 = num;
             fixed (char* ptr = &MemoryMarshal.GetReference(strA))
             {
                 fixed (char* ptr3 = &MemoryMarshal.GetReference(strB))
                 {
-                    char* ptr2 = ptr;
-                    char* ptr4 = ptr3;
+                    char* ptr2 = ptr; char* ptr4 = ptr3;
                     while (num != 0 && *ptr2 <= '\u007f' && *ptr4 <= '\u007f')
                     {
-                        int num3 = *ptr2;
-                        int num4 = *ptr4;
-                        if (num3 == num4)
-                        {
-                            ptr2++;
-                            ptr4++;
-                            num--;
-                            continue;
-                        }
-                        if ((uint)(num3 - 97) <= 25u)
-                        {
-                            num3 -= 32;
-                        }
-                        if ((uint)(num4 - 97) <= 25u)
-                        {
-                            num4 -= 32;
-                        }
-                        if (num3 != num4)
-                        {
-                            return num3 - num4;
-                        }
-                        ptr2++;
-                        ptr4++;
-                        num--;
+                        int num3 = *ptr2; int num4 = *ptr4;
+                        if (num3 == num4) { ptr2++; ptr4++; num--; continue; }
+                        if ((uint)(num3 - 97) <= 25u) { num3 -= 32; }
+                        if ((uint)(num4 - 97) <= 25u) { num4 -= 32; }
+                        if (num3 != num4) { return num3 - num4; }
+                        ptr2++; ptr4++; num--;
                     }
-                    if (num == 0)
-                    {
-                        return strA.Length - strB.Length;
-                    }
+                    if (num == 0) { return strA.Length - strB.Length; }
                     num2 -= num;
                     return string.Compare(strA.Slice(num2).ToString(), strB.Slice(num2).ToString(), StringComparison.OrdinalIgnoreCase);
                 }
@@ -3164,54 +3006,29 @@ namespace System
 
         public static int IndexOf(this ReadOnlySpan<char> span, ReadOnlySpan<char> value, StringComparison comparisonType)
         {
-            if (comparisonType == StringComparison.Ordinal)
-            {
-                return span.IndexOf(value);
-            }
+            if (comparisonType == StringComparison.Ordinal) { return span.IndexOf(value); }
             return span.ToString().IndexOf(value.ToString(), comparisonType);
         }
 
         public static int ToLower(this ReadOnlySpan<char> source, Span<char> destination, CultureInfo culture)
         {
-            if (culture == null)
-            {
-                System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.culture);
-            }
-            if (destination.Length < source.Length)
-            {
-                return -1;
-            }
-            string text = source.ToString();
-            string text2 = text.ToLower(culture);
-            text2.AsSpan().CopyTo(destination);
-            return source.Length;
+            if (culture == null) { System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.culture); }
+            if (destination.Length < source.Length) { return -1; }
+            string text = source.ToString(); string text2 = text.ToLower(culture);
+            text2.AsSpan().CopyTo(destination); return source.Length;
         }
 
-        public static int ToLowerInvariant(this ReadOnlySpan<char> source, Span<char> destination)
-        {
-            return source.ToLower(destination, CultureInfo.InvariantCulture);
-        }
+        public static int ToLowerInvariant(this ReadOnlySpan<char> source, Span<char> destination) { return source.ToLower(destination, CultureInfo.InvariantCulture); }
 
         public static int ToUpper(this ReadOnlySpan<char> source, Span<char> destination, CultureInfo culture)
         {
-            if (culture == null)
-            {
-                System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.culture);
-            }
-            if (destination.Length < source.Length)
-            {
-                return -1;
-            }
-            string text = source.ToString();
-            string text2 = text.ToUpper(culture);
-            text2.AsSpan().CopyTo(destination);
-            return source.Length;
+            if (culture == null) { System.ThrowHelper.ThrowArgumentNullException(System.ExceptionArgument.culture); }
+            if (destination.Length < source.Length) { return -1; }
+            string text = source.ToString(); string text2 = text.ToUpper(culture);
+            text2.AsSpan().CopyTo(destination); return source.Length;
         }
 
-        public static int ToUpperInvariant(this ReadOnlySpan<char> source, Span<char> destination)
-        {
-            return source.ToUpper(destination, CultureInfo.InvariantCulture);
-        }
+        public static int ToUpperInvariant(this ReadOnlySpan<char> source, Span<char> destination) { return source.ToUpper(destination, CultureInfo.InvariantCulture); }
 
         public static bool EndsWith(this ReadOnlySpan<char> span, ReadOnlySpan<char> value, StringComparison comparisonType)
         {
@@ -3220,10 +3037,7 @@ namespace System
                 case StringComparison.Ordinal:
                     return span.EndsWith(value);
                 case StringComparison.OrdinalIgnoreCase:
-                    if (value.Length <= span.Length)
-                    {
-                        return EqualsOrdinalIgnoreCase(span.Slice(span.Length - value.Length), value);
-                    }
+                    if (value.Length <= span.Length) { return EqualsOrdinalIgnoreCase(span.Slice(span.Length - value.Length), value); }
                     return false;
                 default:
                     {
@@ -3241,10 +3055,7 @@ namespace System
                 case StringComparison.Ordinal:
                     return span.StartsWith(value);
                 case StringComparison.OrdinalIgnoreCase:
-                    if (value.Length <= span.Length)
-                    {
-                        return EqualsOrdinalIgnoreCase(span.Slice(0, value.Length), value);
-                    }
+                    if (value.Length <= span.Length) { return EqualsOrdinalIgnoreCase(span.Slice(0, value.Length), value); }
                     return false;
                 default:
                     {
@@ -3258,10 +3069,7 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ReadOnlySpan<char> AsSpan(this string text)
         {
-            if (text == null)
-            {
-                return default(ReadOnlySpan<char>);
-            }
+            if (text == null) { return default; }
             return new ReadOnlySpan<char>(Unsafe.As<Pinnable<char>>(text), StringAdjustment, text.Length);
         }
 
@@ -3270,11 +3078,8 @@ namespace System
         {
             if (text == null)
             {
-                if (start != 0)
-                {
-                    System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
-                }
-                return default(ReadOnlySpan<char>);
+                if (start != 0) { System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start); }
+                return default;
             }
             if ((uint)start > (uint)text.Length)
             {
@@ -3288,11 +3093,8 @@ namespace System
         {
             if (text == null)
             {
-                if (start != 0 || length != 0)
-                {
-                    System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
-                }
-                return default(ReadOnlySpan<char>);
+                if (start != 0 || length != 0) { System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start); }
+                return default;
             }
             if ((uint)start > (uint)text.Length || (uint)length > (uint)(text.Length - start))
             {
@@ -3303,10 +3105,7 @@ namespace System
 
         public static ReadOnlyMemory<char> AsMemory(this string text)
         {
-            if (text == null)
-            {
-                return default(ReadOnlyMemory<char>);
-            }
+            if (text == null) { return default; }
             return new ReadOnlyMemory<char>(text, 0, text.Length);
         }
 
@@ -3318,7 +3117,7 @@ namespace System
                 {
                     System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
                 }
-                return default(ReadOnlyMemory<char>);
+                return default;
             }
             if ((uint)start > (uint)text.Length)
             {
@@ -3331,11 +3130,8 @@ namespace System
         {
             if (text == null)
             {
-                if (start != 0 || length != 0)
-                {
-                    System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
-                }
-                return default(ReadOnlyMemory<char>);
+                if (start != 0 || length != 0) { System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start); }
+                return default;
             }
             if ((uint)start > (uint)text.Length || (uint)length > (uint)(text.Length - start))
             {
@@ -3347,10 +3143,7 @@ namespace System
         private unsafe static IntPtr MeasureStringAdjustment()
         {
             string text = "a";
-            fixed (char* source = text)
-            {
-                return Unsafe.ByteOffset(ref Unsafe.As<Pinnable<char>>(text).Data, ref Unsafe.AsRef<char>(source));
-            }
+            fixed (char* source = text) { return Unsafe.ByteOffset(ref Unsafe.As<Pinnable<char>>(text).Data, ref Unsafe.AsRef<char>(source)); }
         }
     }
 
@@ -3361,15 +3154,9 @@ namespace System
         [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
         public T[] Items => _array;
 
-        public SpanDebugView(Span<T> span)
-        {
-            _array = span.ToArray();
-        }
+        public SpanDebugView(Span<T> span) { _array = span.ToArray(); }
 
-        public SpanDebugView(ReadOnlySpan<T> span)
-        {
-            _array = span.ToArray();
-        }
+        public SpanDebugView(ReadOnlySpan<T> span) { _array = span.ToArray(); }
     }
 
     [DebuggerTypeProxy(typeof(SpanDebugView<>))]
@@ -3387,28 +3174,17 @@ namespace System
             public ref T Current
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return ref _span[_index];
-                }
+                get { return ref _span[_index]; }
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal Enumerator(Span<T> span)
-            {
-                _span = span;
-                _index = -1;
-            }
+            internal Enumerator(Span<T> span) { _span = span; _index = -1; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool MoveNext()
             {
                 int num = _index + 1;
-                if (num < _span.Length)
-                {
-                    _index = num;
-                    return true;
-                }
+                if (num < _span.Length) { _index = num; return true; }
                 return false;
             }
         }
@@ -3430,14 +3206,8 @@ namespace System
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
             {
-                if ((uint)index >= (uint)_length)
-                {
-                    System.ThrowHelper.ThrowIndexOutOfRangeException();
-                }
-                if (_pinnable == null)
-                {
-                    return ref Unsafe.Add(ref Unsafe.AsRef<T>(_byteOffset.ToPointer()), index);
-                }
+                if ((uint)index >= (uint)_length) { System.ThrowHelper.ThrowIndexOutOfRangeException(); }
+                if (_pinnable == null) { return ref Unsafe.Add(ref Unsafe.AsRef<T>(_byteOffset.ToPointer()), index); }
                 return ref Unsafe.Add(ref Unsafe.AddByteOffset(ref _pinnable.Data, _byteOffset), index);
             }
         }
@@ -3446,10 +3216,7 @@ namespace System
 
         internal IntPtr ByteOffset => _byteOffset;
 
-        public static bool operator !=(Span<T> left, Span<T> right)
-        {
-            return !(left == right);
-        }
+        public static bool operator !=(Span<T> left, Span<T> right) { return !(left == right); }
 
 #pragma warning disable CS0809
         [Obsolete("Equals() on Span will always throw an exception. Use == instead.")]
@@ -3466,29 +3233,16 @@ namespace System
             throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallGetHashCodeOnSpan);
         }
 #pragma warning restore CS0809
-        public static implicit operator Span<T>(T[] array)
-        {
-            return new Span<T>(array);
-        }
+        public static implicit operator Span<T>(T[] array) { return new Span<T>(array); }
 
-        public static implicit operator Span<T>(ArraySegment<T> segment)
-        {
-            return new Span<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        public static implicit operator Span<T>(ArraySegment<T> segment) { return new Span<T>(segment.Array, segment.Offset, segment.Count); }
 
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        public Enumerator GetEnumerator() { return new Enumerator(this); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span(T[] array)
         {
-            if (array == null)
-            {
-                this = default(Span<T>);
-                return;
-            }
+            if (array == null) { this = default; return; }
             if (default(T) == null && array.GetType() != typeof(T[]))
             {
                 System.ThrowHelper.ThrowArrayTypeMismatchException();
@@ -3507,7 +3261,7 @@ namespace System
                 {
                     System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
                 }
-                return default(Span<T>);
+                return default;
             }
             if (default(T) == null && array.GetType() != typeof(T[]))
             {
@@ -3531,13 +3285,9 @@ namespace System
                 {
                     System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
                 }
-                this = default(Span<T>);
-                return;
+                this = default; return;
             }
-            if (default(T) == null && array.GetType() != typeof(T[]))
-            {
-                System.ThrowHelper.ThrowArrayTypeMismatchException();
-            }
+            if (default(T) == null && array.GetType() != typeof(T[])) { System.ThrowHelper.ThrowArrayTypeMismatchException(); }
             if ((uint)start > (uint)array.Length || (uint)length > (uint)(array.Length - start))
             {
                 System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
@@ -3551,36 +3301,22 @@ namespace System
         [CLSCompliant(false)]
         public unsafe Span(void* pointer, int length)
         {
-            if (SpanHelpers.IsReferenceOrContainsReferences<T>())
-            {
-                System.ThrowHelper.ThrowArgumentException_InvalidTypeWithPointersNotSupported(typeof(T));
-            }
-            if (length < 0)
-            {
-                System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start);
-            }
+            if (SpanHelpers.IsReferenceOrContainsReferences<T>()) { System.ThrowHelper.ThrowArgumentException_InvalidTypeWithPointersNotSupported(typeof(T)); }
+            if (length < 0) { System.ThrowHelper.ThrowArgumentOutOfRangeException(System.ExceptionArgument.start); }
             _length = length;
             _pinnable = null;
             _byteOffset = new IntPtr(pointer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal Span(Pinnable<T> pinnable, IntPtr byteOffset, int length)
-        {
-            _length = length;
-            _pinnable = pinnable;
-            _byteOffset = byteOffset;
-        }
+        internal Span(Pinnable<T> pinnable, IntPtr byteOffset, int length) { _length = length; _pinnable = pinnable; _byteOffset = byteOffset; }
 
         [EditorBrowsable(EditorBrowsableState.Never)]
         public unsafe ref T GetPinnableReference()
         {
             if (_length != 0)
             {
-                if (_pinnable == null)
-                {
-                    return ref Unsafe.AsRef<T>(_byteOffset.ToPointer());
-                }
+                if (_pinnable == null) { return ref Unsafe.AsRef<T>(_byteOffset.ToPointer()); }
                 return ref Unsafe.AddByteOffset(ref _pinnable.Data, _byteOffset);
             }
             return ref Unsafe.AsRef<T>(null);
@@ -3589,10 +3325,7 @@ namespace System
         public unsafe void Clear()
         {
             int length = _length;
-            if (length == 0)
-            {
-                return;
-            }
+            if (length == 0) { return; }
             UIntPtr byteLength = (UIntPtr)(ulong)((uint)length * Unsafe.SizeOf<T>());
             if ((Unsafe.SizeOf<T>() & (sizeof(IntPtr) - 1)) != 0)
             {
@@ -3620,10 +3353,7 @@ namespace System
         public unsafe void Fill(T value)
         {
             int length = _length;
-            if (length == 0)
-            {
-                return;
-            }
+            if (length == 0) { return; }
             if (Unsafe.SizeOf<T>() == 1)
             {
                 byte value2 = Unsafe.As<T, byte>(ref value);
@@ -3658,32 +3388,20 @@ namespace System
                 Unsafe.Add(ref source, i + 3) = value;
                 i += 4;
             }
-            for (; i < length; i++)
-            {
-                Unsafe.Add(ref source, i) = value;
-            }
+            for (; i < length; i++) { Unsafe.Add(ref source, i) = value; }
         }
 
         public void CopyTo(Span<T> destination)
         {
-            if (!TryCopyTo(destination))
-            {
-                System.ThrowHelper.ThrowArgumentException_DestinationTooShort();
-            }
+            if (!TryCopyTo(destination)) { System.ThrowHelper.ThrowArgumentException_DestinationTooShort(); }
         }
 
         public bool TryCopyTo(Span<T> destination)
         {
             int length = _length;
             int length2 = destination._length;
-            if (length == 0)
-            {
-                return true;
-            }
-            if ((uint)length > (uint)length2)
-            {
-                return false;
-            }
+            if (length == 0) { return true; }
+            if ((uint)length > (uint)length2) { return false; }
             ref T src = ref DangerousGetPinnableReference();
             SpanHelpers.CopyTo(ref destination.DangerousGetPinnableReference(), length2, ref src, length);
             return true;
@@ -3698,19 +3416,13 @@ namespace System
             return false;
         }
 
-        public static implicit operator ReadOnlySpan<T>(Span<T> span)
-        {
-            return new ReadOnlySpan<T>(span._pinnable, span._byteOffset, span._length);
-        }
+        public static implicit operator ReadOnlySpan<T>(Span<T> span) { return new ReadOnlySpan<T>(span._pinnable, span._byteOffset, span._length); }
 
         public unsafe override string ToString()
         {
             if (typeof(T) == typeof(char))
             {
-                fixed (char* value = &Unsafe.As<T, char>(ref DangerousGetPinnableReference()))
-                {
-                    return new string(value, 0, _length);
-                }
+                fixed (char* value = &Unsafe.As<T, char>(ref DangerousGetPinnableReference())) { return new string(value, 0, _length); }
             }
             return $"System.Span<{typeof(T).Name}>[{_length}]";
         }
@@ -3740,10 +3452,7 @@ namespace System
 
         public T[] ToArray()
         {
-            if (_length == 0)
-            {
-                return SpanHelpers.PerTypeValues<T>.EmptyArray;
-            }
+            if (_length == 0) { return SpanHelpers.PerTypeValues<T>.EmptyArray; }
             T[] array = new T[_length];
             CopyTo(array);
             return array;
@@ -3753,10 +3462,7 @@ namespace System
         [EditorBrowsable(EditorBrowsableState.Never)]
         internal unsafe ref T DangerousGetPinnableReference()
         {
-            if (_pinnable == null)
-            {
-                return ref Unsafe.AsRef<T>(_byteOffset.ToPointer());
-            }
+            if (_pinnable == null) { return ref Unsafe.AsRef<T>(_byteOffset.ToPointer()); }
             return ref Unsafe.AddByteOffset(ref _pinnable.Data, _byteOffset);
         }
     }
