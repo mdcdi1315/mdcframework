@@ -4078,13 +4078,7 @@ namespace ROOT
 		/// </summary>
 		public void Dispose() { DisposeResources(); }
 
-		private void DisposeResources()
-		{
-#pragma warning disable CS0219
-			System.Object _TimeEl_ = null;
-			System.Object _Init_ = null;
-#pragma warning restore CS0219
-		}
+		private void DisposeResources() { _TimeEl_ = default; _Init_ = default; }
 	}
 
 	/*
@@ -4159,7 +4153,7 @@ namespace ROOT
 	/// <summary>
 	/// A simple and to-the-point console progress bar class.
 	/// </summary>
-	public class SimpleProgressBar
+	public sealed class SimpleProgressBar
 	{
 		private System.String Progr = "Completed";
 		private System.String Progm = "";
@@ -4178,8 +4172,7 @@ namespace ROOT
 		public System.String ProgressMessage
 		{
 			get { return Progr; }
-			set
-			{ if (System.String.IsNullOrEmpty(value)) { throw new System.ArgumentException("Illegal , not allowed to be null."); } else { Progr = value; } }
+			set { if (System.String.IsNullOrEmpty(value)) { throw new System.ArgumentException("Illegal , not allowed to be null."); } else { Progr = value; } }
 		}
 
 		/// <summary>
@@ -4216,10 +4209,7 @@ namespace ROOT
 			if (End > 300) { throw new System.ArgumentException("It is not allowed the End value to be more than 300."); }
 			if (Start >= End) { throw new System.ArgumentException("It is not allowed the Start value to be more than the ending value."); }
 			if (System.String.IsNullOrEmpty(progressMessage)) { throw new System.ArgumentException("The progressMessage is null."); }
-			Progr = progressMessage;
-			start = Start;
-			stp = Step;
-			end = End;
+			Progr = progressMessage; start = Start; stp = Step; end = End;
 		}
 
 		/// <summary>
@@ -4241,9 +4231,7 @@ namespace ROOT
 		{
 			if (End > 300) { throw new System.ArgumentException("It is not allowed this value to be more than 300."); }
 			if (System.String.IsNullOrEmpty(progressMessage)) { throw new System.ArgumentException("The progressMessage is null."); }
-			Progr = progressMessage;
-			stp = Step;
-			end = End;
+			Progr = progressMessage; stp = Step; end = End;
 		}
 
 
@@ -4267,11 +4255,7 @@ namespace ROOT
 		/// <summary>
 		/// This defines the step to use when the bar number will be changed. Can be also a negative <see cref="System.Int32"/> .
 		/// </summary>
-		public System.Int32 ProgressStep
-		{
-			get { return stp; }
-			set { stp = value; }
-		}
+		public System.Int32 ProgressStep { get { return stp; } set { stp = value; } }
 
 		/// <summary>
 		/// This defines the value that the progress bar will end to.
@@ -4300,7 +4284,7 @@ namespace ROOT
 		{
 			if (System.String.IsNullOrEmpty(Message)) { throw new System.ArgumentException("The Message is null."); }
 			Progr = Message;
-			System.Console.Write($"{Progr}: {iterator}/{end} [{Progm}]\r");
+            ConsoleInterop.WriteToConsole($"{Progr}: {iterator}/{end} [{Progm}]\r");
 		}
 
 		/// <summary>
@@ -4311,36 +4295,25 @@ namespace ROOT
 		/// <summary>
 		/// Update the progress by the defined step.
 		/// </summary>
-		public void UpdateProgress()
-		{
-			if (_Ended == false)
-			{
-				ProgressChangedArgs DFV = new ProgressChangedArgs(iterator += stp);
-				Progm += Progc;
-				this.ChangeProgress?.Invoke(null, DFV);
-			}
-		}
+		public void UpdateProgress() { if (_Ended == false) { Progm += Progc; ChangeProgress.Invoke(null, new ProgressChangedArgs(iterator += stp)); } }
 
-		private void ChangeBar(System.Object sender, ProgressChangedArgs e)
-		{
-			System.Console.Write($"{Progr}: {e.ChangedValueTo}/{end} [{Progm}] \r");
-		}
+		private void ChangeBar(System.Object sender, ProgressChangedArgs e) { ConsoleInterop.WriteToConsole($"{Progr}: {e.ChangedValueTo}/{end} [{Progm}] \r"); }
 
 		/// <summary>
 		/// The function which starts up the Console Bar. This should only be used in a new <see cref="System.Threading.ThreadStart"/> delegate.
 		/// </summary>
 		public void Invoke()
 		{
-			this.ChangeProgress += ChangeBar;
+			ChangeProgress += ChangeBar;
 			iterator = start;
-			System.Console.Write($"{Progr}: {iterator}/{end} [{Progm}]\r");
+			ConsoleInterop.WriteToConsole($"{Progr}: {iterator}/{end} [{Progm}]\r");
 			do
 			{
 				if (iterator >= end) { _Ended = true; }
 				System.Threading.Thread.Sleep(80);
 			} while (_Ended == false);
-			this.ChangeProgress -= ChangeBar;
-			this.ChangeProgress = null;
+			ChangeProgress -= ChangeBar;
+			ChangeProgress = null;
 			ROOT.MAIN.WriteConsoleText("\nCompleted.");
 			return;
 		}
@@ -5019,7 +4992,7 @@ namespace ROOT
 			/// <summary>
 			/// Gets a value whether the algorithm is optimized for 32-Bit machines.
 			/// If <see langword="false"/> , it indicates that the random 
-			/// algorithm is optimized for 64-Bit machines.
+			/// algorithm is optimized for 64-Bit machines only.
 			/// </summary>
 			public abstract System.Boolean Is32Bit { get; }
 
@@ -6894,7 +6867,7 @@ namespace ROOT
 		}
 
 		/// <summary>
-		/// Globally set or get the console foreground color. This property is used for the exproted MDCFR functions , 
+		/// Globally set or get the console foreground color. This property is used for the exported MDCFR functions , 
 		/// and this is equivalent to <see cref="System.Console.ForegroundColor"/> property.
 		/// </summary>
 		public static System.ConsoleColor ForegroundColor
@@ -6916,7 +6889,7 @@ namespace ROOT
 		}
 
         /// <summary>
-        /// Globally set or get the console background color. This property is used for the exproted MDCFR functions , 
+        /// Globally set or get the console background color. This property is used for the exported MDCFR functions , 
         /// and this is equivalent to <see cref="System.Console.BackgroundColor"/> property.
         /// </summary>
         public static System.ConsoleColor BackgroundColor
@@ -7376,7 +7349,8 @@ internal static class ConsoleInterop
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
-    internal static extern System.Boolean GetBufferInfo(System.IntPtr hConsoleOutput, out ROOT.ConsoleExtensions.CONSOLE_SCREEN_BUFFER_INFO lpConsoleScreenBufferInfo);
+    internal static extern System.Boolean GetBufferInfo(System.IntPtr ConsoleOutputHandle, 
+		out ROOT.ConsoleExtensions.CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo);
 
     internal static volatile System.IntPtr InputHandle = System.IntPtr.Zero;
 	internal static volatile System.IntPtr OutputHandle = System.IntPtr.Zero;
@@ -7472,16 +7446,19 @@ internal static class ConsoleInterop
 		UI = true)]
     public static System.Boolean WriteToConsole(System.Char[] data)
 	{
-		if (ROOT.ConsoleExtensions.Detached == true) { return true; }
 		System.String DI = null;
 		for (System.Int32 I = 0; I < data.Length; I++) { DI += data[I]; }
-        if (OutputHandle == System.IntPtr.Zero) { SetOutputHandle(); }
-		if (WriteToConsoleUnmanaged(OutputHandle , DI , 
-			data.Length , out System.Int32 CHARS , System.IntPtr.Zero) != 0)
-		{ return true; } else { return false;  }
+        return WriteToConsole(DI);
     }
 
-	public static System.Boolean WriteToConsole(System.String data) { return WriteToConsole(data.ToCharArray()); }
+	public static System.Boolean WriteToConsole(System.String data) 
+	{
+        if (ROOT.ConsoleExtensions.Detached == true) { return true; }
+        if (OutputHandle == System.IntPtr.Zero) { SetOutputHandle(); }
+        if (WriteToConsoleUnmanaged(OutputHandle, data,
+            data.Length, out System.Int32 CHARS, System.IntPtr.Zero) != 0)
+        { return true; } else { return false; }
+    }
 
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -7770,36 +7747,4 @@ namespace ExternalArchivingMethods
     // VA.Dispose();
     // DM.Close();
     // DM.Dispose();
-}
-
-
-/// <summary>
-/// An internal class defining the author's reserved strings.
-/// </summary>
-internal static class mdcdi1315
-{
-	/// <summary>
-	/// An internal string defining the current product.
-	/// </summary>
-    public const System.String Product = "MDC Application Framework";
-
-	/// <summary>
-	/// An internal string deinfing the author of the product.
-	/// </summary>
-    public const System.String Author = "mdcdi1315";
-
-	/// <summary>
-	/// A small description of this product.
-	/// </summary>
-    public const System.String Description = "Portable Application Development Framework";
-
-	/// <summary>
-	/// The Copyright of the current product.
-	/// </summary>
-    public const System.String Copyright = "© MDCDI1315. All Rights Reserved.";
-
-	/// <summary>
-	/// A URL link which mentions the source code repository.
-	/// </summary>
-    public const System.String SourceLink = "http://github.com/mdcdi1315/mdcframework";
 }

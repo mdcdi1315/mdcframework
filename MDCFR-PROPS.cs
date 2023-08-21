@@ -7,19 +7,51 @@ using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: System.Reflection.AssemblyCompanyAttribute($"© MDCDI1315. {mdcdi1315.SourceLink}")]
-[assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
-[assembly: System.Reflection.AssemblyCopyrightAttribute(mdcdi1315.Copyright)]
-[assembly: System.Reflection.AssemblyDescriptionAttribute(mdcdi1315.Description)]
-[assembly: System.Reflection.AssemblyFileVersionAttribute("1.5.5.04")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.5.5.04 Built by: © MDCDI1315.")]
-[assembly: System.Reflection.AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 4")]
-[assembly: System.Reflection.AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
-[assembly: System.Reflection.AssemblyVersionAttribute("4.4.0.0")]
-[assembly: DefaultDllImportSearchPaths(DllImportSearchPath.System32 | DllImportSearchPath.AssemblyDirectory)]
-[assembly: AssemblyMetadata("mdcdi1315" , "http://github.com/mdcdi1315")]
-[assembly: AssemblyMetadata("Repository URL" , mdcdi1315.SourceLink)]
-[assembly: AssemblyMetadata("RELEASECHANNEL" , "TRUE")]
-[assembly: AssemblyMetadata("FrameworkDisplayName (FDN Internal)" , ".NET Framework 4.8")]
-[assembly: System.Runtime.InteropServices.ComVisible(false)]
-[assembly: System.CLSCompliant(false)]
+[assembly: AssemblyCompanyAttribute($"© MDCDI1315. {mdcdi1315.SourceLink}")]
+[assembly: AssemblyConfigurationAttribute("Release")]
+[assembly: AssemblyCopyrightAttribute(mdcdi1315.Copyright)]
+[assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
+[assembly: AssemblyFileVersionAttribute("1.5.5.04")]
+[assembly: AssemblyInformationalVersionAttribute("1.5.5.04 Built by: © MDCDI1315.")]
+[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 4")]
+[assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
+[assembly: AssemblyVersionAttribute("4.4.0.0")]
+[assembly: DefaultDllImportSearchPathsAttribute(DllImportSearchPath.System32 | DllImportSearchPath.AssemblyDirectory)]
+[assembly: AssemblyMetadataAttribute(mdcdi1315.Author , "http://github.com/mdcdi1315")]
+[assembly: AssemblyMetadataAttribute("Repository URL" , mdcdi1315.SourceLink)]
+[assembly: AssemblyMetadataAttribute("RELEASECHANNEL" , "TRUE")]
+[assembly: AssemblyMetadataAttribute("FrameworkDisplayName (FDN Internal)" , ".NET Framework 4.8")]
+[assembly: ComVisibleAttribute(false)]
+[assembly: CLSCompliantAttribute(false)]
+
+
+/// <summary>
+/// An internal class defining the author's reserved strings.
+/// </summary>
+internal static class mdcdi1315
+{
+    /// <summary>
+    /// An internal string defining the current product.
+    /// </summary>
+    public const System.String Product = "MDC Application Framework";
+
+    /// <summary>
+    /// An internal string deinfing the author of the product.
+    /// </summary>
+    public const System.String Author = "mdcdi1315";
+
+    /// <summary>
+    /// A small description of this product.
+    /// </summary>
+    public const System.String Description = "Portable Application Development Framework";
+
+    /// <summary>
+    /// The Copyright of the current product.
+    /// </summary>
+    public const System.String Copyright = "© MDCDI1315. All Rights Reserved.";
+
+    /// <summary>
+    /// A URL link which mentions the source code repository.
+    /// </summary>
+    public const System.String SourceLink = "http://github.com/mdcdi1315/mdcframework";
+}

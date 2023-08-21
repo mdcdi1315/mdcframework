@@ -61,7 +61,8 @@ The project includes operations related to:
  - User Interaction (Showing a message to Windows , Getting or saving a file , etc.).
  - Registry editor (Now it is more accurate and stable , now is to be tested.) {Microsoft Windows Only!!!} .
  - Cryptography operations (Digests , AES(Implemented on my own using System.Security.Cryptography) , [DES](http://github.com/zeyadetman/Computer-Security-Algorithms) , etc.).
- - Archiving operations (Tar Archives , Zip Archives , GZip Archives  , [Zstandard](https://github.com/facebook/zstd) , Snappy and Brotli.)
+ - Archiving operations (Tar Archives , [Zip/GZip Archives](http://github.com/icsharpcode/SharpZipLib)  , [Zstandard](https://github.com/facebook/zstd) , 
+	[Snappy](http://github.com/brantburnett/Snappier) and [Brotli](http://github.com/master131/BrotliSharpLib).)
  
    __NOTE__: Zstandard archiving is only avaliable as a wrapper with limited functionality.
  - HTTP operations (The [JumpKick.HttpLib](https://github.com/j6mes/httplib) from James Thorne.).
@@ -104,7 +105,7 @@ for more information.
 - DES and Triple DES Implementations by zeyadetman at http://github.com/zeyadetman/Computer-Security-Algorithms .
 - Blake2s Checksum by sparkdustjoe at http://github.com/SparkDustJoe/Blake2 .
 - Cabinet Support by .NET Foundation (Taken from the WiX Toolset) at http://github.com/wixtoolset/wix .
-- Snappy Compression and Decompression native library by brantburnett at http://github.com/brantburnett/Snappier .
+- Snappy Compression and Decompression .NET library by brantburnett at http://github.com/brantburnett/Snappier .
 - A Full and exact implementation of Brotli archiving on C# (version is 0.6.0.) by master131 at http://github.com/master131/BrotliSharpLib .
 - The Packages used (NuGet) are creations of .NET Foundation located at http://github.com/dotnet .
 - Zip .NET Managed Library (SharpZipLib) by icsharpcode at http://github.com/icsharpcode/SharpZipLib .

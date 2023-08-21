@@ -2129,3 +2129,321 @@ programmer in the try to determine which STD Line
 cannot be correctly parsed.
 
  -- End of the `ROOT.STDType` Enumeration --
+
+## The SimpleProgressBar Class:
+CSharp Declaration:
+~~~C#
+public sealed class SimpleProgressBar
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed beforefieldinit ROOT.SimpleProgressBar
+       extends [mscorlib]System.Object
+~~~
+Description: This class intends to present a simple progress bar for console applications, which do not
+have such functionality and support for something similar.
+
+This class also aims to be simple and has only a defined set of functions and properties someone will need.
+
+Finally , it is allowed to change any setting during the display of the bar , or even to terminate it prematurely , if required.
+
+To make such an instance to work correctly , you must initiate a new thread for it and pass to the `ThreadStart` constructor
+the function `Invoke()`.
+
+### Constructors:
+
+#### Parameterless Constructor:
+CSharp Declaration:
+~~~C#
+public SimpleProgressBar() { }
+~~~
+Initailises a new instance of the class. All required settings must be set by the provided properties.
+
+#### Constructor 1:
+CSharp Declaration:
+~~~C#
+public SimpleProgressBar(System.Int32 Start, System.Int32 Step, System.Int32 End)
+~~~
+Initailises a new instance of the class with the specified start point , the step defined for each progress change and
+when the Progress Bar will end it's execution (End value).
+
+__Parameters__:
+1. `System.Int32 Start`: The start point value.
+2. `System.Int32 Step`: The Step value for each progress change.
+3. `System.Int32 End`: The value when the Progress Bar will end it's execution.
+
+#### Constructor 2:
+CSharp Declaration:
+~~~C#
+public SimpleProgressBar(System.String progressMessage, System.Int32 Start, System.Int32 Step, System.Int32 End)
+~~~
+Initailises a new instance of the class with the specified progress message , start point , 
+the step defined for each progress change and
+when the Progress Bar will end it's execution (End value).
+
+__Parameters__:
+1. `System.Int32 progressMessage`: The initial , and specified Progress Message.
+2. `System.Int32 Start`: The start point value.
+3. `System.Int32 Step`: The Step value for each progress change.
+4. `System.Int32 End`: The value when the Progress Bar will end it's execution.
+
+#### Constructor 3:
+CSharp Declaration:
+~~~C#
+public SimpleProgressBar(System.Int32 Step, System.Int32 End) 
+~~~
+Initailises a new instance of the class with the step defined for each progress change and
+when the Progress Bar will end it's execution (End value).
+
+__Parameters__:
+1. `System.Int32 Step`: The Step value for each progress change.
+2. `System.Int32 End`: The value when the Progress Bar will end it's execution.
+
+#### Constructor 4:
+CSharp Declaration:
+~~~C#
+public SimpleProgressBar(System.String progressMessage, System.Int32 Step, System.Int32 End)
+~~~
+Initailises a new instance of the class with the specified progress message ,
+the step defined for each progress change and
+when the Progress Bar will end it's execution (End value).
+
+__Parameters__:
+1. `System.String progressMessage`: The initial , and specified Progress Message.
+2. `System.Int32 Step`: The Step value for each progress change.
+3. `System.Int32 End`: The value when the Progress Bar will end it's execution.
+
+### Properties:
+
+#### 1. The ProgressChar Property:
+CSharp Declaration:
+~~~C#
+public System.Char ProgressChar
+~~~
+Gets or sets the progress character to show in the literal progress bar.
+
+By default , that character is a dot `.` .
+
+__Get__: The current set character for the progress bar.
+
+__Set__: A different character to set for the progress bar. 
+
+__NOTE!!__ If you set an character in the bar that is illegal (special character , slashes , etc.) will throw an
+`System.ArgumentException`.
+
+#### 2. The ProgressStep Property:
+CSharp Declaration:
+~~~C#
+public System.Int32 ProgressStep
+~~~
+Gets or sets the current progress step which is used when the `UpdateProgress()` method is called.
+
+__Get__: The current progress step.
+
+__Set__: Define a new progress step to be used when the `UpdateProgress()` method is called.
+
+
+#### 3. The ProgressEndValue Property:
+CSharp Declaration:
+~~~C#
+public System.Int32 ProgressEndValue
+~~~
+Gets or sets the value when the progress bar will finish execution.
+
+__Get__: The current value.
+
+__Set__: The new value that the progress bar will finish execution.
+
+#### 3. The ProgressStartValue Property:
+CSharp Declaration:
+~~~C#
+public System.Int32 ProgressStartValue
+~~~
+Gets or sets the value when the progress bar will start execution.
+
+__Get__: The current value.
+
+__Set__: The new value that the progress bar will start execution.
+
+__NOTE!!__ If the value set is greater than the value of the `ProgressEndValue` property , 
+then it will throw a `System.ArgumentException` .
+
+
+#### 4. The Ended Property:
+CSharp Declaration:
+~~~C#
+public System.Boolean Ended
+~~~
+Gets a value whether the instance has finished execution.
+
+If you set this value to `true` , then the instance will stop execution immediately
+and you can then dispose the thread.
+
+__Get__: `false` if the progress bar is still running actively; `true` if the execution has stopped.
+
+__Set__: If set to `true` , it will stop execution immediately.
+
+### Methods:
+
+#### 1. The Invoke method:
+CSharp Declaration:
+~~~C#
+public void Invoke()
+~~~
+Initiates actively the console progress bar. Should be passed to either a new thread or anything else
+that has access and control to a thread.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What this function does is to actively initiate the progress bar.
+
+#### 2. The UpdateMessageString method:
+CSharp Declaration:
+~~~C#
+public void UpdateMessageString(System.String Message)
+~~~
+Updates the message that describes the current execution action in your application.
+
+__Parameters__:
+   1. `System.String Message`: The message data to replace with the bar's current one.
+   
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to update the bar's message.
+
+
+#### 3. The UpdateProgress method:
+CSharp Declaration:
+~~~C#
+public void UpdateProgress()
+~~~
+Increments the current bar progress by the value defined by the `ProgressStep` property.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What is does is to increment the current bar progress.
+
+ -- End of `ROOT.SimpleProgressBar` Class --
+
+## The SystemLinks Enumeration:
+CSharp Declaration:
+~~~C#
+public enum SystemLinks
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed ROOT.SystemLinks
+       extends [mscorlib]System.Enum
+~~~
+Description: This Enumeration provides some default values so as to 
+open some UWP system apps or UWP apps that ship with every 
+Windows 10 / 11 OS.
+
+This eunmeration is only used by the OpenSystemApp overloads defined
+in the _MAIN_ class.
+
+### Fields:
+
+#### 1. The Settings Field:
+Opens the Windows Settings application.
+
+#### 2. The Store Field:
+Opens the Microsoft Store application.
+
+#### 3. The ActionBar Field:
+Opens the Windows Shell Action Bar. It has Windows Notifications and a small calendar.
+
+#### 4. The FastSettings Field:
+Opens the Quick Settings menu. It contains settings for BlueTooth , Wi-FI , Sound and Mobile Hotspot settings.
+
+#### 5. The ScreenSnippingTool Field:
+Opens the Print-Screen Snipping tool. It assists in printing the computer's screen or selecting only a portion of it.
+
+#### 6. The PhoneLink Field:
+Opens the Phone Link tool for externally connected Android devices.
+
+#### 7. The GetStarted Field:
+Opens the Get Started App.
+
+#### 8. The MusicApp Field:
+Opens the default Music App that you have associated to Windows.
+
+#### 9. The WindowsSecurity Field:
+Opens the Windows Defended App.
+
+#### 10. The MailApp Field:
+Opens the Mail App.
+
+#### 11. The Calendar Field:
+Opens the Calendar App. 
+
+#### 12. The PeopleApp Field:
+Opens the People App. 
+
+#### 13. The Camera Field:
+Opens the Camera App. 
+
+#### 14. The MapsApp Field:
+Opens the Maps App. 
+
+#### 15. The Calculator Field:
+Opens the Calculator App. 
+
+#### 16. The ClockApp Field:
+Opens the Clock App. 
+
+ -- End of the `ROOT.SystemLinks` Enumeration --
+
+## The TimeCalculator Class:
+CSharp Declaration:
+~~~C#
+public sealed class TimeCaculator : System.IDisposable
+~~~
+IL Declaration:
+~~~IL
+.class public auto ansi sealed beforefieldinit ROOT.TimeCaculator
+       extends [mscorlib]System.Object
+       implements [mscorlib]System.IDisposable
+~~~
+Description: The TimeCalculator class can be used to 
+calculate the time needed to execute code excerpts.
+
+It's mecahnism does not use any CPU resources , but only when it is
+initiated or closed.
+
+### Methods:
+
+#### 1. The Init method:
+CSharp Declaration:
+~~~C#
+public void Init()
+~~~
+Initialises the Time Calculator. Remember that the clock will calculate the time after this method was called.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What this function does is to initiate the time calculator.
+
+#### 2. The CalculateTime method:
+CSharp Declaration:
+~~~C#
+public System.Int32 CaculateTime()
+~~~
+Closes the calculation session and calculates the time needed to reach until before this function was called.
+
+__Returns__: A value which is the needed time to reach this function.
+
+#### 2. The Dispose method:
+CSharp Declaration:
+~~~C#
+public void Dispose()
+~~~
+Resets the current saved values so as to begin a new calculation session.
+
+__Returns__: 
+   This function is declared as `void` , so it does return nothing.
+   What it does is to reset the calculated values so as to begin a new session.
+
+-- End of `ROOT.TimeCalculator` Class -- 
+
+### End of the `ROOT` Documentation for now. Last Update Time: 21/8/2023 , 18:44 EST (UTC+02:00).

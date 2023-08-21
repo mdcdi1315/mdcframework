@@ -1,4 +1,4 @@
-## Making a new request for adding you own Project:
+## Making a new request for adding your own Project:
 
 To make a new request to add your own Project in the MDCFR library , it has some requirements and restrictions.
 
@@ -11,7 +11,7 @@ Framework.
 
 If your project code is targeted for .NET >= 6 , then check out if it can be __FULLY__ ported to .NET Framework.
 
-(Known restriction: ref members in classes or strctures are unsupported by .NET Framework)
+(Known restriction: ref members in classes or structures are unsupported by .NET Framework)
 
 __IF__ your project depends on API's that are of .NET >= 6 , then check also out if any of the embedded 
 packages cover your project's needs.
@@ -35,7 +35,7 @@ and provide you the next steps/moves you need to follow.
 
 7. Finally , the source code that _YOU_ will provide must be of your project's latest stable major or minor release.
 
-(This is done so as to avoid common errors/issues in your Project.)
+(This is done so as to avoid common errors/issues in your project.)
 
 ### Guide to create a new request for your Project addition:
 
@@ -43,7 +43,7 @@ __Step 1.__ Clone the MDCFR Repository to your local computer
 
 (You can also just download the ZIP from GitHub)
 
-__Step 2.__ Add your project's source code in a single new file and give it a name. Be noted that the filename will be changed.
+__Step 2.__ Add your project's source code to the cloned repo in a single new file and give it a name. Be noted that the filename will be changed.
 
 __NOTE!!!__ Your Project code must be in only one source file. 
 However , if your code size exceeds 2.5 ~ 2.7 MB , then you can add 
@@ -61,15 +61,15 @@ See an example:
 ~~~
 Where `MySourceFileName` the temporary filename of your source file.
 
-__Step 4.__ Create a new Pull Request.
+__Step 4.__ Create a new Pull Request using the cloned repo you modified.
 
-Additionally write or copy exactly this prefix to the Pull Request description: `"Project Addition:"`
+Additionally write or copy exactly this prefix to the Pull Request title: `"Project Addition:"`
 (Without the double quotes please).
 
 __NOTE!!__ Any Pull Request that does not have that prefix and intends a Project Addition 
 will be turned down immediately.
 
-__Step 5.__ Write a small description of your Project , (e.g. what it does and how it would help the other developers which using it)
+__Step 5.__ Write a small description of your Project , (e.g. what it does and how it would help the other developers which are actively using the MDC Framework)
 , and send the Pull Request.
 
 __Step 6.__ You have to now just wait. You will recieve an answer whether your project will be included or not in the next minor release as
