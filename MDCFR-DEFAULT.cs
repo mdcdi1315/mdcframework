@@ -5148,7 +5148,7 @@ namespace ROOT
         /// We suggest to use a sign test to extract a random Boolean value, and right shifts to extract subsets of bits.
         /// </para>
         /// </summary>
-        public sealed class Xoroshiro128P : IRandomBase
+        public sealed class Xoshiro128P : IRandomBase
 		{
 			private static System.UInt32[] JUMP = { 0x8764000b, 0xf542d2d3, 0x6fa035c3, 0x77f2db5b };
 			private static System.UInt32[] LONG_JUMP = { 0xb523952e, 0x0b6f099f, 0xccf5a0ef, 0x1c580662 };
@@ -5157,15 +5157,15 @@ namespace ROOT
             private System.UInt32 _SEED = 0;
 
             /// <summary>
-            /// Create a new instance of <see cref="Xoroshiro128P"/> with a default seed value of 0.
+            /// Create a new instance of <see cref="Xoshiro128P"/> with a default seed value of 0.
             /// </summary>
-            public Xoroshiro128P() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
+            public Xoshiro128P() { STATE[0] = 2; STATE[1] = 0; STATE[1] -= 2; }
 
             /// <summary>
-            /// Create a new instance of <see cref="Xoroshiro128P"/> with the seed value specified.
+            /// Create a new instance of <see cref="Xoshiro128P"/> with the seed value specified.
             /// </summary>
             /// <param name="Seed">A Seed value which will be used for consumption in the generator.</param>
-            public Xoroshiro128P(System.Int32 Seed)
+            public Xoshiro128P(System.Int32 Seed)
             {
                 _SEED = (System.UInt32) Seed;
                 if ((Seed / 2) != 0) { STATE[0] = (System.UInt32) Seed / 2; } else { STATE[0] = _SEED * 2; }
@@ -5187,9 +5187,9 @@ namespace ROOT
             }
 
             /// <summary>
-            /// Produce a new <see cref="Xoroshiro128P"/> random number.
+            /// Produce a new <see cref="Xoshiro128P"/> random number.
             /// </summary>
-            /// <returns>A new <see cref="Xoroshiro128P"/> random number.</returns>
+            /// <returns>A new <see cref="Xoshiro128P"/> random number.</returns>
             public System.UInt64 Next()
 			{
                 System.UInt32 result = STATE[0] + STATE[3];
@@ -5270,7 +5270,7 @@ namespace ROOT
             }
 
             /// <summary>
-            /// Disposes the <see cref="Xoroshiro128P"/> instance.
+            /// Disposes the <see cref="Xoshiro128P"/> instance.
             /// </summary>
             public void Dispose() { STATE = null; JUMP = null; LONG_JUMP = null; }
 
@@ -5553,6 +5553,80 @@ namespace ROOT
             /// <inheritdoc />
             public System.Boolean Is32Bit { get { return true; } }
         }
+
+		/// <summary>
+		/// General purpose class to extract random values smaller than an <see cref="System.UInt64"/> number
+		/// returned from the classes that implement the <see cref="IRandomBase"/> interface.
+		/// </summary>
+		public static class RandomHelpers
+		{
+			/// <summary>
+			/// Converts the random value given to a equivalent <see cref="System.Int32"/> instance.
+			/// </summary>
+			/// <param name="value">The random value to convert.</param>
+			/// <returns>A new <see cref="System.Int32"/> instance that represents the <paramref name="value"/> ,
+			/// but as <see cref="System.Int32"/> code points.</returns>
+			public static System.Int32 ToInt32(System.UInt64 value) { return (System.Int32) (value >> 48); }
+
+            /// <summary>
+            /// Converts the random value given to a equivalent <see cref="System.Int64"/> instance.
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>A new <see cref="System.Int64"/> instance that represents the <paramref name="value"/> ,
+            /// but as <see cref="System.Int64"/> code points.</returns>
+            public static System.Int64 ToInt64(System.UInt64 value) { return (System.Int32) (value >> 32); }
+
+            /// <summary>
+            /// Converts the random value given to a equivalent <see cref="System.UInt16"/> instance.
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>A new <see cref="System.UInt16"/> instance that represents the <paramref name="value"/> ,
+            /// but as <see cref="System.UInt16"/> code points.</returns>
+            public static System.UInt16 ToUInt16(System.UInt64 value) { return (System.UInt16) ((value >> 32) >> 16); }
+
+            /// <summary>
+            /// Converts the random value given to a equivalent <see cref="System.Int16"/> instance.
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>A new <see cref="System.UInt16"/> instance that represents the <paramref name="value"/> ,
+            /// but as <see cref="System.UInt16"/> code points.</returns>
+            public static System.Int16 ToInt16(System.UInt64 value) { return (System.Int16)((value >> 32) >> 6 >> 11);  }
+
+            /// <summary>
+            /// Converts the random value given to a equivalent <see cref="System.Byte"/> instance.
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>A new <see cref="System.Byte"/> instance that represents the <paramref name="value"/> ,
+            /// but as <see cref="System.Byte"/> code points.</returns>
+            public static System.Byte ToByte(System.UInt64 value) { return (System.Byte) ((value >> 32) >> 8 >> 16); }
+
+            /// <summary>
+            /// Converts the random value given to a equivalent <see cref="System.Char"/> instance.
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>A new <see cref="System.Char"/> instance that represents the <paramref name="value"/> ,
+            /// but as <see cref="System.Char"/> code points.</returns>
+            public static System.Char ToChar(System.UInt64 value) { return (System.Char) ToUInt16(value); }
+
+            /// <summary>
+            /// <para>Converts the random value given to a <see cref="System.Single"/> value using a special formula. </para>
+			/// <para>This formula guarantees that one value returned from 10 random iterations might produce 
+			/// a number that is fully convertible to an integer. </para>
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>The random <see cref="System.Single"/> number produced by the formula.</returns>
+            public static System.Single ToFloat(System.UInt64 value) { return (System.Single) ((value >> 32) >> 16 / 5 / 4); }
+
+            /// <summary>
+            /// <para>Converts the random value given to a <see cref="System.Double"/> value using a special formula. </para>
+            /// <para>This formula guarantees that one value returned from 10 random iterations might produce 
+            /// a number that is fully convertible to an integer. </para>
+            /// </summary>
+            /// <param name="value">The random value to convert.</param>
+            /// <returns>The random <see cref="System.Double"/> number produced by the formula.</returns>
+            public static System.Double ToDouble(System.UInt64 value) { return (System.Double) ((value >> 32) >> 16 / 5 / 4); }
+
+		}
 
     }
 
