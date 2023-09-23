@@ -3,6 +3,10 @@
 # Proper warning overrides for ALL the files. PLEASE do not put here
 # any important warnings.
 dotnet_diagnostic.IDE0251.severity = none 
+dotnet_diagnostic.IDE0034.severity = none
+dotnet_diagnostic.IDE0044.severity = none
+dotnet_diagnostic.IDE0090.severity = none
+dotnet_diagnostic.IDE0063.severity = none
 
 [MDCFR-SYSCOLIMUT.cs]
 
@@ -31,4 +35,18 @@ dotnet_diagnostic.CS8769.severity = none
 [MDCFR-HTTPLIB.cs]
 
 # Proper warning overrides for MDCFR-HTTPLIB.cs file
+dotnet_diagnostic.CS1591.severity = none
+
+[MDCFR-SYSTEN.cs]
+
+# Proper warning overrides for MDCFR-SYSTEN.cs file
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8602.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8618.severity = none
+
+[MDCFR-NAUDIO.cs]
+
+# Proper warning overrides for MDCFR-NAUDIO.cs file
 dotnet_diagnostic.CS1591.severity = none

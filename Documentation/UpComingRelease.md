@@ -87,3 +87,46 @@ However , it needs to be tested so as to be used in production.
    
     -- Any functions that used the library are also deprecated , except for some that can be migrated
     by using some functions of mscorlib.
+ 
+## Minor Version 1.5.5.4:
+In this minor release , some more NuGet packages are now embedded , allowing more operations to be done in
+.NET Framework 4.8.
+
+ - Final decision about Visual Basic Runtime Library:
+     
+    The dependencies have all been sucessfully removed from MDCFR that involved the library.
+    
+    The library dependency will be removed in the last minor release of 1.5.5. .
+  
+  - Added the NAudio package 
+     
+    The NAudio package is maybe one of the most famous packages for playing audio through .NET .
+    
+    This package was included in the Project because someone would need to play an audio resource
+    for his application.
+ 
+  - All documentation will be migrated to Markdown using xmldocmd . This will not be used yet in this minor release
+   
+    because I am testing if that would work sucessfully.
+  
+  - The Project might be also compiled in .NET >= 6 . 
+  
+    This is also in test phase yet , however for those who need to migrate apps 
+    from .NET Framework 4.8 is extremely useful to have the Project bindings to .NET >= 6.
+  
+    Of course , that library will not contain any of the packages embedded , due to the fact that
+    .NET 6 has these packages already pre-installed.
+
+  - Minor changes to source files , added missing documentation for System.Memory and System.Buffers packages , 
+    and some bug fixes.
+  
+  - From 1.5.5.4. and ahead , a debug release of the library will also exist , along with a full PDB file.
+   
+   \-> This means that you have the ability to debug even the MDCFR itself if it is needed , 
+   or to debug your application that uses the MDCFR code.
+
+   \-> This flavor of the MDCFR library is called "Debug Flavor" and the PDB along with it it
+   is used for debugging reasons only.
+
+   \-> New Manifest properties defined globally in the assembly can help you detect if the 
+   assembly you are using is in debug or release flavor.

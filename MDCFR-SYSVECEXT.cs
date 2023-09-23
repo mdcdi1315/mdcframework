@@ -5,12 +5,13 @@
 
 using System.Text;
 using System.Globalization;
-using System.Numerics.Hashing;
 using System.Runtime.CompilerServices;
 
 
 namespace System.Numerics
 {
+    /// <summary>Represents a single vector of a specified numeric type that is suitable for low-level optimization of parallel algorithms.</summary>
+    /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
     [Intrinsic]
     public struct Vector<T> : IEquatable<Vector<T>>, IFormattable where T : struct
     {
@@ -31,6 +32,9 @@ namespace System.Numerics
 
         private static readonly Vector<T> s_allOnes = new Vector<T>(GetAllBitsSetValue());
 
+        /// <summary>Returns the number of elements stored in the vector.</summary>
+        /// <returns>The number of elements stored in the vector.</returns>
+        /// <exception cref="T:System.NotSupportedException">Access to the property getter via reflection is not supported.</exception>
         public static int Count
         {
             [Intrinsic]
@@ -40,6 +44,8 @@ namespace System.Numerics
             }
         }
 
+        /// <summary>Returns a vector containing all zeroes.</summary>
+        /// <returns>A vector containing all zeroes.</returns>
         public static Vector<T> Zero
         {
             [Intrinsic]
@@ -49,6 +55,8 @@ namespace System.Numerics
             }
         }
 
+        /// <summary>Returns a vector containing all ones.</summary>
+        /// <returns>A vector containing all ones.</returns>
         public static Vector<T> One
         {
             [Intrinsic]
@@ -60,6 +68,12 @@ namespace System.Numerics
 
         internal static Vector<T> AllOnes => s_allOnes;
 
+        /// <summary>Gets the element at a specified index.</summary>
+        /// <param name="index">The index of the element to return.</param>
+        /// <returns>The element at index <paramref name="index">index</paramref>.</returns>
+        /// <exception cref="T:System.IndexOutOfRangeException"><paramref name="index">index</paramref> is less than zero.  
+        ///  -or-  
+        ///  <paramref name="index">index</paramref> is greater than or equal to <see cref="System.Numerics.Vector{T}.Count"></see>.</exception>
         public unsafe T this[int index]
         {
             [Intrinsic]
@@ -67,7 +81,7 @@ namespace System.Numerics
             {
                 if (index >= Count || index < 0)
                 {
-                    throw new IndexOutOfRangeException(SR.Format(MDCFR.Properties.Resources.Arg_ArgumentOutOfRangeException, index));
+                    throw new IndexOutOfRangeException(System.SR.Format(MDCFR.Properties.Resources.Arg_ArgumentOutOfRangeException, index));
                 }
                 if (typeof(T) == typeof(byte))
                 {
@@ -197,6 +211,8 @@ namespace System.Numerics
             return num / num2;
         }
 
+        /// <summary>Creates a vector whose components are of a specified type.</summary>
+        /// <param name="value">The numeric type that defines the type of the components in the vector.</param>
         [Intrinsic]
         public unsafe Vector(T value)
         {
@@ -406,12 +422,22 @@ namespace System.Numerics
             }
         }
 
+        /// <summary>Creates a vector from a specified array.</summary>
+        /// <param name="values">A numeric array.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="values">values</paramref> is null.</exception>
         [Intrinsic]
         public Vector(T[] values)
             : this(values, 0)
         {
         }
 
+        /// <summary>Creates a vector from a specified array starting at a specified index position.</summary>
+        /// <param name="values">A numeric array.</param>
+        /// <param name="index">The starting index position from which to create the vector.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="values">values</paramref> is null.</exception>
+        /// <exception cref="T:System.IndexOutOfRangeException"><paramref name="index">index</paramref> is less than zero.  
+        ///  -or-  
+        ///  The length of <paramref name="values">values</paramref> minus <paramref name="index">index</paramref> is less than <see cref="System.Numerics.Vector{T}.Count"></see>.</exception>
         public unsafe Vector(T[] values, int index)
         {
             this = default(Vector<T>);
@@ -421,7 +447,7 @@ namespace System.Numerics
             }
             if (index < 0 || values.Length - index < Count)
             {
-                throw new IndexOutOfRangeException(SR.Format(MDCFR.Properties.Resources.Arg_InsufficientNumberOfElements, Count, "values"));
+                throw new IndexOutOfRangeException(System.SR.Format(MDCFR.Properties.Resources.Arg_InsufficientNumberOfElements, Count, "values"));
             }
             if (Vector.IsHardwareAccelerated)
             {
@@ -804,12 +830,22 @@ namespace System.Numerics
             register = existingRegister;
         }
 
+        /// <summary>Copies the vector instance to a specified destination array.</summary>
+        /// <param name="destination">The array to receive a copy of the vector values.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="destination">destination</paramref> is null.</exception>
+        /// <exception cref="T:System.ArgumentException">The number of elements in the current vector is greater than the number of elements available in the <paramref name="destination">destination</paramref> array.</exception>
         [Intrinsic]
         public void CopyTo(T[] destination)
         {
             CopyTo(destination, 0);
         }
 
+        /// <summary>Copies the vector instance to a specified destination array starting at a specified index position.</summary>
+        /// <param name="destination">The array to receive a copy of the vector values.</param>
+        /// <param name="startIndex">The starting index in destination at which to begin the copy operation.</param>
+        /// <exception cref="T:System.ArgumentNullException"><paramref name="destination">destination</paramref> is null.</exception>
+        /// <exception cref="T:System.ArgumentException">The number of elements in the current instance is greater than the number of elements available from <paramref name="startIndex">startIndex</paramref> to the end of the <paramref name="destination">destination</paramref> array.</exception>
+        /// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="startIndex">index</paramref> is less than zero or greater than the last index in <paramref name="destination">destination</paramref>.</exception>
         [Intrinsic]
         public unsafe void CopyTo(T[] destination, int startIndex)
         {
@@ -819,11 +855,11 @@ namespace System.Numerics
             }
             if (startIndex < 0 || startIndex >= destination.Length)
             {
-                throw new ArgumentOutOfRangeException("startIndex", SR.Format(MDCFR.Properties.Resources.Arg_ArgumentOutOfRangeException, startIndex));
+                throw new ArgumentOutOfRangeException("startIndex", System.SR.Format(MDCFR.Properties.Resources.Arg_ArgumentOutOfRangeException, startIndex));
             }
             if (destination.Length - startIndex < Count)
             {
-                throw new ArgumentException(SR.Format(MDCFR.Properties.Resources.Arg_ElementsInSourceIsGreaterThanDestination, startIndex));
+                throw new ArgumentException(System.SR.Format(MDCFR.Properties.Resources.Arg_ElementsInSourceIsGreaterThanDestination, startIndex));
             }
             if (Vector.IsHardwareAccelerated)
             {
@@ -1060,6 +1096,9 @@ namespace System.Numerics
             }
         }
 
+        /// <summary>Returns a value that indicates whether this instance is equal to a specified object.</summary>
+        /// <param name="obj">The object to compare with this instance.</param>
+        /// <returns>true if the current instance and <paramref name="obj">obj</paramref> are equal; otherwise, false. The method returns false if <paramref name="obj">obj</paramref> is null, or if <paramref name="obj">obj</paramref> is a vector of a different type than the current instance.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public override bool Equals(object obj)
         {
@@ -1070,6 +1109,9 @@ namespace System.Numerics
             return Equals((Vector<T>)obj);
         }
 
+        /// <summary>Returns a value that indicates whether this instance is equal to a specified vector.</summary>
+        /// <param name="other">The vector to compare with this instance.</param>
+        /// <returns>true if the current instance and <paramref name="other">other</paramref> are equal; otherwise, false.</returns>
         [Intrinsic]
         public bool Equals(Vector<T> other)
         {
@@ -1167,6 +1209,8 @@ namespace System.Numerics
             throw new NotSupportedException(MDCFR.Properties.Resources.Arg_TypeNotSupported);
         }
 
+        /// <summary>Returns the hash code for this instance.</summary>
+        /// <returns>The hash code.</returns>
         public override int GetHashCode()
         {
             int num = 0;
@@ -1353,16 +1397,25 @@ namespace System.Numerics
             throw new NotSupportedException(MDCFR.Properties.Resources.Arg_TypeNotSupported);
         }
 
+        /// <summary>Returns the string representation of this vector using default formatting.</summary>
+        /// <returns>The string representation of this vector.</returns>
         public override string ToString()
         {
             return ToString("G", CultureInfo.CurrentCulture);
         }
 
+        /// <summary>Returns the string representation of this vector using the specified format string to format individual elements.</summary>
+        /// <param name="format">A  or  that defines the format of individual elements.</param>
+        /// <returns>The string representation of the current instance.</returns>
         public string ToString(string format)
         {
             return ToString(format, CultureInfo.CurrentCulture);
         }
 
+        /// <summary>Returns the string representation of this vector using the specified format string to format individual elements and the specified format provider to define culture-specific formatting.</summary>
+        /// <param name="format">A  or  that defines the format of individual elements.</param>
+        /// <param name="formatProvider">A format provider that supplies culture-specific formatting information.</param>
+        /// <returns>The string representation of the current instance.</returns>
         public string ToString(string format, IFormatProvider formatProvider)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -1379,6 +1432,10 @@ namespace System.Numerics
             return stringBuilder.ToString();
         }
 
+        /// <summary>Adds two vectors together.</summary>
+        /// <param name="left">The first vector to add.</param>
+        /// <param name="right">The second vector to add.</param>
+        /// <returns>The summed vector.</returns>
         public unsafe static Vector<T> operator +(Vector<T> left, Vector<T> right)
         {
             if (Vector.IsHardwareAccelerated)
@@ -1575,6 +1632,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Subtracts the second vector from the first.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The vector that results from subtracting <paramref name="right">right</paramref> from <paramref name="left">left</paramref>.</returns>
         public unsafe static Vector<T> operator -(Vector<T> left, Vector<T> right)
         {
             if (Vector.IsHardwareAccelerated)
@@ -1771,6 +1832,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Multiplies two vectors together.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The product vector.</returns>
         public unsafe static Vector<T> operator *(Vector<T> left, Vector<T> right)
         {
             if (Vector.IsHardwareAccelerated)
@@ -1967,6 +2032,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Multiplies a vector by a specified scalar value.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <param name="factor">A scalar value.</param>
+        /// <returns>The scaled vector.</returns>
         public static Vector<T> operator *(Vector<T> value, T factor)
         {
             if (Vector.IsHardwareAccelerated)
@@ -2073,6 +2142,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Multiplies a vector by the given scalar.</summary>
+        /// <param name="factor">The scalar value.</param>
+        /// <param name="value">The source vector.</param>
+        /// <returns>The scaled vector.</returns>
         public static Vector<T> operator *(T factor, Vector<T> value)
         {
             if (Vector.IsHardwareAccelerated)
@@ -2179,6 +2252,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Divides the first vector by the second.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The vector that results from dividing <paramref name="left">left</paramref> by <paramref name="right">right</paramref>.</returns>
         public unsafe static Vector<T> operator /(Vector<T> left, Vector<T> right)
         {
             if (Vector.IsHardwareAccelerated)
@@ -2375,11 +2452,18 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Negates a given vector.</summary>
+        /// <param name="value">The vector to negate.</param>
+        /// <returns>The negated vector.</returns>
         public static Vector<T> operator -(Vector<T> value)
         {
             return Zero - value;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise And operation on each of the elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The vector that results from the bitwise And of <paramref name="left">left</paramref> and <paramref name="right">right</paramref>.</returns>
         [Intrinsic]
         public unsafe static Vector<T> operator &(Vector<T> left, Vector<T> right)
         {
@@ -2402,6 +2486,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise Or operation on each of the elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The vector that results from the bitwise Or of the elements in <paramref name="left">left</paramref> and <paramref name="right">right</paramref>.</returns>
         [Intrinsic]
         public unsafe static Vector<T> operator |(Vector<T> left, Vector<T> right)
         {
@@ -2424,6 +2512,10 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise XOr operation on each of the elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <returns>The vector that results from the bitwise XOr of the elements in <paramref name="left">left</paramref> and <paramref name="right">right</paramref>.</returns>
         [Intrinsic]
         public unsafe static Vector<T> operator ^(Vector<T> left, Vector<T> right)
         {
@@ -2446,18 +2538,29 @@ namespace System.Numerics
             return result;
         }
 
+        /// <summary>Returns a new vector whose elements are obtained by taking the one&amp;#39;s complement of a specified vector&amp;#39;s elements.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <returns>The one&amp;#39;s complement vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> operator ~(Vector<T> value)
         {
             return s_allOnes ^ value;
         }
 
+        /// <summary>Returns a value that indicates whether each pair of elements in two specified vectors are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>true if <paramref name="left">left</paramref> and <paramref name="right">right</paramref> are equal; otherwise, false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator ==(Vector<T> left, Vector<T> right)
         {
             return left.Equals(right);
         }
 
+        /// <summary>Returns a value that indicates whether any single pair of elements in the specified vectors is equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>true if any element pairs in left and right are equal. false if no element pairs are equal.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool operator !=(Vector<T> left, Vector<T> right)
         {
@@ -4485,9 +4588,13 @@ namespace System.Numerics
             throw new NotSupportedException(MDCFR.Properties.Resources.Arg_TypeNotSupported);
         }
     }
+   
+    /// <summary>Provides a collection of static convenience methods for creating, manipulating, combining, and converting generic vectors.</summary>
     [Intrinsic]
     public static class Vector
     {
+        /// <summary>Gets a value that indicates whether vector operations are subject to hardware acceleration through JIT intrinsic support.</summary>
+        /// <returns>true if vector operations are subject to hardware acceleration; otherwise, false.</returns>
         public static bool IsHardwareAccelerated
         {
             [Intrinsic]
@@ -4497,6 +4604,9 @@ namespace System.Numerics
             }
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static void Widen(Vector<byte> source, out Vector<ushort> low, out Vector<ushort> high)
@@ -4516,6 +4626,9 @@ namespace System.Numerics
             high = new Vector<ushort>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static void Widen(Vector<ushort> source, out Vector<uint> low, out Vector<uint> high)
@@ -4535,6 +4648,9 @@ namespace System.Numerics
             high = new Vector<uint>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static void Widen(Vector<uint> source, out Vector<ulong> low, out Vector<ulong> high)
@@ -4554,6 +4670,9 @@ namespace System.Numerics
             high = new Vector<ulong>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static void Widen(Vector<sbyte> source, out Vector<short> low, out Vector<short> high)
@@ -4573,6 +4692,9 @@ namespace System.Numerics
             high = new Vector<short>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [Intrinsic]
         public unsafe static void Widen(Vector<short> source, out Vector<int> low, out Vector<int> high)
         {
@@ -4591,6 +4713,9 @@ namespace System.Numerics
             high = new Vector<int>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [Intrinsic]
         public unsafe static void Widen(Vector<int> source, out Vector<long> low, out Vector<long> high)
         {
@@ -4609,6 +4734,9 @@ namespace System.Numerics
             high = new Vector<long>(ptr2);
         }
 
+        /// <param name="source"></param>
+        /// <param name="low"></param>
+        /// <param name="high"></param>
         [Intrinsic]
         public unsafe static void Widen(Vector<float> source, out Vector<double> low, out Vector<double> high)
         {
@@ -4627,6 +4755,9 @@ namespace System.Numerics
             high = new Vector<double>(ptr2);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<byte> Narrow(Vector<ushort> low, Vector<ushort> high)
@@ -4644,6 +4775,9 @@ namespace System.Numerics
             return new Vector<byte>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<ushort> Narrow(Vector<uint> low, Vector<uint> high)
@@ -4661,6 +4795,9 @@ namespace System.Numerics
             return new Vector<ushort>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<uint> Narrow(Vector<ulong> low, Vector<ulong> high)
@@ -4678,6 +4815,9 @@ namespace System.Numerics
             return new Vector<uint>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<sbyte> Narrow(Vector<short> low, Vector<short> high)
@@ -4695,6 +4835,9 @@ namespace System.Numerics
             return new Vector<sbyte>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<short> Narrow(Vector<int> low, Vector<int> high)
         {
@@ -4711,6 +4854,9 @@ namespace System.Numerics
             return new Vector<short>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<int> Narrow(Vector<long> low, Vector<long> high)
         {
@@ -4727,6 +4873,9 @@ namespace System.Numerics
             return new Vector<int>(ptr);
         }
 
+        /// <param name="low"></param>
+        /// <param name="high"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<float> Narrow(Vector<double> low, Vector<double> high)
         {
@@ -4743,6 +4892,8 @@ namespace System.Numerics
             return new Vector<float>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<float> ConvertToSingle(Vector<int> value)
         {
@@ -4755,6 +4906,8 @@ namespace System.Numerics
             return new Vector<float>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<float> ConvertToSingle(Vector<uint> value)
@@ -4768,6 +4921,8 @@ namespace System.Numerics
             return new Vector<float>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<double> ConvertToDouble(Vector<long> value)
         {
@@ -4780,6 +4935,8 @@ namespace System.Numerics
             return new Vector<double>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<double> ConvertToDouble(Vector<ulong> value)
@@ -4793,6 +4950,8 @@ namespace System.Numerics
             return new Vector<double>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<int> ConvertToInt32(Vector<float> value)
         {
@@ -4805,6 +4964,8 @@ namespace System.Numerics
             return new Vector<int>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<uint> ConvertToUInt32(Vector<float> value)
@@ -4818,6 +4979,8 @@ namespace System.Numerics
             return new Vector<uint>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [Intrinsic]
         public unsafe static Vector<long> ConvertToInt64(Vector<double> value)
         {
@@ -4830,6 +4993,8 @@ namespace System.Numerics
             return new Vector<long>(ptr);
         }
 
+        /// <param name="value"></param>
+        /// <returns></returns>
         [CLSCompliant(false)]
         [Intrinsic]
         public unsafe static Vector<ulong> ConvertToUInt64(Vector<double> value)
@@ -4843,342 +5008,602 @@ namespace System.Numerics
             return new Vector<ulong>(ptr);
         }
 
+        /// <summary>Creates a new single-precision vector with elements selected between two specified single-precision source vectors based on an integral mask vector.</summary>
+        /// <param name="condition">The integral mask vector used to drive selection.</param>
+        /// <param name="left">The first source vector.</param>
+        /// <param name="right">The second source vector.</param>
+        /// <returns>The new vector with elements selected based on the mask.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<float> ConditionalSelect(Vector<int> condition, Vector<float> left, Vector<float> right)
         {
             return Vector<float>.ConditionalSelect((Vector<float>)condition, left, right);
         }
 
+        /// <summary>Creates a new double-precision vector with elements selected between two specified double-precision source vectors based on an integral mask vector.</summary>
+        /// <param name="condition">The integral mask vector used to drive selection.</param>
+        /// <param name="left">The first source vector.</param>
+        /// <param name="right">The second source vector.</param>
+        /// <returns>The new vector with elements selected based on the mask.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<double> ConditionalSelect(Vector<long> condition, Vector<double> left, Vector<double> right)
         {
             return Vector<double>.ConditionalSelect((Vector<double>)condition, left, right);
         }
 
+        /// <summary>Creates a new vector of a specified type with elements selected between two specified source vectors of the same type based on an integral mask vector.</summary>
+        /// <param name="condition">The integral mask vector used to drive selection.</param>
+        /// <param name="left">The first source vector.</param>
+        /// <param name="right">The second source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The new vector with elements selected based on the mask.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> ConditionalSelect<T>(Vector<T> condition, Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.ConditionalSelect(condition, left, right);
         }
 
+        /// <summary>Returns a new vector of a specified type whose elements signal whether the elements in two specified vectors of the same type are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Equals<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.Equals(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in two specified single-precision vectors are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> Equals(Vector<float> left, Vector<float> right)
         {
             return (Vector<int>)Vector<float>.Equals(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in two specified integral vectors are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> Equals(Vector<int> left, Vector<int> right)
         {
             return Vector<int>.Equals(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in two specified double-precision vectors are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> Equals(Vector<double> left, Vector<double> right)
         {
             return (Vector<long>)Vector<double>.Equals(left, right);
         }
 
+        /// <summary>Returns a new vector whose elements signal whether the elements in two specified long integer vectors are equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting long integer vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> Equals(Vector<long> left, Vector<long> right)
         {
             return Vector<long>.Equals(left, right);
         }
 
+        /// <summary>Returns a value that indicates whether each pair of elements in the given vectors is equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if all elements in <paramref name="left">left</paramref> and <paramref name="right">right</paramref> are equal; otherwise, false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EqualsAll<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left == right;
         }
 
+        /// <summary>Returns a value that indicates whether any single pair of elements in the given vectors is equal.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if any element pair in <paramref name="left">left</paramref> and <paramref name="right">right</paramref> is equal; otherwise, false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EqualsAny<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return !Vector<T>.Equals(left, right).Equals(Vector<T>.Zero);
         }
 
+        /// <summary>Returns a new vector of a specified type whose elements signal whether the elements in one vector are less than their corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> LessThan<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.LessThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one single-precision vector are less than their corresponding elements in a second single-precision vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> LessThan(Vector<float> left, Vector<float> right)
         {
             return (Vector<int>)Vector<float>.LessThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one integral vector are less than their corresponding elements in a second integral vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> LessThan(Vector<int> left, Vector<int> right)
         {
             return Vector<int>.LessThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one double-precision floating-point vector are less than their corresponding elements in a second double-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> LessThan(Vector<double> left, Vector<double> right)
         {
             return (Vector<long>)Vector<double>.LessThan(left, right);
         }
 
+        /// <summary>Returns a new long integer vector whose elements signal whether the elements in one long integer vector are less than their corresponding elements in a second long integer vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting long integer vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> LessThan(Vector<long> left, Vector<long> right)
         {
             return Vector<long>.LessThan(left, right);
         }
 
+        /// <summary>Returns a value that indicates whether all of the elements in the first vector are less than their corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if all of the elements in <paramref name="left">left</paramref> are less than the corresponding elements in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThanAll<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return ((Vector<int>)Vector<T>.LessThan(left, right)).Equals(Vector<int>.AllOnes);
         }
 
+        /// <summary>Returns a value that indicates whether any element in the first vector is less than the corresponding element in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if any element in <paramref name="left">left</paramref> is less than the corresponding element in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThanAny<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return !((Vector<int>)Vector<T>.LessThan(left, right)).Equals(Vector<int>.Zero);
         }
 
+        /// <summary>Returns a new vector whose elements signal whether the elements in one vector are less than or equal to their corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> LessThanOrEqual<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.LessThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one single-precision floating-point vector are less than or equal to their corresponding elements in a second single-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> LessThanOrEqual(Vector<float> left, Vector<float> right)
         {
             return (Vector<int>)Vector<float>.LessThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one integral vector are less than or equal to their corresponding elements in a second integral vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> LessThanOrEqual(Vector<int> left, Vector<int> right)
         {
             return Vector<int>.LessThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new long integer vector whose elements signal whether the elements in one long integer vector are less or equal to their corresponding elements in a second long integer vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting long integer vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> LessThanOrEqual(Vector<long> left, Vector<long> right)
         {
             return Vector<long>.LessThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one double-precision floating-point vector are less than or equal to their corresponding elements in a second double-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> LessThanOrEqual(Vector<double> left, Vector<double> right)
         {
             return (Vector<long>)Vector<double>.LessThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a value that indicates whether all elements in the first vector are less than or equal to their corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if all of the elements in <paramref name="left">left</paramref> are less than or equal to the corresponding elements in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThanOrEqualAll<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return ((Vector<int>)Vector<T>.LessThanOrEqual(left, right)).Equals(Vector<int>.AllOnes);
         }
 
+        /// <summary>Returns a value that indicates whether any element in the first vector is less than or equal to the corresponding element in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if any element in <paramref name="left">left</paramref> is less than or equal to the corresponding element in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessThanOrEqualAny<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return !((Vector<int>)Vector<T>.LessThanOrEqual(left, right)).Equals(Vector<int>.Zero);
         }
 
+        /// <summary>Returns a new vector whose elements signal whether the elements in one vector of a specified type are greater than their corresponding elements in the second vector of the same time.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> GreaterThan<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.GreaterThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one single-precision floating-point vector are greater than their corresponding elements in a second single-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> GreaterThan(Vector<float> left, Vector<float> right)
         {
             return (Vector<int>)Vector<float>.GreaterThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one integral vector are greater than their corresponding elements in a second integral vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> GreaterThan(Vector<int> left, Vector<int> right)
         {
             return Vector<int>.GreaterThan(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one double-precision floating-point vector are greater than their corresponding elements in a second double-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> GreaterThan(Vector<double> left, Vector<double> right)
         {
             return (Vector<long>)Vector<double>.GreaterThan(left, right);
         }
 
+        /// <summary>Returns a new long integer vector whose elements signal whether the elements in one long integer vector are greater than their corresponding elements in a second long integer vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting long integer vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> GreaterThan(Vector<long> left, Vector<long> right)
         {
             return Vector<long>.GreaterThan(left, right);
         }
 
+        /// <summary>Returns a value that indicates whether all elements in the first vector are greater than the corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if all elements in <paramref name="left">left</paramref> are greater than the corresponding elements in <paramref name="right">right</paramref>; otherwise, false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThanAll<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return ((Vector<int>)Vector<T>.GreaterThan(left, right)).Equals(Vector<int>.AllOnes);
         }
 
+        /// <summary>Returns a value that indicates whether any element in the first vector is greater than the corresponding element in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if any element in <paramref name="left">left</paramref> is greater than the corresponding element in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThanAny<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return !((Vector<int>)Vector<T>.GreaterThan(left, right)).Equals(Vector<int>.Zero);
         }
 
+        /// <summary>Returns a new vector whose elements signal whether the elements in one vector of a specified type are greater than or equal to their corresponding elements in the second vector of the same type.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> GreaterThanOrEqual<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.GreaterThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one vector are greater than or equal to their corresponding elements in the single-precision floating-point second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> GreaterThanOrEqual(Vector<float> left, Vector<float> right)
         {
             return (Vector<int>)Vector<float>.GreaterThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one integral vector are greater than or equal to their corresponding elements in the second integral vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> GreaterThanOrEqual(Vector<int> left, Vector<int> right)
         {
             return Vector<int>.GreaterThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new long integer vector whose elements signal whether the elements in one long integer vector are greater than or equal to their corresponding elements in the second long integer vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting long integer vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> GreaterThanOrEqual(Vector<long> left, Vector<long> right)
         {
             return Vector<long>.GreaterThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a new integral vector whose elements signal whether the elements in one vector are greater than or equal to their corresponding elements in the second double-precision floating-point vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <returns>The resulting integral vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> GreaterThanOrEqual(Vector<double> left, Vector<double> right)
         {
             return (Vector<long>)Vector<double>.GreaterThanOrEqual(left, right);
         }
 
+        /// <summary>Returns a value that indicates whether all elements in the first vector are greater than or equal to all the corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if all elements in <paramref name="left">left</paramref> are greater than or equal to the corresponding elements in <paramref name="right">right</paramref>; otherwise, false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThanOrEqualAll<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return ((Vector<int>)Vector<T>.GreaterThanOrEqual(left, right)).Equals(Vector<int>.AllOnes);
         }
 
+        /// <summary>Returns a value that indicates whether any element in the first vector is greater than or equal to the corresponding element in the second vector.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>true if any element in <paramref name="left">left</paramref> is greater than or equal to the corresponding element in <paramref name="right">right</paramref>; otherwise,  false.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThanOrEqualAny<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return !((Vector<int>)Vector<T>.GreaterThanOrEqual(left, right)).Equals(Vector<int>.Zero);
         }
 
+        /// <summary>Returns a new vector whose elements are the absolute values of the given vector&amp;#39;s elements.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The absolute value vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Abs<T>(Vector<T> value) where T : struct
         {
             return Vector<T>.Abs(value);
         }
 
+        /// <summary>Returns a new vector whose elements are the minimum of each pair of elements in the two given vectors.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The minimum vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Min<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.Min(left, right);
         }
 
+        /// <summary>Returns a new vector whose elements are the maximum of each pair of elements in the two given vectors.</summary>
+        /// <param name="left">The first vector to compare.</param>
+        /// <param name="right">The second vector to compare.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The maximum vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Max<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.Max(left, right);
         }
 
+        /// <summary>Returns the dot product of two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The dot product.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Dot<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return Vector<T>.DotProduct(left, right);
         }
 
+        /// <summary>Returns a new vector whose elements are the square roots of a specified vector&amp;#39;s elements.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The square root vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> SquareRoot<T>(Vector<T> value) where T : struct
         {
             return Vector<T>.SquareRoot(value);
         }
 
+        /// <summary>Returns a new vector whose values are the sum of each pair of elements from two given vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The summed vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Add<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left + right;
         }
 
+        /// <summary>Returns a new vector whose values are the difference between the elements in the second vector and their corresponding elements in the first vector.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The difference vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Subtract<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left - right;
         }
 
+        /// <summary>Returns a new vector whose values are the product of each pair of elements in two specified vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The product vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Multiply<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left * right;
         }
 
+        /// <summary>Returns a new vector whose values are the values of a specified vector each multiplied by a scalar value.</summary>
+        /// <param name="left">The vector.</param>
+        /// <param name="right">The scalar value.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The scaled vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Multiply<T>(Vector<T> left, T right) where T : struct
         {
             return left * right;
         }
 
+        /// <summary>Returns a new vector whose values are a scalar value multiplied by each of the values of a specified vector.</summary>
+        /// <param name="left">The scalar value.</param>
+        /// <param name="right">The vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The scaled vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Multiply<T>(T left, Vector<T> right) where T : struct
         {
             return left * right;
         }
 
+        /// <summary>Returns a new vector whose values are the result of dividing the first vector&amp;#39;s elements by the corresponding elements in the second vector.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The divided vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Divide<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left / right;
         }
 
+        /// <summary>Returns a new vector whose elements are the negation of the corresponding element in the specified vector.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The negated vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Negate<T>(Vector<T> value) where T : struct
         {
             return -value;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise And operation on each pair of elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> BitwiseAnd<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left & right;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise Or operation on each pair of elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> BitwiseOr<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left | right;
         }
 
+        /// <summary>Returns a new vector whose elements are obtained by taking the one&amp;#39;s complement of a specified vector&amp;#39;s elements.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> OnesComplement<T>(Vector<T> value) where T : struct
         {
             return ~value;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise exclusive Or (XOr) operation on each pair of elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> Xor<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left ^ right;
         }
 
+        /// <summary>Returns a new vector by performing a bitwise And Not operation on each pair of corresponding elements in two vectors.</summary>
+        /// <param name="left">The first vector.</param>
+        /// <param name="right">The second vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The resulting vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<T> AndNot<T>(Vector<T> left, Vector<T> right) where T : struct
         {
             return left & ~right;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of unsigned bytes.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<byte> AsVectorByte<T>(Vector<T> value) where T : struct
         {
             return (Vector<byte>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of signed bytes.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public static Vector<sbyte> AsVectorSByte<T>(Vector<T> value) where T : struct
@@ -5186,6 +5611,10 @@ namespace System.Numerics
             return (Vector<sbyte>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of unsigned 16-bit integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public static Vector<ushort> AsVectorUInt16<T>(Vector<T> value) where T : struct
@@ -5193,12 +5622,20 @@ namespace System.Numerics
             return (Vector<ushort>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of 16-bit integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<short> AsVectorInt16<T>(Vector<T> value) where T : struct
         {
             return (Vector<short>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of unsigned integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public static Vector<uint> AsVectorUInt32<T>(Vector<T> value) where T : struct
@@ -5206,12 +5643,20 @@ namespace System.Numerics
             return (Vector<uint>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<int> AsVectorInt32<T>(Vector<T> value) where T : struct
         {
             return (Vector<int>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of unsigned long integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public static Vector<ulong> AsVectorUInt64<T>(Vector<T> value) where T : struct
@@ -5219,23 +5664,34 @@ namespace System.Numerics
             return (Vector<ulong>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a vector of long integers.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<long> AsVectorInt64<T>(Vector<T> value) where T : struct
         {
             return (Vector<long>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a single-precision floating-point vector.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<float> AsVectorSingle<T>(Vector<T> value) where T : struct
         {
             return (Vector<float>)value;
         }
 
+        /// <summary>Reinterprets the bits of a specified vector into those of a double-precision floating-point vector.</summary>
+        /// <param name="value">The source vector.</param>
+        /// <typeparam name="T">The vector type. T can be any primitive numeric type.</typeparam>
+        /// <returns>The reinterpreted vector.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Vector<double> AsVectorDouble<T>(Vector<T> value) where T : struct
         {
             return (Vector<double>)value;
         }
     }
-
 }

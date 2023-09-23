@@ -8,18 +8,26 @@ using System.Reflection;
 using System.Runtime.InteropServices;
 
 [assembly: AssemblyCompanyAttribute($"© MDCDI1315. {mdcdi1315.SourceLink}")]
-[assembly: AssemblyConfigurationAttribute("Release")]
 [assembly: AssemblyCopyrightAttribute(mdcdi1315.Copyright)]
 [assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
 [assembly: AssemblyFileVersionAttribute("1.5.5.04")]
 [assembly: AssemblyInformationalVersionAttribute("1.5.5.04 Built by: © MDCDI1315.")]
 [assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 4")]
-[assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
 [assembly: AssemblyVersionAttribute("4.4.0.0")]
 [assembly: DefaultDllImportSearchPathsAttribute(DllImportSearchPath.System32 | DllImportSearchPath.AssemblyDirectory)]
-[assembly: AssemblyMetadataAttribute(mdcdi1315.Author , "http://github.com/mdcdi1315")]
+[assembly: AssemblyMetadataAttribute(mdcdi1315.Author , mdcdi1315.AuthorLinkGitHub)]
 [assembly: AssemblyMetadataAttribute("Repository URL" , mdcdi1315.SourceLink)]
-[assembly: AssemblyMetadataAttribute("RELEASECHANNEL" , "TRUE")]
+#if DEBUG
+    [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Debug Flavor)")]
+    [assembly: AssemblyConfigurationAttribute("Debug")]
+    [assembly: AssemblyMetadataAttribute("RELEASECHANNEL", "FALSE")]
+    [assembly: AssemblyMetadataAttribute("DEBUGCHANNEL", "TRUE")]
+#else
+    [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
+    [assembly: AssemblyConfigurationAttribute("Release")]
+    [assembly: AssemblyMetadataAttribute("RELEASECHANNEL" , "TRUE")]
+    [assembly: AssemblyMetadataAttribute("DEBUGCHANNEL" , "FALSE")]
+#endif
 [assembly: AssemblyMetadataAttribute("FrameworkDisplayName (FDN Internal)" , ".NET Framework 4.8")]
 [assembly: ComVisibleAttribute(false)]
 [assembly: CLSCompliantAttribute(false)]
@@ -36,9 +44,14 @@ internal static class mdcdi1315
     public const System.String Product = "MDC Application Framework";
 
     /// <summary>
-    /// An internal string deinfing the author of the product.
+    /// An internal string defining the author of the product.
     /// </summary>
     public const System.String Author = "mdcdi1315";
+
+    /// <summary>
+    /// A link to the Author Account in GitHub.
+    /// </summary>
+    public const System.String AuthorLinkGitHub = $"http://github.com/{Author}";
 
     /// <summary>
     /// A small description of this product.
@@ -53,5 +66,5 @@ internal static class mdcdi1315
     /// <summary>
     /// A URL link which mentions the source code repository.
     /// </summary>
-    public const System.String SourceLink = "http://github.com/mdcdi1315/mdcframework";
+    public const System.String SourceLink = $"http://github.com/{Author}/mdcframework";
 }

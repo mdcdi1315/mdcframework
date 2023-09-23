@@ -6,15 +6,17 @@
 using System.Threading;
 using System.Diagnostics;
 using System.Globalization;
-using System.Buffers.Binary;
 using System.Diagnostics.Tracing;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using System.Buffers;
+using System.ComponentModel;
 
 namespace System
 {
     namespace Buffers
     {
+        using Binary;
 
         // This code is located from the official NUGET package (System.Buffers)
         // and was decompiled. That code is located here:
@@ -926,7 +928,7 @@ namespace System
             /// </summary>
             public static class Utf8Formatter
             {
-                
+
                 private const byte TimeMarker = 84;
 
                 private const byte UtcMarker = 90;
@@ -6831,7 +6833,7 @@ namespace System
                     }
                     return true;
                 }
-            
+
             }
 
         }
@@ -6841,7 +6843,7 @@ namespace System
             /// <summary>
             /// Reads bytes as primitives with specific endianness.
             /// </summary>
-            #pragma warning disable CS1591
+#pragma warning disable CS1591
             public static class BinaryPrimitives
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -7426,7 +7428,7 @@ namespace System
                     return MemoryMarshal.TryWrite(destination, ref value);
                 }
             }
-            #pragma warning restore CS1591
+#pragma warning restore CS1591
 
         }
 
@@ -7487,25 +7489,46 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Represents a pool of memory blocks.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the memory pool.</typeparam>
         public abstract class MemoryPool<T> : IDisposable
         {
             private static readonly MemoryPool<T> s_shared = new ArrayMemoryPool<T>();
 
+            /// <summary>
+            /// Gets a singleton instance of a memory pool based on arrays.
+            /// </summary>
             public static MemoryPool<T> Shared => s_shared;
 
+            /// <summary>
+            /// The maximum buffer size supported by this pool.
+            /// </summary>
             public abstract int MaxBufferSize { get; }
 
+            /// <summary>
+            /// Returns a memory block capable of holding at least <paramref name="minBufferSize"/> elements of T.
+            /// </summary>
+            /// <param name="minBufferSize">The minimum number of elements of <typeparamref name="T"/> that the memory pool can hold. A value of -1 returns a memory pool set to the default size for the pool.</param>
+            /// <returns>A memory block capable of holding at least <paramref name="minBufferSize"/> elements of T.</returns>
             public abstract IMemoryOwner<T> Rent(int minBufferSize = -1);
 
+            /// <summary>
+            /// Frees all resources used by the memory pool.
+            /// </summary>
             public void Dispose()
             {
                 Dispose(disposing: true);
                 GC.SuppressFinalize(this);
             }
 
+            /// <summary>
+            /// Frees the unmanaged resources used by the memory pool and optionally releases the managed resources.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release both managed and unmanaged resources; <see langword="false"/> to release only unmanaged resources.</param>
             protected abstract void Dispose(bool disposing);
         }
-
 
         /// <summary>
         /// This enum defines the various potential status that can be returned from Span-based operations
@@ -7535,37 +7558,65 @@ namespace System
             InvalidData,
         }
 
+
+        /// <summary>
+        /// Represents a standard format string without using an actual string.
+        /// </summary>
+        /// <remarks>A <see cref="StandardFormat"/> object consists of a single character 
+        /// standard format specifier (such as 'G', 'D', or 'X') and an optional 
+        /// precision specifier. The precision specifier can range from 0 to 9, 
+        /// or it can be the special <see cref="StandardFormat.NoPrecision" /> value.</remarks>
         public readonly struct StandardFormat : IEquatable<StandardFormat>
         {
+            /// <summary>
+            /// Indicates that a format doesn't use a precision or that the precision is unspecified.
+            /// </summary>
             public const byte NoPrecision = byte.MaxValue;
 
+            /// <summary>
+            /// Defines the maximum valid precision value.
+            /// </summary>
+            /// <remarks>The maximum valid precision is 99.</remarks>
             public const byte MaxPrecision = 99;
 
             private readonly byte _format;
 
             private readonly byte _precision;
 
+            /// <summary>
+            /// Gets the character component of the format.
+            /// </summary>
             public char Symbol => (char)_format;
 
+            /// <summary>
+            /// Gets the precision component of the format.
+            /// </summary>
             public byte Precision => _precision;
 
-            public bool HasPrecision => _precision != byte.MaxValue;
+            /// <summary>
+            /// Gets a value that indicates whether a format has a defined precision.
+            /// </summary>
+            public bool HasPrecision => _precision != NoPrecision;
 
-            public bool IsDefault
-            {
-                get
-                {
-                    if (_format == 0)
-                    {
-                        return _precision == 0;
-                    }
-                    return false;
-                }
-            }
+            /// <summary>
+            /// Gets a value that indicates whether the current instance is a default format.
+            /// </summary>
+            /// <remarks>A default format has a format specifier whose <see cref="System.Byte"/> value is 0 and whose precision is <see cref="NoPrecision"/>.</remarks>
+            public bool IsDefault { get { if (_format == 0) { return _precision == 0; } return false; } }
 
-            public StandardFormat(char symbol, byte precision = byte.MaxValue)
+            /// <summary>
+            /// Initializes a new instance of the <see cref="StandardFormat"/> structure.
+            /// </summary>
+            /// <param name="symbol">A type-specific format specifier, such as 'G', 'D', or 'X'.</param>
+            /// <param name="precision">An optional precision ranging from 0 to 99, or the special value <see cref="NoPrecision"/> (the default).</param>
+            /// <exception cref="System.ArgumentOutOfRangeException">
+            /// <paramref name="symbol"/> is not <see cref="NoPrecision"/>, and its value is greater than <see cref="MaxPrecision"/>. <br/>
+            /// -or- <br />
+            /// <paramref name="symbol"/> cannot be converted to a <see cref="System.Byte"/>.
+            /// </exception>
+            public StandardFormat(char symbol, byte precision = NoPrecision)
             {
-                if (precision != byte.MaxValue && precision > 99)
+                if (precision != NoPrecision && precision > 99)
                 {
                     System.ThrowHelper.ThrowArgumentOutOfRangeException_PrecisionTooLarge();
                 }
@@ -7577,11 +7628,20 @@ namespace System
                 _precision = precision;
             }
 
-            public static implicit operator StandardFormat(char symbol)
-            {
-                return new StandardFormat(symbol);
-            }
+            /// <summary>
+            /// Converts a character to a <see cref="StandardFormat"/> instance using <see cref="NoPrecision"/> precision.
+            /// </summary>
+            /// <param name="symbol">The character to convert to a <see cref="StandardFormat"/> value.</param>
+            public static implicit operator StandardFormat(char symbol) { return new StandardFormat(symbol); }
 
+            /// <summary>
+            /// Converts a <see cref="ReadOnlySpan{T}"/> (T is <see cref="System.Char"/>) into a <see cref="StandardFormat"/> instance using <see cref="NoPrecision"/> precision.
+            /// </summary>
+            /// <param name="format">A read-only span that contains the character to parse.</param>
+            /// <returns>A value whose <see cref="Symbol"/> property value is the character in format and whose <see cref="Precision"/> property value is <see cref="NoPrecision"/> .</returns>
+            /// <exception cref="FormatException">
+            /// <paramref name="format"/> is not a valid standard character.
+            /// </exception>
             public static StandardFormat Parse(ReadOnlySpan<char> format)
             {
                 if (format.Length == 0)
@@ -7617,6 +7677,14 @@ namespace System
                 return new StandardFormat(symbol, precision);
             }
 
+            /// <summary>
+            /// Converts a classic .NET standard format string to a <see cref="StandardFormat"/> instance.
+            /// </summary>
+            /// <param name="format">A classic .NET standard format string.</param>
+            /// <returns>A format.</returns>
+            /// <exception cref="FormatException">
+            /// <paramref name="format"/> is not a valid standard format string.
+            /// </exception>
             public static StandardFormat Parse(string format)
             {
                 if (format != null)
@@ -7626,6 +7694,11 @@ namespace System
                 return default(StandardFormat);
             }
 
+            /// <summary>
+            /// Returns a value that indicates whether the specified object is a <see cref="StandardFormat"/> object that is equal to the current instance.
+            /// </summary>
+            /// <param name="obj">An object to compare to the current instance.</param>
+            /// <returns><see langword="true"/> if the two instances are equal; otherwise, <see langword="true"/>.</returns>
             public override bool Equals(object obj)
             {
                 if (obj is StandardFormat other)
@@ -7635,20 +7708,21 @@ namespace System
                 return false;
             }
 
-            public override int GetHashCode()
-            {
-                return _format.GetHashCode() ^ _precision.GetHashCode();
-            }
+            /// <inheritdoc />
+            public override int GetHashCode() { return _format.GetHashCode() ^ _precision.GetHashCode(); }
 
-            public bool Equals(StandardFormat other)
-            {
-                if (_format == other._format)
-                {
-                    return _precision == other._precision;
-                }
-                return false;
-            }
+            /// <summary>
+            /// Returns a value that indicates whether the specified <see cref="StandardFormat"/> is equal to the current instance.
+            /// </summary>
+            /// <param name="other">The format to compare to the current instance.</param>
+            /// <returns><see langword="true"/> if the two instances are equal; otherwise, <see langword="false"/>.</returns>
+            public bool Equals(StandardFormat other) { if (_format == other._format) { return _precision == other._precision; } return false; }
 
+            /// <summary>
+            /// Returns the string representation of this format.
+            /// </summary>
+            /// <returns>The string representation of this format.</returns>
+            /// <remarks>The string representation of a <see cref="StandardFormat"/> instance is a standard .NET format string.</remarks>
             public unsafe override string ToString()
             {
                 char* ptr = stackalloc char[4];
@@ -7676,29 +7750,86 @@ namespace System
                 return new string(ptr, 0, length);
             }
 
-            public static bool operator ==(StandardFormat left, StandardFormat right)
-            {
-                return left.Equals(right);
-            }
+            /// <summary>
+            /// Returns a value that indicates whether two <see cref="StandardFormat"/> instances are equal.
+            /// </summary>
+            /// <param name="left">The first format to compare.</param>
+            /// <param name="right">The second format to compare.</param>
+            /// <returns><see langword="true"/> if the two instances are equal; otherwise, <see langword="false"/>.</returns>
+            public static bool operator ==(StandardFormat left, StandardFormat right) { return left.Equals(right); }
 
-            public static bool operator !=(StandardFormat left, StandardFormat right)
-            {
-                return !left.Equals(right);
-            }
+            /// <summary>
+            /// Returns a value that indicates whether two <see cref="StandardFormat"/> instances are unequal.
+            /// </summary>
+            /// <param name="left">The first format to compare.</param>
+            /// <param name="right">The second format to compare.</param>
+            /// <returns><see langword="true"/> if the two instances are equal; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>Two <see cref="StandardFormat"/> instances are unequal if their <see cref="Symbol"/> and <see cref="Precision"/> properties are not identical.</remarks>
+            public static bool operator !=(StandardFormat left, StandardFormat right) { return !left.Equals(right); }
         }
 
+        /// <summary>
+        /// Identifies the owner of a block of memory who is responsible for disposing of the underlying memory appropriately.
+        /// </summary>
+        /// <typeparam name="T">The type of elements to store in memory.</typeparam>
+        /// <remarks>
+        /// The <see cref="IMemoryOwner{T}"/> interface is used to define the owner responsible for the lifetime management of a <see cref="Memory{T}"/> buffer. 
+        /// An instance of the <see cref="IMemoryOwner{T}"/> interface is returned by the <see cref="MemoryPool{T}.Rent(int)"/> method. <br />
+        /// While a buffer can have multiple consumers, it can only have a single owner at any given time. The owner can: <br /> <br />
+        /// -> Create the buffer either directly or by calling a factory method. <br />
+        /// -> Transfer ownership to another consumer. In this case, the previous owner should no longer use the buffer. <br />
+        /// -> Destroy the buffer when it is no longer in use. <br /> <br />
+        /// Because the <see cref="IMemoryOwner{T}"/> object implements the <see cref="IDisposable"/> interface, you should 
+        /// call its <see cref="IDisposable.Dispose"/> method only after the memory buffer is no longer needed and you have 
+        /// destroyed it.You should not dispose of the <see cref="IMemoryOwner{T}"/> object while a reference to its memory 
+        /// is available.This means that the type in which <see cref="IMemoryOwner{T}"/> is declared should not have a Finalize method.
+        /// </remarks>
         public interface IMemoryOwner<T> : IDisposable
         {
+            /// <summary>
+            /// Gets the memory belonging to this owner.
+            /// </summary>
             Memory<T> Memory { get; }
         }
 
+        /// <summary>
+        /// Provides a mechanism for pinning and unpinning objects to prevent the garbage collector from moving them.
+        /// </summary>
+        /// <remarks>The <see cref="MemoryManager{T}"/> class implements the <see cref="IPinnable"/> interface.</remarks>
         public interface IPinnable
         {
+            /// <summary>
+            /// Pins a block of memory.
+            /// </summary>
+            /// <param name="elementIndex">The offset to the element within the memory buffer to which the returned <see cref="MemoryHandle"/> points.</param>
+            /// <returns>A handle to the block of memory.</returns>
+            /// <remarks>
+            /// A developer can access an object that implements the <see cref="IPinnable"/> interface without pinning it only through managed APIs. 
+            /// Pinning is required for access by unmanaged APIs. <br />
+            /// Call this method to indicate that the <see cref="IPinnable"/> object cannot be moved by the garbage collector so that the 
+            /// address of the pinned object can be used.
+            /// </remarks>
             MemoryHandle Pin(int elementIndex);
 
+            /// <summary>
+            /// Frees a block of pinned memory.
+            /// </summary>
+            /// <remarks>Call this method to indicate that the <see cref="IPinnable"/> object no longer needs to be pinned, 
+            /// and that the garbage collector can now move the object.
+            /// </remarks>
             void Unpin();
         }
 
+        /// <summary>
+        /// Provides a memory handle for a block of memory.
+        /// </summary>
+        /// <remarks>
+        /// A MemoryHandle instance represents a handle to a pinned block of memory. It is returned by the following methods:<br /> <br />
+        /// <see cref="IPinnable.Pin(int)"/> <br />
+        /// <see cref="Memory{T}.Pin"/> <br />
+        /// <see cref="ReadOnlyMemory{T}.Pin"/> <br />
+        /// <see cref="MemoryManager{T}.Pin(int)"/> <br />
+        /// </remarks>
         public struct MemoryHandle : IDisposable
         {
             private unsafe void* _pointer;
@@ -7707,9 +7838,19 @@ namespace System
 
             private IPinnable _pinnable;
 
+            /// <summary>
+            /// Returns a pointer to the memory block.
+            /// </summary>
+            /// <remarks>The memory is assumed to be pinned so that its address won't change.</remarks>
             [CLSCompliant(false)]
             public unsafe void* Pointer => _pointer;
 
+            /// <summary>
+            /// Creates a new memory handle for the block of memory.
+            /// </summary>
+            /// <param name="pointer">A pointer to memory.</param>
+            /// <param name="handle">A handle used to pin array buffers.</param>
+            /// <param name="pinnable">A reference to a manually managed object, or <see langword="default"/> if there is no memory manager.</param>
             [CLSCompliant(false)]
             public unsafe MemoryHandle(void* pointer, GCHandle handle = default(GCHandle), IPinnable pinnable = null)
             {
@@ -7718,23 +7859,30 @@ namespace System
                 _pinnable = pinnable;
             }
 
+            /// <summary>
+            /// Frees the pinned handle and releases the <see cref="IPinnable"/> instance.
+            /// </summary>
             public unsafe void Dispose()
             {
-                if (_handle.IsAllocated)
-                {
-                    _handle.Free();
-                }
-                if (_pinnable != null)
-                {
-                    _pinnable.Unpin();
-                    _pinnable = null;
-                }
+                if (_handle.IsAllocated) { _handle.Free(); }
+                if (_pinnable != null) { _pinnable.Unpin(); _pinnable = null; }
                 _pointer = null;
             }
         }
 
+        /// <summary>
+        /// Provides extension methods for <see cref="ReadOnlySequence{T}"/>.
+        /// </summary>
         public static class BuffersExtensions
         {
+            /// <summary>
+            /// Returns the position of the first occurrence of item in the <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the <see cref="ReadOnlySequence{T}"/>.</typeparam>
+            /// <param name="source">The source <see cref="ReadOnlySequence{T}"/>.</param>
+            /// <param name="value">The item to find in the <see cref="ReadOnlySequence{T}"/>.</param>
+            /// <returns>An object whose <see cref="System.SequencePosition.GetInteger"/> method returns the position 
+            /// of the first occurrence of item, or an object whose <see cref="System.Nullable{SequencePosition}.HasValue"/> property is false .</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static SequencePosition? PositionOf<T>(this in ReadOnlySequence<T> source, T value) where T : IEquatable<T>
             {
@@ -7771,6 +7919,12 @@ namespace System
                 return null;
             }
 
+            /// <summary>
+            /// Copies the <see cref="ReadOnlySequence{T}"/> to the specified <see cref="Span{T}"/>.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the <see cref="ReadOnlySequence{T}"/>.</typeparam>
+            /// <param name="source">The source <see cref="ReadOnlySequence{T}"/>.</param>
+            /// <param name="destination">The destination <see cref="Span{T}"/>.</param>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static void CopyTo<T>(this in ReadOnlySequence<T> source, Span<T> destination)
             {
@@ -7805,6 +7959,12 @@ namespace System
                 }
             }
 
+            /// <summary>
+            /// Converts the <see cref="ReadOnlySequence{T}"/> to an array.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the <see cref="ReadOnlySequence{T}"/>.</typeparam>
+            /// <param name="sequence">The read-only sequence to convert to an array.</param>
+            /// <returns>An array containing the data in the current read-only sequence.</returns>
             public static T[] ToArray<T>(this in ReadOnlySequence<T> sequence)
             {
                 T[] array = new T[sequence.Length];
@@ -7812,6 +7972,12 @@ namespace System
                 return array;
             }
 
+            /// <summary>
+            /// Writes the contents of <paramref name="value"/> to <paramref name="writer"/>.
+            /// </summary>
+            /// <typeparam name="T">The type of the items in the <see cref="ReadOnlySpan{T}"/>.</typeparam>
+            /// <param name="writer">The buffer writer to which to write <paramref name="value"/>.</param>
+            /// <param name="value">The read-only span to be written to <paramref name="writer"/>.</param>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static void Write<T>(this IBufferWriter<T> writer, ReadOnlySpan<T> value)
             {
@@ -7846,12 +8012,52 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Represents an output sink into which <typeparamref name="T"/> data can be written.
+        /// </summary>
+        /// <typeparam name="T">The type of the items in the <see cref="IBufferWriter{T}"/>.</typeparam>
         public interface IBufferWriter<T>
         {
+            /// <summary>
+            /// Notifies the <see cref="IBufferWriter{T}"/> that <paramref name="count"/> data 
+            /// items were written to the output <see cref="Span{T}"/> or <see cref="Memory{T}"/>.
+            /// </summary>
+            /// <param name="count">The number of data items written to the <see cref="Span{T}"/> 
+            /// or <see cref="Memory{T}"/>.</param>
+            /// <remarks>You must request a new buffer after calling <see cref="Advance(int)"/> to continue writing 
+            /// more data; you cannot write to a previously acquired buffer.</remarks>
             void Advance(int count);
 
+            /// <summary>
+            /// Returns a <see cref="Memory{T}"/> to write to that is at least the requested size (specified by <paramref name="sizeHint"/>).
+            /// </summary>
+            /// <param name="sizeHint">The minimum length of the returned <see cref="Memory{T}"/>. If 0, a non-empty buffer is returned.</param>
+            /// <returns>A <see cref="Memory{T}"/> of at least the size <paramref name="sizeHint"/>. If <paramref name="sizeHint"/> is 0, 
+            /// returns a non-empty buffer.</returns>
+            /// <exception cref="System.OutOfMemoryException">The requested buffer size is not available.</exception>
+            /// <remarks>
+            /// There is no guarantee that successive calls will return the same buffer or the same-sized buffer. <br />
+            /// This must never return <see cref="Span{T}.Empty"/>, but it can throw if the requested buffer size 
+            /// is not available. <br />
+            /// You must request a new buffer after calling Advance to continue writing more data; you cannot write 
+            /// to a previously acquired buffer.<br />
+            /// </remarks>
             Memory<T> GetMemory(int sizeHint = 0);
 
+            /// <summary>
+            /// Returns a <see cref="Span{T}"/> to write to that is at least the requested size (specified by <paramref name="sizeHint"/>).
+            /// </summary>
+            /// <param name="sizeHint">The minimum length of the returned <see cref="Memory{T}"/>. If 0, a non-empty buffer is returned.</param>
+            /// <returns>A <see cref="Span{T}"/> of at least the size <paramref name="sizeHint"/>. If <paramref name="sizeHint"/> is 0, 
+            /// returns a non-empty buffer.</returns>
+            /// <exception cref="System.OutOfMemoryException">The requested buffer size is not available.</exception>
+            /// <remarks>
+            /// There is no guarantee that successive calls will return the same buffer or the same-sized buffer. <br />
+            /// This must never return <see cref="Span{T}.Empty"/>, but it can throw if the requested buffer size 
+            /// is not available. <br />
+            /// You must request a new buffer after calling Advance to continue writing more data; you cannot write 
+            /// to a previously acquired buffer.<br />
+            /// </remarks>
             Span<T> GetSpan(int sizeHint = 0);
         }
 
@@ -8332,19 +8538,40 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Represents a linked list of <see cref="ReadOnlyMemory{T}"/> nodes.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the read-only sequence segment.</typeparam>
         public abstract class ReadOnlySequenceSegment<T>
         {
+            /// <summary>
+            /// Gets or sets a <see cref="ReadOnlyMemory{T}"/> value for the current node.
+            /// </summary>
             public ReadOnlyMemory<T> Memory { get; protected set; }
 
+            /// <summary>
+            /// Gets or sets the next node.
+            /// </summary>
             public ReadOnlySequenceSegment<T> Next { get; protected set; }
 
+            /// <summary>
+            /// Gets or sets the sum of node lengths before the current node.
+            /// </summary>
             public long RunningIndex { get; protected set; }
         }
 
+        /// <summary>
+        /// Represents a sequence that can read a sequential series of <typeparamref name="T"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of the elements in the read-only sequence.</typeparam>
         [DebuggerTypeProxy(typeof(ReadOnlySequenceDebugView<>))]
         [DebuggerDisplay("{ToString(),raw}")]
         public readonly struct ReadOnlySequence<T>
         {
+
+            /// <summary>
+            /// Represents an enumerator over a <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
             public struct Enumerator
             {
                 private readonly ReadOnlySequence<T> _sequence;
@@ -8353,8 +8580,15 @@ namespace System
 
                 private ReadOnlyMemory<T> _currentMemory;
 
+                /// <summary>
+                /// Gets the current <see cref="ReadOnlyMemory{T}"/>.
+                /// </summary>
                 public ReadOnlyMemory<T> Current => _currentMemory;
 
+                /// <summary>
+                /// Initializes the enumerator.
+                /// </summary>
+                /// <param name="sequence">The <see cref="ReadOnlySequence{T}"/> to enumerate.</param>
                 public Enumerator(in ReadOnlySequence<T> sequence)
                 {
                     _currentMemory = default(ReadOnlyMemory<T>);
@@ -8362,6 +8596,11 @@ namespace System
                     _sequence = sequence;
                 }
 
+                /// <summary>
+                /// Moves to the next <see cref="ReadOnlyMemory{T}"/> in the <see cref="ReadOnlySequence{T}"/>.
+                /// </summary>
+                /// <returns><see langword="true"/> if the enumerator successfully advanced to the next item; 
+                /// <see langword="false"/> if the end of the sequence has been reached.</returns>
                 public bool MoveNext()
                 {
                     if (_next.GetObject() == null)
@@ -8385,25 +8624,43 @@ namespace System
 
             private readonly SequencePosition _sequenceEnd;
 
+            /// <summary>
+            /// Returns an empty <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
             public static readonly ReadOnlySequence<T> Empty = new ReadOnlySequence<T>(SpanHelpers.PerTypeValues<T>.EmptyArray);
 
+            /// <summary>
+            /// Gets the length of the <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
             public long Length => GetLength();
 
+            /// <summary>
+            /// Gets a value that indicates whether the <see cref="ReadOnlySequence{T}"/> is empty.
+            /// </summary>
             public bool IsEmpty => Length == 0;
 
+            /// <summary>
+            /// Gets a value that indicates whether the <see cref="ReadOnlySequence{T}"/> contains a single <see cref="ReadOnlyMemory{T}"/> segment.
+            /// </summary>
             public bool IsSingleSegment
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    return _sequenceStart.GetObject() == _sequenceEnd.GetObject();
-                }
+                get { return _sequenceStart.GetObject() == _sequenceEnd.GetObject(); }
             }
 
+            /// <summary>
+            /// Gets the <see cref="ReadOnlyMemory{T}"/> from the first segment.
+            /// </summary>
             public ReadOnlyMemory<T> First => GetFirstBuffer();
 
+            /// <summary>
+            /// Gets the position to the start of the <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
             public SequencePosition Start => _sequenceStart;
 
+            /// <summary>
+            /// Gets the position at the end of the <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
             public SequencePosition End => _sequenceEnd;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -8413,6 +8670,22 @@ namespace System
                 _sequenceEnd = new SequencePosition(endSegment, endIndexAndFlags);
             }
 
+            /// <summary>
+            /// Creates an instance of a <see cref="ReadOnlySequence{T}"/> from a linked memory list represented by start and end segments and the corresponding indexes in them.
+            /// </summary>
+            /// <param name="startSegment">The initial node of the linked memory list.</param>
+            /// <param name="startIndex">The position to the start of the sequence inside <paramref name="startSegment"/>.</param>
+            /// <param name="endSegment">The final node of the linked memory list.</param>
+            /// <param name="endIndex">The position to the end of the sequence inside <paramref name="endSegment"/>.</param>
+            /// <exception cref="System.ArgumentNullException"><paramref name="startSegment"/> or <paramref name="endSegment"/> is <see langword="null"/>.</exception>
+            /// <exception cref="System.ArgumentOutOfRangeException">
+            /// The running index of <paramref name="startSegment"/> is greater than the running index 
+            /// of <paramref name="endSegment"/>, even though <paramref name="startSegment"/> is different to <paramref name="endSegment"/>.<br /> <br />
+            /// -or- <br /> <br />
+            /// <paramref name="startSegment"/> is equal to <paramref name="endSegment"/> but <paramref name="endIndex"/> is smaller than <paramref name="startIndex"/>. <br /> <br />
+            /// -or- <br /> <br />
+            /// <paramref name="startIndex"/> is greater than the length of the underlying memory block of <paramref name="startSegment"/>.
+            /// </exception>
             public ReadOnlySequence(ReadOnlySequenceSegment<T> startSegment, int startIndex, ReadOnlySequenceSegment<T> endSegment, int endIndex)
             {
                 if (startSegment == null || endSegment == null || (startSegment != endSegment && startSegment.RunningIndex > endSegment.RunningIndex) || (uint)startSegment.Memory.Length < (uint)startIndex || (uint)endSegment.Memory.Length < (uint)endIndex || (startSegment == endSegment && endIndex < startIndex))
@@ -8423,6 +8696,10 @@ namespace System
                 _sequenceEnd = new SequencePosition(endSegment, ReadOnlySequence.SegmentToSequenceEnd(endIndex));
             }
 
+            /// <summary>
+            /// Creates an instance of <see cref="ReadOnlySequence{T}"/> from the <paramref name="array"/>.
+            /// </summary>
+            /// <param name="array">The array from which to create a read-only sequence.</param>
             public ReadOnlySequence(T[] array)
             {
                 if (array == null)
@@ -8433,6 +8710,12 @@ namespace System
                 _sequenceEnd = new SequencePosition(array, ReadOnlySequence.ArrayToSequenceEnd(array.Length));
             }
 
+            /// <summary>
+            /// Creates an instance of <see cref="ReadOnlySequence{T}"/> from a section of the <paramref name="array"/>.
+            /// </summary>
+            /// <param name="array">The array from which to create a read-only sequence.</param>
+            /// <param name="start">The zero-based index of the first element in the array to include in the read-only sequence.</param>
+            /// <param name="length">The number of elements to include in the read-only sequence.</param>
             public ReadOnlySequence(T[] array, int start, int length)
             {
                 if (array == null || (uint)start > (uint)array.Length || (uint)length > (uint)(array.Length - start))
@@ -8443,6 +8726,11 @@ namespace System
                 _sequenceEnd = new SequencePosition(array, ReadOnlySequence.ArrayToSequenceEnd(start + length));
             }
 
+            /// <summary>
+            /// Creates an instance of <see cref="ReadOnlySequence{T}"/> from a <see cref="ReadOnlyMemory{T}"/>.
+            /// </summary>
+            /// <param name="memory">A read-only block of memory of elements of type <typeparamref name="T"/>.</param>
+            /// <remarks>The consumer is expected to manage the lifetime of memory until <see cref="ReadOnlySequence{T}"/> is not used anymore.</remarks>
             public ReadOnlySequence(ReadOnlyMemory<T> memory)
             {
                 ArraySegment<T> segment;
@@ -8475,6 +8763,12 @@ namespace System
                 }
             }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/>, with <paramref name="length"/> items.
+            /// </summary>
+            /// <param name="start">The index at which to begin this slice.</param>
+            /// <param name="length">The length of the slice.</param>
+            /// <returns>A slice that consists of <paramref name="length"/> elements from the current instance starting at index <paramref name="start"/>.</returns>
             public ReadOnlySequence<T> Slice(long start, long length)
             {
                 if (start < 0 || length < 0)
@@ -8537,6 +8831,12 @@ namespace System
                 return SliceImpl(in start2, in end);
             }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/> and ending at <paramref name="end"/> (exclusive).
+            /// </summary>
+            /// <param name="start">The index at which to begin this slice.</param>
+            /// <param name="end">The end (exclusive) <see cref="SequencePosition"/> of the slice.</param>
+            /// <returns>A slice that consists of items from the <paramref name="start"/> index to, but not including, the <paramref name="end"/> sequence position in the current read-only sequence.</returns>
             public ReadOnlySequence<T> Slice(long start, SequencePosition end)
             {
                 if (start < 0)
@@ -8588,6 +8888,12 @@ namespace System
                 return SliceImpl(in start3, in end);
             }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/>, with <paramref name="length"/> items.
+            /// </summary>
+            /// <param name="start">The starting (inclusive) <see cref="SequencePosition"/> at which to begin this slice.</param>
+            /// <param name="length">The length of the slice.</param>
+            /// <returns>A slice that consists of <paramref name="length"/> elements from the current instance starting at sequence position <paramref name="start"/>.</returns>
             public ReadOnlySequence<T> Slice(SequencePosition start, long length)
             {
                 uint index = (uint)GetIndex(in start);
@@ -8644,21 +8950,36 @@ namespace System
                 return SliceImpl(in start, in end2);
             }
 
-            public ReadOnlySequence<T> Slice(int start, int length)
-            {
-                return Slice((long)start, (long)length);
-            }
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/>, with <paramref name="length"/> items.
+            /// </summary>
+            /// <param name="start">The index at which to begin this slice.</param>
+            /// <param name="length">The length of the slice.</param>
+            /// <returns>A slice that consists of <paramref name="length"/> elements from the current instance starting at index <paramref name="start"/>.</returns>
+            public ReadOnlySequence<T> Slice(int start, int length) { return Slice((long)start, (long)length); }
 
-            public ReadOnlySequence<T> Slice(int start, SequencePosition end)
-            {
-                return Slice((long)start, end);
-            }
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/> and ending at <paramref name="end"/> (exclusive).
+            /// </summary>
+            /// <param name="start">The index at which to begin this slice.</param>
+            /// <param name="end">The end (exclusive) <see cref="SequencePosition"/> of the slice.</param>
+            /// <returns>A slice that consists of items from the <paramref name="start"/> index to, but not including, the <paramref name="end"/> sequence position in the current read-only sequence.</returns>
+            public ReadOnlySequence<T> Slice(int start, SequencePosition end) { return Slice((long)start, end); }
 
-            public ReadOnlySequence<T> Slice(SequencePosition start, int length)
-            {
-                return Slice(start, (long)length);
-            }
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/>, with <paramref name="length"/> items.
+            /// </summary>
+            /// <param name="start">The starting (inclusive) <see cref="SequencePosition"/> at which to begin this slice.</param>
+            /// <param name="length">The length of the slice.</param>
+            /// <returns>A slice that consists of <paramref name="length"/> elements from the current instance starting at sequence position <paramref name="start"/>.</returns>
+            public ReadOnlySequence<T> Slice(SequencePosition start, int length) { return Slice(start, (long)length); }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at <paramref name="start"/> and ending at <paramref name="end"/> (exclusive). 
+            /// </summary>
+            /// <param name="start">The starting (inclusive) <see cref="SequencePosition"/> at which to begin this slice.</param>
+            /// <param name="end">The ending (exclusive) <see cref="SequencePosition"/> of the slice. </param>
+            /// <returns>A slice that consists of items from the <paramref name="start"/> sequence position to, but not including, the <paramref name="end"/> sequence position in the current read-only sequence.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public ReadOnlySequence<T> Slice(SequencePosition start, SequencePosition end)
             {
@@ -8666,13 +8987,19 @@ namespace System
                 return SliceImpl(in start, in end);
             }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at a specified sequence position and continuing to the end of the read-only sequence.
+            /// </summary>
+            /// <param name="start">The starting (inclusive) <see cref="SequencePosition"/> at which to begin this slice.</param>
+            /// <returns>A slice starting at sequence position <paramref name="start"/> and continuing to the end of the current read-only sequence.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ReadOnlySequence<T> Slice(SequencePosition start)
-            {
-                BoundsCheck(in start);
-                return SliceImpl(in start, in _sequenceEnd);
-            }
+            public ReadOnlySequence<T> Slice(SequencePosition start) { BoundsCheck(in start); return SliceImpl(in start, in _sequenceEnd); }
 
+            /// <summary>
+            /// Forms a slice out of the current <see cref="ReadOnlySequence{T}"/>, beginning at a specified index and continuing to the end of the read-only sequence.
+            /// </summary>
+            /// <param name="start">The start index at which to begin this slice.</param>
+            /// <returns>A slice starting at index <paramref name="start"/> and continuing to the end of the current read-only sequence.</returns>
             public ReadOnlySequence<T> Slice(long start)
             {
                 if (start < 0)
@@ -8687,6 +9014,10 @@ namespace System
                 return SliceImpl(in start2, in _sequenceEnd);
             }
 
+            /// <summary>
+            /// Returns a string that represents the current sequence.
+            /// </summary>
+            /// <returns>A string that represents the current sequence.</returns>
             public override string ToString()
             {
                 if (typeof(T) == typeof(char))
@@ -8705,16 +9036,25 @@ namespace System
                 return $"System.Buffers.ReadOnlySequence<{typeof(T).Name}>[{Length}]";
             }
 
-            public Enumerator GetEnumerator()
-            {
-                return new Enumerator(in this);
-            }
+            /// <summary>
+            /// Returns an enumerator over the <see cref="ReadOnlySequence{T}"/>.
+            /// </summary>
+            /// <returns>Returns an enumerator over the <see cref="ReadOnlySequence{T}"/>.</returns>
+            public Enumerator GetEnumerator() { return new Enumerator(in this); }
 
-            public SequencePosition GetPosition(long offset)
-            {
-                return GetPosition(offset, _sequenceStart);
-            }
+            /// <summary>
+            /// Returns a new <see cref="SequencePosition"/> at an <paramref name="offset"/> from the start of the sequence.
+            /// </summary>
+            /// <param name="offset">The offset from the start of the sequence.</param>
+            /// <returns>An object representing the sequence position that starts at the specified <paramref name="offset"/> from the start of the sequence.</returns>
+            public SequencePosition GetPosition(long offset) { return GetPosition(offset, _sequenceStart); }
 
+            /// <summary>
+            /// Returns a new SequencePosition starting at the specified offset from the <paramref name="origin"/> position.
+            /// </summary>
+            /// <param name="offset">The offset from the specified <paramref name="origin"/> sequence position.</param>
+            /// <param name="origin">A sequence position representing the point from which to initiate the offset.</param>
+            /// <returns>An object representing the sequence position that starts at the <paramref name="offset"/> position of the specified <paramref name="origin"/> position object.</returns>
             public SequencePosition GetPosition(long offset, SequencePosition origin)
             {
                 if (offset < 0)
@@ -8724,6 +9064,13 @@ namespace System
                 return Seek(in origin, in _sequenceEnd, offset, System.ExceptionArgument.offset);
             }
 
+            /// <summary>
+            /// Tries to retrieve the next segment after <paramref name="position"/> and returns a value that indicates whether the operation succeeded.
+            /// </summary>
+            /// <param name="position">The current sequence position.</param>
+            /// <param name="memory">A read-only memory span that contains the next segment after <paramref name="position"/>.</param>
+            /// <param name="advance"><see langword="true"/> if <paramref name="position"/> should to be in the beginning of next segment; otherwise, <see langword="false"/>.</param>
+            /// <returns>Returns <see langword="true"/> if the method returned the next segment, or <see langword="false"/> if the end of the read-only sequence was reached.</returns>
             public bool TryGet(ref SequencePosition position, out ReadOnlyMemory<T> memory, bool advance = true)
             {
                 SequencePosition next;
@@ -8944,16 +9291,10 @@ namespace System
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private SequenceType GetSequenceType()
-            {
-                return (SequenceType)(-(2 * (_sequenceStart.GetInteger() >> 31) + (_sequenceEnd.GetInteger() >> 31)));
-            }
+            private SequenceType GetSequenceType() { return (SequenceType)(-(2 * (_sequenceStart.GetInteger() >> 31) + (_sequenceEnd.GetInteger() >> 31))); }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static int GetIndex(in SequencePosition position)
-            {
-                return position.GetInteger() & 0x7FFFFFFF;
-            }
+            private static int GetIndex(in SequencePosition position) { return position.GetInteger() & 0x7FFFFFFF; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private ReadOnlySequence<T> SliceImpl(in SequencePosition start, in SequencePosition end)
@@ -9022,15 +9363,9 @@ namespace System
                 return true;
             }
 
-            private static bool InRange(uint value, uint start, uint end)
-            {
-                return value - start <= end - start;
-            }
+            private static bool InRange(uint value, uint start, uint end) { return value - start <= end - start; }
 
-            private static bool InRange(ulong value, ulong start, ulong end)
-            {
-                return value - start <= end - start;
-            }
+            private static bool InRange(ulong value, ulong start, ulong end) { return value - start <= end - start; }
         }
 
         internal static class ReadOnlySequence
@@ -9104,28 +9439,58 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// An abstract base class that is used to replace the implementation of <see cref="Memory{T}"/>.
+        /// </summary>
+        /// <typeparam name="T">The type of items in the memory buffer managed by this memory manager.</typeparam>
         public abstract class MemoryManager<T> : IMemoryOwner<T>, IDisposable, IPinnable
         {
+            /// <summary>
+            /// Gets the memory block handled by this <see cref="MemoryManager{T}"/>.
+            /// </summary>
             public virtual Memory<T> Memory => new Memory<T>(this, GetSpan().Length);
 
+            /// <summary>
+            /// Returns a memory span that wraps the underlying memory buffer.
+            /// </summary>
+            /// <returns>A memory span that wraps the underlying memory buffer.</returns>
             public abstract Span<T> GetSpan();
 
+            /// <summary>
+            /// Returns a handle to the memory that has been pinned and whose address can be taken.
+            /// </summary>
+            /// <param name="elementIndex">The offset to the element in the memory buffer at which the returned <see cref="MemoryHandle"/> points.</param>
+            /// <returns>A handle to the memory that has been pinned.</returns>
             public abstract MemoryHandle Pin(int elementIndex = 0);
 
+            /// <summary>
+            /// Unpins pinned memory so that the garbage collector is free to move it.
+            /// </summary>
             public abstract void Unpin();
 
+            /// <summary>
+            /// Returns a memory buffer consisting of a specified number of elements from the memory managed by the current memory manager.
+            /// </summary>
+            /// <param name="length">The number of elements in the memory buffer, starting at offset 0.</param>
+            /// <returns>A memory buffer.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected Memory<T> CreateMemory(int length)
-            {
-                return new Memory<T>(this, length);
-            }
+            protected Memory<T> CreateMemory(int length) { return new Memory<T>(this, length); }
 
+            /// <summary>
+            /// Returns a memory buffer consisting of a specified number of elements starting at a specified offset from the memory managed by the current memory manager.
+            /// </summary>
+            /// <param name="start">The offset to the element at which the returned memory buffer starts.</param>
+            /// <param name="length">The number of elements to include in the returned memory buffer.</param>
+            /// <returns>A memory buffer that consists of <paramref name="length"/> elements starting at offset <paramref name="start"/>.</returns>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected Memory<T> CreateMemory(int start, int length)
-            {
-                return new Memory<T>(this, start, length);
-            }
+            protected Memory<T> CreateMemory(int start, int length) { return new Memory<T>(this, start, length); }
 
+            /// <summary>
+            /// Returns an array segment.
+            /// </summary>
+            /// <param name="segment">The array segment to write to.</param>
+            /// <returns><see langword="true"/> if the method succeeded in retrieving the array segment; otherwise, <see langword="false"/>.</returns>
+            /// <remarks>If this method is not overridden, it returns the default array segment.</remarks>
             protected internal virtual bool TryGetArray(out ArraySegment<T> segment)
             {
                 segment = default(ArraySegment<T>);
@@ -9138,10 +9503,100 @@ namespace System
                 GC.SuppressFinalize(this);
             }
 
+            /// <summary>
+            /// Releases all resources used by the current memory manager.
+            /// </summary>
+            /// <param name="disposing"><see langword="true"/> to release 
+            /// both managed and unmanaged resources; 
+            /// <see langword="false"/> to release only 
+            /// unmanaged resources.</param>
             protected abstract void Dispose(bool disposing);
         }
 
 
     }
+
+    /// <summary>
+    /// Represents a position in a non-contiguous set of memory. 
+    /// Properties of this type should not be interpreted by anything but the type that created it.
+    /// </summary>
+    public readonly struct SequencePosition : IEquatable<SequencePosition>
+    {
+        private readonly object _object;
+
+        private readonly int _integer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <param name="object">A non-contiguous set of memory.</param>
+        /// <param name="integer">The position in <paramref name="object"/>.</param>
+        public SequencePosition(object @object, int integer)
+        {
+            _object = @object;
+            _integer = integer;
+        }
+
+        /// <summary>
+        /// Returns the object part of this <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <returns>The object part of this sequence position.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public object GetObject()
+        {
+            return _object;
+        }
+
+        /// <summary>
+        /// Returns the integer part of this <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <returns>The integer part of this sequence position.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public int GetInteger()
+        {
+            return _integer;
+        }
+
+        /// <summary>
+        /// Indicates whether the current instance is equal to another <see cref="SequencePosition"/> struct.
+        /// </summary>
+        /// <param name="other">The sequence position to compare with the current instance.</param>
+        /// <returns><c>true</c> if the two instances are equal; <c>false</c> otherwise.</returns>
+        /// <remarks>
+        /// Equality does not guarantee that the two instances point to the same location in a <see cref="ReadOnlySequence{T}"/>.
+        /// </remarks>
+        public bool Equals(SequencePosition other)
+        {
+            if (_integer == other._integer)
+            {
+                return object.Equals(_object, other._object);
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// Returns a value that indicates whether the current instance is equal to another object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><c>true</c> if <paramref name="obj"/> is of type <see cref="SequencePosition"/>
+        /// and is equal to the current instance; otherwise, <c>false</c>.</returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override bool Equals(object obj)
+        {
+            if (obj is SequencePosition other)
+            {
+                return Equals(other);
+            }
+            return false;
+        }
+
+        /// <inheritdoc />
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        public override int GetHashCode()
+        {
+            return System.Numerics.Hashing.HashHelpers.Combine(_object?.GetHashCode() ?? 0, _integer);
+        }
+    }
+
 
 }

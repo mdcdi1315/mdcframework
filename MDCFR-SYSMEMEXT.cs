@@ -2,7 +2,6 @@
 // The .NET Foundation licenses this file to you under the MIT license.
 // See the LICENSE file in the project root for more information.
 
-using System;
 using System.Buffers;
 using System.Numerics;
 using System.Reflection;
@@ -18,6 +17,7 @@ namespace System
 
     internal static class SpanHelpers
     {
+
         internal struct ComparerComparable<T, TComparer> : IComparable<T> where TComparer : IComparer<T>
         {
             private readonly T _value;
@@ -2339,6 +2339,9 @@ namespace System
         }
     }
 
+    /// <summary>
+    /// Provides extension methods for the memory- and span-related types, such as <see cref="Memory{T}"/>, <see cref="ReadOnlyMemory{T}"/>, <see cref="Span{T}"/>, and <see cref="ReadOnlySpan{T}"/>.
+    /// </summary>
     public static class MemoryExtensions
     {
         internal static readonly IntPtr StringAdjustment = MeasureStringAdjustment();
@@ -3159,18 +3162,110 @@ namespace System
         public SpanDebugView(ReadOnlySpan<T> span) { _array = span.ToArray(); }
     }
 
+    /// <summary>
+    /// Provides a type-safe and memory-safe representation of a contiguous region of arbitrary memory.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the <see cref="Span{T}"/>.</typeparam>
+    /// <remarks>
+    /// <see cref="Span{T}"/> is a <see langword="ref struct"/> that is allocated on the stack rather than on the managed heap. 
+    /// Ref struct types have a number of restrictions to ensure that they cannot be promoted to the managed heap, including 
+    /// that they can't be boxed, they can't be assigned to variables of type <see cref="System.Object"/>, 
+    /// <see langword="dynamic"/> or to any interface type, they can't be fields in a reference type, and they can't be used 
+    /// across <see langword="await"/> and <see langword="yield"/> boundaries. 
+    /// In addition, calls to two methods, <see cref="Equals(object)"/> and <see cref="GetHashCode"/>, throw a <see cref="NotSupportedException"/>.
+    /// </remarks>
     [DebuggerTypeProxy(typeof(SpanDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     [DebuggerTypeProxy(typeof(SpanDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     public readonly ref struct Span<T>
     {
+
+        /// <summary>
+        /// Provides an enumerator for the elements of a <see cref="Span{T}"/>.
+        /// </summary>
+        ///
+        /// <remarks>
+        /// The C# <see langword="foreach"/> of the C# language and the <c>For Each...Next</c> construct in Visual Basic hides the complexity of enumerators. 
+        /// Instead of directly manipulating the enumerator, using <see langword="foreach"/> or <c>For Each...Next</c> is recommended. <br />
+        /// <br />
+        /// Initially, the enumerator is positioned before the first element in the <see cref="Span{T}"/>. 
+        /// At this position, <see cref="Current"/> is undefined.
+        /// You must call <see cref="MoveNext()"/> to advance the enumerator to the first item in the 
+        /// <see cref="Span{T}"/> before reading the value of <see cref="Current"/>. <br />
+        /// <br />
+        /// <see cref="Current"/> returns the same value until <see cref="MoveNext()"/> is called. <see cref="MoveNext()"/> sets 
+        /// <see cref="Current"/> to the next item in the <see cref="Span{T}"/>.
+        /// <br />
+        /// <br />
+        /// If <see cref="MoveNext()"/> passes the end of the <see cref="Span{T}"/>, <see cref="MoveNext()"/>
+        /// returns <see langword="false"/>. When the enumerator is at this state, subsequent calls to <see cref="MoveNext()"/> 
+        /// also return <see langword="false"/> and <see cref="Current"/> is undefined. You cannot set <see cref="Current"/> 
+        /// to the first item in the <see cref="Span{T}"/> again; you must create a new enumerator instance instead. <br /> <br />
+        /// The enumerator does not have exclusive access to the <see cref="Span{T}"/>. In addition, the underlying data 
+        /// on which the span is based can also be modified. 
+        /// Therefore, enumerating through a span is intrinsically not a thread-safe procedure. To guarantee thread 
+        /// safety during enumeration, you must implement your own synchronization. For example, the following code has a 
+        /// race condition. It does not ensure that the span will be enumerated before the ClearContents method executes. 
+        /// As a result, the underlying array is cleared during enumeration of the span: <br />
+        /// </remarks>
+        /// <code>
+        /// using System;
+        /// using System.Threading.Tasks;
+        ///
+        ///    class Program
+        ///    {
+        ///            private static readonly byte[] _array = new byte[5];
+        ///
+        ///            static void Main()
+        ///            {
+        ///                new Random(42).NextBytes(_array);
+        ///                Span&lt;byte&gt; span = _array;
+        ///
+        ///                Task.Run( () => ClearContents() );
+        ///
+        ///               EnumerateSpan(span);
+        ///            }
+        ///
+        ///            public static void ClearContents()
+        ///            {
+        ///                Task.Delay(20).Wait();
+        ///                lock (_array)
+        ///                {
+        ///                   Array.Clear(_array, 0, _array.Length);
+        ///                }
+        ///            }
+        ///
+        ///            public static void EnumerateSpan(Span&lt;byte&gt; span)
+        ///            {
+        ///                foreach (byte element in span)
+        ///                {
+        ///                    Console.WriteLine(element);
+        ///                    Task.Delay(10).Wait();
+        ///                }
+        ///          }
+        ///     }
+        /// </code>
         public ref struct Enumerator
         {
             private readonly Span<T> _span;
 
             private int _index;
 
+            /// <summary>
+            /// Gets a reference to the item at the current position of the enumerator.
+            /// </summary>
+            /// <remarks>
+            /// <see cref="Current"/> is undefined under either of the following conditions:
+            /// <list type="bullet">
+            /// <item>Immediately after the enumerator is created, the enumerator is positioned 
+            /// before the first element in the span. <see cref="MoveNext()"/> must be called 
+            /// to advance the enumerator to the first element of the span before reading 
+            /// the value of <see cref="Current"/>.</item>
+            /// <item>The last call to <see cref="MoveNext()"/> returned <see langword="false"/>, which indicates the end of the span.</item>
+            /// </list>
+            /// <see cref="Current"/> returns the same value until <see cref="MoveNext()"/> is called. <see cref="MoveNext()"/> sets <see cref="Current"/> to the next item in the span.
+            /// </remarks>
             public ref T Current
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3180,6 +3275,22 @@ namespace System
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             internal Enumerator(Span<T> span) { _span = span; _index = -1; }
 
+            /// <summary>
+            /// Advances the enumerator to the next item of the <see cref="Span{T}"/>.
+            /// </summary>
+            /// <returns><see langword="true"/> if the enumerator successfully 
+            /// advanced to the next item; <see langword="false"/> if the end of the 
+            /// span has been passed.</returns>
+            /// <remarks>
+            /// After an enumerator is created, it is positioned before the first element 
+            /// in the span, and the first call to <see cref="MoveNext()"/> advances the 
+            /// enumerator to the first item in the span. <br />
+            /// <br /> 
+            /// If <see cref="MoveNext()"/> passes the end of the span, 
+            /// <see cref="MoveNext()"/> returns <see langword="false"/>. When the 
+            /// enumerator is at this state, subsequent calls to <see cref="MoveNext()"/> 
+            /// also return <see langword="false"/>.
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool MoveNext()
             {
@@ -3195,12 +3306,27 @@ namespace System
 
         private readonly int _length;
 
+        /// <summary>
+        /// Returns the length of the current span.
+        /// </summary>
         public int Length => _length;
 
+        /// <summary>
+        /// Returns a value that indicates whether the current <see cref="Span{T}"/> is empty.
+        /// </summary>
         public bool IsEmpty => _length == 0;
 
+        /// <summary>
+        /// Returns an empty <see cref="Span{T}"/> object.
+        /// </summary>
         public static Span<T> Empty => default(Span<T>);
 
+        /// <summary>
+        /// Gets the element at the specified zero-based index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element.</param>
+        /// <returns>The element at the specified index.</returns>
+        /// <exception cref="System.IndexOutOfRangeException"><paramref name="index"/> is less than zero or greater than or equal to <see cref="Length"/>.</exception>
         public unsafe ref T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3216,29 +3342,61 @@ namespace System
 
         internal IntPtr ByteOffset => _byteOffset;
 
-        public static bool operator !=(Span<T> left, Span<T> right) { return !(left == right); }
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Span{T}"/> objects are not equal.
+        /// </summary>
+        /// <param name="left">The first span to compare.</param>
+        /// <param name="right">The second span to compare.</param>
+        /// <returns><see langword="true"/> if the two <see cref="Span{T}"/> objects are not equal; otherwise, <see langword="false"/>.</returns>
+        public static bool operator !=(Span<T> left, Span<T> right) { return (left == right) == false; }
 
 #pragma warning disable CS0809
-        [Obsolete("Equals() on Span will always throw an exception. Use == instead.")]
+        /// <inheritdoc />
+        [Obsolete("Equals() on Span will always throw an exception. Use == instead." , false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
-        {
-            throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallEqualsOnSpan);
-        }
+        public override bool Equals(object obj) { throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallEqualsOnSpan); }
 
-        [Obsolete("GetHashCode() on Span will always throw an exception.")]
+        /// <inheritdoc />
+        [Obsolete("GetHashCode() on Span will always throw an exception." , false)]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode()
-        {
-            throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallGetHashCodeOnSpan);
-        }
+        public override int GetHashCode() { throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallGetHashCodeOnSpan); }
 #pragma warning restore CS0809
+
+        /// <summary>
+        /// Defines an implicit conversion of an array to a <see cref="Span{T}"/>.
+        /// </summary>
+        /// <param name="array">The array to convert to a <see cref="Span{T}"/>.</param>
         public static implicit operator Span<T>(T[] array) { return new Span<T>(array); }
 
+        /// <summary>
+        /// Defines an implicit conversion of an <see cref="ArraySegment{T}"/> to a <see cref="Span{T}"/>.
+        /// </summary>
+        /// <param name="segment">The array segment to be converted to a <see cref="Span{T}"/>.</param>
         public static implicit operator Span<T>(ArraySegment<T> segment) { return new Span<T>(segment.Array, segment.Offset, segment.Count); }
 
+        /// <summary>
+        /// Returns an enumerator for this <see cref="Span{T}"/>.
+        /// </summary>
+        /// <returns>An enumerator for this span.</returns>
+        /// <remarks>
+        /// Instead of calling the <see cref="GetEnumerator"/> 
+        /// method directly, you can use the C# <see langword="foreach"/> 
+        /// statement and the Visual Basic <c>For Each...Next</c> 
+        /// construct to enumerate a <see cref="Span{T}"/>.
+        /// </remarks>
         public Enumerator GetEnumerator() { return new Enumerator(this); }
 
+        /// <summary>
+        /// Creates a new <see cref="Span{T}"/> object over the entirety of a specified array.
+        /// </summary>
+        /// <param name="array">The array from which to create the <see cref="Span{T}"/> object.</param>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, and <paramref name="array"/> is not an array 
+        /// of type <typeparamref name="T"/>.
+        /// </exception>
+        /// <remarks>
+        /// If <paramref name="array"/> is <see langword="null"/>, this constructor returns a <see langword="null"/> <see cref="Span{T}"/>.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span(T[] array)
         {
@@ -3276,6 +3434,24 @@ namespace System
             return new Span<T>(Unsafe.As<Pinnable<T>>(array), byteOffset, length);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Span{T}"/> object that includes a specified number of elements of an array starting at a specified index.
+        /// </summary>
+        /// <param name="array">The source array.</param>
+        /// <param name="start">The index of the first element to include in the new <see cref="Span{T}"/>.</param>
+        /// <param name="length">The number of elements to include in the new <see cref="Span{T}"/>.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// <paramref name="array"/> is <see langword="null"/>, but <paramref name="start"/> or <paramref name="length"/> is non-zero.<br /> <br />
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> is outside the bounds of the array.
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> and <paramref name="length"/> exceeds the number of elements in the array.
+        /// </exception>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, and <paramref name="array"/> is not an array 
+        /// of type <typeparamref name="T"/>.
+        /// </exception>
+        /// <remarks>This constructor returns <see langword="default"/> when <paramref name="array"/> is <see langword="null"/>.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span(T[] array, int start, int length)
         {
@@ -3297,6 +3473,21 @@ namespace System
             _byteOffset = SpanHelpers.PerTypeValues<T>.ArrayAdjustment.Add<T>(start);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Span{T}"/> object from a specified 
+        /// number of <typeparamref name="T"/> elements starting at a specified memory address.
+        /// </summary>
+        /// <param name="pointer">A pointer to the starting address of a specified number of 
+        /// <typeparamref name="T"/> elements in memory.</param>
+        /// <param name="length">The number of <typeparamref name="T"/> elements to be included 
+        /// in the <see cref="Span{T}"/>.</param>
+        /// <exception cref="System.ArgumentException">
+        /// <typeparamref name="T"/> is a reference type or contains pointers and therefore cannot be stored in unmanaged memory.
+        /// </exception>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length"/> is negative.</exception>
+        /// <remarks>This constructor should be used with care, since it creates arbitrarily typed <typeparamref name="T"/>'s from a 
+        /// <see cref="System.Void"/>*-typed block of memory, and length is not checked. However, if the constructor succeeds in 
+        /// creating a new <see cref="Span{T}"/> object, all subsequent uses are correct.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public unsafe Span(void* pointer, int length)
@@ -3311,6 +3502,11 @@ namespace System
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         internal Span(Pinnable<T> pinnable, IntPtr byteOffset, int length) { _length = length; _pinnable = pinnable; _byteOffset = byteOffset; }
 
+        /// <summary>
+        /// Returns a reference to an object of type <typeparamref name="T"/> that can be used for pinning. <br /> <br />
+        /// This method is intended to support .NET compilers and is not intended to be called by user code.
+        /// </summary>
+        /// <returns>A reference to the element of the span at index 0, or <see langword="null"/> if the span is empty.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public unsafe ref T GetPinnableReference()
         {
@@ -3322,6 +3518,14 @@ namespace System
             return ref Unsafe.AsRef<T>(null);
         }
 
+        /// <summary>
+        /// Clears the contents of this <see cref="Span{T}"/> object.
+        /// </summary>
+        /// <remarks>
+        /// The <see cref="Clear"/> method sets the items 
+        /// in the <see cref="Span{T}"/> object to their default values. <br />
+        /// It does not remove items from the <see cref="Span{T}"/>.
+        /// </remarks>
         public unsafe void Clear()
         {
             int length = _length;
@@ -3350,6 +3554,10 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Fills the elements of this span with a specified value.
+        /// </summary>
+        /// <param name="value">The value to assign to each element of the span.</param>
         public unsafe void Fill(T value)
         {
             int length = _length;
@@ -3391,11 +3599,23 @@ namespace System
             for (; i < length; i++) { Unsafe.Add(ref source, i) = value; }
         }
 
-        public void CopyTo(Span<T> destination)
-        {
-            if (!TryCopyTo(destination)) { System.ThrowHelper.ThrowArgumentException_DestinationTooShort(); }
-        }
+        /// <summary>
+        /// Copies the contents of this <see cref="Span{T}"/> into a destination <see cref="Span{T}"/>.
+        /// </summary>
+        /// <param name="destination">The destination <see cref="Span{T}"/> object.</param>
+        /// <exception cref="System.ArgumentException"><paramref name="destination"/> is shorter 
+        /// than the source <see cref="Span{T}"/>.</exception>
+        /// <remarks>This method copies all of source to <paramref name="destination"/> even if 
+        /// source and <paramref name="destination"/> overlap.</remarks>
+        public void CopyTo(Span<T> destination) { if (TryCopyTo(destination) == false) { System.ThrowHelper.ThrowArgumentException_DestinationTooShort(); } }
 
+        /// <summary>
+        /// Attempts to copy the current <see cref="Span{T}"/> to a destination 
+        /// <see cref="Span{T}"/> and returns a value that indicates whether 
+        /// the copy operation succeeded.
+        /// </summary>
+        /// <param name="destination">The target of the copy operation.</param>
+        /// <returns><see langword="true"/> if the copy operation succeeded; otherwise, <see langword="false"/>.</returns>
         public bool TryCopyTo(Span<T> destination)
         {
             int length = _length;
@@ -3407,17 +3627,34 @@ namespace System
             return true;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="Span{T}"/> objects are equal.
+        /// </summary>
+        /// <param name="left">The first span to compare.</param>
+        /// <param name="right">The second span to compare.</param>
+        /// <returns><see langword="true"/> if the two <see cref="Span{T}"/> objects are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(Span<T> left, Span<T> right)
         {
-            if (left._length == right._length)
-            {
-                return Unsafe.AreSame(ref left.DangerousGetPinnableReference(), ref right.DangerousGetPinnableReference());
-            }
+            if (left._length == right._length) { return Unsafe.AreSame(ref left.DangerousGetPinnableReference(), ref right.DangerousGetPinnableReference()); }
             return false;
         }
 
+        /// <summary>
+        /// Defines an implicit conversion of a <see cref="Span{T}"/> to a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        /// <param name="span">The object to convert to a <see cref="ReadOnlySpan{T}"/>.</param>
         public static implicit operator ReadOnlySpan<T>(Span<T> span) { return new ReadOnlySpan<T>(span._pinnable, span._byteOffset, span._length); }
 
+        /// <summary>
+        /// Returns the string representation of this <see cref="Span{T}"/> object.
+        /// </summary>
+        /// <returns>The string representation of this <see cref="Span{T}"/> object.</returns>
+        /// <remarks>
+        /// For a Span&lt;<see cref="System.Char"/>&gt;, the <see cref="ToString"/> method returns a 
+        /// <see cref="System.String"/> that contains the characters pointed to by the 
+        /// <see cref="Span{T}"/>. Otherwise, it returns a <see cref="System.String"/> 
+        /// with the name of the type and the number of elements that the <see cref="Span{T}"/> contains.
+        /// </remarks>
         public unsafe override string ToString()
         {
             if (typeof(T) == typeof(char))
@@ -3427,6 +3664,12 @@ namespace System
             return $"System.Span<{typeof(T).Name}>[{_length}]";
         }
 
+        /// <summary>
+        /// Forms a slice out of the current span that begins at a specified index.
+        /// </summary>
+        /// <param name="start">The index at which to begin the slice.</param>
+        /// <returns>A span that consists of all elements of the current span from <paramref name="start"/> to the end of the span.</returns>
+        /// <exception cref="System.ArgumentException"><paramref name="start"/> is less than zero or greater than <see cref="Length"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T> Slice(int start)
         {
@@ -3439,6 +3682,17 @@ namespace System
             return new Span<T>(_pinnable, byteOffset, length);
         }
 
+        /// <summary>
+        /// Forms a slice out of the current span starting at a specified index for a specified length.
+        /// </summary>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <param name="length">The desired length for the slice.</param>
+        /// <returns>A span that consists of <paramref name="length"/> elements
+        /// from the current span starting at <paramref name="start"/>.</returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// <paramref name="start"/> or 
+        /// <c><paramref name="start"/> + <paramref name="length"/></c> 
+        /// is less than zero or greater than <see cref="Length"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Span<T> Slice(int start, int length)
         {
@@ -3450,6 +3704,16 @@ namespace System
             return new Span<T>(_pinnable, byteOffset, length);
         }
 
+        /// <summary>
+        /// Copies the contents of this span into a new array.
+        /// </summary>
+        /// <returns>An array containing the data in the current span.</returns>
+        /// <remarks>
+        /// This method performs a heap allocation and therefore should be avoided if possible. 
+        /// Heap allocations are expected in APIs that work with arrays. 
+        /// Using such APIs is unavoidable if an alternative API overload that takes a 
+        /// <see cref="Span{T}"/> does not exist.
+        /// </remarks>
         public T[] ToArray()
         {
             if (_length == 0) { return SpanHelpers.PerTypeValues<T>.EmptyArray; }
@@ -3467,6 +3731,24 @@ namespace System
         }
     }
 
+    /// <summary>
+    /// Represents a contiguous region of memory.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the <see cref="Memory{T}"/>.</typeparam>
+    /// <remarks>
+    /// Like <see cref="Span{T}"/>, <see cref="Memory{T}"/> represents a contiguous region 
+    /// of memory. Unlike <see cref="Span{T}"/>, however, <see cref="Memory{T}"/> is not a 
+    /// ref struct. This means that <see cref="Memory{T}"/> can be placed on the managed heap,
+    /// whereas <see cref="Span{T}"/> cannot. As a result, the <see cref="Memory{T}"/> 
+    /// structure does not have the same restrictions as a <see cref="Span{T}"/> 
+    /// instance. In particular:
+    /// <list type="bullet">
+    /// <item>It can be used as a field in a class.</item>
+    /// <item>It can be used across <see langword="await"/> and <see langword="yield"/> boundaries.</item>
+    /// </list>
+    /// In addition to <see cref="Memory{T}"/>, you can use <see cref="System.ReadOnlyMemory{T}"/> to
+    /// represent immutable or read-only memory.
+    /// </remarks>
     [DebuggerTypeProxy(typeof(MemoryDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     public readonly struct Memory<T>
@@ -3479,12 +3761,24 @@ namespace System
 
         private const int RemoveFlagsBitMask = int.MaxValue;
 
+        /// <summary>
+        /// Returns an empty <see cref="Memory{T}"/> object.
+        /// </summary>
         public static Memory<T> Empty => default(Memory<T>);
 
+        /// <summary>
+        /// Gets the number of items in the current instance.
+        /// </summary>
         public int Length => _length & 0x7FFFFFFF;
 
+        /// <summary>
+        /// Indicates whether the current instance is empty.
+        /// </summary>
         public bool IsEmpty => (_length & 0x7FFFFFFF) == 0;
 
+        /// <summary>
+        /// Returns a span from the current instance.
+        /// </summary>
         public Span<T> Span
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3510,6 +3804,18 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Memory{T}"/> object over the entirety of a specified array.
+        /// </summary>
+        /// <param name="array">The array from which to create the <see cref="Memory{T}"/> object.</param>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, 
+        /// and <paramref name="array"/> 
+        /// is not an array of type <typeparamref name="T"/>. <br /> <br />
+        /// -or- <br /> <br />
+        /// The array is <see href="https://learn.microsoft.com/en-us/dotnet/csharp/programming-guide/concepts/covariance-contravariance">covariant</see>.
+        /// </exception>
+        /// <remarks>If <paramref name="array"/> is <see langword="null"/>, this constructor returns a <see cref="Memory{T}"/> object with a <see langword="default&lt;T&gt;"/> value.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory(T[] array)
         {
@@ -3552,6 +3858,22 @@ namespace System
             _length = array.Length - start;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="Memory{T}"/> object that includes a specified number of elements of an array beginning at a specified index.
+        /// </summary>
+        /// <param name="array">The source array.</param>
+        /// <param name="start">The index of the first element to include in the new <see cref="Memory{T}"/>.</param>
+        /// <param name="length">The number of elements to include in the new <see cref="Memory{T}"/>.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// <paramref name="array"/> is <see langword="null"/>, but <paramref name="start"/> or <paramref name="length"/> is non-zero. <br /> <br />
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> is outside the bounds of the <paramref name="array"/>.
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> and <paramref name="length"/> exceeds the number of elements in the <paramref name="array"/>.
+        /// </exception>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, and <paramref name="array"/> is not an array of type <typeparamref name="T"/>.
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory(T[] array, int start, int length)
         {
@@ -3609,34 +3931,50 @@ namespace System
             _length = length;
         }
 
-        public static implicit operator Memory<T>(T[] array)
-        {
-            return new Memory<T>(array);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of an array to a <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <param name="array">The array to convert.</param>
+        public static implicit operator Memory<T>(T[] array) { return new Memory<T>(array); }
 
-        public static implicit operator Memory<T>(ArraySegment<T> segment)
-        {
-            return new Memory<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of an <see cref="ArraySegment{T}"/> object to a <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <param name="segment">The object to convert.</param>
+        public static implicit operator Memory<T>(ArraySegment<T> segment) { return new Memory<T>(segment.Array, segment.Offset, segment.Count); }
 
-        public static implicit operator ReadOnlyMemory<T>(Memory<T> memory)
-        {
-            return Unsafe.As<Memory<T>, ReadOnlyMemory<T>>(ref memory);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of a <see cref="Memory{T}"/> object to a <see cref="ReadOnlyMemory{T}"/> object.
+        /// </summary>
+        /// <param name="memory">The object to convert.</param>
+        public static implicit operator ReadOnlyMemory<T>(Memory<T> memory) { return Unsafe.As<Memory<T>, ReadOnlyMemory<T>>(ref memory); }
 
+        /// <summary>
+        /// Returns the string representation of this <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <returns>The string representation of this <see cref="Memory{T}"/> object.</returns>
+        /// <remarks>
+        /// For a Memory&lt;<see cref="System.Char"/>&gt;, the <see cref="ToString"/> method returns a 
+        /// <see cref="System.String"/> that contains the characters pointed to by the 
+        /// <see cref="Memory{T}"/>. Otherwise, it returns a <see cref="System.String"/> 
+        /// with the name of the type and the number of elements that the <see cref="Memory{T}"/> contains.
+        /// </remarks>
         public override string ToString()
         {
             if (typeof(T) == typeof(char))
             {
-                if (!(_object is string text))
-                {
-                    return Span.ToString();
-                }
+                if (!(_object is string text)) { return Span.ToString(); }
                 return text.Substring(_index, _length & 0x7FFFFFFF);
             }
             return $"System.Memory<{typeof(T).Name}>[{_length & 0x7FFFFFFF}]";
         }
 
+        /// <summary>
+        /// Forms a slice out of the current memory that begins at a specified index.
+        /// </summary>
+        /// <param name="start">The index at which to begin the slice.</param>
+        /// <returns>An object that contains all elements of the current instance from <paramref name="start"/> to the end of the instance.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than zero or greater than <see cref="Length"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<T> Slice(int start)
         {
@@ -3649,6 +3987,16 @@ namespace System
             return new Memory<T>(_object, _index + start, length - start);
         }
 
+        /// <summary>
+        /// Forms a slice out of the current memory starting at a specified index for a specified length.
+        /// </summary>
+        /// <param name="start">The index at which to begin the slice.</param>
+        /// <param name="length">The number of elements to include in the slice.</param>
+        /// <returns>An object that contains <paramref name="length"/> elements from the current instance starting at <paramref name="start"/>.</returns>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="start"/> is less than zero or greater than <see cref="Length"/>. <br /> <br />
+        /// -or- <br /> <br />
+        /// <paramref name="length"/> is greater than <c><see cref="Length"/> - <paramref name="start"/></c>
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Memory<T> Slice(int start, int length)
         {
@@ -3661,22 +4009,38 @@ namespace System
             return new Memory<T>(_object, _index + start, length | (length2 & int.MinValue));
         }
 
-        public void CopyTo(Memory<T> destination)
-        {
-            Span.CopyTo(destination.Span);
-        }
+        /// <summary>
+        /// Copies the contents of a <see cref="Memory{T}"/> object into a destination <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <param name="destination">The destination <see cref="Memory{T}"/> object.</param>
+        /// <exception cref="System.ArgumentException">The length of <paramref name="destination"/> is less than the length of the current instance.</exception>
+        /// <remarks>This method copies all of the contents of the current <see cref="Memory{T}"/> instance to <paramref name="destination"/> even if the contents of the 
+        /// current instance and <paramref name="destination"/> overlap.</remarks>
+        public void CopyTo(Memory<T> destination) { Span.CopyTo(destination.Span); }
 
-        public bool TryCopyTo(Memory<T> destination)
-        {
-            return Span.TryCopyTo(destination.Span);
-        }
+        /// <summary>
+        /// Copies the contents of a <see cref="Memory{T}"/> object into a destination <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <param name="destination">The destination <see cref="Memory{T}"/> object.</param>
+        /// <returns><see langword="true" /> if the copy operation succeeds; otherwise, <see langword="false" />.</returns>
+        /// <exception cref="System.ArgumentException">The length of <paramref name="destination"/> is less than the length of the current instance.</exception>
+        /// <remarks>This method copies all of the contents of the current <see cref="Memory{T}"/> instance to <paramref name="destination"/> even if the contents of the 
+        /// current instance and <paramref name="destination"/> overlap.</remarks>
+        public bool TryCopyTo(Memory<T> destination) { return Span.TryCopyTo(destination.Span); }
 
+        /// <summary>
+        /// Creates a handle for the <see cref="Memory{T}"/> object.
+        /// </summary>
+        /// <returns>A handle for the <see cref="Memory{T}"/> object.</returns>
+        /// <exception cref="System.ArgumentException">An instance with non-primitive (non-blittable) members cannot be pinned.</exception>
+        /// <remarks>
+        /// The garbage collector will not move the memory until the returned <see cref="MemoryHandle"/> object is disposed. 
+        /// This enables you to retrieve and use the memory's address. <br /> <br />
+        /// See also: <seealso cref="System.Type.IsPrimitive"/>
+        /// </remarks>
         public unsafe MemoryHandle Pin()
         {
-            if (_index < 0)
-            {
-                return ((MemoryManager<T>)_object).Pin(_index & 0x7FFFFFFF);
-            }
+            if (_index < 0) { return ((MemoryManager<T>)_object).Pin(_index & 0x7FFFFFFF); }
             if (typeof(T) == typeof(char) && _object is string value)
             {
                 GCHandle handle = GCHandle.Alloc(value, GCHandleType.Pinned);
@@ -3697,53 +4061,54 @@ namespace System
             return default(MemoryHandle);
         }
 
-        public T[] ToArray()
-        {
-            return Span.ToArray();
-        }
+        /// <summary>
+        /// Copies the contents from the memory into a new array.
+        /// </summary>
+        /// <returns>An array containing the elements in the current memory.</returns>
+        /// <remarks>
+        /// This method performs a heap allocation and therefore should be avoided if possible. 
+        /// However, it is sometimes necessary to take advantage of functionality that is only available for arrays. <br />
+        /// Each call to the <see cref="ToArray"/> method returns a new array.
+        /// </remarks>
+        public T[] ToArray() { return Span.ToArray(); }
 
+        /// <summary>
+        /// Determines whether the specified object is equal to the current object.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the current instance and other are equal; otherwise, <see langword="false"/>.</returns>
+        /// <remarks>Two <see cref="Memory{T}"/> objects are equal if both objects point to the same array and have the same length. 
+        /// Note that the test for equality does not check whether the contents are equal.</remarks>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override bool Equals(object obj)
         {
-            if (obj is ReadOnlyMemory<T> readOnlyMemory)
-            {
-                return readOnlyMemory.Equals(this);
-            }
-            if (obj is Memory<T> other)
-            {
-                return Equals(other);
-            }
+            if (obj is ReadOnlyMemory<T> readOnlyMemory) { return readOnlyMemory.Equals(this); }
+            if (obj is Memory<T> other) { return Equals(other); }
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Memory{T}"/> object is equal to the current object.
+        /// </summary>
+        /// <param name="other">The object to compare with the current instance.</param>
+        /// <returns><see langword="true"/> if the current instance and other are equal; otherwise, <see langword="false"/>.</returns>
         public bool Equals(Memory<T> other)
         {
-            if (_object == other._object && _index == other._index)
-            {
-                return _length == other._length;
-            }
+            if (_object == other._object && _index == other._index) { return _length == other._length; }
             return false;
         }
 
+        /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode()
         {
-            if (_object == null)
-            {
-                return 0;
-            }
+            if (_object == null) { return 0; }
             return CombineHashCodes(_object.GetHashCode(), _index.GetHashCode(), _length.GetHashCode());
         }
 
-        private static int CombineHashCodes(int left, int right)
-        {
-            return ((left << 5) + left) ^ right;
-        }
+        private static int CombineHashCodes(int left, int right) { return ((left << 5) + left) ^ right; }
 
-        private static int CombineHashCodes(int h1, int h2, int h3)
-        {
-            return CombineHashCodes(CombineHashCodes(h1, h2), h3);
-        }
+        private static int CombineHashCodes(int h1, int h2, int h3) { return CombineHashCodes(CombineHashCodes(h1, h2), h3); }
     }
 
     [DebuggerTypeProxy(typeof(MemoryDebugView<>))]
@@ -3970,18 +4335,38 @@ namespace System
         }
     }
 
+    /// <summary>
+    /// Provides a type-safe and memory-safe read-only representation of a contiguous region of arbitrary memory.
+    /// </summary>
+    /// <typeparam name="T">The type of items in the <see cref="ReadOnlySpan{T}"/>.</typeparam>
+    /// <remarks>
+    /// <see cref="ReadOnlySpan{T}"/> is a <see langword="ref struct"/> that is allocated on the stack and can 
+    /// never escape to the managed heap. Ref struct types have a number of restrictions to ensure that they 
+    /// cannot be promoted to the managed heap, including that they can't be boxed, captured in lambda expressions, 
+    /// assigned to variables of type <see cref="System.Object"/>, assigned to <see langword="dynamic"/> variables, 
+    /// and they cannot implement any interface type. <br /> <br />
+    /// A <see cref="ReadOnlySpan{T}"/> instance is often used to reference the elements of an array or a portion 
+    /// of an array. Unlike an array, however, a <see cref="ReadOnlySpan{T}"/> instance can point to managed memory, 
+    /// native memory, or memory managed on the stack.
+    /// </remarks>
     [DebuggerTypeProxy(typeof(SpanDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     [DebuggerTypeProxy(typeof(SpanDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     public readonly ref struct ReadOnlySpan<T>
     {
+        /// <summary>
+        /// Provides an enumerator for the elements of a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
         public ref struct Enumerator
         {
             private readonly ReadOnlySpan<T> _span;
 
             private int _index;
 
+            /// <summary>
+            /// Gets a reference to the item at the current position of the enumerator.
+            /// </summary>
             public ref readonly T Current
             {
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -3998,6 +4383,22 @@ namespace System
                 _index = -1;
             }
 
+            /// <summary>
+            /// Advances the enumerator to the next item of the <see cref="ReadOnlySpan{T}"/>.
+            /// </summary>
+            /// <returns><see langword="true"/> if the enumerator successfully 
+            /// advanced to the next item; <see langword="false"/> if the end of the 
+            /// span has been passed.</returns>
+            /// <remarks>
+            /// After an enumerator is created, it is positioned before the first element 
+            /// in the span, and the first call to <see cref="MoveNext()"/> advances the 
+            /// enumerator to the first item in the span. <br />
+            /// <br /> 
+            /// If <see cref="MoveNext()"/> passes the end of the span, 
+            /// <see cref="MoveNext()"/> returns <see langword="false"/>. When the 
+            /// enumerator is at this state, subsequent calls to <see cref="MoveNext()"/> 
+            /// also return <see langword="false"/>.
+            /// </remarks>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool MoveNext()
             {
@@ -4017,12 +4418,27 @@ namespace System
 
         private readonly int _length;
 
+        /// <summary>
+        /// Returns the length of the current read-only span.
+        /// </summary>
         public int Length => _length;
 
+        /// <summary>
+        /// Returns a value that indicates whether the current <see cref="ReadOnlySpan{T}"/> is empty.
+        /// </summary>
         public bool IsEmpty => _length == 0;
 
+        /// <summary>
+        /// Returns an empty <see cref="ReadOnlySpan{T}"/> object.
+        /// </summary>
         public static ReadOnlySpan<T> Empty => default(ReadOnlySpan<T>);
 
+        /// <summary>
+        /// Gets the element at the specified zero-based index.
+        /// </summary>
+        /// <param name="index">The zero-based index of the element.</param>
+        /// <returns>The element at the specified index.</returns>
+        /// <exception cref="System.IndexOutOfRangeException"><paramref name="index"/> is less than zero or greater than or equal to <see cref="Length"/>.</exception>
         public unsafe ref readonly T this[int index]
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4044,40 +4460,61 @@ namespace System
 
         internal IntPtr ByteOffset => _byteOffset;
 
-        public static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
-        {
-            return !(left == right);
-        }
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="ReadOnlySpan{T}"/> objects are not equal.
+        /// </summary>
+        /// <param name="left">The first read-only span to compare.</param>
+        /// <param name="right">The second read-only span to compare.</param>
+        /// <returns><see langword="true"/> if the two <see cref="ReadOnlySpan{T}"/> objects are not equal; otherwise, <see langword="false"/>.</returns>
+        public static bool operator !=(ReadOnlySpan<T> left, ReadOnlySpan<T> right) { return !(left == right); }
+
 #pragma warning disable CS0809
+        /// <inheritdoc />
         [Obsolete("Equals() on ReadOnlySpan will always throw an exception. Use == instead.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
-        {
-            throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallEqualsOnSpan);
-        }
+        public override bool Equals(object obj) { throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallEqualsOnSpan); }
 
+        /// <inheritdoc />
         [Obsolete("GetHashCode() on ReadOnlySpan will always throw an exception.")]
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode()
-        {
-            throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallGetHashCodeOnSpan);
-        }
+        public override int GetHashCode() { throw new NotSupportedException(MDCFR.Properties.Resources.NotSupported_CannotCallGetHashCodeOnSpan); }
 #pragma warning restore CS0809
-        public static implicit operator ReadOnlySpan<T>(T[] array)
-        {
-            return new ReadOnlySpan<T>(array);
-        }
 
-        public static implicit operator ReadOnlySpan<T>(ArraySegment<T> segment)
-        {
-            return new ReadOnlySpan<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of an array to a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        /// <param name="array">The array to convert to a <see cref="ReadOnlySpan{T}"/>.</param>
+        public static implicit operator ReadOnlySpan<T>(T[] array) { return new ReadOnlySpan<T>(array); }
 
-        public Enumerator GetEnumerator()
-        {
-            return new Enumerator(this);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of an <see cref="ArraySegment{T}"/> to a <see cref="ReadOnlySpan{T}"/>.
+        /// </summary>
+        /// <param name="segment">The array segment to be converted to a <see cref="ReadOnlySpan{T}"/>.</param>
+        public static implicit operator ReadOnlySpan<T>(ArraySegment<T> segment) { return new ReadOnlySpan<T>(segment.Array, segment.Offset, segment.Count); }
 
+        /// <summary>
+        /// Returns an enumerator for this <see cref="Span{T}"/>.
+        /// </summary>
+        /// <returns>An enumerator for this span.</returns>
+        /// <remarks>
+        /// Instead of calling the <see cref="GetEnumerator"/> 
+        /// method directly, you can use the C# <see langword="foreach"/> 
+        /// statement and the Visual Basic <c>For Each...Next</c> 
+        /// construct to enumerate a <see cref="Span{T}"/>.
+        /// </remarks>
+        public Enumerator GetEnumerator() { return new Enumerator(this); }
+
+        /// <summary>
+        /// Creates a new <see cref="ReadOnlySpan{T}"/> object over the entirety of a specified array.
+        /// </summary>
+        /// <param name="array">The array from which to create the <see cref="ReadOnlySpan{T}"/> object.</param>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, and <paramref name="array"/> is not an array 
+        /// of type <typeparamref name="T"/>.
+        /// </exception>
+        /// <remarks>
+        /// If <paramref name="array"/> is <see langword="null"/>, this constructor returns a <see langword="null"/> <see cref="ReadOnlySpan{T}"/>.
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan(T[] array)
         {
@@ -4091,6 +4528,24 @@ namespace System
             _byteOffset = SpanHelpers.PerTypeValues<T>.ArrayAdjustment;
         }
 
+        /// <summary>
+        /// Creates a new <see cref="ReadOnlySpan{T}"/> object that includes a specified number of elements of an array starting at a specified index.
+        /// </summary>
+        /// <param name="array">The source array.</param>
+        /// <param name="start">The index of the first element to include in the new <see cref="ReadOnlySpan{T}"/>.</param>
+        /// <param name="length">The number of elements to include in the new <see cref="ReadOnlySpan{T}"/>.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// <paramref name="array"/> is <see langword="null"/>, but <paramref name="start"/> or <paramref name="length"/> is non-zero.<br /> <br />
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> is outside the bounds of the array.
+        /// -or- <br /> <br />
+        /// <paramref name="start"/> and <paramref name="length"/> exceeds the number of elements in the array.
+        /// </exception>
+        /// <exception cref="System.ArrayTypeMismatchException">
+        /// <typeparamref name="T"/> is a reference type, and <paramref name="array"/> is not an array 
+        /// of type <typeparamref name="T"/>.
+        /// </exception>
+        /// <remarks>This constructor returns <see langword="default"/> when <paramref name="array"/> is <see langword="null"/>.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan(T[] array, int start, int length)
         {
@@ -4112,6 +4567,21 @@ namespace System
             _byteOffset = SpanHelpers.PerTypeValues<T>.ArrayAdjustment.Add<T>(start);
         }
 
+        /// <summary>
+        /// Creates a new <see cref="ReadOnlySpan{T}"/> object from a specified 
+        /// number of <typeparamref name="T"/> elements starting at a specified memory address.
+        /// </summary>
+        /// <param name="pointer">A pointer to the starting address of a specified number of 
+        /// <typeparamref name="T"/> elements in memory.</param>
+        /// <param name="length">The number of <typeparamref name="T"/> elements to be included 
+        /// in the <see cref="ReadOnlySpan{T}"/>.</param>
+        /// <exception cref="System.ArgumentException">
+        /// <typeparamref name="T"/> is a reference type or contains pointers and therefore cannot be stored in unmanaged memory.
+        /// </exception>
+        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length"/> is negative.</exception>
+        /// <remarks>This constructor should be used with care, since it creates arbitrarily typed <typeparamref name="T"/>'s from a 
+        /// <see cref="System.Void"/>*-typed block of memory, and length is not checked. However, if the constructor succeeds in 
+        /// creating a new <see cref="ReadOnlySpan{T}"/> object, all subsequent uses are correct.</remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         [CLSCompliant(false)]
         public unsafe ReadOnlySpan(void* pointer, int length)
@@ -4137,6 +4607,11 @@ namespace System
             _byteOffset = byteOffset;
         }
 
+        /// <summary>
+        /// Returns a reference to an object of type <typeparamref name="T"/> that can be used for pinning. <br /> <br />
+        /// This method is intended to support .NET compilers and is not intended to be called by user code.
+        /// </summary>
+        /// <returns>A reference to the element of the span at index 0, or <see langword="null"/> if the span is empty.</returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public unsafe ref readonly T GetPinnableReference()
         {
@@ -4151,14 +4626,23 @@ namespace System
             return ref Unsafe.AsRef<T>(null);
         }
 
-        public void CopyTo(Span<T> destination)
-        {
-            if (!TryCopyTo(destination))
-            {
-                System.ThrowHelper.ThrowArgumentException_DestinationTooShort();
-            }
-        }
+        /// <summary>
+        /// Copies the contents of this <see cref="ReadOnlySpan{T}"/> into a destination <see cref="Span{T}"/>.
+        /// </summary>
+        /// <param name="destination">The destination <see cref="Span{T}"/> object.</param>
+        /// <exception cref="System.ArgumentException"><paramref name="destination"/> is shorter 
+        /// than the source <see cref="ReadOnlySpan{T}"/>.</exception>
+        /// <remarks>This method copies all of source to <paramref name="destination"/> even if 
+        /// source and <paramref name="destination"/> overlap.</remarks>
+        public void CopyTo(Span<T> destination) { if (TryCopyTo(destination) == false) { System.ThrowHelper.ThrowArgumentException_DestinationTooShort(); } }
 
+        /// <summary>
+        /// Attempts to copy the current <see cref="ReadOnlySpan{T}"/> to a destination 
+        /// <see cref="Span{T}"/> and returns a value that indicates whether 
+        /// the copy operation succeeded.
+        /// </summary>
+        /// <param name="destination">The target of the copy operation.</param>
+        /// <returns><see langword="true"/> if the copy operation succeeded; otherwise, <see langword="false"/>.</returns>
         public bool TryCopyTo(Span<T> destination)
         {
             int length = _length;
@@ -4176,6 +4660,12 @@ namespace System
             return true;
         }
 
+        /// <summary>
+        /// Returns a value that indicates whether two <see cref="ReadOnlySpan{T}"/> objects are equal.
+        /// </summary>
+        /// <param name="left">The first span to compare.</param>
+        /// <param name="right">The second span to compare.</param>
+        /// <returns><see langword="true"/> if the two <see cref="ReadOnlySpan{T}"/> objects are equal; otherwise, <see langword="false"/>.</returns>
         public static bool operator ==(ReadOnlySpan<T> left, ReadOnlySpan<T> right)
         {
             if (left._length == right._length)
@@ -4185,6 +4675,16 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Returns the string representation of this <see cref="ReadOnlySpan{T}"/> object.
+        /// </summary>
+        /// <returns>The string representation of this <see cref="ReadOnlySpan{T}"/> object.</returns>
+        /// <remarks>
+        /// For a ReadOnlySpan&lt;<see cref="System.Char"/>&gt;, the <see cref="ToString"/> method returns a 
+        /// <see cref="System.String"/> that contains the characters pointed to by the 
+        /// <see cref="ReadOnlySpan{T}"/>. Otherwise, it returns a <see cref="System.String"/> 
+        /// with the name of the type and the number of elements that the <see cref="ReadOnlySpan{T}"/> contains.
+        /// </remarks>
         public unsafe override string ToString()
         {
             if (typeof(T) == typeof(char))
@@ -4192,10 +4692,7 @@ namespace System
                 if (_byteOffset == MemoryExtensions.StringAdjustment)
                 {
                     object obj = Unsafe.As<object>(_pinnable);
-                    if (obj is string text && _length == text.Length)
-                    {
-                        return text;
-                    }
+                    if (obj is string text && _length == text.Length) { return text; }
                 }
                 fixed (char* value = &Unsafe.As<T, char>(ref DangerousGetPinnableReference()))
                 {
@@ -4205,6 +4702,12 @@ namespace System
             return $"System.ReadOnlySpan<{typeof(T).Name}>[{_length}]";
         }
 
+        /// <summary>
+        /// Forms a slice out of the current span that begins at a specified index.
+        /// </summary>
+        /// <param name="start">The index at which to begin the slice.</param>
+        /// <returns>A span that consists of all elements of the current span from <paramref name="start"/> to the end of the span.</returns>
+        /// <exception cref="System.ArgumentException"><paramref name="start"/> is less than zero or greater than <see cref="Length"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<T> Slice(int start)
         {
@@ -4217,6 +4720,17 @@ namespace System
             return new ReadOnlySpan<T>(_pinnable, byteOffset, length);
         }
 
+        /// <summary>
+        /// Forms a slice out of the current span starting at a specified index for a specified length.
+        /// </summary>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <param name="length">The desired length for the slice.</param>
+        /// <returns>A span that consists of <paramref name="length"/> elements
+        /// from the current span starting at <paramref name="start"/>.</returns>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// <paramref name="start"/> or 
+        /// <c><paramref name="start"/> + <paramref name="length"/></c> 
+        /// is less than zero or greater than <see cref="Length"/>.</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlySpan<T> Slice(int start, int length)
         {
@@ -4228,6 +4742,16 @@ namespace System
             return new ReadOnlySpan<T>(_pinnable, byteOffset, length);
         }
 
+        /// <summary>
+        /// Copies the contents of this span into a new array.
+        /// </summary>
+        /// <returns>An array containing the data in the current span.</returns>
+        /// <remarks>
+        /// This method performs a heap allocation and therefore should be avoided if possible. 
+        /// Heap allocations are expected in APIs that work with arrays. 
+        /// Using such APIs is unavoidable if an alternative API overload that takes a 
+        /// <see cref="ReadOnlySpan{T}"/> does not exist.
+        /// </remarks>
         public T[] ToArray()
         {
             if (_length == 0)
@@ -4250,6 +4774,10 @@ namespace System
             return ref Unsafe.AddByteOffset(ref _pinnable.Data, _byteOffset);
         }
     }
+
+    [StructLayout(LayoutKind.Sequential)]
+    internal sealed class Pinnable<T> { public T Data; }
+
 
 
 }

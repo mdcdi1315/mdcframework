@@ -84,6 +84,58 @@ namespace ROOT
         [SupportedOSPlatform("windows")]
         public static System.Boolean OpenSystemApp(SystemLinks link , IWin32Window Window) { return StartUWPApp(ToURL(link) , Window); }
 
+		/// <summary>
+		/// Creates a new Windows Internet Shortcut.
+		/// </summary>
+		/// <param name="URL">The URL that the shortcut will point to.</param>
+		/// <param name="Path">The path of the shortcut that will be saved.</param>
+		/// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+		public static System.Boolean CreateInternetShortcut(System.Uri URL , System.String Path)
+		{
+			return CreateInternetShortcut(URL, Path, false);
+        }
+
+        /// <summary>
+        /// Creates a new Windows Internet Shortcut.
+        /// </summary>
+        /// <param name="URL">The URL that the shortcut will point to.</param>
+        /// <param name="Path">The path of the shortcut that will be saved.</param>
+		/// <param name="OverwriteIfExists">If <see langword="true"/> , then it will delete the contents of the existing file , if exists.</param>
+        /// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+        public static System.Boolean CreateInternetShortcut(System.Uri URL, System.String Path , System.Boolean OverwriteIfExists)
+        {
+            System.IO.FileStream Out = null;
+            HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
+            System.Boolean executed = false;
+            System.Net.WebException err = null;
+            req.OnSuccess(df => { executed = true; });
+            req.OnFail(dg => { executed = true; err = dg; });
+            req.Go();
+            while (executed == false) { HaltApplicationThread(430); }
+            req = null;
+            if (err != null) { err = null; goto G_ExitErr; }
+            err = null;
+			if (FileExists(Path)) 
+			{
+				if (OverwriteIfExists) 
+				{
+					Out = ClearAndWriteAFile(Path);
+					if (Out == null) { goto G_ExitErr; }
+				} else { goto G_ExitErr; }
+			} else 
+			{
+				Out = CreateANewFile(Path);
+                if (Out == null) { goto G_ExitErr; }
+            }
+			PassNewContentsToFile(String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE , URL.ToString()) , Out);
+			Out.Close();
+			Out.Dispose();
+			Out = null;
+			goto G_Succ;
+			G_ExitErr: { if (Out != null) { Out.Close(); Out.Dispose(); } return false; }
+			G_Succ: { if (Out != null) { Out.Close(); Out.Dispose(); } return true; }
+        }
+
         /// <summary>
         /// Opens a Windows UWP App from a custom link.
         /// </summary>
@@ -119,7 +171,6 @@ namespace ROOT
         /// </summary>
         /// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
         /// <returns>The full file path returned by the dialog.</returns>
-        [SupportedOSPlatform("windows")]
 		public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
 
 		/// <summary>
@@ -128,7 +179,6 @@ namespace ROOT
 		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
 		/// <returns>A <see cref="System.Boolean"/> value indicating whether the dialog execution 
 		/// was sucessfull; <c>false</c> in the case of error or the user did not supplied a file path.</returns>
-		[SupportedOSPlatform("windows")]
 		public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
 
 		/// <summary>
@@ -262,11 +312,9 @@ namespace ROOT
         /// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
 		[SupportedOSPlatform("windows")]
         public static System.Boolean WriteConsoleText(System.Char[] Text) 
-		{ 
-			List<System.Char> LST = new List<System.Char>(Text);
-			LST.Add('\r');
-			LST.Add('\n');
-			System.Boolean DS = ConsoleInterop.WriteToConsole(LST.ToArray());
+		{
+            List<System.Char> LST = new List<System.Char>(Text) { '\r', '\n' };
+            System.Boolean DS = ConsoleInterop.WriteToConsole(LST.ToArray());
 			LST.Clear();
 			LST = null;
 			return DS;
@@ -4995,7 +5043,6 @@ namespace ROOT
 			/// algorithm is optimized for 64-Bit machines only.
 			/// </summary>
 			public abstract System.Boolean Is32Bit { get; }
-
 		}
 
         /// <summary>
@@ -5016,7 +5063,6 @@ namespace ROOT
 			private static System.UInt64[] JUMP = { 0x2bd7a6a6e99c2ddc, 0x0992ccaf6a6fca05 };
 			private static System.UInt64[] LONG_JUMP = { 0x360fd5f2cf8d5d99, 0x9c6e6877736c46e3 };
 			private System.UInt64 _SEED = 0;
-
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
             private System.UInt64 rotl(System.UInt64 x, int k) { return (x << k) | (x >> (64 - k)); }
 
@@ -6871,10 +6917,10 @@ namespace ROOT
 		// An internal buffer for the Title commands.
 		internal static System.String T = T2;
         internal const System.String T2 = "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0";
-        
+
 		/// <summary>
-        /// Define the Buffer Size when using the function <see cref="ROOT.MAIN.ReadConsoleText(ConsoleReadBufferOptions)"/> .
-        /// </summary>
+		/// Define the Buffer Size when using the function <see cref="ROOT.MAIN.ReadConsoleText(ConsoleReadBufferOptions)"/> .
+		/// </summary>
         public enum ConsoleReadBufferOptions : System.Int32
         {
 			/// <summary>

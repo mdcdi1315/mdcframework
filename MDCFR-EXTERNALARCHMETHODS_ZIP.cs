@@ -1,21 +1,20 @@
-﻿using System;
+﻿
+using System;
 using System.IO;
-using System.Text;
 using System.Linq;
+using System.Text;
 using System.Buffers;
 using System.Threading;
+using System.Collections;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using System.Security.Cryptography;
 using System.Runtime.Serialization;
+using System.Security.Cryptography;
 using System.Collections.Concurrent;
-using System.Text.RegularExpressions;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using CT = System.Threading.CancellationToken;
-using static ExternalArchivingMethods.SharpZipLib.ZipEntryFactory;
-using System.Collections;
+using System.Text.RegularExpressions;
+
 #if NETSTANDARD2_1_OR_GREATER || NETCOREAPP3_1_OR_GREATER
     #define VECTORIZE_MEMORY_MOVE
 #endif
@@ -23,6 +22,9 @@ using System.Collections;
 
 namespace ExternalArchivingMethods.SharpZipLib
 {
+    using CT = System.Threading.CancellationToken;
+    using static ZipEntryFactory;
+
     /// <summary>
     /// An example class to demonstrate compression and decompression of BZip2 streams.
     /// </summary>

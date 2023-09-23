@@ -1,18 +1,20 @@
-﻿using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
-using System.Threading.Tasks.Dataflow.Internal;
-using System.Diagnostics.CodeAnalysis;
+﻿// Licensed to the .NET Foundation under one or more agreements.
+// The .NET Foundation licenses this file to you under the MIT license.
+// See the LICENSE file in the project root for more information.
+
 using System.Linq;
-using System.Runtime.ExceptionServices;
 using System.Collections;
+using System.Diagnostics;
+using System.Collections.Generic;
 using System.Diagnostics.Tracing;
-using System.Drawing;
 using System.Runtime.InteropServices;
-using System.Runtime;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.ExceptionServices;
 
 namespace System.Threading.Tasks.Dataflow
 {
+    using Internal;
 
     namespace Internal
     {

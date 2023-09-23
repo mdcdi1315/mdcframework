@@ -869,43 +869,108 @@
     <value>ms-settings://</value>
     <comment>Windows Settings</comment>
   </data>
-	<data name="ArgumentOutOfRange_GenericPositive" xml:space="preserve">
-		<value>Number must be positive.</value>
+  <data name="ArgumentOutOfRange_GenericPositive" xml:space="preserve">
+    <value>Number must be positive.</value>
+  </data>
+  <data name="ArgumentOutOfRange_NeedNonNegOrNegative1" xml:space="preserve">
+    <value>Number must be either non-negative and less than or equal to Int32.MaxValue or -1</value>
+  </data>
+  <data name="ArgumentOutOfRange_BatchSizeMustBeNoGreaterThanBoundedCapacity" xml:space="preserve">
+    <value>Number must be no greater than the value specified in BoundedCapacity.</value>
+  </data>
+  <data name="Argument_InvalidMessageHeader" xml:space="preserve">
+    <value>The DataflowMessageHeader instance does not represent a valid message header.</value>
+  </data>
+  <data name="InvalidOperation_DataNotAvailableForReceive" xml:space="preserve">
+    <value>The source completed without providing data to receive.</value>
+  </data>
+  <data name="NotSupported_MemberNotNeeded" xml:space="preserve">
+    <value>This member is not supported on this dataflow block. The block is intended for a specific purpose that does not utilize this member.</value>
+  </data>
+  <data name="InvalidOperation_MessageNotReservedByTarget" xml:space="preserve">
+    <value>The target does not have the message reserved.</value>
+  </data>
+  <data name="InvalidOperation_FailedToConsumeReservedMessage" xml:space="preserve">
+    <value>The target block failed to consume a message it had successfully reserved.</value>
+  </data>
+  <data name="InvalidOperation_ErrorDuringCleanup" xml:space="preserve">
+    <value>An error occurred while linking up the target or during the cleanup after completion.</value>
+  </data>
+  <data name="Argument_BoundedCapacityNotSupported" xml:space="preserve">
+    <value>BoundedCapacity must be Unbounded or -1 for this dataflow block.</value>
+  </data>
+  <data name="Argument_CantConsumeFromANullSource" xml:space="preserve">
+    <value>The argument must be false if no source from which to consume is specified.</value>
+  </data>
+  <data name="Argument_NonGreedyNotSupported" xml:space="preserve">
+    <value>Greedy must be true for this dataflow block.</value>
+  </data>
+  <data name="Argument_InvalidMessageId" xml:space="preserve">
+    <value>To construct a DataflowMessageHeader instance, either pass a non-zero value or use the parameterless constructor.</value>
+  </data>
+  <data name="MDCFR_INTS_CREATE" xml:space="preserve">
+    <value>[InternetShortcut]
+URL={0}</value>
+    <comment>Proper file code that can open an Internet Shortcut.</comment>
+  </data>
+  <data name="LengthMustMatch" xml:space="preserve">
+	<value>Length of {0} ({1}) must match product of {2} ({3}).</value>
+  </data>
+  <data name="CannotComputeTriangle" xml:space="preserve">
+	<value>Cannot compute triangle of {0} with Rank less than 2.</value>
+  </data>
+  <data name="CannotComputeDiagonal" xml:space="preserve">
+	<value>Cannot compute diagonal of {0} with Rank less than 2.</value>
+  </data>
+	<data name="CannotCompareWithRank" xml:space="preserve">
+		<value>Cannot compare {0} with Rank {1} to {2} with Rank {3}.</value>
 	</data>
-	<data name="ArgumentOutOfRange_NeedNonNegOrNegative1" xml:space="preserve">
-		<value>Number must be either non-negative and less than or equal to Int32.MaxValue or -1</value>
+	<data name="CannotCompareWithDifferentDimension" xml:space="preserve">
+		<value>Cannot compare {0} with different dimension {1}, {2} != {3}.</value>
 	</data>
-	<data name="ArgumentOutOfRange_BatchSizeMustBeNoGreaterThanBoundedCapacity" xml:space="preserve">
-		<value>Number must be no greater than the value specified in BoundedCapacity.</value>
+	<data name="MustHaveAtLeastOneDimension" xml:space="preserve">
+		<value>Tensor {0} must have at least one dimension.</value>
 	</data>
-	<data name="Argument_InvalidMessageHeader" xml:space="preserve">
-		<value>The DataflowMessageHeader instance does not represent a valid message header.</value>
+	<data name="OnlySingleDimensionalArraysSupported" xml:space="preserve">
+		<value>Only single dimensional arrays are supported for the requested action.</value>
 	</data>
-	<data name="InvalidOperation_DataNotAvailableForReceive" xml:space="preserve">
-		<value>The source completed without providing data to receive.</value>
+	<data name="DimensionsMustContainElements" xml:space="preserve">
+		<value>Dimensions must contain elements.</value>
 	</data>
-	<data name="NotSupported_MemberNotNeeded" xml:space="preserve">
-		<value>This member is not supported on this dataflow block. The block is intended for a specific purpose that does not utilize this member.</value>
+	<data name="NumberGreaterThenAvailableSpace" xml:space="preserve">
+		<value>The number of elements in the Tensor is greater than the available space from index to the end of the destination array.</value>
 	</data>
-	<data name="InvalidOperation_MessageNotReservedByTarget" xml:space="preserve">
-		<value>The target does not have the message reserved.</value>
+	<data name="CannotReshapeArrayDueToMismatchInLengths" xml:space="preserve">
+		<value>Cannot reshape array due to mismatch in lengths, currently {0} would become {1}.</value>
 	</data>
-	<data name="InvalidOperation_FailedToConsumeReservedMessage" xml:space="preserve">
-		<value>The target block failed to consume a message it had successfully reserved.</value>
+	<data name="ValueIsNotOfType" xml:space="preserve">
+		<value>The value "{0}" is not of type "{1}" and cannot be used in this generic collection.</value>
 	</data>
-	<data name="InvalidOperation_ErrorDuringCleanup" xml:space="preserve">
-		<value>An error occurred while linking up the target or during the cleanup after completion.</value>
+	<data name="CannotCompareToWithDifferentDimension" xml:space="preserve">
+		<value>Cannot compare {0} to {1} with different dimension {2}, {3} != {4}.</value>
 	</data>
-	<data name="Argument_BoundedCapacityNotSupported" xml:space="preserve">
-		<value>BoundedCapacity must be Unbounded or -1 for this dataflow block.</value>
+	<data name="ArrayMustContainElements" xml:space="preserve">
+		<value>Array must contain elements.</value>
 	</data>
-	<data name="Argument_CantConsumeFromANullSource" xml:space="preserve">
-		<value>The argument must be false if no source from which to consume is specified.</value>
+	<data name="CannotCompare" xml:space="preserve">
+		<value>Cannot compare {0} to {1}.</value>
 	</data>
-	<data name="Argument_NonGreedyNotSupported" xml:space="preserve">
-		<value>Greedy must be true for this dataflow block.</value>
+	<data name="DimensionsMustBePositiveAndNonZero" xml:space="preserve">
+		<value>Dimensions must be positive and non-zero.</value>
 	</data>
-	<data name="Argument_InvalidMessageId" xml:space="preserve">
-		<value>To construct a DataflowMessageHeader instance, either pass a non-zero value or use the parameterless constructor.</value>
+	<data name="CannotComputeDiagonalWithOffset" xml:space="preserve">
+		<value>Cannot compute diagonal with offset {0}.</value>
+	</data>
+	<data name="InvalidOperation_MultipleContinuations">
+		<value>Another continuation was already registered.</value>
+	</data>
+	<data name="ChannelClosedException_DefaultMessage">
+		<value>The channel has been closed.</value>
+	</data>
+	<data name="InvalidOperation_IncorrectToken">
+		<value>The result of the operation was already consumed and may not be used again.</value>
+	</data>
+	<data name="InvalidOperation_IncompleteAsyncOperation">
+		<value>The asynchronous operation has not completed.</value>
 	</data>
 </root>

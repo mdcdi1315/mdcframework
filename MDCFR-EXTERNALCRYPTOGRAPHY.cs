@@ -1,3 +1,7 @@
+// NOTE: This file is now deprecated and will NOT be built in the final result. 
+// To re-include it , rename in the project file the Remove attribute from the 
+// Compile item for this file to Include.
+
 using System;
 using System.Collections.Generic;
 

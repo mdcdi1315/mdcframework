@@ -448,6 +448,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Array must contain elements..
+        /// </summary>
+        internal static string ArrayMustContainElements {
+            get {
+                return ResourceManager.GetString("ArrayMustContainElements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Corrupt .resources file.  The specified type doesn&apos;t exist..
         /// </summary>
         internal static string BadImageFormat_InvalidType {
@@ -556,11 +565,83 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot compare {0} to {1}..
+        /// </summary>
+        internal static string CannotCompare {
+            get {
+                return ResourceManager.GetString("CannotCompare", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compare {0} to {1} with different dimension {2}, {3} != {4}..
+        /// </summary>
+        internal static string CannotCompareToWithDifferentDimension {
+            get {
+                return ResourceManager.GetString("CannotCompareToWithDifferentDimension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compare {0} with different dimension {1}, {2} != {3}..
+        /// </summary>
+        internal static string CannotCompareWithDifferentDimension {
+            get {
+                return ResourceManager.GetString("CannotCompareWithDifferentDimension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compare {0} with Rank {1} to {2} with Rank {3}..
+        /// </summary>
+        internal static string CannotCompareWithRank {
+            get {
+                return ResourceManager.GetString("CannotCompareWithRank", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compute diagonal of {0} with Rank less than 2..
+        /// </summary>
+        internal static string CannotComputeDiagonal {
+            get {
+                return ResourceManager.GetString("CannotComputeDiagonal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compute diagonal with offset {0}..
+        /// </summary>
+        internal static string CannotComputeDiagonalWithOffset {
+            get {
+                return ResourceManager.GetString("CannotComputeDiagonalWithOffset", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compute triangle of {0} with Rank less than 2..
+        /// </summary>
+        internal static string CannotComputeTriangle {
+            get {
+                return ResourceManager.GetString("CannotComputeTriangle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find the old value..
         /// </summary>
         internal static string CannotFindOldValue {
             get {
                 return ResourceManager.GetString("CannotFindOldValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot reshape array due to mismatch in lengths, currently {0} would become {1}..
+        /// </summary>
+        internal static string CannotReshapeArrayDueToMismatchInLengths {
+            get {
+                return ResourceManager.GetString("CannotReshapeArrayDueToMismatchInLengths", resourceCulture);
             }
         }
         
@@ -583,11 +664,38 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The channel has been closed..
+        /// </summary>
+        internal static string ChannelClosedException_DefaultMessage {
+            get {
+                return ResourceManager.GetString("ChannelClosedException_DefaultMessage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collection was modified; enumeration operation may not execute..
         /// </summary>
         internal static string CollectionModifiedDuringEnumeration {
             get {
                 return ResourceManager.GetString("CollectionModifiedDuringEnumeration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dimensions must be positive and non-zero..
+        /// </summary>
+        internal static string DimensionsMustBePositiveAndNonZero {
+            get {
+                return ResourceManager.GetString("DimensionsMustBePositiveAndNonZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Dimensions must contain elements..
+        /// </summary>
+        internal static string DimensionsMustContainElements {
+            get {
+                return ResourceManager.GetString("DimensionsMustContainElements", resourceCulture);
             }
         }
         
@@ -1982,11 +2090,38 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The asynchronous operation has not completed..
+        /// </summary>
+        internal static string InvalidOperation_IncompleteAsyncOperation {
+            get {
+                return ResourceManager.GetString("InvalidOperation_IncompleteAsyncOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The result of the operation was already consumed and may not be used again..
+        /// </summary>
+        internal static string InvalidOperation_IncorrectToken {
+            get {
+                return ResourceManager.GetString("InvalidOperation_IncorrectToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The target does not have the message reserved..
         /// </summary>
         internal static string InvalidOperation_MessageNotReservedByTarget {
             get {
                 return ResourceManager.GetString("InvalidOperation_MessageNotReservedByTarget", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Another continuation was already registered..
+        /// </summary>
+        internal static string InvalidOperation_MultipleContinuations {
+            get {
+                return ResourceManager.GetString("InvalidOperation_MultipleContinuations", resourceCulture);
             }
         }
         
@@ -2032,6 +2167,25 @@ namespace MDCFR.Properties {
         internal static string InvalidOperationOnDefaultArray {
             get {
                 return ResourceManager.GetString("InvalidOperationOnDefaultArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Length of {0} ({1}) must match product of {2} ({3})..
+        /// </summary>
+        internal static string LengthMustMatch {
+            get {
+                return ResourceManager.GetString("LengthMustMatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [InternetShortcut]
+        ///URL={0}.
+        /// </summary>
+        internal static string MDCFR_INTS_CREATE {
+            get {
+                return ResourceManager.GetString("MDCFR_INTS_CREATE", resourceCulture);
             }
         }
         
@@ -2225,6 +2379,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Tensor {0} must have at least one dimension..
+        /// </summary>
+        internal static string MustHaveAtLeastOneDimension {
+            get {
+                return ResourceManager.GetString("MustHaveAtLeastOneDimension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This platform does not support binary serialized resources..
         /// </summary>
         internal static string NotSupported_BinarySerializedResources {
@@ -2297,11 +2460,29 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The number of elements in the Tensor is greater than the available space from index to the end of the destination array..
+        /// </summary>
+        internal static string NumberGreaterThenAvailableSpace {
+            get {
+                return ResourceManager.GetString("NumberGreaterThenAvailableSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot access a closed resource set..
         /// </summary>
         internal static string ObjectDisposed_ResourceSet {
             get {
                 return ResourceManager.GetString("ObjectDisposed_ResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Only single dimensional arrays are supported for the requested action..
+        /// </summary>
+        internal static string OnlySingleDimensionalArraysSupported {
+            get {
+                return ResourceManager.GetString("OnlySingleDimensionalArraysSupported", resourceCulture);
             }
         }
         
@@ -2366,6 +2547,15 @@ namespace MDCFR.Properties {
         internal static string UnexpectedSegmentType {
             get {
                 return ResourceManager.GetString("UnexpectedSegmentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &quot;{0}&quot; is not of type &quot;{1}&quot; and cannot be used in this generic collection..
+        /// </summary>
+        internal static string ValueIsNotOfType {
+            get {
+                return ResourceManager.GetString("ValueIsNotOfType", resourceCulture);
             }
         }
         

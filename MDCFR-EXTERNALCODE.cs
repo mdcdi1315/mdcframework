@@ -6,12 +6,11 @@ using System.Text;
 using System.Buffers;
 using System.Diagnostics;
 using System.Buffers.Text;
-using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Diagnostics.CodeAnalysis;
 using System.Threading.Tasks.Sources;
+using System.Collections.Generic;
 #if NET6_0_OR_GREATER
 	using System.Runtime.Intrinsics;
 	using System.Runtime.Intrinsics.X86;
@@ -46,7 +45,6 @@ namespace Microsoft.Win32.SafeHandles
     }
 }
 
-
 namespace Internal
 {
     [StructLayout(LayoutKind.Explicit, Size = 124)]
@@ -58,1287 +56,24 @@ namespace Internal
 namespace System
 {
     #nullable enable
-    namespace Threading.Tasks
-    {
-        using Internal;
-        using System.Collections;
-        using System.Collections.Generic;
-        using System.Collections.Concurrent;
-
-
-
-        internal interface IProducerConsumerQueue<T> : IEnumerable<T>, System.Collections.IEnumerable
-        {
-            bool IsEmpty { get; }
-
-            int Count { get; }
-
-            void Enqueue(T item);
-
-            bool TryDequeue([MaybeNullWhen(false)] out T result);
-
-            int GetCountSafe(object syncObj);
-        }
-
-        [DebuggerDisplay("Count = {Count}")]
-        internal sealed class MultiProducerMultiConsumerQueue<T> : ConcurrentQueue<T>, System.Threading.Tasks.IProducerConsumerQueue<T>, IEnumerable<T>, IEnumerable
-        {
-            bool System.Threading.Tasks.IProducerConsumerQueue<T>.IsEmpty => base.IsEmpty;
-
-            int System.Threading.Tasks.IProducerConsumerQueue<T>.Count => base.Count;
-
-            void System.Threading.Tasks.IProducerConsumerQueue<T>.Enqueue(T item)
-            {
-                Enqueue(item);
-            }
-
-            bool System.Threading.Tasks.IProducerConsumerQueue<T>.TryDequeue([MaybeNullWhen(false)] out T result)
-            {
-                return TryDequeue(out result);
-            }
-
-            int System.Threading.Tasks.IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
-            {
-                return base.Count;
-            }
-        }
-
-#pragma warning disable CS8600 , CS8618 , CS8601
-        [DebuggerDisplay("Count = {Count}")]
-        [DebuggerTypeProxy(typeof(SingleProducerSingleConsumerQueue<>.SingleProducerSingleConsumerQueue_DebugView))]
-        internal sealed class SingleProducerSingleConsumerQueue<T> : System.Threading.Tasks.IProducerConsumerQueue<T>, IEnumerable<T>, IEnumerable
-        {
-            [StructLayout(LayoutKind.Sequential)]
-            private sealed class Segment
-            {
-                internal Segment _next;
-
-                internal readonly T[] _array;
-
-                internal SegmentState _state;
-
-                internal Segment(int size)
-                {
-                    _array = new T[size];
-                }
-            }
-
-            private struct SegmentState
-            { 
-                internal PaddingFor32 _pad0;
-
-                internal volatile int _first;
-
-                internal int _lastCopy;
-
-                internal PaddingFor32 _pad1;
-
-                internal int _firstCopy;
-
-                internal volatile int _last;
-
-                internal PaddingFor32 _pad2;
-            }
-
-            private sealed class SingleProducerSingleConsumerQueue_DebugView
-            {
-                private readonly System.Threading.Tasks.SingleProducerSingleConsumerQueue<T> _queue;
-
-                [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
-                public T[] Items
-                {
-                    get
-                    {
-                        List<T> list = new List<T>();
-                        foreach (T item in _queue)
-                        {
-                            list.Add(item);
-                        }
-                        return list.ToArray();
-                    }
-                }
-
-                public SingleProducerSingleConsumerQueue_DebugView(System.Threading.Tasks.SingleProducerSingleConsumerQueue<T> queue)
-                {
-                    _queue = queue;
-                }
-            }
-
-            private const int INIT_SEGMENT_SIZE = 32;
-
-            private const int MAX_SEGMENT_SIZE = 16777216;
-
-            private volatile Segment _head;
-
-            private volatile Segment _tail;
-
-            public bool IsEmpty
-            {
-                get
-                {
-                    Segment head = _head;
-                    if (head._state._first != head._state._lastCopy)
-                    {
-                        return false;
-                    }
-                    if (head._state._first != head._state._last)
-                    {
-                        return false;
-                    }
-                    return head._next == null;
-                }
-            }
-
-            public int Count
-            {
-                get
-                {
-                    int num = 0;
-                    for (Segment segment = _head; segment != null; segment = segment._next)
-                    {
-                        int num2 = segment._array.Length;
-                        int first;
-                        int last;
-                        do
-                        {
-                            first = segment._state._first;
-                            last = segment._state._last;
-                        }
-                        while (first != segment._state._first);
-                        num += (last - first) & (num2 - 1);
-                    }
-                    return num;
-                }
-            }
-
-            internal SingleProducerSingleConsumerQueue()
-            {
-                _head = (_tail = new Segment(32));
-            }
-
-            public void Enqueue(T item)
-            {
-                Segment segment = _tail;
-                T[] array = segment._array;
-                int last = segment._state._last;
-                int num = (last + 1) & (array.Length - 1);
-                if (num != segment._state._firstCopy)
-                {
-                    array[last] = item;
-                    segment._state._last = num;
-                }
-                else
-                {
-                    EnqueueSlow(item, ref segment);
-                }
-            }
-
-            private void EnqueueSlow(T item, ref Segment segment)
-            {
-                if (segment._state._firstCopy != segment._state._first)
-                {
-                    segment._state._firstCopy = segment._state._first;
-                    Enqueue(item);
-                    return;
-                }
-                int num = _tail._array.Length << 1;
-                if (num > 16777216)
-                {
-                    num = 16777216;
-                }
-                Segment segment2 = new Segment(num);
-                segment2._array[0] = item;
-                segment2._state._last = 1;
-                segment2._state._lastCopy = 1;
-                try
-                {
-                }
-                finally
-                {
-                    Volatile.Write(ref _tail._next, segment2);
-                    _tail = segment2;
-                }
-            }
-
-            public bool TryDequeue([MaybeNullWhen(false)] out T result)
-            {
-                Segment segment = _head;
-                T[] array = segment._array;
-                int first = segment._state._first;
-                if (first != segment._state._lastCopy)
-                {
-                    result = array[first];
-                    array[first] = default(T);
-                    segment._state._first = (first + 1) & (array.Length - 1);
-                    return true;
-                }
-                return TryDequeueSlow(ref segment, ref array, out result);
-            }
-
-            private bool TryDequeueSlow(ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
-            {
-                if (segment._state._last != segment._state._lastCopy)
-                {
-                    segment._state._lastCopy = segment._state._last;
-                    return TryDequeue(out result);
-                }
-                if (segment._next != null && segment._state._first == segment._state._last)
-                {
-                    segment = segment._next;
-                    array = segment._array;
-                    _head = segment;
-                }
-                int first = segment._state._first;
-                if (first == segment._state._last)
-                {
-                    result = default(T);
-                    return false;
-                }
-                result = array[first];
-                array[first] = default(T);
-                segment._state._first = (first + 1) & (segment._array.Length - 1);
-                segment._state._lastCopy = segment._state._last;
-                return true;
-            }
-
-            public bool TryPeek([MaybeNullWhen(false)] out T result)
-            {
-                Segment segment = _head;
-                T[] array = segment._array;
-                int first = segment._state._first;
-                if (first != segment._state._lastCopy)
-                {
-                    result = array[first];
-                    return true;
-                }
-                return TryPeekSlow(ref segment, ref array, out result);
-            }
-
-            private bool TryPeekSlow(ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
-            {
-                if (segment._state._last != segment._state._lastCopy)
-                {
-                    segment._state._lastCopy = segment._state._last;
-                    return TryPeek(out result);
-                }
-                if (segment._next != null && segment._state._first == segment._state._last)
-                {
-                    segment = segment._next;
-                    array = segment._array;
-                    _head = segment;
-                }
-                int first = segment._state._first;
-                if (first == segment._state._last)
-                {
-                    result = default(T);
-                    return false;
-                }
-                result = array[first];
-                return true;
-            }
-
-            public bool TryDequeueIf(Predicate<T> predicate, [MaybeNullWhen(false)] out T result)
-            {
-                Segment segment = _head;
-                T[] array = segment._array;
-                int first = segment._state._first;
-                if (first != segment._state._lastCopy)
-                {
-                    result = array[first];
-                    if (predicate == null || predicate(result))
-                    {
-                        array[first] = default(T);
-                        segment._state._first = (first + 1) & (array.Length - 1);
-                        return true;
-                    }
-                    result = default(T);
-                    return false;
-                }
-                return TryDequeueIfSlow(predicate, ref segment, ref array, out result);
-            }
-
-            private bool TryDequeueIfSlow(Predicate<T> predicate, ref Segment segment, ref T[] array, [MaybeNullWhen(false)] out T result)
-            {
-                if (segment._state._last != segment._state._lastCopy)
-                {
-                    segment._state._lastCopy = segment._state._last;
-                    return TryDequeueIf(predicate, out result);
-                }
-                if (segment._next != null && segment._state._first == segment._state._last)
-                {
-                    segment = segment._next;
-                    array = segment._array;
-                    _head = segment;
-                }
-                int first = segment._state._first;
-                if (first == segment._state._last)
-                {
-                    result = default(T);
-                    return false;
-                }
-                result = array[first];
-                if (predicate == null || predicate(result))
-                {
-                    array[first] = default(T);
-                    segment._state._first = (first + 1) & (segment._array.Length - 1);
-                    segment._state._lastCopy = segment._state._last;
-                    return true;
-                }
-                result = default(T);
-                return false;
-            }
-
-            public void Clear()
-            {
-                T result;
-                while (TryDequeue(out result)) { }
-            }
-
-            public IEnumerator<T> GetEnumerator()
-            {
-                for (Segment segment = _head; segment != null; segment = segment._next)
-                {
-                    for (int pt = segment._state._first; pt != segment._state._last; pt = (pt + 1) & (segment._array.Length - 1))
-                    {
-                        yield return segment._array[pt];
-                    }
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
-
-            int System.Threading.Tasks.IProducerConsumerQueue<T>.GetCountSafe(object syncObj)
-            {
-                lock (syncObj)
-                {
-                    return Count;
-                }
-            }
-        }
-#pragma warning restore CS8600 , CS8618 , CS8601
-
-        namespace Sources
-        {
-            /// <summary>
-            /// Flags passed from <see cref="ValueTask"/> and <see cref="ValueTask{TResult}"/> to
-            /// <see cref="IValueTaskSource.OnCompleted"/> and <see cref="IValueTaskSource{TResult}.OnCompleted"/>
-            /// to control behavior.
-            /// </summary>
-            [Flags]
-            public enum ValueTaskSourceOnCompletedFlags
-            {
-                /// <summary>
-                /// No requirements are placed on how the continuation is invoked.
-                /// </summary>
-                None,
-                /// <summary>
-                /// Set if OnCompleted should capture the current scheduling context (e.g. SynchronizationContext)
-                /// and use it when queueing the continuation for execution.  If this is not set, the implementation
-                /// may choose to execute the continuation in an arbitrary location.
-                /// </summary>
-                UseSchedulingContext = 0x1,
-                /// <summary>
-                /// Set if OnCompleted should capture the current ExecutionContext and use it to run the continuation.
-                /// </summary>
-                FlowExecutionContext = 0x2,
-            }
-
-            /// <summary>Indicates the status of an <see cref="IValueTaskSource"/> or <see cref="IValueTaskSource{TResult}"/>.</summary>
-            public enum ValueTaskSourceStatus
-            {
-                /// <summary>The operation has not yet completed.</summary>
-                Pending = 0,
-                /// <summary>The operation completed successfully.</summary>
-                Succeeded = 1,
-                /// <summary>The operation completed with an error.</summary>
-                Faulted = 2,
-                /// <summary>The operation completed due to cancellation.</summary>
-                Canceled = 3
-            }
-
-            /// <summary>Represents an object that can be wrapped by a <see cref="ValueTask"/>.</summary>
-            public interface IValueTaskSource
-            {
-                /// <summary>Gets the status of the current operation.</summary>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                ValueTaskSourceStatus GetStatus(short token);
-
-                /// <summary>Schedules the continuation action for this <see cref="IValueTaskSource"/>.</summary>
-                /// <param name="continuation">The continuation to invoke when the operation has completed.</param>
-                /// <param name="state">The state object to pass to <paramref name="continuation"/> when it's invoked.</param>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                /// <param name="flags">The flags describing the behavior of the continuation.</param>
-                void OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags);
-
-                /// <summary>Gets the result of the <see cref="IValueTaskSource"/>.</summary>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                void GetResult(short token);
-            }
-
-            /// <summary>Represents an object that can be wrapped by a <see cref="ValueTask{TResult}"/>.</summary>
-            /// <typeparam name="TResult">Specifies the type of data returned from the object.</typeparam>
-            public interface IValueTaskSource<out TResult>
-            {
-                /// <summary>Gets the status of the current operation.</summary>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                ValueTaskSourceStatus GetStatus(short token);
-
-                /// <summary>Schedules the continuation action for this <see cref="IValueTaskSource{TResult}"/>.</summary>
-                /// <param name="continuation">The continuation to invoke when the operation has completed.</param>
-                /// <param name="state">The state object to pass to <paramref name="continuation"/> when it's invoked.</param>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                /// <param name="flags">The flags describing the behavior of the continuation.</param>
-                void OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags);
-
-                /// <summary>Gets the result of the <see cref="IValueTaskSource{TResult}"/>.</summary>
-                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask"/>'s constructor.</param>
-                TResult GetResult(short token);
-            }
-        
-        }
-
-
-        // TYPE SAFETY WARNING:
-        // This code uses Unsafe.As to cast _obj.  This is done in order to minimize the costs associated with
-        // casting _obj to a variety of different types that can be stored in a ValueTask, e.g. Task<TResult>
-        // vs IValueTaskSource<TResult>.  Previous attempts at this were faulty due to using a separate field
-        // to store information about the type of the object in _obj; this is faulty because if the ValueTask
-        // is stored into a field, concurrent read/writes can result in tearing the _obj from the type information
-        // stored in a separate field.  This means we can rely only on the _obj field to determine how to handle
-        // it.  As such, the pattern employed is to copy _obj into a local obj, and then check it for null and
-        // type test against Task/Task<TResult>.  Since the ValueTask can only be constructed with null, Task,
-        // or IValueTaskSource, we can then be confident in knowing that if it doesn't match one of those values,
-        // it must be an IValueTaskSource, and we can use Unsafe.As.  This could be defeated by other unsafe means,
-        // like private reflection or using Unsafe.As manually, but at that point you're already doing things
-        // that can violate type safety; we only care about getting correct behaviors when using "safe" code.
-        // There are still other race conditions in user's code that can result in errors, but such errors don't
-        // cause ValueTask to violate type safety.
-
-        /// <summary>Provides an awaitable result of an asynchronous operation.</summary>
-        /// <remarks>
-        /// <see cref="ValueTask"/> instances are meant to be directly awaited.  To do more complicated operations with them, a <see cref="Task"/>
-        /// should be extracted using <see cref="AsTask"/>.  Such operations might include caching a task instance to be awaited later,
-        /// registering multiple continuations with a single task, awaiting the same task multiple times, and using combinators over
-        /// multiple operations:
-        /// <list type="bullet">
-        /// <item>
-        /// Once the result of a <see cref="ValueTask"/> instance has been retrieved, do not attempt to retrieve it again.
-        /// <see cref="ValueTask"/> instances may be backed by <see cref="IValueTaskSource"/> instances that are reusable, and such
-        /// instances may use the act of retrieving the instances result as a notification that the instance may now be reused for
-        /// a different operation.  Attempting to then reuse that same <see cref="ValueTask"/> results in undefined behavior.
-        /// </item>
-        /// <item>
-        /// Do not attempt to add multiple continuations to the same <see cref="ValueTask"/>.  While this might work if the
-        /// <see cref="ValueTask"/> wraps a <c>T</c> or a <see cref="Task"/>, it may not work if the <see cref="ValueTask"/>
-        /// was constructed from an <see cref="IValueTaskSource"/>.
-        /// </item>
-        /// <item>
-        /// Some operations that return a <see cref="ValueTask"/> may invalidate it based on some subsequent operation being performed.
-        /// Unless otherwise documented, assume that a <see cref="ValueTask"/> should be awaited prior to performing any additional operations
-        /// on the instance from which it was retrieved.
-        /// </item>
-        /// </list>
-        /// </remarks>
-        [AsyncMethodBuilder(typeof(AsyncValueTaskMethodBuilder))]
-        [StructLayout(LayoutKind.Auto)]
-        public readonly struct ValueTask : IEquatable<ValueTask>
-        {
-            /// <summary>A task canceled using `new CancellationToken(true)`. Lazily created only when first needed.</summary>
-            private static volatile Task? s_canceledTask;
-
-            /// <summary>null if representing a successful synchronous completion, otherwise a <see cref="Task"/> or a <see cref="IValueTaskSource"/>.</summary>
-            internal readonly object? _obj;
-            /// <summary>Opaque value passed through to the <see cref="IValueTaskSource"/>.</summary>
-            internal readonly short _token;
-            /// <summary>true to continue on the captured context; otherwise, false.</summary>
-            /// <remarks>Stored in the <see cref="ValueTask"/> rather than in the configured awaiter to utilize otherwise padding space.</remarks>
-            internal readonly bool _continueOnCapturedContext;
-
-            // An instance created with the default ctor (a zero init'd struct) represents a synchronously, successfully completed operation.
-
-            /// <summary>Initialize the <see cref="ValueTask"/> with a <see cref="Task"/> that represents the operation.</summary>
-            /// <param name="task">The task.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTask(Task task)
-            {
-                if (task == null)
-                {
-                    throw new System.ArgumentNullException($"{task}");
-                }
-
-                _obj = task;
-
-                _continueOnCapturedContext = true;
-                _token = 0;
-            }
-
-            /// <summary>Initialize the <see cref="ValueTask"/> with a <see cref="IValueTaskSource"/> object that represents the operation.</summary>
-            /// <param name="source">The source.</param>
-            /// <param name="token">Opaque value passed through to the <see cref="IValueTaskSource"/>.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTask(IValueTaskSource source, short token)
-            {
-                if (source == null)
-                {
-                    throw new System.ArgumentNullException($"{source}");
-                }
-
-                _obj = source;
-                _token = token;
-
-                _continueOnCapturedContext = true;
-            }
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private ValueTask(object? obj, short token, bool continueOnCapturedContext)
-            {
-                _obj = obj;
-                _token = token;
-                _continueOnCapturedContext = continueOnCapturedContext;
-            }
-
-            /// <summary>Gets a task that has already completed successfully.</summary>
-            public static ValueTask CompletedTask => default;
-
-            /// <summary>Creates a <see cref="ValueTask{TResult}"/> that's completed successfully with the specified result.</summary>
-            /// <typeparam name="TResult">The type of the result returned by the task.</typeparam>
-            /// <param name="result">The result to store into the completed task.</param>
-            /// <returns>The successfully completed task.</returns>
-            public static ValueTask<TResult> FromResult<TResult>(TResult result) => new ValueTask<TResult>(result);
-
-            /// <summary>Creates a <see cref="ValueTask"/> that has completed due to cancellation with the specified cancellation token.</summary>
-            /// <param name="cancellationToken">The cancellation token with which to complete the task.</param>
-            /// <returns>The canceled task.</returns>
-            public static ValueTask FromCanceled(CancellationToken cancellationToken) => new ValueTask(Task.FromCanceled(cancellationToken));
-
-            /// <summary>Creates a <see cref="ValueTask{TResult}"/> that has completed due to cancellation with the specified cancellation token.</summary>
-            /// <param name="cancellationToken">The cancellation token with which to complete the task.</param>
-            /// <returns>The canceled task.</returns>
-            public static ValueTask<TResult> FromCanceled<TResult>(CancellationToken cancellationToken) =>
-                new ValueTask<TResult>(Task.FromCanceled<TResult>(cancellationToken));
-
-            /// <summary>Creates a <see cref="ValueTask"/> that has completed with the specified exception.</summary>
-            /// <param name="exception">The exception with which to complete the task.</param>
-            /// <returns>The faulted task.</returns>
-            public static ValueTask FromException(Exception exception) => new ValueTask(Task.FromException(exception));
-
-            /// <summary>Creates a <see cref="ValueTask{TResult}"/> that has completed with the specified exception.</summary>
-            /// <param name="exception">The exception with which to complete the task.</param>
-            /// <returns>The faulted task.</returns>
-            public static ValueTask<TResult> FromException<TResult>(Exception exception) => new ValueTask<TResult>(Task.FromException<TResult>(exception));
-
-            /// <summary>Returns the hash code for this instance.</summary>
-            public override int GetHashCode() => _obj?.GetHashCode() ?? 0;
-
-            /// <summary>Returns a value indicating whether this value is equal to a specified <see cref="object"/>.</summary>
-            public override bool Equals([NotNullWhen(true)] object? obj) => obj is ValueTask && Equals((ValueTask)obj);
-
-            /// <summary>Returns a value indicating whether this value is equal to a specified <see cref="ValueTask"/> value.</summary>
-            public bool Equals(ValueTask other) => _obj == other._obj && _token == other._token;
-
-            /// <summary>Returns a value indicating whether two <see cref="ValueTask"/> values are equal.</summary>
-            public static bool operator ==(ValueTask left, ValueTask right) => left.Equals(right);
-
-            /// <summary>Returns a value indicating whether two <see cref="ValueTask"/> values are not equal.</summary>
-            public static bool operator !=(ValueTask left, ValueTask right) => !left.Equals(right);
-
-            /// <summary>
-            /// Gets a <see cref="Task"/> object to represent this ValueTask.
-            /// </summary>
-            /// <remarks>
-            /// It will either return the wrapped task object if one exists, or it'll
-            /// manufacture a new task object to represent the result.
-            /// </remarks>
-            public Task AsTask()
-            {
-                object? obj = _obj;
-                Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-                return obj == null ? Task.CompletedTask : obj as Task ?? GetTaskForValueTaskSource(Unsafe.As<IValueTaskSource>(obj));
-            }
-
-            /// <summary>Gets a <see cref="ValueTask"/> that may be used at any point in the future.</summary>
-            public ValueTask Preserve() => _obj == null ? this : new ValueTask(AsTask());
-
-            /// <summary>Creates a <see cref="Task"/> to represent the <see cref="IValueTaskSource"/>.</summary>
-            /// <remarks>
-            /// The <see cref="IValueTaskSource"/> is passed in rather than reading and casting <see cref="_obj"/>
-            /// so that the caller can pass in an object it's already validated.
-            /// </remarks>
-            private Task GetTaskForValueTaskSource(IValueTaskSource t)
-            {
-                ValueTaskSourceStatus status = t.GetStatus(_token);
-                if (status != ValueTaskSourceStatus.Pending)
-                {
-                    try
-                    {
-                        // Propagate any exceptions that may have occurred, then return
-                        // an already successfully completed task.
-                        t.GetResult(_token);
-                        return Task.CompletedTask;
-
-                        // If status is Faulted or Canceled, GetResult should throw.  But
-                        // we can't guarantee every implementation will do the "right thing".
-                        // If it doesn't throw, we just treat that as success and ignore
-                        // the status.
-                    }
-                    catch (System.Exception exc)
-                    {
-                        if (status == ValueTaskSourceStatus.Canceled)
-                        {
-                            if (exc is System.OperationCanceledException oce)
-                            {
-                                var task = new TaskCompletionSource<System.Boolean>();
-                                task.TrySetException(oce);
-                                return task.Task;
-                            }
-
-                            // Benign race condition to initialize cached task, as identity doesn't matter.
-                            return s_canceledTask ??= Task.FromCanceled(new CancellationToken(canceled: true));
-                        }
-                        else
-                        {
-                            return Task.FromException(exc);
-                        }
-                    }
-                }
-
-                return new ValueTaskSourceAsTask(t, _token).Task;
-            }
-
-            /// <summary>Type used to create a <see cref="Task"/> to represent a <see cref="IValueTaskSource"/>.</summary>
-            private sealed class ValueTaskSourceAsTask : Threading.Tasks.TaskCompletionSource<System.Boolean>
-            {
-
-                private static readonly Action<object?> s_completionAction = static state =>
-                {
-                    if (!(state is ValueTaskSourceAsTask vtst) ||
-                        !(vtst._source is IValueTaskSource source))
-                    {
-                        // This could only happen if the IValueTaskSource passed the wrong state
-                        // or if this callback were invoked multiple times such that the state
-                        // was previously nulled out.
-                        throw new ArgumentOutOfRangeException($"{state}");
-                    }
-
-                    vtst._source = null;
-                    ValueTaskSourceStatus status = source.GetStatus(vtst._token);
-                    try
-                    {
-                        source.GetResult(vtst._token);
-                        vtst.TrySetResult(false);
-                    }
-                    catch (Exception exc)
-                    {
-                        if (status == ValueTaskSourceStatus.Canceled)
-                        {
-                            if (exc is OperationCanceledException oce)
-                            {
-                                vtst.TrySetCanceled(oce.CancellationToken);
-                            }
-                            else
-                            {
-                                vtst.TrySetCanceled(new CancellationToken(true));
-                            }
-                        }
-                        else
-                        {
-                            vtst.TrySetException(exc);
-                        }
-                    }
-                };
-
-                /// <summary>The associated <see cref="IValueTaskSource"/>.</summary>
-                private IValueTaskSource? _source;
-                /// <summary>The token to pass through to operations on <see cref="_source"/></summary>
-                private readonly short _token;
-
-                internal ValueTaskSourceAsTask(IValueTaskSource source, short token)
-                {
-                    _token = token;
-                    _source = source;
-                    source.OnCompleted(s_completionAction, this, token, ValueTaskSourceOnCompletedFlags.None);
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask"/> represents a completed operation.</summary>
-            public bool IsCompleted
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj == null)
-                    {
-                        return true;
-                    }
-
-                    if (obj is Task t)
-                    {
-                        return t.IsCompleted;
-                    }
-
-                    return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) != ValueTaskSourceStatus.Pending;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask"/> represents a successfully completed operation.</summary>
-            public bool IsCompletedSuccessfully
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj == null)
-                    {
-                        return true;
-                    }
-
-                    if (obj is Task t)
-                    {
-                        return (System.Int32) t.Status == 5;
-                    }
-
-                    return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Succeeded;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask"/> represents a failed operation.</summary>
-            public bool IsFaulted
-            {
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj == null)
-                    {
-                        return false;
-                    }
-
-                    if (obj is Task t)
-                    {
-                        return t.IsFaulted;
-                    }
-
-                    return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Faulted;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask"/> represents a canceled operation.</summary>
-            /// <remarks>
-            /// If the <see cref="ValueTask"/> is backed by a result or by a <see cref="IValueTaskSource"/>,
-            /// this will always return false.  If it's backed by a <see cref="Task"/>, it'll return the
-            /// value of the task's <see cref="Task.IsCanceled"/> property.
-            /// </remarks>
-            public bool IsCanceled
-            {
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj == null)
-                    {
-                        return false;
-                    }
-
-                    if (obj is Task t)
-                    {
-                        return t.IsCanceled;
-                    }
-
-                    return Unsafe.As<IValueTaskSource>(obj).GetStatus(_token) == ValueTaskSourceStatus.Canceled;
-                }
-            }
-
-            /// <summary>Throws the exception that caused the <see cref="ValueTask"/> to fail.  If it completed successfully, nothing is thrown.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal void ThrowIfCompletedUnsuccessfully()
-            {
-                object? obj = _obj;
-                Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                if (obj != null)
-                {
-                    if (obj is Task t)
-                    {
-                        t.GetAwaiter().GetResult();
-                    }
-                    else
-                    {
-                        Unsafe.As<IValueTaskSource>(obj).GetResult(_token);
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Transfers the <see cref="ValueTask{TResult}"/> to a <see cref="ValueTask"/> instance.
-            ///
-            /// The <see cref="ValueTask{TResult}"/> should not be used after calling this method.
-            /// </summary>
-            internal static ValueTask DangerousCreateFromTypedValueTask<TResult>(ValueTask<TResult> valueTask)
-            {
-                Debug.Assert(valueTask._obj is null or Task or IValueTaskSource, "If the ValueTask<>'s backing object is an IValueTaskSource<TResult>, it must also be IValueTaskSource.");
-
-                return new ValueTask(valueTask._obj, valueTask._token, valueTask._continueOnCapturedContext);
-            }
-
-            /// <summary>Gets an awaiter for this <see cref="ValueTask"/>.</summary>
-            public ValueTaskAwaiter GetAwaiter() => new ValueTaskAwaiter(this);
-
-            /// <summary>Configures an awaiter for this <see cref="ValueTask"/>.</summary>
-            /// <param name="continueOnCapturedContext">
-            /// true to attempt to marshal the continuation back to the captured context; otherwise, false.
-            /// </param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ConfiguredValueTaskAwaitable ConfigureAwait(bool continueOnCapturedContext) =>
-                new ConfiguredValueTaskAwaitable(new ValueTask(_obj, _token, continueOnCapturedContext));
-        }
-
-        /// <summary>Provides a value type that can represent a synchronously available value or a task object.</summary>
-        /// <typeparam name="TResult">Specifies the type of the result.</typeparam>
-        /// <remarks>
-        /// <see cref="ValueTask{TResult}"/> instances are meant to be directly awaited.  To do more complicated operations with them, a <see cref="Task{TResult}"/>
-        /// should be extracted using <see cref="AsTask"/>.  Such operations might include caching a task instance to be awaited later,
-        /// registering multiple continuations with a single task, awaiting the same task multiple times, and using combinators over
-        /// multiple operations:
-        /// <list type="bullet">
-        /// <item>
-        /// Once the result of a <see cref="ValueTask{TResult}"/> instance has been retrieved, do not attempt to retrieve it again.
-        /// <see cref="ValueTask{TResult}"/> instances may be backed by <see cref="IValueTaskSource{TResult}"/> instances that are reusable, and such
-        /// instances may use the act of retrieving the instances result as a notification that the instance may now be reused for
-        /// a different operation.  Attempting to then reuse that same <see cref="ValueTask{TResult}"/> results in undefined behavior.
-        /// </item>
-        /// <item>
-        /// Do not attempt to add multiple continuations to the same <see cref="ValueTask{TResult}"/>.  While this might work if the
-        /// <see cref="ValueTask{TResult}"/> wraps a <c>T</c> or a <see cref="Task{TResult}"/>, it may not work if the <see cref="Task{TResult}"/>
-        /// was constructed from an <see cref="IValueTaskSource{TResult}"/>.
-        /// </item>
-        /// <item>
-        /// Some operations that return a <see cref="ValueTask{TResult}"/> may invalidate it based on some subsequent operation being performed.
-        /// Unless otherwise documented, assume that a <see cref="ValueTask{TResult}"/> should be awaited prior to performing any additional operations
-        /// on the instance from which it was retrieved.
-        /// </item>
-        /// </list>
-        /// </remarks>
-        [AsyncMethodBuilder(typeof(AsyncValueTaskMethodBuilder<>))]
-        [StructLayout(LayoutKind.Auto)]
-        public readonly struct ValueTask<TResult> : IEquatable<ValueTask<TResult>>
-        {
-            /// <summary>A task canceled using `new CancellationToken(true)`. Lazily created only when first needed.</summary>
-            private static volatile Task<TResult>? s_canceledTask;
-            /// <summary>null if <see cref="_result"/> has the result, otherwise a <see cref="Task{TResult}"/> or a <see cref="IValueTaskSource{TResult}"/>.</summary>
-            internal readonly object? _obj;
-            /// <summary>The result to be used if the operation completed successfully synchronously.</summary>
-            internal readonly TResult? _result;
-            /// <summary>Opaque value passed through to the <see cref="IValueTaskSource{TResult}"/>.</summary>
-            internal readonly short _token;
-            /// <summary>true to continue on the captured context; otherwise, false.</summary>
-            /// <remarks>Stored in the <see cref="ValueTask{TResult}"/> rather than in the configured awaiter to utilize otherwise padding space.</remarks>
-            internal readonly bool _continueOnCapturedContext;
-
-            // An instance created with the default ctor (a zero init'd struct) represents a synchronously, successfully completed operation
-            // with a result of default(TResult).
-
-            /// <summary>Initialize the <see cref="ValueTask{TResult}"/> with a <typeparamref name="TResult"/> result value.</summary>
-            /// <param name="result">The result.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTask(TResult result)
-            {
-                _result = result;
-
-                _obj = null;
-                _continueOnCapturedContext = true;
-                _token = 0;
-            }
-
-            /// <summary>Initialize the <see cref="ValueTask{TResult}"/> with a <see cref="Task{TResult}"/> that represents the operation.</summary>
-            /// <param name="task">The task.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTask(Task<TResult> task)
-            {
-                if (task == null)
-                {
-                    throw new ArgumentNullException($"{task}");
-                }
-
-                _obj = task;
-
-                _result = default;
-                _continueOnCapturedContext = true;
-                _token = 0;
-            }
-
-            /// <summary>Initialize the <see cref="ValueTask{TResult}"/> with a <see cref="IValueTaskSource{TResult}"/> object that represents the operation.</summary>
-            /// <param name="source">The source.</param>
-            /// <param name="token">Opaque value passed through to the <see cref="IValueTaskSource"/>.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTask(IValueTaskSource<TResult> source, short token)
-            {
-                if (source == null)
-                {
-                    throw new ArgumentNullException($"{source}");
-                }
-
-                _obj = source;
-                _token = token;
-
-                _result = default;
-                _continueOnCapturedContext = true;
-            }
-
-            /// <summary>Non-verified initialization of the struct to the specified values.</summary>
-            /// <param name="obj">The object.</param>
-            /// <param name="result">The result.</param>
-            /// <param name="token">The token.</param>
-            /// <param name="continueOnCapturedContext">true to continue on captured context; otherwise, false.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private ValueTask(object? obj, TResult? result, short token, bool continueOnCapturedContext)
-            {
-                _obj = obj;
-                _result = result;
-                _token = token;
-                _continueOnCapturedContext = continueOnCapturedContext;
-            }
-
-            /// <summary>Returns the hash code for this instance.</summary>
-            public override int GetHashCode() => _obj != null ? _obj.GetHashCode() : _result != null ? _result.GetHashCode() : 0;
-
-            /// <summary>Returns a value indicating whether this value is equal to a specified <see cref="object"/>.</summary>
-            public override bool Equals([NotNullWhen(true)] object? obj) => obj is ValueTask<TResult> && Equals((ValueTask<TResult>)obj);
-
-            #pragma warning disable CS8604
-            /// <summary>Returns a value indicating whether this value is equal to a specified <see cref="ValueTask{TResult}"/> value.</summary>
-            public bool Equals(ValueTask<TResult> other) => _obj != null || other._obj != null ? _obj == other._obj && _token == other._token :
-                    System.Collections.Generic.EqualityComparer<TResult>.Default.Equals(_result, other._result);
-            #pragma warning restore CS8604
-
-            /// <summary>Returns a value indicating whether two <see cref="ValueTask{TResult}"/> values are equal.</summary>
-            public static bool operator ==(ValueTask<TResult> left, ValueTask<TResult> right) => left.Equals(right);
-
-            /// <summary>Returns a value indicating whether two <see cref="ValueTask{TResult}"/> values are not equal.</summary>
-            public static bool operator !=(ValueTask<TResult> left, ValueTask<TResult> right) => !left.Equals(right);
-
-            /// <summary>
-            /// Gets a <see cref="Task{TResult}"/> object to represent this ValueTask.
-            /// </summary>
-            /// <remarks>
-            /// It will either return the wrapped task object if one exists, or it'll
-            /// manufacture a new task object to represent the result.
-            /// </remarks>
-            public Task<TResult> AsTask()
-            {
-                object? obj = _obj;
-                Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                if (obj == null)
-                {
-                    return Task.FromResult(_result!);
-                }
-
-                if (obj is Task<TResult> t)
-                {
-                    return t;
-                }
-
-                return GetTaskForValueTaskSource(Unsafe.As<IValueTaskSource<TResult>>(obj));
-            }
-
-            /// <summary>Gets a <see cref="ValueTask{TResult}"/> that may be used at any point in the future.</summary>
-            public ValueTask<TResult> Preserve() => _obj == null ? this : new ValueTask<TResult>(AsTask());
-
-            /// <summary>Creates a <see cref="Task{TResult}"/> to represent the <see cref="IValueTaskSource{TResult}"/>.</summary>
-            /// <remarks>
-            /// The <see cref="IValueTaskSource{TResult}"/> is passed in rather than reading and casting <see cref="_obj"/>
-            /// so that the caller can pass in an object it's already validated.
-            /// </remarks>
-            private Task<TResult> GetTaskForValueTaskSource(IValueTaskSource<TResult> t)
-            {
-                ValueTaskSourceStatus status = t.GetStatus(_token);
-                if (status != ValueTaskSourceStatus.Pending)
-                {
-                    try
-                    {
-                        // Get the result of the operation and return a task for it.
-                        // If any exception occurred, propagate it
-                        return Task.FromResult(t.GetResult(_token));
-
-                        // If status is Faulted or Canceled, GetResult should throw.  But
-                        // we can't guarantee every implementation will do the "right thing".
-                        // If it doesn't throw, we just treat that as success and ignore
-                        // the status.
-                    }
-                    catch (Exception exc)
-                    {
-                        if (status == ValueTaskSourceStatus.Canceled)
-                        {
-                            if (exc is OperationCanceledException oce)
-                            {
-                                var task = new TaskCompletionSource<TResult>();
-                                task.TrySetCanceled(oce.CancellationToken);
-                                return task.Task;
-                            }
-
-                            // Benign race condition to initialize cached task, as identity doesn't matter.
-                            return s_canceledTask ??= Task.FromCanceled<TResult>(new CancellationToken(true));
-                        }
-                        else
-                        {
-                            return Task.FromException<TResult>(exc);
-                        }
-                    }
-                }
-
-                return new ValueTaskSourceAsTask(t, _token).Task;
-            }
-
-            /// <summary>Type used to create a <see cref="Task{TResult}"/> to represent a <see cref="IValueTaskSource{TResult}"/>.</summary>
-            private sealed class ValueTaskSourceAsTask : TaskCompletionSource<TResult>
-            {
-                private static readonly Action<object?> s_completionAction = static state =>
-                {
-                    if (!(state is ValueTaskSourceAsTask vtst) ||
-                        !(vtst._source is IValueTaskSource<TResult> source))
-                    {
-                        // This could only happen if the IValueTaskSource<TResult> passed the wrong state
-                        // or if this callback were invoked multiple times such that the state
-                        // was previously nulled out.
-                        throw new ArgumentOutOfRangeException($"{state}");
-                    }
-
-                    vtst._source = null;
-                    ValueTaskSourceStatus status = source.GetStatus(vtst._token);
-                    try
-                    {
-                        vtst.TrySetResult(source.GetResult(vtst._token));
-                    }
-                    catch (Exception exc)
-                    {
-                        if (status == ValueTaskSourceStatus.Canceled)
-                        {
-                            if (exc is OperationCanceledException oce)
-                            {
-                                vtst.TrySetCanceled(oce.CancellationToken);
-                            }
-                            else
-                            {
-                                vtst.TrySetCanceled(new CancellationToken(true));
-                            }
-                        }
-                        else
-                        {
-                            vtst.TrySetException(exc);
-                        }
-                    }
-                };
-
-                /// <summary>The associated <see cref="IValueTaskSource"/>.</summary>
-                private IValueTaskSource<TResult>? _source;
-                /// <summary>The token to pass through to operations on <see cref="_source"/></summary>
-                private readonly short _token;
-
-                public ValueTaskSourceAsTask(IValueTaskSource<TResult> source, short token)
-                {
-                    _source = source;
-                    _token = token;
-                    source.OnCompleted(s_completionAction, this, token, ValueTaskSourceOnCompletedFlags.None);
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> represents a completed operation.</summary>
-            public bool IsCompleted
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                    if (obj == null)
-                    {
-                        return true;
-                    }
-
-                    if (obj is Task<TResult> t)
-                    {
-                        return t.IsCompleted;
-                    }
-
-                    return Unsafe.As<IValueTaskSource<TResult>>(obj).GetStatus(_token) != ValueTaskSourceStatus.Pending;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> represents a successfully completed operation.</summary>
-            public bool IsCompletedSuccessfully
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                    if (obj == null)
-                    {
-                        return true;
-                    }
-
-                    if (obj is Task<TResult> t)
-                    {
-                        return (System.Int32) t.Status == 5;
-                    }
-
-                    return Unsafe.As<IValueTaskSource<TResult>>(obj).GetStatus(_token) == ValueTaskSourceStatus.Succeeded;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> represents a failed operation.</summary>
-            public bool IsFaulted
-            {
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                    if (obj == null)
-                    {
-                        return false;
-                    }
-
-                    if (obj is Task<TResult> t)
-                    {
-                        return t.IsFaulted;
-                    }
-
-                    return Unsafe.As<IValueTaskSource<TResult>>(obj).GetStatus(_token) == ValueTaskSourceStatus.Faulted;
-                }
-            }
-
-            /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> represents a canceled operation.</summary>
-            /// <remarks>
-            /// If the <see cref="ValueTask{TResult}"/> is backed by a result or by a <see cref="IValueTaskSource{TResult}"/>,
-            /// this will always return false.  If it's backed by a <see cref="Task"/>, it'll return the
-            /// value of the task's <see cref="Task.IsCanceled"/> property.
-            /// </remarks>
-            public bool IsCanceled
-            {
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                    if (obj == null)
-                    {
-                        return false;
-                    }
-
-                    if (obj is Task<TResult> t)
-                    {
-                        return t.IsCanceled;
-                    }
-
-                    return Unsafe.As<IValueTaskSource<TResult>>(obj).GetStatus(_token) == ValueTaskSourceStatus.Canceled;
-                }
-            }
-
-            /// <summary>Gets the result.</summary>
-            [DebuggerBrowsable(DebuggerBrowsableState.Never)] // prevent debugger evaluation from invalidating an underling IValueTaskSource<T>
-            public TResult Result
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get
-                {
-                    object? obj = _obj;
-                    Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                    if (obj == null)
-                    {
-                        return _result!;
-                    }
-
-                    if (obj is Task<TResult> t)
-                    {
-                        TaskAwaiter<TResult> TA = t.GetAwaiter();
-                        return TA.GetResult();
-                    }
-
-                    return Unsafe.As<IValueTaskSource<TResult>>(obj).GetResult(_token);
-                }
-            }
-
-            /// <summary>Gets an awaiter for this <see cref="ValueTask{TResult}"/>.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ValueTaskAwaiter<TResult> GetAwaiter() => new ValueTaskAwaiter<TResult>(this);
-
-            /// <summary>Configures an awaiter for this <see cref="ValueTask{TResult}"/>.</summary>
-            /// <param name="continueOnCapturedContext">
-            /// true to attempt to marshal the continuation back to the captured context; otherwise, false.
-            /// </param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ConfiguredValueTaskAwaitable<TResult> ConfigureAwait(bool continueOnCapturedContext) =>
-                new ConfiguredValueTaskAwaitable<TResult>(new ValueTask<TResult>(_obj, _result, _token, continueOnCapturedContext));
-
-            /// <summary>Gets a string-representation of this <see cref="ValueTask{TResult}"/>.</summary>
-            public override string? ToString()
-            {
-                if (IsCompletedSuccessfully)
-                {
-                    Debugger.NotifyOfCrossThreadDependency(); // prevent debugger evaluation from invalidating an underling IValueTaskSource<T> unless forced
-
-                    TResult result = Result;
-                    if (result != null)
-                    {
-                        return result.ToString();
-                    }
-                }
-
-                return string.Empty;
-            }
-        }
-
-    }
 
     namespace Collections.Generic
     {
-        internal interface IHashKeyCollection<in TKey>
-        {
-            IEqualityComparer<TKey> KeyComparer { get; }
-        }
+        internal interface IHashKeyCollection<in TKey> { IEqualityComparer<TKey> KeyComparer { get; } }
 
-        internal interface ISortKeyCollection<in TKey>
-        {
-            IComparer<TKey> KeyComparer { get; }
-        }
+        internal interface ISortKeyCollection<in TKey> { IComparer<TKey> KeyComparer { get; } }
 
         #pragma warning disable CS8601
         internal static class EnumerableHelpers
         {
-            internal static T[] ToArray<T>(IEnumerable<T> source)
-            {
-                int length;
-                T[] array = ToArray(source, out length);
-                Array.Resize(ref array, length);
-                return array;
-            }
+            internal static T[] ToArray<T>(IEnumerable<T> source) { int length; T[] array = ToArray(source, out length); Array.Resize(ref array, length); return array; }
 
             internal static T[] ToArray<T>(IEnumerable<T> source, out int length)
             {
                 if (source is ICollection<T> collection)
                 {
                     int count = collection.Count;
-                    if (count != 0)
-                    {
-                        T[] array = new T[count];
-                        collection.CopyTo(array, 0);
-                        length = count;
-                        return array;
-                    }
+                    if (count != 0) { T[] array = new T[count]; collection.CopyTo(array, 0); length = count; return array; }
                 }
                 else
                 {
@@ -1358,10 +93,7 @@ namespace System
                             if (num == array2.Length)
                             {
                                 int num2 = num << 1;
-                                if ((uint)num2 > 2146435071u)
-                                {
-                                    num2 = ((2146435071 <= num) ? (num + 1) : 2146435071);
-                                }
+                                if ((uint)num2 > 2146435071u) { num2 = ((2146435071 <= num) ? (num + 1) : 2146435071); }
                                 Array.Resize(ref array2, num2);
                             }
                             array2[num++] = enumerator.Current;
@@ -1547,7 +279,7 @@ namespace System
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, Inherited = false)]
         public sealed class IntrinsicAttribute : Attribute { }
 
-        //Code required when the Snappy Archiving is compiled < .NET 6 .
+        // Code required when the Snappy Archiving is compiled < .NET 6 .
         #if ! NET6_0_OR_GREATER
             // Licensed to the .NET Foundation under one or more agreements.
             // The .NET Foundation licenses this file to you under the MIT license.
@@ -1555,10 +287,7 @@ namespace System
             [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = false)]
             internal sealed class CallerArgumentExpressionAttribute : Attribute
             {
-                public CallerArgumentExpressionAttribute(string parameterName)
-                {
-                    ParameterName = parameterName;
-                }
+                public CallerArgumentExpressionAttribute(string parameterName) { ParameterName = parameterName; }
 
                 public string ParameterName { get; }
             }
@@ -1932,6 +661,51 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Indicates that the use of <see cref="T:System.ValueTuple" /> on a member is meant to be treated as a tuple with element names.
+        /// </summary>
+        [CLSCompliant(false)]
+        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
+        public sealed class TupleElementNamesAttribute : Attribute
+        {
+            private readonly string[] _transformNames;
+
+            /// <summary>
+            /// Specifies, in a pre-order depth-first traversal of a type's
+            /// construction, which <see cref="T:System.ValueTuple" /> elements are
+            /// meant to carry element names.
+            /// </summary>
+            public IList<string> TransformNames => _transformNames;
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.TupleElementNamesAttribute" /> class.
+            /// </summary>
+            /// <param name="transformNames">
+            /// Specifies, in a pre-order depth-first traversal of a type's
+            /// construction, which <see cref="T:System.ValueType" /> occurrences are
+            /// meant to carry element names.
+            /// </param>
+            /// <remarks>
+            /// This constructor is meant to be used on types that contain an
+            /// instantiation of <see cref="T:System.ValueType" /> that contains
+            /// element names.  For instance, if <c>C</c> is a generic type with
+            /// two type parameters, then a use of the constructed type <c>C{<see cref="T:System.ValueTuple`2" />, <see cref="T:System.ValueTuple`3" /></c> might be intended to
+            /// treat the first type argument as a tuple with element names and the
+            /// second as a tuple without element names. In which case, the
+            /// appropriate attribute specification should use a
+            /// <c>transformNames</c> value of <c>{ "name1", "name2", null, null,
+            /// null }</c>.
+            /// </remarks>
+            public TupleElementNamesAttribute(string[] transformNames)
+            {
+                if (transformNames == null)
+                {
+                    throw new ArgumentNullException("transformNames");
+                }
+                _transformNames = transformNames;
+            }
+        }
+
     }
 
     namespace Runtime.InteropServices.Marshalling
@@ -1985,14 +759,11 @@ namespace System
             ElementOut
         }
 
-
         /// <summary>
         /// Specifies that this marshaller entry-point type is a contiguous collection marshaller.
         /// </summary>
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
-        public sealed class ContiguousCollectionMarshallerAttribute : Attribute
-        {
-        }
+        public sealed class ContiguousCollectionMarshallerAttribute : Attribute { }
 
         /// <summary>
         /// Indicates an entry point type for defining a marshaller.
@@ -2006,12 +777,7 @@ namespace System
             /// <param name="managedType">The managed type to marshal.</param>
             /// <param name="marshalMode">The marshalling mode this attribute applies to.</param>
             /// <param name="marshallerType">The type used for marshalling.</param>
-            public CustomMarshallerAttribute(Type managedType, MarshalMode marshalMode, Type marshallerType)
-            {
-                ManagedType = managedType;
-                MarshalMode = marshalMode;
-                MarshallerType = marshallerType;
-            }
+            public CustomMarshallerAttribute(Type managedType, MarshalMode marshalMode, Type marshallerType) { ManagedType = managedType; MarshalMode = marshalMode; MarshallerType = marshallerType; }
 
             /// <summary>
             /// Gets the managed type to marshal.
@@ -2031,9 +797,7 @@ namespace System
             /// <summary>
             /// Placeholder type for a generic parameter.
             /// </summary>
-            public struct GenericPlaceholder
-            {
-            }
+            public struct GenericPlaceholder { }
         }
 
         /// <summary>
@@ -2052,10 +816,7 @@ namespace System
             /// Initializes a new instance of the  <see cref="NativeMarshallingAttribute" /> class that provides a native marshalling type.
             /// </summary>
             /// <param name="nativeType">The marshaller type used to convert the attributed type from managed to native code. This type must be attributed with <see cref="CustomMarshallerAttribute" />.</param>
-            public NativeMarshallingAttribute(Type nativeType)
-            {
-                NativeType = nativeType;
-            }
+            public NativeMarshallingAttribute(Type nativeType) { NativeType = nativeType; }
 
             /// <summary>
             /// Gets the marshaller type used to convert the attributed type from managed to native code. This type must be attributed with <see cref="CustomMarshallerAttribute" />.
@@ -3228,10 +1989,7 @@ namespace System
 
             public bool SetLastError { get; set; }
 
-            public LibraryImportAttribute(string libraryName)
-            {
-                LibraryName = libraryName;
-            }
+            public LibraryImportAttribute(string libraryName) { LibraryName = libraryName; }
         }
         #nullable disable
         internal enum StringMarshalling
@@ -3265,12 +2023,8 @@ namespace System
 
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor,
                         AllowMultiple = false, Inherited = false)]
-        internal sealed class NonVersionableAttribute : Attribute
-        {
-            public NonVersionableAttribute()
-            {
-            }
-        }
+        internal sealed class NonVersionableAttribute : Attribute { public NonVersionableAttribute() { } }
+
         #if !NET7_0_OR_GREATER
             #nullable enable
             /// <summary>
@@ -3375,286 +2129,104 @@ namespace System
         [StructLayout(LayoutKind.Explicit)]
         internal struct Register
         {
-            [FieldOffset(0)]
-            internal byte byte_0;
+            [FieldOffset(0)] internal byte byte_0; [FieldOffset(1)] internal byte byte_1;
+            
+            [FieldOffset(2)] internal byte byte_2; [FieldOffset(3)] internal byte byte_3;
 
-            [FieldOffset(1)]
-            internal byte byte_1;
+            [FieldOffset(4)] internal byte byte_4; [FieldOffset(5)] internal byte byte_5;
 
-            [FieldOffset(2)]
-            internal byte byte_2;
+            [FieldOffset(6)] internal byte byte_6; [FieldOffset(7)] internal byte byte_7;
 
-            [FieldOffset(3)]
-            internal byte byte_3;
+            [FieldOffset(8)] internal byte byte_8; [FieldOffset(9)] internal byte byte_9;
 
-            [FieldOffset(4)]
-            internal byte byte_4;
+            [FieldOffset(10)] internal byte byte_10; [FieldOffset(11)] internal byte byte_11;
 
-            [FieldOffset(5)]
-            internal byte byte_5;
+            [FieldOffset(12)] internal byte byte_12; [FieldOffset(13)] internal byte byte_13;
 
-            [FieldOffset(6)]
-            internal byte byte_6;
+            [FieldOffset(14)] internal byte byte_14; [FieldOffset(15)] internal byte byte_15;
 
-            [FieldOffset(7)]
-            internal byte byte_7;
+            [FieldOffset(0)] internal sbyte sbyte_0; [FieldOffset(1)] internal sbyte sbyte_1;
 
-            [FieldOffset(8)]
-            internal byte byte_8;
+            [FieldOffset(2)] internal sbyte sbyte_2; [FieldOffset(3)] internal sbyte sbyte_3;
 
-            [FieldOffset(9)]
-            internal byte byte_9;
+            [FieldOffset(4)] internal sbyte sbyte_4; [FieldOffset(5)] internal sbyte sbyte_5;
 
-            [FieldOffset(10)]
-            internal byte byte_10;
+            [FieldOffset(6)] internal sbyte sbyte_6; [FieldOffset(7)] internal sbyte sbyte_7;
 
-            [FieldOffset(11)]
-            internal byte byte_11;
+            [FieldOffset(8)] internal sbyte sbyte_8; [FieldOffset(9)] internal sbyte sbyte_9;
 
-            [FieldOffset(12)]
-            internal byte byte_12;
+            [FieldOffset(10)] internal sbyte sbyte_10; [FieldOffset(11)] internal sbyte sbyte_11;
 
-            [FieldOffset(13)]
-            internal byte byte_13;
+            [FieldOffset(12)] internal sbyte sbyte_12; [FieldOffset(13)] internal sbyte sbyte_13;
 
-            [FieldOffset(14)]
-            internal byte byte_14;
+            [FieldOffset(14)] internal sbyte sbyte_14; [FieldOffset(15)] internal sbyte sbyte_15;
 
-            [FieldOffset(15)]
-            internal byte byte_15;
+            [FieldOffset(0)] internal ushort uint16_0; [FieldOffset(2)] internal ushort uint16_1;
 
-            [FieldOffset(0)]
-            internal sbyte sbyte_0;
+            [FieldOffset(4)] internal ushort uint16_2; [FieldOffset(6)] internal ushort uint16_3;
 
-            [FieldOffset(1)]
-            internal sbyte sbyte_1;
+            [FieldOffset(8)] internal ushort uint16_4; [FieldOffset(10)] internal ushort uint16_5;
 
-            [FieldOffset(2)]
-            internal sbyte sbyte_2;
+            [FieldOffset(12)] internal ushort uint16_6; [FieldOffset(14)] internal ushort uint16_7;
 
-            [FieldOffset(3)]
-            internal sbyte sbyte_3;
+            [FieldOffset(0)] internal short int16_0; [FieldOffset(2)] internal short int16_1;
 
-            [FieldOffset(4)]
-            internal sbyte sbyte_4;
+            [FieldOffset(4)] internal short int16_2; [FieldOffset(6)] internal short int16_3;
 
-            [FieldOffset(5)]
-            internal sbyte sbyte_5;
+            [FieldOffset(8)] internal short int16_4; [FieldOffset(10)] internal short int16_5;
 
-            [FieldOffset(6)]
-            internal sbyte sbyte_6;
+            [FieldOffset(12)] internal short int16_6; [FieldOffset(14)] internal short int16_7;
 
-            [FieldOffset(7)]
-            internal sbyte sbyte_7;
+            [FieldOffset(0)] internal uint uint32_0; [FieldOffset(4)] internal uint uint32_1;
 
-            [FieldOffset(8)]
-            internal sbyte sbyte_8;
+            [FieldOffset(8)] internal uint uint32_2; [FieldOffset(12)] internal uint uint32_3;
 
-            [FieldOffset(9)]
-            internal sbyte sbyte_9;
+            [FieldOffset(0)] internal int int32_0; [FieldOffset(4)] internal int int32_1;
 
-            [FieldOffset(10)]
-            internal sbyte sbyte_10;
+            [FieldOffset(8)] internal int int32_2; [FieldOffset(12)] internal int int32_3;
 
-            [FieldOffset(11)]
-            internal sbyte sbyte_11;
+            [FieldOffset(0)] internal ulong uint64_0; [FieldOffset(8)] internal ulong uint64_1;
 
-            [FieldOffset(12)]
-            internal sbyte sbyte_12;
+            [FieldOffset(0)] internal long int64_0; [FieldOffset(8)] internal long int64_1;
 
-            [FieldOffset(13)]
-            internal sbyte sbyte_13;
+            [FieldOffset(0)] internal float single_0; [FieldOffset(4)] internal float single_1;
 
-            [FieldOffset(14)]
-            internal sbyte sbyte_14;
+            [FieldOffset(8)] internal float single_2; [FieldOffset(12)] internal float single_3;
 
-            [FieldOffset(15)]
-            internal sbyte sbyte_15;
-
-            [FieldOffset(0)]
-            internal ushort uint16_0;
-
-            [FieldOffset(2)]
-            internal ushort uint16_1;
-
-            [FieldOffset(4)]
-            internal ushort uint16_2;
-
-            [FieldOffset(6)]
-            internal ushort uint16_3;
-
-            [FieldOffset(8)]
-            internal ushort uint16_4;
-
-            [FieldOffset(10)]
-            internal ushort uint16_5;
-
-            [FieldOffset(12)]
-            internal ushort uint16_6;
-
-            [FieldOffset(14)]
-            internal ushort uint16_7;
-
-            [FieldOffset(0)]
-            internal short int16_0;
-
-            [FieldOffset(2)]
-            internal short int16_1;
-
-            [FieldOffset(4)]
-            internal short int16_2;
-
-            [FieldOffset(6)]
-            internal short int16_3;
-
-            [FieldOffset(8)]
-            internal short int16_4;
-
-            [FieldOffset(10)]
-            internal short int16_5;
-
-            [FieldOffset(12)]
-            internal short int16_6;
-
-            [FieldOffset(14)]
-            internal short int16_7;
-
-            [FieldOffset(0)]
-            internal uint uint32_0;
-
-            [FieldOffset(4)]
-            internal uint uint32_1;
-
-            [FieldOffset(8)]
-            internal uint uint32_2;
-
-            [FieldOffset(12)]
-            internal uint uint32_3;
-
-            [FieldOffset(0)]
-            internal int int32_0;
-
-            [FieldOffset(4)]
-            internal int int32_1;
-
-            [FieldOffset(8)]
-            internal int int32_2;
-
-            [FieldOffset(12)]
-            internal int int32_3;
-
-            [FieldOffset(0)]
-            internal ulong uint64_0;
-
-            [FieldOffset(8)]
-            internal ulong uint64_1;
-
-            [FieldOffset(0)]
-            internal long int64_0;
-
-            [FieldOffset(8)]
-            internal long int64_1;
-
-            [FieldOffset(0)]
-            internal float single_0;
-
-            [FieldOffset(4)]
-            internal float single_1;
-
-            [FieldOffset(8)]
-            internal float single_2;
-
-            [FieldOffset(12)]
-            internal float single_3;
-
-            [FieldOffset(0)]
-            internal double double_0;
-
-            [FieldOffset(8)]
-            internal double double_1;
+            [FieldOffset(0)] internal double double_0; [FieldOffset(8)] internal double double_1;
         }
 
         internal class ConstantHelper
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static byte GetByteWithAllBitsSet()
-            {
-                byte result = 0;
-                result = byte.MaxValue;
-                return result;
-            }
+            public static byte GetByteWithAllBitsSet() { byte result = 0; result = byte.MaxValue; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static sbyte GetSByteWithAllBitsSet()
-            {
-                sbyte result = 0;
-                result = -1;
-                return result;
-            }
+            public static sbyte GetSByteWithAllBitsSet() { sbyte result = 0; result = -1; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static ushort GetUInt16WithAllBitsSet()
-            {
-                ushort result = 0;
-                result = ushort.MaxValue;
-                return result;
-            }
+            public static ushort GetUInt16WithAllBitsSet() { ushort result = 0; result = ushort.MaxValue; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static short GetInt16WithAllBitsSet()
-            {
-                short result = 0;
-                result = -1;
-                return result;
-            }
+            public static short GetInt16WithAllBitsSet() { short result = 0; result = -1; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static uint GetUInt32WithAllBitsSet()
-            {
-                uint result = 0u;
-                result = uint.MaxValue;
-                return result;
-            }
+            public static uint GetUInt32WithAllBitsSet() { uint result = 0u; result = uint.MaxValue; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static int GetInt32WithAllBitsSet()
-            {
-                int result = 0;
-                result = -1;
-                return result;
-            }
+            public static int GetInt32WithAllBitsSet() { int result = 0; result = -1; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static ulong GetUInt64WithAllBitsSet()
-            {
-                ulong result = 0uL;
-                result = ulong.MaxValue;
-                return result;
-            }
+            public static ulong GetUInt64WithAllBitsSet() { ulong result = 0uL; result = ulong.MaxValue; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public static long GetInt64WithAllBitsSet()
-            {
-                long result = 0L;
-                result = -1L;
-                return result;
-            }
+            public static long GetInt64WithAllBitsSet() { long result = 0L; result = -1L; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe static float GetSingleWithAllBitsSet()
-            {
-                float result = 0f;
-                *(int*)(&result) = -1;
-                return result;
-            }
+            public unsafe static float GetSingleWithAllBitsSet() { float result = 0f; *(int*)(&result) = -1; return result; }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public unsafe static double GetDoubleWithAllBitsSet()
-            {
-                double result = 0.0;
-                *(long*)(&result) = -1L;
-                return result;
-            }
+            public unsafe static double GetDoubleWithAllBitsSet() { double result = 0.0; *(long*)(&result) = -1L; return result; }
         }
 
     }
@@ -4026,6 +2598,7 @@ namespace System
 
     #nullable enable
     #pragma warning disable CS1591
+
     /// <summary>
     /// The Microsoft's base class for the Internal Runtime Resource Handler.
     /// This class , however , does only contain some formatting methods that you might need when you migrate code.
@@ -4135,45 +2708,15 @@ namespace System
 
     internal static class DecimalDecCalc
     {
-        private static uint D32DivMod1E9(uint hi32, ref uint lo32)
-        {
-            ulong num = ((ulong)hi32 << 32) | lo32;
-            lo32 = (uint)(num / 1000000000uL);
-            return (uint)(num % 1000000000uL);
-        }
+        private static uint D32DivMod1E9(uint hi32, ref uint lo32) { ulong num = ((ulong)hi32 << 32) | lo32; lo32 = (uint)(num / 1000000000uL); return (uint)(num % 1000000000uL); }
 
-        internal static uint DecDivMod1E9(ref MutableDecimal value)
-        {
-            return D32DivMod1E9(D32DivMod1E9(D32DivMod1E9(0u, ref value.High), ref value.Mid), ref value.Low);
-        }
+        internal static uint DecDivMod1E9(ref MutableDecimal value) { return D32DivMod1E9(D32DivMod1E9(D32DivMod1E9(0u, ref value.High), ref value.Mid), ref value.Low); }
 
-        internal static void DecAddInt32(ref MutableDecimal value, uint i)
-        {
-            if (D32AddCarry(ref value.Low, i) && D32AddCarry(ref value.Mid, 1u))
-            {
-                D32AddCarry(ref value.High, 1u);
-            }
-        }
+        internal static void DecAddInt32(ref MutableDecimal value, uint i) { if (D32AddCarry(ref value.Low, i) && D32AddCarry(ref value.Mid, 1u)) { D32AddCarry(ref value.High, 1u); } }
 
-        private static bool D32AddCarry(ref uint value, uint i)
-        {
-            uint num = value;
-            uint num2 = (value = num + i);
-            if (num2 >= num)
-            {
-                return num2 < i;
-            }
-            return true;
-        }
+        private static bool D32AddCarry(ref uint value, uint i) { uint num = value; uint num2 = (value = num + i); if (num2 >= num) { return num2 < i; } return true; }
 
-        internal static void DecMul10(ref MutableDecimal value)
-        {
-            MutableDecimal d = value;
-            DecShiftLeft(ref value);
-            DecShiftLeft(ref value);
-            DecAdd(ref value, d);
-            DecShiftLeft(ref value);
-        }
+        internal static void DecMul10(ref MutableDecimal value) { MutableDecimal d = value; DecShiftLeft(ref value); DecShiftLeft(ref value); DecAdd(ref value, d); DecShiftLeft(ref value); }
 
         private static void DecShiftLeft(ref MutableDecimal value)
         {
@@ -4186,14 +2729,8 @@ namespace System
 
         private static void DecAdd(ref MutableDecimal value, MutableDecimal d)
         {
-            if (D32AddCarry(ref value.Low, d.Low) && D32AddCarry(ref value.Mid, 1u))
-            {
-                D32AddCarry(ref value.High, 1u);
-            }
-            if (D32AddCarry(ref value.Mid, d.Mid))
-            {
-                D32AddCarry(ref value.High, 1u);
-            }
+            if (D32AddCarry(ref value.Low, d.Low) && D32AddCarry(ref value.Mid, 1u)) { D32AddCarry(ref value.High, 1u); }
+            if (D32AddCarry(ref value.Mid, d.Mid)) { D32AddCarry(ref value.High, 1u); }
             D32AddCarry(ref value.High, d.High);
         }
     }
@@ -4231,49 +2768,25 @@ namespace System
     {
         private unsafe readonly void* _value;
 
-        private unsafe NUInt(uint value)
-        {
-            _value = (void*)value;
-        }
+        private unsafe NUInt(uint value) { _value = (void*)value; }
 
-        private unsafe NUInt(ulong value)
-        {
-            _value = (void*)value;
-        }
+        private unsafe NUInt(ulong value) { _value = (void*)value; }
 
-        public static implicit operator NUInt(uint value)
-        {
-            return new NUInt(value);
-        }
+        public static implicit operator NUInt(uint value) { return new NUInt(value); }
 
-        public unsafe static implicit operator IntPtr(NUInt value)
-        {
-            return (IntPtr)value._value;
-        }
+        public unsafe static implicit operator IntPtr(NUInt value) { return (IntPtr)value._value; }
 
-        public static explicit operator NUInt(int value)
-        {
-            return new NUInt((uint)value);
-        }
+        public static explicit operator NUInt(int value) { return new NUInt((uint)value); }
 
-        public unsafe static explicit operator void*(NUInt value)
-        {
-            return value._value;
-        }
+        public unsafe static explicit operator void*(NUInt value) { return value._value; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe static NUInt operator *(NUInt left, NUInt right)
         {
-            if (sizeof(IntPtr) != 4)
-            {
-                return new NUInt((ulong)left._value * (ulong)right._value);
-            }
+            if (sizeof(IntPtr) != 4) { return new NUInt((ulong)left._value * (ulong)right._value); }
             return new NUInt((uint)((int)left._value * (int)right._value));
         }
     }
-
-    [StructLayout(LayoutKind.Sequential)]
-    internal sealed class Pinnable<T> { public T Data; }
 
     internal enum ExceptionArgument
     {
@@ -4298,20 +2811,11 @@ namespace System
     {
         private static class DoubleHelper
         {
-            public unsafe static uint Exponent(double d)
-            {
-                return (*(uint*)((byte*)(&d) + 4) >> 20) & 0x7FFu;
-            }
+            public unsafe static uint Exponent(double d) { return (*(uint*)((byte*)(&d) + 4) >> 20) & 0x7FFu; }
 
-            public unsafe static ulong Mantissa(double d)
-            {
-                return *(uint*)(&d) | ((ulong)(uint)(*(int*)((byte*)(&d) + 4) & 0xFFFFF) << 32);
-            }
+            public unsafe static ulong Mantissa(double d) { return *(uint*)(&d) | ((ulong)(uint)(*(int*)((byte*)(&d) + 4) & 0xFFFFF) << 32); }
 
-            public unsafe static bool Sign(double d)
-            {
-                return *(uint*)((byte*)(&d) + 4) >> 31 != 0;
-            }
+            public unsafe static bool Sign(double d) { return *(uint*)((byte*)(&d) + 4) >> 31 != 0; }
         }
 
         internal const int DECIMAL_PRECISION = 29;
@@ -4323,11 +2827,7 @@ namespace System
             9671406556917033399uL, 15474250491067253438uL, 12379400392853802751uL, 9903520314283042201uL, 15845632502852867522uL, 12676506002282294018uL, 10141204801825835215uL, 16225927682921336344uL, 12980742146337069075uL, 10384593717069655260uL
         };
 
-        private static readonly sbyte[] s_rgexp64Power10 = new sbyte[15]
-        {
-        4, 7, 10, 14, 17, 20, 24, 27, 30, 34,
-        37, 40, 44, 47, 50
-        };
+        private static readonly sbyte[] s_rgexp64Power10 = new sbyte[15] { 4, 7, 10, 14, 17, 20, 24, 27, 30, 34, 37, 40, 44, 47, 50 };
 
         private static readonly ulong[] s_rgval64Power10By16 = new ulong[42]
         {
@@ -4338,49 +2838,24 @@ namespace System
         18230774251475056952uL, 16420821625123739930uL
         };
 
-        private static readonly short[] s_rgexp64Power10By16 = new short[21]
-        {
-        54, 107, 160, 213, 266, 319, 373, 426, 479, 532,
-        585, 638, 691, 745, 798, 851, 904, 957, 1010, 1064,
-        1117
-        };
+        private static readonly short[] s_rgexp64Power10By16 = new short[21] { 54, 107, 160, 213, 266, 319, 373, 426, 479, 532, 585, 638, 691, 745, 798, 851, 904, 957, 1010, 1064, 1117 };
 
         public static void RoundNumber(ref NumberBuffer number, int pos)
         {
             Span<byte> digits = number.Digits;
             int i;
-            for (i = 0; i < pos && digits[i] != 0; i++)
-            {
-            }
+            for (i = 0; i < pos && digits[i] != 0; i++) { }
             if (i == pos && digits[i] >= 53)
             {
-                while (i > 0 && digits[i - 1] == 57)
-                {
-                    i--;
-                }
-                if (i > 0)
-                {
-                    digits[i - 1]++;
-                }
-                else
-                {
-                    number.Scale++;
-                    digits[0] = 49;
-                    i = 1;
-                }
+                while (i > 0 && digits[i - 1] == 57) { i--; }
+                if (i > 0) { digits[i - 1]++; }
+                else { number.Scale++; digits[0] = 49; i = 1; }
             }
             else
             {
-                while (i > 0 && digits[i - 1] == 48)
-                {
-                    i--;
-                }
+                while (i > 0 && digits[i - 1] == 48) { i--; }
             }
-            if (i == 0)
-            {
-                number.Scale = 0;
-                number.IsNegative = false;
-            }
+            if (i == 0) { number.Scale = 0; number.IsNegative = false; }
             digits[i] = 0;
         }
 
@@ -4395,10 +2870,7 @@ namespace System
                     value = 0.0;
                     return false;
                 case 0u:
-                    if (num3 == 0L)
-                    {
-                        num = 0.0;
-                    }
+                    if (num3 == 0L) { num = 0.0; }
                     break;
             }
             value = num;
@@ -4412,24 +2884,15 @@ namespace System
             int num = number.Scale;
             if (*ptr == 0)
             {
-                if (num > 0)
-                {
-                    num = 0;
-                }
+                if (num > 0) { num = 0; }
             }
             else
             {
-                if (num > 29)
-                {
-                    return false;
-                }
+                if (num > 29) { return false; }
                 while ((num > 0 || (*ptr != 0 && num > -28)) && (source.High < 429496729 || (source.High == 429496729 && (source.Mid < 2576980377u || (source.Mid == 2576980377u && (source.Low < 2576980377u || (source.Low == 2576980377u && *ptr <= 53)))))))
                 {
                     DecimalDecCalc.DecMul10(ref source);
-                    if (*ptr != 0)
-                    {
-                        DecimalDecCalc.DecAddInt32(ref source, (uint)(*(ptr++) - 48));
-                    }
+                    if (*ptr != 0) { DecimalDecCalc.DecAddInt32(ref source, (uint)(*(ptr++) - 48)); }
                     num--;
                 }
                 if (*(ptr++) >= 53)
@@ -4438,44 +2901,18 @@ namespace System
                     if (*(ptr - 1) == 53 && (int)(*(ptr - 2)) % 2 == 0)
                     {
                         int num2 = 20;
-                        while (*ptr == 48 && num2 != 0)
-                        {
-                            ptr++;
-                            num2--;
-                        }
-                        if (*ptr == 0 || num2 == 0)
-                        {
-                            flag = false;
-                        }
+                        while (*ptr == 48 && num2 != 0) { ptr++; num2--; }
+                        if (*ptr == 0 || num2 == 0) { flag = false; }
                     }
                     if (flag)
                     {
                         DecimalDecCalc.DecAddInt32(ref source, 1u);
-                        if ((source.High | source.Mid | source.Low) == 0)
-                        {
-                            source.High = 429496729u;
-                            source.Mid = 2576980377u;
-                            source.Low = 2576980378u;
-                            num++;
-                        }
+                        if ((source.High | source.Mid | source.Low) == 0) { source.High = 429496729u; source.Mid = 2576980377u; source.Low = 2576980378u; num++; }
                     }
                 }
             }
-            if (num > 0)
-            {
-                return false;
-            }
-            if (num <= -29)
-            {
-                source.High = 0u;
-                source.Low = 0u;
-                source.Mid = 0u;
-                source.Scale = 28;
-            }
-            else
-            {
-                source.Scale = -num;
-            }
+            if (num > 0) { return false; }
+            if (num <= -29) { source.High = 0u; source.Low = 0u; source.Mid = 0u; source.Scale = 28; } else { source.Scale = -num; }
             source.IsNegative = number.IsNegative;
             value = Unsafe.As<MutableDecimal, decimal>(ref source);
             return true;
@@ -4490,74 +2927,44 @@ namespace System
             while ((reference.Mid != 0) | (reference.High != 0))
             {
                 uint num2 = DecimalDecCalc.DecDivMod1E9(ref reference);
-                for (int i = 0; i < 9; i++)
-                {
-                    digits[--num] = (byte)(num2 % 10u + 48);
-                    num2 /= 10u;
-                }
+                for (int i = 0; i < 9; i++) { digits[--num] = (byte)(num2 % 10u + 48); num2 /= 10u; }
             }
-            for (uint num3 = reference.Low; num3 != 0; num3 /= 10u)
-            {
-                digits[--num] = (byte)(num3 % 10u + 48);
-            }
+            for (uint num3 = reference.Low; num3 != 0; num3 /= 10u) { digits[--num] = (byte)(num3 % 10u + 48); }
             int num4 = 29 - num;
             number.Scale = num4 - reference.Scale;
             Span<byte> digits2 = number.Digits;
             int index = 0;
-            while (--num4 >= 0)
-            {
-                digits2[index++] = digits[num++];
-            }
+            while (--num4 >= 0) { digits2[index++] = digits[num++]; }
             digits2[index] = 0;
         }
 
         private static uint DigitsToInt(ReadOnlySpan<byte> digits, int count)
         {
-            uint value;
-            int bytesConsumed;
+            uint value; int bytesConsumed;
             bool flag = Utf8Parser.TryParse(digits.Slice(0, count), out value, out bytesConsumed, 'D');
             return value;
         }
 
-        private static ulong Mul32x32To64(uint a, uint b)
-        {
-            return (ulong)a * (ulong)b;
-        }
+        private static ulong Mul32x32To64(uint a, uint b) { return (ulong)a * (ulong)b; }
 
         private static ulong Mul64Lossy(ulong a, ulong b, ref int pexp)
         {
             ulong num = Mul32x32To64((uint)(a >> 32), (uint)(b >> 32)) + (Mul32x32To64((uint)(a >> 32), (uint)b) >> 32) + (Mul32x32To64((uint)a, (uint)(b >> 32)) >> 32);
-            if ((num & 0x8000000000000000uL) == 0L)
-            {
-                num <<= 1;
-                pexp--;
-            }
+            if ((num & 0x8000000000000000uL) == 0L) { num <<= 1; pexp--; }
             return num;
         }
 
         private static int abs(int value)
         {
-            if (value < 0)
-            {
-                return -value;
-            }
+            if (value < 0) { return -value; }
             return value;
         }
 
         private unsafe static double NumberToDouble(ref NumberBuffer number)
         {
-            ReadOnlySpan<byte> digits = number.Digits;
-            int i = 0;
-            int numDigits = number.NumDigits;
-            int num = numDigits;
-            for (; digits[i] == 48; i++)
-            {
-                num--;
-            }
-            if (num == 0)
-            {
-                return 0.0;
-            }
+            ReadOnlySpan<byte> digits = number.Digits; int i = 0; int numDigits = number.NumDigits; int num = numDigits;
+            for (; digits[i] == 48; i++) { num--; }
+            if (num == 0) { return 0.0; }
             int num2 = Math.Min(num, 9);
             num -= num2;
             ulong num3 = DigitsToInt(digits, num2);
@@ -4573,43 +2980,16 @@ namespace System
             if (num5 >= 352)
             {
                 ulong num6 = ((num4 > 0) ? 9218868437227405312uL : 0);
-                if (number.IsNegative)
-                {
-                    num6 |= 0x8000000000000000uL;
-                }
+                if (number.IsNegative) { num6 |= 0x8000000000000000uL; }
                 return *(double*)(&num6);
             }
             int pexp = 64;
-            if ((num3 & 0xFFFFFFFF00000000uL) == 0L)
-            {
-                num3 <<= 32;
-                pexp -= 32;
-            }
-            if ((num3 & 0xFFFF000000000000uL) == 0L)
-            {
-                num3 <<= 16;
-                pexp -= 16;
-            }
-            if ((num3 & 0xFF00000000000000uL) == 0L)
-            {
-                num3 <<= 8;
-                pexp -= 8;
-            }
-            if ((num3 & 0xF000000000000000uL) == 0L)
-            {
-                num3 <<= 4;
-                pexp -= 4;
-            }
-            if ((num3 & 0xC000000000000000uL) == 0L)
-            {
-                num3 <<= 2;
-                pexp -= 2;
-            }
-            if ((num3 & 0x8000000000000000uL) == 0L)
-            {
-                num3 <<= 1;
-                pexp--;
-            }
+            if ((num3 & 0xFFFFFFFF00000000uL) == 0L) { num3 <<= 32; pexp -= 32; }
+            if ((num3 & 0xFFFF000000000000uL) == 0L) { num3 <<= 16; pexp -= 16; }
+            if ((num3 & 0xFF00000000000000uL) == 0L) { num3 <<= 8; pexp -= 8; }
+            if ((num3 & 0xF000000000000000uL) == 0L) { num3 <<= 4; pexp -= 4; }
+            if ((num3 & 0xC000000000000000uL) == 0L) { num3 <<= 2; pexp -= 2; }
+            if ((num3 & 0x8000000000000000uL) == 0L) { num3 <<= 1; pexp--; }
             int num7 = num5 & 0xF;
             if (num7 != 0)
             {
@@ -4629,19 +3009,12 @@ namespace System
             if (((uint)(int)num3 & 0x400u) != 0)
             {
                 ulong num10 = num3 + 1023 + (ulong)(((int)num3 >> 11) & 1);
-                if (num10 < num3)
-                {
-                    num10 = (num10 >> 1) | 0x8000000000000000uL;
-                    pexp++;
-                }
+                if (num10 < num3) { num10 = (num10 >> 1) | 0x8000000000000000uL; pexp++; }
                 num3 = num10;
             }
             pexp += 1022;
             num3 = ((pexp <= 0) ? ((pexp == -52 && num3 >= 9223372036854775896uL) ? 1 : ((pexp > -52) ? (num3 >> -pexp + 11 + 1) : 0)) : ((pexp < 2047) ? ((ulong)((long)pexp << 52) + ((num3 >> 11) & 0xFFFFFFFFFFFFFL)) : 9218868437227405312uL));
-            if (number.IsNegative)
-            {
-                num3 |= 0x8000000000000000uL;
-            }
+            if (number.IsNegative) { num3 |= 0x8000000000000000uL; }
             return *(double*)(&num3);
         }
     }
@@ -4654,107 +3027,39 @@ namespace System
 
         public const int BufferSize = 51;
 
-        private byte _b0;
+        private byte _b0; private byte _b1; private byte _b2;
 
-        private byte _b1;
+        private byte _b3; private byte _b4; private byte _b5; 
+        
+        private byte _b6; private byte _b7; private byte _b8;
 
-        private byte _b2;
+        private byte _b9; private byte _b10; private byte _b11; 
+        
+        private byte _b12; private byte _b13; private byte _b14;
 
-        private byte _b3;
+        private byte _b15; private byte _b16; private byte _b17;
 
-        private byte _b4;
+        private byte _b18; private byte _b19; private byte _b20;
 
-        private byte _b5;
+        private byte _b21; private byte _b22; private byte _b23;
 
-        private byte _b6;
+        private byte _b24; private byte _b25; private byte _b26;
 
-        private byte _b7;
+        private byte _b27; private byte _b28; private byte _b29;
 
-        private byte _b8;
+        private byte _b30; private byte _b31; private byte _b32;
 
-        private byte _b9;
+        private byte _b33; private byte _b34; private byte _b35;
 
-        private byte _b10;
+        private byte _b36; private byte _b37; private byte _b38;
 
-        private byte _b11;
+        private byte _b39; private byte _b40; private byte _b41;
 
-        private byte _b12;
+        private byte _b42; private byte _b43; private byte _b44;
 
-        private byte _b13;
-
-        private byte _b14;
-
-        private byte _b15;
-
-        private byte _b16;
-
-        private byte _b17;
-
-        private byte _b18;
-
-        private byte _b19;
-
-        private byte _b20;
-
-        private byte _b21;
-
-        private byte _b22;
-
-        private byte _b23;
-
-        private byte _b24;
-
-        private byte _b25;
-
-        private byte _b26;
-
-        private byte _b27;
-
-        private byte _b28;
-
-        private byte _b29;
-
-        private byte _b30;
-
-        private byte _b31;
-
-        private byte _b32;
-
-        private byte _b33;
-
-        private byte _b34;
-
-        private byte _b35;
-
-        private byte _b36;
-
-        private byte _b37;
-
-        private byte _b38;
-
-        private byte _b39;
-
-        private byte _b40;
-
-        private byte _b41;
-
-        private byte _b42;
-
-        private byte _b43;
-
-        private byte _b44;
-
-        private byte _b45;
-
-        private byte _b46;
-
-        private byte _b47;
-
-        private byte _b48;
-
-        private byte _b49;
-
-        private byte _b50;
+        private byte _b45; private byte _b46; private byte _b47; 
+        
+        private byte _b48; private byte _b49; private byte _b50;
 
         public unsafe Span<byte> Digits => new Span<byte>(Unsafe.AsPointer(ref _b0), 51);
 
@@ -4763,9 +3068,7 @@ namespace System
         public int NumDigits => Digits.IndexOf<byte>(0);
 
         [Conditional("DEBUG")]
-        public void CheckConsistency()
-        {
-        }
+        public void CheckConsistency() { }
 
         public override string ToString()
         {
@@ -4773,15 +3076,7 @@ namespace System
             stringBuilder.Append('[');
             stringBuilder.Append('"');
             Span<byte> digits = Digits;
-            for (int i = 0; i < 51; i++)
-            {
-                byte b = digits[i];
-                if (b == 0)
-                {
-                    break;
-                }
-                stringBuilder.Append((char)b);
-            }
+            for (int i = 0; i < 51; i++) { byte b = digits[i]; if (b == 0) { break; } stringBuilder.Append((char)b); }
             stringBuilder.Append('"');
             stringBuilder.Append(", Scale = " + Scale);
             stringBuilder.Append(", IsNegative   = " + IsNegative);
@@ -4792,87 +3087,42 @@ namespace System
 
     internal static class ThrowHelper
     {
-        internal static void ThrowArgumentNullException(System.ExceptionArgument argument)
-        {
-            throw CreateArgumentNullException(argument);
-        }
+        internal static void ThrowArgumentNullException(System.ExceptionArgument argument) { throw CreateArgumentNullException(argument); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentNullException(System.ExceptionArgument argument)
-        {
-            return new ArgumentNullException(argument.ToString());
-        }
+        private static Exception CreateArgumentNullException(System.ExceptionArgument argument) { return new ArgumentNullException(argument.ToString()); }
 
-        internal static void ThrowArrayTypeMismatchException()
-        {
-            throw CreateArrayTypeMismatchException();
-        }
+        internal static void ThrowArrayTypeMismatchException() { throw CreateArrayTypeMismatchException(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArrayTypeMismatchException()
-        {
-            return new ArrayTypeMismatchException();
-        }
+        private static Exception CreateArrayTypeMismatchException() { return new ArrayTypeMismatchException(); }
 
-        internal static void ThrowArgumentException_InvalidTypeWithPointersNotSupported(Type type)
-        {
-            throw CreateArgumentException_InvalidTypeWithPointersNotSupported(type);
-        }
+        internal static void ThrowArgumentException_InvalidTypeWithPointersNotSupported(Type type) { throw CreateArgumentException_InvalidTypeWithPointersNotSupported(type); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentException_InvalidTypeWithPointersNotSupported(Type type)
-        {
-            return new ArgumentException(System.SR.Format(MDCFR.Properties.Resources.Argument_InvalidTypeWithPointersNotSupported, type));
-        }
+        private static Exception CreateArgumentException_InvalidTypeWithPointersNotSupported(Type type) { return new ArgumentException(System.SR.Format(MDCFR.Properties.Resources.Argument_InvalidTypeWithPointersNotSupported, type)); }
 
-        internal static void ThrowArgumentException_DestinationTooShort()
-        {
-            throw CreateArgumentException_DestinationTooShort();
-        }
+        internal static void ThrowArgumentException_DestinationTooShort() { throw CreateArgumentException_DestinationTooShort(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentException_DestinationTooShort()
-        {
-            return new ArgumentException(MDCFR.Properties.Resources.Argument_DestinationTooShort);
-        }
+        private static Exception CreateArgumentException_DestinationTooShort() { return new ArgumentException(MDCFR.Properties.Resources.Argument_DestinationTooShort); }
 
-        internal static void ThrowIndexOutOfRangeException()
-        {
-            throw CreateIndexOutOfRangeException();
-        }
+        internal static void ThrowIndexOutOfRangeException() { throw CreateIndexOutOfRangeException(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateIndexOutOfRangeException()
-        {
-            return new IndexOutOfRangeException();
-        }
+        private static Exception CreateIndexOutOfRangeException() { return new IndexOutOfRangeException(); }
 
-        internal static void ThrowArgumentOutOfRangeException()
-        {
-            throw CreateArgumentOutOfRangeException();
-        }
+        internal static void ThrowArgumentOutOfRangeException() { throw CreateArgumentOutOfRangeException(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentOutOfRangeException()
-        {
-            return new ArgumentOutOfRangeException();
-        }
+        private static Exception CreateArgumentOutOfRangeException() { return new ArgumentOutOfRangeException(); }
 
-        internal static void ThrowArgumentOutOfRangeException(System.ExceptionArgument argument)
-        {
-            throw CreateArgumentOutOfRangeException(argument);
-        }
+        internal static void ThrowArgumentOutOfRangeException(System.ExceptionArgument argument) { throw CreateArgumentOutOfRangeException(argument); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentOutOfRangeException(System.ExceptionArgument argument)
-        {
-            return new ArgumentOutOfRangeException(argument.ToString());
-        }
+        private static Exception CreateArgumentOutOfRangeException(System.ExceptionArgument argument) { return new ArgumentOutOfRangeException(argument.ToString()); }
 
-        internal static void ThrowArgumentOutOfRangeException_PrecisionTooLarge()
-        {
-            throw CreateArgumentOutOfRangeException_PrecisionTooLarge();
-        }
+        internal static void ThrowArgumentOutOfRangeException_PrecisionTooLarge() { throw CreateArgumentOutOfRangeException_PrecisionTooLarge(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateArgumentOutOfRangeException_PrecisionTooLarge()
@@ -4880,10 +3130,7 @@ namespace System
             return new ArgumentOutOfRangeException("precision", System.SR.Format(MDCFR.Properties.Resources.Argument_PrecisionTooLarge, (byte)99));
         }
 
-        internal static void ThrowArgumentOutOfRangeException_SymbolDoesNotFit()
-        {
-            throw CreateArgumentOutOfRangeException_SymbolDoesNotFit();
-        }
+        internal static void ThrowArgumentOutOfRangeException_SymbolDoesNotFit() { throw CreateArgumentOutOfRangeException_SymbolDoesNotFit(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateArgumentOutOfRangeException_SymbolDoesNotFit()
@@ -4891,32 +3138,17 @@ namespace System
             return new ArgumentOutOfRangeException("symbol", MDCFR.Properties.Resources.Argument_BadFormatSpecifier);
         }
 
-        internal static void ThrowInvalidOperationException()
-        {
-            throw CreateInvalidOperationException();
-        }
+        internal static void ThrowInvalidOperationException() { throw CreateInvalidOperationException(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateInvalidOperationException()
-        {
-            return new InvalidOperationException();
-        }
+        private static Exception CreateInvalidOperationException() { return new InvalidOperationException(); }
 
-        internal static void ThrowInvalidOperationException_OutstandingReferences()
-        {
-            throw CreateInvalidOperationException_OutstandingReferences();
-        }
+        internal static void ThrowInvalidOperationException_OutstandingReferences() { throw CreateInvalidOperationException_OutstandingReferences(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateInvalidOperationException_OutstandingReferences()
-        {
-            return new InvalidOperationException(MDCFR.Properties.Resources.OutstandingReferences);
-        }
+        private static Exception CreateInvalidOperationException_OutstandingReferences() { return new InvalidOperationException(MDCFR.Properties.Resources.OutstandingReferences); }
 
-        internal static void ThrowInvalidOperationException_UnexpectedSegmentType()
-        {
-            throw CreateInvalidOperationException_UnexpectedSegmentType();
-        }
+        internal static void ThrowInvalidOperationException_UnexpectedSegmentType() { throw CreateInvalidOperationException_UnexpectedSegmentType(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateInvalidOperationException_UnexpectedSegmentType()
@@ -4924,10 +3156,7 @@ namespace System
             return new InvalidOperationException(MDCFR.Properties.Resources.UnexpectedSegmentType);
         }
 
-        internal static void ThrowInvalidOperationException_EndPositionNotReached()
-        {
-            throw CreateInvalidOperationException_EndPositionNotReached();
-        }
+        internal static void ThrowInvalidOperationException_EndPositionNotReached() { throw CreateInvalidOperationException_EndPositionNotReached(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateInvalidOperationException_EndPositionNotReached()
@@ -4935,43 +3164,22 @@ namespace System
             return new InvalidOperationException(MDCFR.Properties.Resources.EndPositionNotReached);
         }
 
-        internal static void ThrowArgumentOutOfRangeException_PositionOutOfRange()
-        {
-            throw CreateArgumentOutOfRangeException_PositionOutOfRange();
-        }
+        internal static void ThrowArgumentOutOfRangeException_PositionOutOfRange() { throw CreateArgumentOutOfRangeException_PositionOutOfRange(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentOutOfRangeException_PositionOutOfRange()
-        {
-            return new ArgumentOutOfRangeException("position");
-        }
+        private static Exception CreateArgumentOutOfRangeException_PositionOutOfRange() { return new ArgumentOutOfRangeException("position"); }
 
-        internal static void ThrowArgumentOutOfRangeException_OffsetOutOfRange()
-        {
-            throw CreateArgumentOutOfRangeException_OffsetOutOfRange();
-        }
+        internal static void ThrowArgumentOutOfRangeException_OffsetOutOfRange() { throw CreateArgumentOutOfRangeException_OffsetOutOfRange(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateArgumentOutOfRangeException_OffsetOutOfRange()
-        {
-            return new ArgumentOutOfRangeException("offset");
-        }
+        private static Exception CreateArgumentOutOfRangeException_OffsetOutOfRange() { return new ArgumentOutOfRangeException("offset"); }
 
-        internal static void ThrowObjectDisposedException_ArrayMemoryPoolBuffer()
-        {
-            throw CreateObjectDisposedException_ArrayMemoryPoolBuffer();
-        }
+        internal static void ThrowObjectDisposedException_ArrayMemoryPoolBuffer() { throw CreateObjectDisposedException_ArrayMemoryPoolBuffer(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateObjectDisposedException_ArrayMemoryPoolBuffer()
-        {
-            return new ObjectDisposedException("ArrayMemoryPoolBuffer");
-        }
+        private static Exception CreateObjectDisposedException_ArrayMemoryPoolBuffer() { return new ObjectDisposedException("ArrayMemoryPoolBuffer"); }
 
-        internal static void ThrowFormatException_BadFormatSpecifier()
-        {
-            throw CreateFormatException_BadFormatSpecifier();
-        }
+        internal static void ThrowFormatException_BadFormatSpecifier() { throw CreateFormatException_BadFormatSpecifier(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateFormatException_BadFormatSpecifier()
@@ -4979,27 +3187,16 @@ namespace System
             return new FormatException(MDCFR.Properties.Resources.Argument_BadFormatSpecifier);
         }
 
-        internal static void ThrowArgumentException_OverlapAlignmentMismatch()
-        {
-            throw CreateArgumentException_OverlapAlignmentMismatch();
-        }
+        internal static void ThrowArgumentException_OverlapAlignmentMismatch() { throw CreateArgumentException_OverlapAlignmentMismatch(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
         private static Exception CreateArgumentException_OverlapAlignmentMismatch()
-        {
-            return new ArgumentException(MDCFR.Properties.Resources.Argument_OverlapAlignmentMismatch);
-        }
+        { return new ArgumentException(MDCFR.Properties.Resources.Argument_OverlapAlignmentMismatch); }
 
-        internal static void ThrowNotSupportedException()
-        {
-            throw CreateThrowNotSupportedException();
-        }
+        internal static void ThrowNotSupportedException() { throw CreateThrowNotSupportedException(); }
 
         [MethodImpl(MethodImplOptions.NoInlining)]
-        private static Exception CreateThrowNotSupportedException()
-        {
-            return new NotSupportedException();
-        }
+        private static Exception CreateThrowNotSupportedException() { return new NotSupportedException(); }
 
         public static bool TryFormatThrowFormatException(out int bytesWritten)
         {
@@ -5042,10 +3239,7 @@ namespace System
             return CreateArgumentOutOfRangeException(System.ExceptionArgument.endIndex);
         }
 
-        public static void ThrowArgumentValidationException(Array array, int start)
-        {
-            throw CreateArgumentValidationException(array, start);
-        }
+        public static void ThrowArgumentValidationException(Array array, int start) { throw CreateArgumentValidationException(array, start); }
 
         private static Exception CreateArgumentValidationException(Array array, int start)
         {
@@ -5060,100 +3254,12 @@ namespace System
             return CreateArgumentOutOfRangeException(System.ExceptionArgument.length);
         }
 
-        public static void ThrowStartOrEndArgumentValidationException(long start)
-        {
-            throw CreateStartOrEndArgumentValidationException(start);
-        }
+        public static void ThrowStartOrEndArgumentValidationException(long start) { throw CreateStartOrEndArgumentValidationException(start); }
 
         private static Exception CreateStartOrEndArgumentValidationException(long start)
         {
-            if (start < 0)
-            {
-                return CreateArgumentOutOfRangeException(System.ExceptionArgument.start);
-            }
+            if (start < 0) { return CreateArgumentOutOfRangeException(System.ExceptionArgument.start); }
             return CreateArgumentOutOfRangeException(System.ExceptionArgument.length);
-        }
-    }
-
-    /// <summary>
-    /// Represents a position in a non-contiguous set of memory. 
-    /// Properties of this type should not be interpreted by anything but the type that created it.
-    /// </summary>
-    public readonly struct SequencePosition : IEquatable<SequencePosition>
-    {
-        private readonly object _object;
-
-        private readonly int _integer;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SequencePosition"/> struct.
-        /// </summary>
-        /// <param name="object">A non-contiguous set of memory.</param>
-        /// <param name="integer">The position in <paramref name="object"/>.</param>
-        public SequencePosition(object @object, int integer)
-        {
-            _object = @object;
-            _integer = integer;
-        }
-
-        /// <summary>
-        /// Returns the object part of this <see cref="SequencePosition"/> struct.
-        /// </summary>
-        /// <returns>The object part of this sequence position.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public object GetObject()
-        {
-            return _object;
-        }
-
-        /// <summary>
-        /// Returns the integer part of this <see cref="SequencePosition"/> struct.
-        /// </summary>
-        /// <returns>The integer part of this sequence position.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public int GetInteger()
-        {
-            return _integer;
-        }
-
-        /// <summary>
-        /// Indicates whether the current instance is equal to another <see cref="SequencePosition"/> struct.
-        /// </summary>
-        /// <param name="other">The sequence position to compare with the current instance.</param>
-        /// <returns><c>true</c> if the two instances are equal; <c>false</c> otherwise.</returns>
-        /// <remarks>
-        /// Equality does not guarantee that the two instances point to the same location in a <see cref="ReadOnlySequence{T}"/>.
-        /// </remarks>
-        public bool Equals(SequencePosition other)
-        {
-            if (_integer == other._integer)
-            {
-                return object.Equals(_object, other._object);
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Returns a value that indicates whether the current instance is equal to another object.
-        /// </summary>
-        /// <param name="obj">The object to compare with the current instance.</param>
-        /// <returns><c>true</c> if <paramref name="obj"/> is of type <see cref="SequencePosition"/>
-        /// and is equal to the current instance; otherwise, <c>false</c>.</returns>
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
-        {
-            if (obj is SequencePosition other)
-            {
-                return Equals(other);
-            }
-            return false;
-        }
-
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override int GetHashCode()
-        {
-            return System.Numerics.Hashing.HashHelpers.Combine(_object?.GetHashCode() ?? 0, _integer);
         }
     }
 
@@ -5162,52 +3268,28 @@ namespace System
         public const float PI = 3.1415927f;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Abs(float x)
-        {
-            return Math.Abs(x);
-        }
+        public static float Abs(float x) { return Math.Abs(x); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Acos(float x)
-        {
-            return (float)Math.Acos(x);
-        }
+        public static float Acos(float x) { return (float)Math.Acos(x); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Cos(float x)
-        {
-            return (float)Math.Cos(x);
-        }
+        public static float Cos(float x) { return (float)Math.Cos(x); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float IEEERemainder(float x, float y)
-        {
-            return (float)Math.IEEERemainder(x, y);
-        }
+        public static float IEEERemainder(float x, float y) { return (float)Math.IEEERemainder(x, y); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Pow(float x, float y)
-        {
-            return (float)Math.Pow(x, y);
-        }
+        public static float Pow(float x, float y) { return (float)Math.Pow(x, y); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sin(float x)
-        {
-            return (float)Math.Sin(x);
-        }
+        public static float Sin(float x) { return (float)Math.Sin(x); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sqrt(float x)
-        {
-            return (float)Math.Sqrt(x);
-        }
+        public static float Sqrt(float x) { return (float)Math.Sqrt(x); }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Tan(float x)
-        {
-            return (float)Math.Tan(x);
-        }
+        public static float Tan(float x) { return (float)Math.Tan(x); }
     }
 
 }
