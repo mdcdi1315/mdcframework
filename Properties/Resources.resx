@@ -914,63 +914,155 @@ URL={0}</value>
     <comment>Proper file code that can open an Internet Shortcut.</comment>
   </data>
   <data name="LengthMustMatch" xml:space="preserve">
-	<value>Length of {0} ({1}) must match product of {2} ({3}).</value>
+    <value>Length of {0} ({1}) must match product of {2} ({3}).</value>
   </data>
   <data name="CannotComputeTriangle" xml:space="preserve">
-	<value>Cannot compute triangle of {0} with Rank less than 2.</value>
+    <value>Cannot compute triangle of {0} with Rank less than 2.</value>
   </data>
   <data name="CannotComputeDiagonal" xml:space="preserve">
-	<value>Cannot compute diagonal of {0} with Rank less than 2.</value>
+    <value>Cannot compute diagonal of {0} with Rank less than 2.</value>
   </data>
-	<data name="CannotCompareWithRank" xml:space="preserve">
-		<value>Cannot compare {0} with Rank {1} to {2} with Rank {3}.</value>
-	</data>
-	<data name="CannotCompareWithDifferentDimension" xml:space="preserve">
-		<value>Cannot compare {0} with different dimension {1}, {2} != {3}.</value>
-	</data>
-	<data name="MustHaveAtLeastOneDimension" xml:space="preserve">
-		<value>Tensor {0} must have at least one dimension.</value>
-	</data>
-	<data name="OnlySingleDimensionalArraysSupported" xml:space="preserve">
-		<value>Only single dimensional arrays are supported for the requested action.</value>
-	</data>
-	<data name="DimensionsMustContainElements" xml:space="preserve">
-		<value>Dimensions must contain elements.</value>
-	</data>
-	<data name="NumberGreaterThenAvailableSpace" xml:space="preserve">
-		<value>The number of elements in the Tensor is greater than the available space from index to the end of the destination array.</value>
-	</data>
-	<data name="CannotReshapeArrayDueToMismatchInLengths" xml:space="preserve">
-		<value>Cannot reshape array due to mismatch in lengths, currently {0} would become {1}.</value>
-	</data>
-	<data name="ValueIsNotOfType" xml:space="preserve">
-		<value>The value "{0}" is not of type "{1}" and cannot be used in this generic collection.</value>
-	</data>
-	<data name="CannotCompareToWithDifferentDimension" xml:space="preserve">
-		<value>Cannot compare {0} to {1} with different dimension {2}, {3} != {4}.</value>
-	</data>
-	<data name="ArrayMustContainElements" xml:space="preserve">
-		<value>Array must contain elements.</value>
-	</data>
-	<data name="CannotCompare" xml:space="preserve">
-		<value>Cannot compare {0} to {1}.</value>
-	</data>
-	<data name="DimensionsMustBePositiveAndNonZero" xml:space="preserve">
-		<value>Dimensions must be positive and non-zero.</value>
-	</data>
-	<data name="CannotComputeDiagonalWithOffset" xml:space="preserve">
-		<value>Cannot compute diagonal with offset {0}.</value>
-	</data>
-	<data name="InvalidOperation_MultipleContinuations">
-		<value>Another continuation was already registered.</value>
-	</data>
-	<data name="ChannelClosedException_DefaultMessage">
-		<value>The channel has been closed.</value>
-	</data>
-	<data name="InvalidOperation_IncorrectToken">
-		<value>The result of the operation was already consumed and may not be used again.</value>
-	</data>
-	<data name="InvalidOperation_IncompleteAsyncOperation">
-		<value>The asynchronous operation has not completed.</value>
-	</data>
+  <data name="CannotCompareWithRank" xml:space="preserve">
+    <value>Cannot compare {0} with Rank {1} to {2} with Rank {3}.</value>
+  </data>
+  <data name="CannotCompareWithDifferentDimension" xml:space="preserve">
+    <value>Cannot compare {0} with different dimension {1}, {2} != {3}.</value>
+  </data>
+  <data name="MustHaveAtLeastOneDimension" xml:space="preserve">
+    <value>Tensor {0} must have at least one dimension.</value>
+  </data>
+  <data name="OnlySingleDimensionalArraysSupported" xml:space="preserve">
+    <value>Only single dimensional arrays are supported for the requested action.</value>
+  </data>
+  <data name="DimensionsMustContainElements" xml:space="preserve">
+    <value>Dimensions must contain elements.</value>
+  </data>
+  <data name="NumberGreaterThenAvailableSpace" xml:space="preserve">
+    <value>The number of elements in the Tensor is greater than the available space from index to the end of the destination array.</value>
+  </data>
+  <data name="CannotReshapeArrayDueToMismatchInLengths" xml:space="preserve">
+    <value>Cannot reshape array due to mismatch in lengths, currently {0} would become {1}.</value>
+  </data>
+  <data name="ValueIsNotOfType" xml:space="preserve">
+    <value>The value "{0}" is not of type "{1}" and cannot be used in this generic collection.</value>
+  </data>
+  <data name="CannotCompareToWithDifferentDimension" xml:space="preserve">
+    <value>Cannot compare {0} to {1} with different dimension {2}, {3} != {4}.</value>
+  </data>
+  <data name="ArrayMustContainElements" xml:space="preserve">
+    <value>Array must contain elements.</value>
+  </data>
+  <data name="CannotCompare" xml:space="preserve">
+    <value>Cannot compare {0} to {1}.</value>
+  </data>
+  <data name="DimensionsMustBePositiveAndNonZero" xml:space="preserve">
+    <value>Dimensions must be positive and non-zero.</value>
+  </data>
+  <data name="CannotComputeDiagonalWithOffset" xml:space="preserve">
+    <value>Cannot compute diagonal with offset {0}.</value>
+  </data>
+  <data name="InvalidOperation_MultipleContinuations" xml:space="preserve">
+    <value>Another continuation was already registered.</value>
+  </data>
+  <data name="ChannelClosedException_DefaultMessage" xml:space="preserve">
+    <value>The channel has been closed.</value>
+  </data>
+  <data name="InvalidOperation_IncorrectToken" xml:space="preserve">
+    <value>The result of the operation was already consumed and may not be used again.</value>
+  </data>
+  <data name="InvalidOperation_IncompleteAsyncOperation" xml:space="preserve">
+    <value>The asynchronous operation has not completed.</value>
+  </data>
+  <data name="CountdownEvent_Increment_AlreadyZero" xml:space="preserve">
+    <value>The event is already signaled and cannot be incremented.</value>
+  </data>
+  <data name="SynchronizationLockException_IncorrectDispose" xml:space="preserve">
+    <value>The lock is being disposed while still being used. It either is being held by a thread and/or has active waiters waiting to acquire the lock.</value>
+  </data>
+  <data name="LockRecursionException_ReadAfterWriteNotAllowed" xml:space="preserve">
+    <value>A read lock may not be acquired with the write lock held in this mode.</value>
+  </data>
+  <data name="Barrier_RemoveParticipants_ArgumentOutOfRange" xml:space="preserve">
+    <value>The participantCount argument must be less than or equal the number of participants.</value>
+  </data>
+  <data name="LockRecursionException_UpgradeAfterWriteNotAllowed" xml:space="preserve">
+    <value>Upgradeable lock may not be acquired with write lock held in this mode. Acquiring Upgradeable lock gives the ability to read along with an option to upgrade to a writer.</value>
+  </data>
+  <data name="LockRecursionException_WriteAfterReadNotAllowed" xml:space="preserve">
+    <value>Write lock may not be acquired with read lock held. This pattern is prone to deadlocks. Please ensure that read locks are released before taking a write lock. If an upgrade is necessary, use an upgrade lock in place of the read lock.</value>
+  </data>
+  <data name="LockRecursionException_RecursiveWriteNotAllowed" xml:space="preserve">
+    <value>Recursive write lock acquisitions not allowed in this mode.</value>
+  </data>
+  <data name="Barrier_SignalAndWait_ArgumentOutOfRange" xml:space="preserve">
+    <value>The specified timeout must represent a value between -1 and Int32.MaxValue, inclusive.</value>
+  </data>
+  <data name="BarrierPostPhaseException" xml:space="preserve">
+    <value>The postPhaseAction failed with an exception.</value>
+  </data>
+  <data name="Barrier_RemoveParticipants_NonPositive_ArgumentOutOfRange" xml:space="preserve">
+    <value>The participantCount argument must be a positive value.</value>
+  </data>
+  <data name="Barrier_Dispose" xml:space="preserve">
+    <value>The barrier has been disposed.</value>
+  </data>
+  <data name="LockRecursionException_UpgradeAfterReadNotAllowed" xml:space="preserve">
+    <value>Upgradeable lock may not be acquired with read lock held.</value>
+  </data>
+  <data name="Barrier_AddParticipants_NonPositive_ArgumentOutOfRange" xml:space="preserve">
+    <value>The participantCount argument must be a positive value.</value>
+  </data>
+  <data name="LockRecursionException_RecursiveReadNotAllowed" xml:space="preserve">
+    <value>Recursive read lock acquisitions not allowed in this mode.</value>
+  </data>
+  <data name="Common_OperationCanceled" xml:space="preserve">
+    <value>The operation was canceled.</value>
+  </data>
+  <data name="LockRecursionException_RecursiveUpgradeNotAllowed" xml:space="preserve">
+    <value>Recursive upgradeable lock acquisitions not allowed in this mode.</value>
+  </data>
+  <data name="Barrier_ctor_ArgumentOutOfRange" xml:space="preserve">
+    <value>The participantCount argument must be non-negative and less than or equal to 32767.</value>
+  </data>
+  <data name="Barrier_SignalAndWait_InvalidOperation_ZeroTotal" xml:space="preserve">
+    <value>The barrier has no registered participants.</value>
+  </data>
+  <data name="CountdownEvent_Increment_AlreadyMax" xml:space="preserve">
+    <value>The increment operation would cause the CurrentCount to overflow.</value>
+  </data>
+  <data name="Barrier_InvalidOperation_CalledFromPHA" xml:space="preserve">
+    <value>This method may not be called from within the postPhaseAction.</value>
+  </data>
+  <data name="SynchronizationLockException_MisMatchedUpgrade" xml:space="preserve">
+    <value>The upgradeable lock is being released without being held.</value>
+  </data>
+  <data name="Barrier_AddParticipants_Overflow_ArgumentOutOfRange" xml:space="preserve">
+    <value>Adding participantCount participants would result in the number of participants exceeding the maximum number allowed.</value>
+  </data>
+  <data name="SynchronizationLockException_MisMatchedWrite" xml:space="preserve">
+    <value>The write lock is being released without being held.</value>
+  </data>
+  <data name="Barrier_SignalAndWait_InvalidOperation_ThreadsExceeded" xml:space="preserve">
+    <value>The number of threads using the barrier exceeded the total number of registered participants.</value>
+  </data>
+  <data name="CountdownEvent_Decrement_BelowZero" xml:space="preserve">
+    <value>Invalid attempt made to decrement the event's count below zero.</value>
+  </data>
+  <data name="Barrier_RemoveParticipants_InvalidOperation" xml:space="preserve">
+    <value>The participantCount argument is greater than the number of participants that haven't yet arrived at the barrier in this phase.</value>
+  </data>
+  <data name="SynchronizationLockException_MisMatchedRead" xml:space="preserve">
+    <value>The read lock is being released without being held.</value>
+  </data>
+  <data name="MDCFR_INTS_CREATE2" xml:space="preserve">
+    <value>[{{000214A0-0000-0000-C000-000000000046}}]
+Prop3=19,11
+[InternetShortcut]
+IDList=
+URL={0}
+IconIndex={1}
+HotKey=0
+IconFile={2}</value>
+    <comment>Proper file code that can open an Internet Shortcut: Now it has the ability to change it's current icon to a custom one.</comment>
+  </data>
 </root>

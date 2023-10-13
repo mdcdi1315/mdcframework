@@ -1,21 +1,19 @@
-﻿// Licensed to the .NET Foundation under one or more agreements.
-// The .NET Foundation licenses this file to you under the MIT license.
-// See the LICENSE file in the project root for more information.
+﻿
+/*
+ * Some of the code used here is from .NET Foundation. A small license excerpt is here:
+ * 
+ * 
+ * Licensed to the .NET Foundation under one or more agreements.
+ * The .NET Foundation licenses this file to you under the MIT license.
+ * See the LICENSE file in the project root for more information.
+*/
 
-using System.Text;
-using System.Buffers;
 using System.Diagnostics;
-using System.Buffers.Text;
-using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks.Sources;
-using System.Collections.Generic;
-#if NET6_0_OR_GREATER
-	using System.Runtime.Intrinsics;
-	using System.Runtime.Intrinsics.X86;
-	using static System.Runtime.Intrinsics.X86.Ssse3;
-#endif
+
+#if NET6_0_OR_GREATER == false
+// Types exposed in .NET Framework 4.8. :
 
 namespace Microsoft.Win32.SafeHandles
 {
@@ -55,15 +53,14 @@ namespace Internal
 
 namespace System
 {
-    #nullable enable
-
+#nullable enable
     namespace Collections.Generic
     {
         internal interface IHashKeyCollection<in TKey> { IEqualityComparer<TKey> KeyComparer { get; } }
 
         internal interface ISortKeyCollection<in TKey> { IComparer<TKey> KeyComparer { get; } }
 
-        #pragma warning disable CS8601
+#pragma warning disable CS8601
         internal static class EnumerableHelpers
         {
             internal static T[] ToArray<T>(IEnumerable<T> source) { int length; T[] array = ToArray(source, out length); Array.Resize(ref array, length); return array; }
@@ -106,181 +103,15 @@ namespace System
                 return Array.Empty<T>();
             }
         }
-        #pragma warning restore CS8601
+#pragma warning restore CS8601
     }
 
     namespace Runtime.CompilerServices
     {
-
-        /// <summary>Provides an awaiter for a <see cref="ValueTask{TResult}"/>.</summary>
-        public readonly struct ValueTaskAwaiter<TResult> : ICriticalNotifyCompletion, INotifyCompletion
-        {
-
-
-            /// <summary>The value being awaited.</summary>
-            private readonly ValueTask<TResult> _value;
-
-            /// <summary>Initializes the awaiter.</summary>
-            /// <param name="value">The value to be awaited.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal ValueTaskAwaiter(in ValueTask<TResult> value) => _value = value;
-
-            /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> has completed.</summary>
-            public bool IsCompleted
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => _value.IsCompleted;
-            }
-
-            /// <summary>Gets the result of the ValueTask.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public TResult GetResult() => _value.Result;
-
-            /// <summary>Schedules the continuation action for this ValueTask.</summary>
-            public void OnCompleted(Action continuation)
-            {
-                object? obj = _value._obj;
-                Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                if (obj is Task<TResult> t)
-                {
-                    t.GetAwaiter().OnCompleted(continuation);
-                }
-                else if (obj != null)
-                {
-                    Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext | ValueTaskSourceOnCompletedFlags.FlowExecutionContext);
-                }
-                else
-                {
-                    Task.CompletedTask.GetAwaiter().OnCompleted(continuation);
-                }
-            }
-
-            /// <summary>Schedules the continuation action for this ValueTask.</summary>
-            public void UnsafeOnCompleted(Action continuation)
-            {
-                object? obj = _value._obj;
-                Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
-
-                if (obj is Task<TResult> t)
-                {
-                    t.GetAwaiter().UnsafeOnCompleted(continuation);
-                }
-                else if (obj != null)
-                {
-                    Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
-                }
-                else
-                {
-                    Task.CompletedTask.GetAwaiter().UnsafeOnCompleted(continuation);
-                }
-            }
-
-
-        }
-
-        /// <summary>Provides an awaiter for a <see cref="ValueTask"/>.</summary>
-        public readonly struct ValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
-        {
-            /// <summary>Shim used to invoke an <see cref="Action"/> passed as the state argument to a <see cref="Action{Object}"/>.</summary>
-            internal static readonly Action<object?> s_invokeActionDelegate = static state =>
-            {
-                if (!(state is Action action))
-                {
-                    throw new ArgumentOutOfRangeException($"{state}");
-                }
-
-                action();
-            };
-
-            /// <summary>The value being awaited.</summary>
-            private readonly ValueTask _value;
-
-            /// <summary>Initializes the awaiter.</summary>
-            /// <param name="value">The value to be awaited.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal ValueTaskAwaiter(in ValueTask value) => _value = value;
-
-            /// <summary>Gets whether the <see cref="ValueTask"/> has completed.</summary>
-            public bool IsCompleted
-            {
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                get => _value.IsCompleted;
-            }
-
-            /// <summary>Gets the result of the ValueTask.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void GetResult() => _value.ThrowIfCompletedUnsuccessfully();
-
-            /// <summary>Schedules the continuation action for this ValueTask.</summary>
-            public void OnCompleted(Action continuation)
-            {
-                object? obj = _value._obj;
-                Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                if (obj is Task t)
-                {
-                    t.GetAwaiter().OnCompleted(continuation);
-                }
-                else if (obj != null)
-                {
-                    Unsafe.As<IValueTaskSource>(obj).OnCompleted(s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext | ValueTaskSourceOnCompletedFlags.FlowExecutionContext);
-                }
-                else
-                {
-                    Task.CompletedTask.GetAwaiter().OnCompleted(continuation);
-                }
-            }
-
-            /// <summary>Schedules the continuation action for this ValueTask.</summary>
-            public void UnsafeOnCompleted(Action continuation)
-            {
-                object? obj = _value._obj;
-                Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                if (obj is Task t)
-                {
-                    t.GetAwaiter().UnsafeOnCompleted(continuation);
-                }
-                else if (obj != null)
-                {
-                    Unsafe.As<IValueTaskSource>(obj).OnCompleted(s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
-                }
-                else
-                {
-                    Task.CompletedTask.GetAwaiter().UnsafeOnCompleted(continuation);
-                }
-            }
-        }
-        
-        #nullable disable
-
-        /// <summary>
-        /// Indicates the type of the async method builder that should be used by a language compiler to
-        /// build the attributed async method or to build the attributed type when used as the return type
-        /// of an async method.
-        /// </summary>
-        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Delegate | AttributeTargets.Enum | AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
-        public sealed class AsyncMethodBuilderAttribute : Attribute
-        {
-            /// <summary>Initializes the <see cref="AsyncMethodBuilderAttribute"/>.</summary>
-            /// <param name="builderType">The <see cref="Type"/> of the associated builder.</param>
-            public AsyncMethodBuilderAttribute(Type builderType) => BuilderType = builderType;
-
-            /// <summary>Gets the <see cref="Type"/> of the associated builder.</summary>
-            public Type BuilderType { get; }
-        }
-
-        /// <summary>
-        /// Calls to methods or references to fields marked with this attribute may be replaced at
-        /// some call sites with jit intrinsic expansions.
-        /// Types marked with this attribute may be specially treated by the runtime/compiler.
-        /// </summary>
-        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, Inherited = false)]
-        public sealed class IntrinsicAttribute : Attribute { }
-
-        // Code required when the Snappy Archiving is compiled < .NET 6 .
-        #if ! NET6_0_OR_GREATER
+            using System.Threading.Tasks;
+            using System.Threading.Tasks.Sources;
+            // Code required when the Snappy Archiving is compiled < .NET 6 .
+            // <--
             // Licensed to the .NET Foundation under one or more agreements.
             // The .NET Foundation licenses this file to you under the MIT license.
 
@@ -291,308 +122,23 @@ namespace System
 
                 public string ParameterName { get; }
             }
-        #endif
+            // -->
+            // Rest of the code is used when MDCFR is compiled for .NET Framework (For package System.Threading.Tasks.Extensions package)
 
-        // Special internal struct that we use to signify that we are not interested in
-        // a Task<VoidTaskResult>'s result.
-        internal struct VoidTaskResult { }
-
-
-        /// <summary>Represents a builder for asynchronous methods that return a <see cref="ValueTask"/>.</summary>
-        [StructLayout(LayoutKind.Auto)]
-        public struct AsyncValueTaskMethodBuilder
-        {
-            private System.Boolean _haveResult;
-            private System.Runtime.CompilerServices.AsyncTaskMethodBuilder _methodBuilder;
-            private System.Boolean _useBuilder;
-
-            /// <summary>Creates an instance of the <see cref="AsyncValueTaskMethodBuilder"/> struct.</summary>
-            /// <returns>The initialized instance.</returns>
-            public static AsyncValueTaskMethodBuilder Create() => default;
-
-            /// <summary>Begins running the builder with the associated state machine.</summary>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="stateMachine">The state machine instance, passed by reference.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine =>
-                _methodBuilder.Start(ref stateMachine);
-
-            /// <summary>Associates the builder with the specified state machine.</summary>
-            /// <param name="stateMachine">The state machine instance to associate with the builder.</param>
-            public void SetStateMachine(IAsyncStateMachine stateMachine) =>
-                _methodBuilder.SetStateMachine(stateMachine);
-
-            /// <summary>Marks the task as successfully completed.</summary>
-            public void SetResult()
+            /// <summary>Provides an awaiter for a <see cref="ValueTask{TResult}"/>.</summary>
+            public readonly struct ValueTaskAwaiter<TResult> : ICriticalNotifyCompletion, INotifyCompletion
             {
-                if (_useBuilder)
-                {
-                    _methodBuilder.SetResult();
-                    return;
-                }
-                else
-                {
-                    _haveResult = true;
-                }
-            }
-
-            /// <summary>Marks the task as failed and binds the specified exception to the task.</summary>
-            /// <param name="exception">The exception to bind to the task.</param>
-            public void SetException(Exception exception) => _methodBuilder.SetException(exception);
-
-            /// <summary>Gets the task for this builder.</summary>
-            public ValueTask Task
-            {
-                get
-                {
-                    if (_haveResult)
-                    {
-                        return default;
-                    }
-                    else 
-                    {
-                        _useBuilder = true;
-                        Task task = _methodBuilder.Task;
-                        return new ValueTask(task);
-                    }
-
-                    // With normal access paterns, m_task should always be non-null here: the async method should have
-                    // either completed synchronously, in which case SetResult would have set m_task to a non-null object,
-                    // or it should be completing asynchronously, in which case AwaitUnsafeOnCompleted would have similarly
-                    // initialized m_task to a state machine object.  However, if the type is used manually (not via
-                    // compiler-generated code) and accesses Task directly, we force it to be initialized.  Things will then
-                    // "work" but in a degraded mode, as we don't know the TStateMachine type here, and thus we use a normal
-                    // task object instead.
-                }
-            }
-
-            /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
-            /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="awaiter">The awaiter.</param>
-            /// <param name="stateMachine">The state machine.</param>
-            public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
-                where TAwaiter : INotifyCompletion
-                where TStateMachine : IAsyncStateMachine
-            {
-                _useBuilder = true;
-                _methodBuilder.AwaitOnCompleted(ref awaiter, ref stateMachine);
-            }
-
-            /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
-            /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="awaiter">The awaiter.</param>
-            /// <param name="stateMachine">The state machine.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
-                where TAwaiter : ICriticalNotifyCompletion
-                where TStateMachine : IAsyncStateMachine
-            {
-                _useBuilder = true;
-                _methodBuilder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
-            }
-        }
-
-        /// <summary>Represents a builder for asynchronous methods that return a <see cref="ValueTask"/>.</summary>
-        [StructLayout(LayoutKind.Auto)]
-        public struct AsyncValueTaskMethodBuilder<TResult>
-        {
-            private System.Boolean _haveResult;
-            private System.Runtime.CompilerServices.AsyncTaskMethodBuilder<TResult> _methodBuilder;
-            private System.Boolean _useBuilder;
-            private TResult _result;
-
-            /// <summary>Creates an instance of the <see cref="AsyncValueTaskMethodBuilder"/> struct.</summary>
-            /// <returns>The initialized instance.</returns>
-            public static AsyncValueTaskMethodBuilder<TResult> Create() => default;
-
-            /// <summary>Begins running the builder with the associated state machine.</summary>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="stateMachine">The state machine instance, passed by reference.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine =>
-                _methodBuilder.Start(ref stateMachine);
-
-            /// <summary>Associates the builder with the specified state machine.</summary>
-            /// <param name="stateMachine">The state machine instance to associate with the builder.</param>
-            public void SetStateMachine(IAsyncStateMachine stateMachine) =>
-                _methodBuilder.SetStateMachine(stateMachine);
-
-            /// <summary>Marks the task as successfully completed.</summary>
-            public void SetResult(TResult result)
-            {
-                if (_useBuilder) { _methodBuilder.SetResult(result);  return; } else { _result = result; _haveResult = true; }
-            }
-
-            /// <summary>Marks the task as failed and binds the specified exception to the task.</summary>
-            /// <param name="exception">The exception to bind to the task.</param>
-            public void SetException(System.Exception exception) => _methodBuilder.SetException(exception);
-
-            /// <summary>Gets the task for this builder.</summary>
-            public ValueTask<TResult> Task
-            {
-                get
-                {
-                    if (_haveResult)
-                    { return default; } else { _useBuilder = true; return new ValueTask<TResult>(_methodBuilder.Task); }
-
-                    // With normal access paterns, task should always be non-null here: the async method should have
-                    // either completed synchronously, in which case SetResult would have set m_task to a non-null object,
-                    // or it should be completing asynchronously, in which case AwaitUnsafeOnCompleted would have similarly
-                    // initialized m_task to a state machine object.  However, if the type is used manually (not via
-                    // compiler-generated code) and accesses Task directly, we force it to be initialized.  Things will then
-                    // "work" but in a degraded mode, as we don't know the TStateMachine type here, and thus we use a normal
-                    // task object instead.
-                }
-            }
-
-            /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
-            /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="awaiter">The awaiter.</param>
-            /// <param name="stateMachine">The state machine.</param>
-            public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
-                where TAwaiter : INotifyCompletion
-                where TStateMachine : IAsyncStateMachine
-            {
-                _useBuilder = true;
-                _methodBuilder.AwaitOnCompleted(ref awaiter, ref stateMachine);
-            }
-
-            /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
-            /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
-            /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
-            /// <param name="awaiter">The awaiter.</param>
-            /// <param name="stateMachine">The state machine.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
-                where TAwaiter : ICriticalNotifyCompletion
-                where TStateMachine : IAsyncStateMachine
-            {
-                _useBuilder = true;
-                _methodBuilder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
-            }
-        }
-
-        #nullable enable
-        /// <summary>Provides an awaitable type that enables configured awaits on a <see cref="ValueTask"/>.</summary>
-        [StructLayout(LayoutKind.Auto)]
-        public readonly struct ConfiguredValueTaskAwaitable
-        {
-            /// <summary>The wrapped <see cref="Task"/>.</summary>
-            private readonly ValueTask _value;
-
-            /// <summary>Initializes the awaitable.</summary>
-            /// <param name="value">The wrapped <see cref="ValueTask"/>.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal ConfiguredValueTaskAwaitable(in ValueTask value) => _value = value;
-
-            /// <summary>Returns an awaiter for this <see cref="ConfiguredValueTaskAwaitable"/> instance.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ConfiguredValueTaskAwaiter GetAwaiter() => new ConfiguredValueTaskAwaiter(in _value);
-
-            /// <summary>Provides an awaiter for a <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
-            [StructLayout(LayoutKind.Auto)]
-            public readonly struct ConfiguredValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
-            {
-                /// <summary>The value being awaited.</summary>
-                private readonly ValueTask _value;
-
-                /// <summary>Initializes the awaiter.</summary>
-                /// <param name="value">The value to be awaited.</param>
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                internal ConfiguredValueTaskAwaiter(in ValueTask value) => _value = value;
-
-                /// <summary>Gets whether the <see cref="ConfiguredValueTaskAwaitable"/> has completed.</summary>
-                public bool IsCompleted
-                {
-                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                    get => _value.IsCompleted;
-                }
-
-                /// <summary>Gets the result of the ValueTask.</summary>
-                [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                public void GetResult() => _value.ThrowIfCompletedUnsuccessfully();
-
-                /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
-                public void OnCompleted(Action continuation)
-                {
-                    object? obj = _value._obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj is Task t)
-                    {
-                        t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
-                    }
-                    else if (obj != null)
-                    {
-                        Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
-                            ValueTaskSourceOnCompletedFlags.FlowExecutionContext |
-                                (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None));
-                    }
-                    else
-                    {
-                        Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
-                    }
-                }
-
-                /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
-                public void UnsafeOnCompleted(Action continuation)
-                {
-                    object? obj = _value._obj;
-                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
-
-                    if (obj is Task t)
-                    {
-                        t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
-                    }
-                    else if (obj != null)
-                    {
-                        Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
-                            _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
-                    }
-                    else
-                    {
-                        Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
-                    }
-                }
 
 
-            }
-
-        }
-
-        /// <summary>Provides an awaitable type that enables configured awaits on a <see cref="ValueTask{TResult}"/>.</summary>
-        /// <typeparam name="TResult">The type of the result produced.</typeparam>
-        [StructLayout(LayoutKind.Auto)]
-        public readonly struct ConfiguredValueTaskAwaitable<TResult>
-        {
-            /// <summary>The wrapped <see cref="ValueTask{TResult}"/>.</summary>
-            private readonly ValueTask<TResult> _value;
-
-            /// <summary>Initializes the awaitable.</summary>
-            /// <param name="value">The wrapped <see cref="ValueTask{TResult}"/>.</param>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            internal ConfiguredValueTaskAwaitable(in ValueTask<TResult> value) => _value = value;
-
-            /// <summary>Returns an awaiter for this <see cref="ConfiguredValueTaskAwaitable{TResult}"/> instance.</summary>
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public ConfiguredValueTaskAwaiter GetAwaiter() => new ConfiguredValueTaskAwaiter(in _value);
-
-            /// <summary>Provides an awaiter for a <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
-            [StructLayout(LayoutKind.Auto)]
-            public readonly struct ConfiguredValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
-            {
                 /// <summary>The value being awaited.</summary>
                 private readonly ValueTask<TResult> _value;
 
                 /// <summary>Initializes the awaiter.</summary>
                 /// <param name="value">The value to be awaited.</param>
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
-                internal ConfiguredValueTaskAwaiter(in ValueTask<TResult> value) => _value = value;
+                internal ValueTaskAwaiter(in ValueTask<TResult> value) => _value = value;
 
-                /// <summary>Gets whether the <see cref="ConfiguredValueTaskAwaitable{TResult}"/> has completed.</summary>
+                /// <summary>Gets whether the <see cref="ValueTask{TResult}"/> has completed.</summary>
                 public bool IsCompleted
                 {
                     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -603,7 +149,7 @@ namespace System
                 [MethodImpl(MethodImplOptions.AggressiveInlining)]
                 public TResult GetResult() => _value.Result;
 
-                /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
+                /// <summary>Schedules the continuation action for this ValueTask.</summary>
                 public void OnCompleted(Action continuation)
                 {
                     object? obj = _value._obj;
@@ -611,21 +157,19 @@ namespace System
 
                     if (obj is Task<TResult> t)
                     {
-                        t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        t.GetAwaiter().OnCompleted(continuation);
                     }
                     else if (obj != null)
                     {
-                        Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
-                            ValueTaskSourceOnCompletedFlags.FlowExecutionContext |
-                                (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None));
+                        Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext | ValueTaskSourceOnCompletedFlags.FlowExecutionContext);
                     }
                     else
                     {
-                        Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        Task.CompletedTask.GetAwaiter().OnCompleted(continuation);
                     }
                 }
 
-                /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
+                /// <summary>Schedules the continuation action for this ValueTask.</summary>
                 public void UnsafeOnCompleted(Action continuation)
                 {
                     object? obj = _value._obj;
@@ -633,79 +177,534 @@ namespace System
 
                     if (obj is Task<TResult> t)
                     {
-                        t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        t.GetAwaiter().UnsafeOnCompleted(continuation);
                     }
                     else if (obj != null)
                     {
-                        Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
-                            _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
+                        Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
                     }
                     else
                     {
-                        Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        Task.CompletedTask.GetAwaiter().UnsafeOnCompleted(continuation);
+                    }
+                }
+
+
+            }
+
+            /// <summary>Provides an awaiter for a <see cref="ValueTask"/>.</summary>
+            public readonly struct ValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
+            {
+                /// <summary>Shim used to invoke an <see cref="Action"/> passed as the state argument to a <see cref="Action{Object}"/>.</summary>
+                internal static readonly Action<object?> s_invokeActionDelegate = static state =>
+                {
+                    if (!(state is Action action))
+                    {
+                        throw new ArgumentOutOfRangeException($"{state}");
+                    }
+
+                    action();
+                };
+
+                /// <summary>The value being awaited.</summary>
+                private readonly ValueTask _value;
+
+                /// <summary>Initializes the awaiter.</summary>
+                /// <param name="value">The value to be awaited.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                internal ValueTaskAwaiter(in ValueTask value) => _value = value;
+
+                /// <summary>Gets whether the <see cref="ValueTask"/> has completed.</summary>
+                public bool IsCompleted
+                {
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    get => _value.IsCompleted;
+                }
+
+                /// <summary>Gets the result of the ValueTask.</summary>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public void GetResult() => _value.ThrowIfCompletedUnsuccessfully();
+
+                /// <summary>Schedules the continuation action for this ValueTask.</summary>
+                public void OnCompleted(Action continuation)
+                {
+                    object? obj = _value._obj;
+                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
+
+                    if (obj is Task t)
+                    {
+                        t.GetAwaiter().OnCompleted(continuation);
+                    }
+                    else if (obj != null)
+                    {
+                        Unsafe.As<IValueTaskSource>(obj).OnCompleted(s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext | ValueTaskSourceOnCompletedFlags.FlowExecutionContext);
+                    }
+                    else
+                    {
+                        Task.CompletedTask.GetAwaiter().OnCompleted(continuation);
+                    }
+                }
+
+                /// <summary>Schedules the continuation action for this ValueTask.</summary>
+                public void UnsafeOnCompleted(Action continuation)
+                {
+                    object? obj = _value._obj;
+                    Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
+
+                    if (obj is Task t)
+                    {
+                        t.GetAwaiter().UnsafeOnCompleted(continuation);
+                    }
+                    else if (obj != null)
+                    {
+                        Unsafe.As<IValueTaskSource>(obj).OnCompleted(s_invokeActionDelegate, continuation, _value._token, ValueTaskSourceOnCompletedFlags.UseSchedulingContext);
+                    }
+                    else
+                    {
+                        Task.CompletedTask.GetAwaiter().UnsafeOnCompleted(continuation);
                     }
                 }
             }
-        }
+        
 #nullable disable
 
-        [CompilerGenerated]
-        [AttributeUsage(AttributeTargets.Module, AllowMultiple = false, Inherited = false)]
-        internal sealed class NullablePublicOnlyAttribute : Attribute
-        {
-            public readonly bool IncludesInternals;
-
-            public NullablePublicOnlyAttribute(bool includes_internals)
+            /// <summary>
+            /// Indicates the type of the async method builder that should be used by a language compiler to
+            /// build the attributed async method or to build the attributed type when used as the return type
+            /// of an async method.
+            /// </summary>
+            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Interface | AttributeTargets.Delegate | AttributeTargets.Enum | AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+            public sealed class AsyncMethodBuilderAttribute : Attribute
             {
-                IncludesInternals = includes_internals;
+                /// <summary>Initializes the <see cref="AsyncMethodBuilderAttribute"/>.</summary>
+                /// <param name="builderType">The <see cref="Type"/> of the associated builder.</param>
+                public AsyncMethodBuilderAttribute(Type builderType) => BuilderType = builderType;
+
+                /// <summary>Gets the <see cref="Type"/> of the associated builder.</summary>
+                public Type BuilderType { get; }
             }
-        }
-
-        /// <summary>
-        /// Indicates that the use of <see cref="T:System.ValueTuple" /> on a member is meant to be treated as a tuple with element names.
-        /// </summary>
-        [CLSCompliant(false)]
-        [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
-        public sealed class TupleElementNamesAttribute : Attribute
-        {
-            private readonly string[] _transformNames;
 
             /// <summary>
-            /// Specifies, in a pre-order depth-first traversal of a type's
-            /// construction, which <see cref="T:System.ValueTuple" /> elements are
-            /// meant to carry element names.
+            /// Calls to methods or references to fields marked with this attribute may be replaced at
+            /// some call sites with jit intrinsic expansions.
+            /// Types marked with this attribute may be specially treated by the runtime/compiler.
             /// </summary>
-            public IList<string> TransformNames => _transformNames;
+            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, Inherited = false)]
+            public sealed class IntrinsicAttribute : Attribute { }
 
-            /// <summary>
-            /// Initializes a new instance of the <see cref="T:System.Runtime.CompilerServices.TupleElementNamesAttribute" /> class.
-            /// </summary>
-            /// <param name="transformNames">
-            /// Specifies, in a pre-order depth-first traversal of a type's
-            /// construction, which <see cref="T:System.ValueType" /> occurrences are
-            /// meant to carry element names.
-            /// </param>
-            /// <remarks>
-            /// This constructor is meant to be used on types that contain an
-            /// instantiation of <see cref="T:System.ValueType" /> that contains
-            /// element names.  For instance, if <c>C</c> is a generic type with
-            /// two type parameters, then a use of the constructed type <c>C{<see cref="T:System.ValueTuple`2" />, <see cref="T:System.ValueTuple`3" /></c> might be intended to
-            /// treat the first type argument as a tuple with element names and the
-            /// second as a tuple without element names. In which case, the
-            /// appropriate attribute specification should use a
-            /// <c>transformNames</c> value of <c>{ "name1", "name2", null, null,
-            /// null }</c>.
-            /// </remarks>
-            public TupleElementNamesAttribute(string[] transformNames)
+            // Special internal struct that we use to signify that we are not interested in
+            // a Task<VoidTaskResult>'s result.
+            internal struct VoidTaskResult { }
+
+
+            /// <summary>Represents a builder for asynchronous methods that return a <see cref="ValueTask"/>.</summary>
+            [StructLayout(LayoutKind.Auto)]
+            public struct AsyncValueTaskMethodBuilder
             {
-                if (transformNames == null)
+                private System.Boolean _haveResult;
+                private System.Runtime.CompilerServices.AsyncTaskMethodBuilder _methodBuilder;
+                private System.Boolean _useBuilder;
+
+                /// <summary>Creates an instance of the <see cref="AsyncValueTaskMethodBuilder"/> struct.</summary>
+                /// <returns>The initialized instance.</returns>
+                public static AsyncValueTaskMethodBuilder Create() => default;
+
+                /// <summary>Begins running the builder with the associated state machine.</summary>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="stateMachine">The state machine instance, passed by reference.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine =>
+                    _methodBuilder.Start(ref stateMachine);
+
+                /// <summary>Associates the builder with the specified state machine.</summary>
+                /// <param name="stateMachine">The state machine instance to associate with the builder.</param>
+                public void SetStateMachine(IAsyncStateMachine stateMachine) =>
+                    _methodBuilder.SetStateMachine(stateMachine);
+
+                /// <summary>Marks the task as successfully completed.</summary>
+                public void SetResult()
                 {
-                    throw new ArgumentNullException("transformNames");
+                    if (_useBuilder)
+                    {
+                        _methodBuilder.SetResult();
+                        return;
+                    }
+                    else
+                    {
+                        _haveResult = true;
+                    }
                 }
-                _transformNames = transformNames;
-            }
-        }
 
+                /// <summary>Marks the task as failed and binds the specified exception to the task.</summary>
+                /// <param name="exception">The exception to bind to the task.</param>
+                public void SetException(Exception exception) => _methodBuilder.SetException(exception);
+
+                /// <summary>Gets the task for this builder.</summary>
+                public ValueTask Task
+                {
+                    get
+                    {
+                        if (_haveResult)
+                        {
+                            return default;
+                        }
+                        else 
+                        {
+                            _useBuilder = true;
+                            Task task = _methodBuilder.Task;
+                            return new ValueTask(task);
+                        }
+
+                        // With normal access paterns, m_task should always be non-null here: the async method should have
+                        // either completed synchronously, in which case SetResult would have set m_task to a non-null object,
+                        // or it should be completing asynchronously, in which case AwaitUnsafeOnCompleted would have similarly
+                        // initialized m_task to a state machine object.  However, if the type is used manually (not via
+                        // compiler-generated code) and accesses Task directly, we force it to be initialized.  Things will then
+                        // "work" but in a degraded mode, as we don't know the TStateMachine type here, and thus we use a normal
+                        // task object instead.
+                    }
+                }
+
+                /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
+                /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="awaiter">The awaiter.</param>
+                /// <param name="stateMachine">The state machine.</param>
+                public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+                    where TAwaiter : INotifyCompletion
+                    where TStateMachine : IAsyncStateMachine
+                {
+                    _useBuilder = true;
+                    _methodBuilder.AwaitOnCompleted(ref awaiter, ref stateMachine);
+                }
+
+                /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
+                /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="awaiter">The awaiter.</param>
+                /// <param name="stateMachine">The state machine.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+                    where TAwaiter : ICriticalNotifyCompletion
+                    where TStateMachine : IAsyncStateMachine
+                {
+                    _useBuilder = true;
+                    _methodBuilder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+                }
+            }
+
+            /// <summary>Represents a builder for asynchronous methods that return a <see cref="ValueTask"/>.</summary>
+            [StructLayout(LayoutKind.Auto)]
+            public struct AsyncValueTaskMethodBuilder<TResult>
+            {
+                private System.Boolean _haveResult;
+                private System.Runtime.CompilerServices.AsyncTaskMethodBuilder<TResult> _methodBuilder;
+                private System.Boolean _useBuilder;
+                private TResult _result;
+
+                /// <summary>Creates an instance of the <see cref="AsyncValueTaskMethodBuilder"/> struct.</summary>
+                /// <returns>The initialized instance.</returns>
+                public static AsyncValueTaskMethodBuilder<TResult> Create() => default;
+
+                /// <summary>Begins running the builder with the associated state machine.</summary>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="stateMachine">The state machine instance, passed by reference.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public void Start<TStateMachine>(ref TStateMachine stateMachine) where TStateMachine : IAsyncStateMachine =>
+                    _methodBuilder.Start(ref stateMachine);
+
+                /// <summary>Associates the builder with the specified state machine.</summary>
+                /// <param name="stateMachine">The state machine instance to associate with the builder.</param>
+                public void SetStateMachine(IAsyncStateMachine stateMachine) =>
+                    _methodBuilder.SetStateMachine(stateMachine);
+
+                /// <summary>Marks the task as successfully completed.</summary>
+                public void SetResult(TResult result)
+                {
+                    if (_useBuilder) { _methodBuilder.SetResult(result);  return; } else { _result = result; _haveResult = true; }
+                }
+
+                /// <summary>Marks the task as failed and binds the specified exception to the task.</summary>
+                /// <param name="exception">The exception to bind to the task.</param>
+                public void SetException(System.Exception exception) => _methodBuilder.SetException(exception);
+
+                /// <summary>Gets the task for this builder.</summary>
+                public ValueTask<TResult> Task
+                {
+                    get
+                    {
+                        if (_haveResult)
+                        { return default; } else { _useBuilder = true; return new ValueTask<TResult>(_methodBuilder.Task); }
+
+                        // With normal access paterns, task should always be non-null here: the async method should have
+                        // either completed synchronously, in which case SetResult would have set m_task to a non-null object,
+                        // or it should be completing asynchronously, in which case AwaitUnsafeOnCompleted would have similarly
+                        // initialized m_task to a state machine object.  However, if the type is used manually (not via
+                        // compiler-generated code) and accesses Task directly, we force it to be initialized.  Things will then
+                        // "work" but in a degraded mode, as we don't know the TStateMachine type here, and thus we use a normal
+                        // task object instead.
+                    }
+                }
+
+                /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
+                /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="awaiter">The awaiter.</param>
+                /// <param name="stateMachine">The state machine.</param>
+                public void AwaitOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+                    where TAwaiter : INotifyCompletion
+                    where TStateMachine : IAsyncStateMachine
+                {
+                    _useBuilder = true;
+                    _methodBuilder.AwaitOnCompleted(ref awaiter, ref stateMachine);
+                }
+
+                /// <summary>Schedules the state machine to proceed to the next action when the specified awaiter completes.</summary>
+                /// <typeparam name="TAwaiter">The type of the awaiter.</typeparam>
+                /// <typeparam name="TStateMachine">The type of the state machine.</typeparam>
+                /// <param name="awaiter">The awaiter.</param>
+                /// <param name="stateMachine">The state machine.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public void AwaitUnsafeOnCompleted<TAwaiter, TStateMachine>(ref TAwaiter awaiter, ref TStateMachine stateMachine)
+                    where TAwaiter : ICriticalNotifyCompletion
+                    where TStateMachine : IAsyncStateMachine
+                {
+                    _useBuilder = true;
+                    _methodBuilder.AwaitUnsafeOnCompleted(ref awaiter, ref stateMachine);
+                }
+            }
+
+#nullable enable
+            /// <summary>Provides an awaitable type that enables configured awaits on a <see cref="ValueTask"/>.</summary>
+            [StructLayout(LayoutKind.Auto)]
+            public readonly struct ConfiguredValueTaskAwaitable
+            {
+                /// <summary>The wrapped <see cref="Task"/>.</summary>
+                private readonly ValueTask _value;
+
+                /// <summary>Initializes the awaitable.</summary>
+                /// <param name="value">The wrapped <see cref="ValueTask"/>.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                internal ConfiguredValueTaskAwaitable(in ValueTask value) => _value = value;
+
+                /// <summary>Returns an awaiter for this <see cref="ConfiguredValueTaskAwaitable"/> instance.</summary>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public ConfiguredValueTaskAwaiter GetAwaiter() => new ConfiguredValueTaskAwaiter(in _value);
+
+                /// <summary>Provides an awaiter for a <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
+                [StructLayout(LayoutKind.Auto)]
+                public readonly struct ConfiguredValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
+                {
+                    /// <summary>The value being awaited.</summary>
+                    private readonly ValueTask _value;
+
+                    /// <summary>Initializes the awaiter.</summary>
+                    /// <param name="value">The value to be awaited.</param>
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    internal ConfiguredValueTaskAwaiter(in ValueTask value) => _value = value;
+
+                    /// <summary>Gets whether the <see cref="ConfiguredValueTaskAwaitable"/> has completed.</summary>
+                    public bool IsCompleted
+                    {
+                        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                        get => _value.IsCompleted;
+                    }
+
+                    /// <summary>Gets the result of the ValueTask.</summary>
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    public void GetResult() => _value.ThrowIfCompletedUnsuccessfully();
+
+                    /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
+                    public void OnCompleted(Action continuation)
+                    {
+                        object? obj = _value._obj;
+                        Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
+
+                        if (obj is Task t)
+                        {
+                            t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        }
+                        else if (obj != null)
+                        {
+                            Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                                ValueTaskSourceOnCompletedFlags.FlowExecutionContext |
+                                    (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None));
+                        }
+                        else
+                        {
+                            Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        }
+                    }
+
+                    /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable"/>.</summary>
+                    public void UnsafeOnCompleted(Action continuation)
+                    {
+                        object? obj = _value._obj;
+                        Debug.Assert(obj == null || obj is Task || obj is IValueTaskSource);
+
+                        if (obj is Task t)
+                        {
+                            t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        }
+                        else if (obj != null)
+                        {
+                            Unsafe.As<IValueTaskSource>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                                _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
+                        }
+                        else
+                        {
+                            Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        }
+                    }
+
+
+                }
+
+            }
+
+            /// <summary>Provides an awaitable type that enables configured awaits on a <see cref="ValueTask{TResult}"/>.</summary>
+            /// <typeparam name="TResult">The type of the result produced.</typeparam>
+            [StructLayout(LayoutKind.Auto)]
+            public readonly struct ConfiguredValueTaskAwaitable<TResult>
+            {
+                /// <summary>The wrapped <see cref="ValueTask{TResult}"/>.</summary>
+                private readonly ValueTask<TResult> _value;
+
+                /// <summary>Initializes the awaitable.</summary>
+                /// <param name="value">The wrapped <see cref="ValueTask{TResult}"/>.</param>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                internal ConfiguredValueTaskAwaitable(in ValueTask<TResult> value) => _value = value;
+
+                /// <summary>Returns an awaiter for this <see cref="ConfiguredValueTaskAwaitable{TResult}"/> instance.</summary>
+                [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                public ConfiguredValueTaskAwaiter GetAwaiter() => new ConfiguredValueTaskAwaiter(in _value);
+
+                /// <summary>Provides an awaiter for a <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
+                [StructLayout(LayoutKind.Auto)]
+                public readonly struct ConfiguredValueTaskAwaiter : ICriticalNotifyCompletion, INotifyCompletion
+                {
+                    /// <summary>The value being awaited.</summary>
+                    private readonly ValueTask<TResult> _value;
+
+                    /// <summary>Initializes the awaiter.</summary>
+                    /// <param name="value">The value to be awaited.</param>
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    internal ConfiguredValueTaskAwaiter(in ValueTask<TResult> value) => _value = value;
+
+                    /// <summary>Gets whether the <see cref="ConfiguredValueTaskAwaitable{TResult}"/> has completed.</summary>
+                    public bool IsCompleted
+                    {
+                        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                        get => _value.IsCompleted;
+                    }
+
+                    /// <summary>Gets the result of the ValueTask.</summary>
+                    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+                    public TResult GetResult() => _value.Result;
+
+                    /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
+                    public void OnCompleted(Action continuation)
+                    {
+                        object? obj = _value._obj;
+                        Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
+
+                        if (obj is Task<TResult> t)
+                        {
+                            t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        }
+                        else if (obj != null)
+                        {
+                            Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                                ValueTaskSourceOnCompletedFlags.FlowExecutionContext |
+                                    (_value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None));
+                        }
+                        else
+                        {
+                            Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().OnCompleted(continuation);
+                        }
+                    }
+
+                    /// <summary>Schedules the continuation action for the <see cref="ConfiguredValueTaskAwaitable{TResult}"/>.</summary>
+                    public void UnsafeOnCompleted(Action continuation)
+                    {
+                        object? obj = _value._obj;
+                        Debug.Assert(obj == null || obj is Task<TResult> || obj is IValueTaskSource<TResult>);
+
+                        if (obj is Task<TResult> t)
+                        {
+                            t.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        }
+                        else if (obj != null)
+                        {
+                            Unsafe.As<IValueTaskSource<TResult>>(obj).OnCompleted(ValueTaskAwaiter.s_invokeActionDelegate, continuation, _value._token,
+                                _value._continueOnCapturedContext ? ValueTaskSourceOnCompletedFlags.UseSchedulingContext : ValueTaskSourceOnCompletedFlags.None);
+                        }
+                        else
+                        {
+                            Task.CompletedTask.ConfigureAwait(_value._continueOnCapturedContext).GetAwaiter().UnsafeOnCompleted(continuation);
+                        }
+                    }
+                }
+            }
+#nullable disable
+
+            [CompilerGenerated]
+            [AttributeUsage(AttributeTargets.Module, AllowMultiple = false, Inherited = false)]
+            internal sealed class NullablePublicOnlyAttribute : Attribute
+            {
+                public readonly bool IncludesInternals;
+
+                public NullablePublicOnlyAttribute(bool includes_internals)
+                {
+                    IncludesInternals = includes_internals;
+                }
+            }
+
+            /// <summary>
+            /// Indicates that the use of <see cref="System.ValueTuple" /> on a member is meant to be treated as a tuple with element names.
+            /// </summary>
+            [CLSCompliant(false)]
+            [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
+            public sealed class TupleElementNamesAttribute : Attribute
+            {
+                private readonly string[] _transformNames;
+
+                /// <summary>
+                /// Specifies, in a pre-order depth-first traversal of a type's
+                /// construction, which <see cref="T:System.ValueTuple" /> elements are
+                /// meant to carry element names.
+                /// </summary>
+                public System.Collections.Generic.IList<string> TransformNames => _transformNames;
+
+                /// <summary>
+                /// Initializes a new instance of the <see cref="System.Runtime.CompilerServices.TupleElementNamesAttribute" /> class.
+                /// </summary>
+                /// <param name="transformNames">
+                /// Specifies, in a pre-order depth-first traversal of a type's
+                /// construction, which <see cref="System.ValueType" /> occurrences are
+                /// meant to carry element names.
+                /// </param>
+                /// <remarks>
+                /// This constructor is meant to be used on types that contain an
+                /// instantiation of <see cref="System.ValueType" /> that contains
+                /// element names.  For instance, if <c>C</c> is a generic type with
+                /// two type parameters, then a use of the constructed type 
+                /// <c>C{<see cref="System.ValueTuple{T1, T}" />, <see cref="System.ValueTuple{T1 , T2 , T3}" /></c> might be intended to
+                /// treat the first type argument as a tuple with element names and the
+                /// second as a tuple without element names. In which case, the
+                /// appropriate attribute specification should use a
+                /// <paramref name="transformNames"/>
+                /// value of <c>{ "name1", "name2", null, null, null }</c>.
+                /// </remarks>
+                public TupleElementNamesAttribute(string[] transformNames)
+                {
+                    if (transformNames == null)
+                    {
+                        throw new ArgumentNullException("transformNames");
+                    }
+                    _transformNames = transformNames;
+                }
+            }
     }
 
     namespace Runtime.InteropServices.Marshalling
@@ -834,8 +833,8 @@ namespace System
         /// <summary>
         /// LINQ extension method overrides that offer greater efficiency for <see cref="System.Collections.Immutable.ImmutableArray{T}" /> than the standard LINQ methods.
         /// </summary>
-        #nullable enable
-        #pragma warning disable CS8600, CS8602, CS8603, CS8604
+#nullable enable
+#pragma warning disable CS8600, CS8602, CS8603, CS8604
         public static class ImmutableArrayExtensions
         {
             /// <summary>Projects each element of a sequence into a new form.</summary>
@@ -1413,12 +1412,13 @@ namespace System
                 }
             }
         }
-        #pragma warning restore CS8600 , CS8602 , CS8603 , CS8604
-        #nullable disable
+#pragma warning restore CS8600, CS8602, CS8603, CS8604
+#nullable disable
     }
 
     namespace Runtime.InteropServices
     {
+        using System.Buffers;
         /// <summary>
         /// Provides methods to interoperate with <see cref="System.Memory{T}"/>, 
         /// <see cref="System.ReadOnlySpan{T}"/>, <see cref="System.Span{T}"/>, and 
@@ -1974,31 +1974,6 @@ namespace System
                 return sequence.TryGetString(out text, out start, out length);
             }
         }
-
-        #nullable enable
-        [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
-        internal sealed class LibraryImportAttribute : Attribute
-        {
-            public string LibraryName { get; }
-
-            public string? EntryPoint { get; set; }
-
-            public StringMarshalling StringMarshalling { get; set; }
-
-            public Type? StringMarshallingCustomType { get; set; }
-
-            public bool SetLastError { get; set; }
-
-            public LibraryImportAttribute(string libraryName) { LibraryName = libraryName; }
-        }
-        #nullable disable
-        internal enum StringMarshalling
-        {
-            Custom,
-            Utf8,
-            Utf16
-        }
-
     }
 
     namespace Runtime.Versioning
@@ -2025,22 +2000,22 @@ namespace System
                         AllowMultiple = false, Inherited = false)]
         internal sealed class NonVersionableAttribute : Attribute { public NonVersionableAttribute() { } }
 
-        #if !NET7_0_OR_GREATER
-            #nullable enable
-            /// <summary>
-            /// [INHERITEDFROMDOTNET7] An attribute that specifies the platform that the assembly ,
-            /// method , class , structure or token can run to or not. This class is abstract; which means 
-            /// that you must create another class that inherit from this one.
-            /// </summary>
-            public abstract partial class OSPlatformAttribute : System.Attribute
+#if !NET7_0_OR_GREATER
+#nullable enable
+        /// <summary>
+        /// [INHERITEDFROMDOTNET7] An attribute that specifies the platform that the assembly ,
+        /// method , class , structure or token can run to or not. This class is abstract; which means 
+        /// that you must create another class that inherit from this one.
+        /// </summary>
+        public abstract class OSPlatformAttribute : System.Attribute
             {
-                private protected OSPlatformAttribute(string platformName) { }
+                private protected OSPlatformAttribute(string platformName) { PlatformName = platformName; }
 
                 /// <summary>
                 /// The Platform name that the attributed function can run to.
                 /// Do not use this property directly. Otherwise , this one method will throw up an exception.
                 /// </summary>
-                public string PlatformName { get { throw new System.Exception(); } }
+                public string? PlatformName { get; private set; }
 
             }
 
@@ -2053,7 +2028,7 @@ namespace System
                 | System.AttributeTargets.Event | System.AttributeTargets.Field | System.AttributeTargets.Interface
                 | System.AttributeTargets.Method | System.AttributeTargets.Module | System.AttributeTargets.Property
                 | System.AttributeTargets.Struct, AllowMultiple = true, Inherited = false)]
-            public sealed partial class SupportedOSPlatformAttribute : System.Runtime.Versioning.OSPlatformAttribute
+            public sealed class SupportedOSPlatformAttribute : System.Runtime.Versioning.OSPlatformAttribute
             {
                 /// <summary>
                 /// Create a new instance of the <see cref="SupportedOSPlatformAttribute"/> class with the specified platform name.
@@ -2071,7 +2046,7 @@ namespace System
                 | System.AttributeTargets.Field | System.AttributeTargets.Interface | System.AttributeTargets.Method
                 | System.AttributeTargets.Module | System.AttributeTargets.Property | System.AttributeTargets.Struct,
                 AllowMultiple = true, Inherited = false)]
-            public sealed partial class UnsupportedOSPlatformAttribute : System.Runtime.Versioning.OSPlatformAttribute
+            public sealed class UnsupportedOSPlatformAttribute : System.Runtime.Versioning.OSPlatformAttribute
             {
                 /// <summary>
                 /// Create a new instance of the <see cref="UnsupportedOSPlatformAttribute"/> class with the specified platform name.
@@ -2083,12 +2058,12 @@ namespace System
                 /// </summary>
                 public UnsupportedOSPlatformAttribute(string platformName, string? message) : base(platformName) { Message = message; }
                 /// <summary>
-                /// Read-only <see cref="System.String"/> that when it is attempted to be retrieved , throws an exception.
+                /// Read-only <see cref="System.String"/> that represents the exception message. Cannot be set by the user.
                 /// </summary>
-                public string? Message { get { throw new System.Exception(); } set { } }
+                public string? Message { get; private set; }
             }
-            #nullable disable   
-        #endif
+#nullable disable
+#endif
     }
 
     namespace Numerics
@@ -2233,7 +2208,7 @@ namespace System
 
     namespace Diagnostics.CodeAnalysis
     {
-        #nullable enable
+#nullable enable
         /// <summary>Specifies that the method or property will ensure that the listed field and property members have not-null values.</summary>
         [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property, Inherited = false, AllowMultiple = true)]
         public sealed class MemberNotNullAttribute : Attribute
@@ -2368,7 +2343,7 @@ namespace System
             /// </summary>
             public string? Url { get; set; }
         }
-        #nullable disable
+#nullable disable
     }
 
     namespace IO
@@ -2455,256 +2430,94 @@ namespace System
         }
     }
 
-    #if NETSTANDARD2_0 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NET45 || NET451 || NET452 || NET6 || NET461 || NET462 || NET47 || NET471 || NET472 || NET48
+#if NETSTANDARD2_0 || NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NET45 || NET451 || NET452 || NET6 || NET461 || NET462 || NET47 || NET471 || NET472 || NET48
 
-        // https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
+        // Reference: https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 
         // Licensed to the .NET Foundation under one or more agreements.
         // The .NET Foundation licenses this file to you under the MIT license.
         // See the LICENSE file in the project root for more information.
 
-    namespace Diagnostics.CodeAnalysis
-    {
-        /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-            sealed class AllowNullAttribute : Attribute
-        { }
-
-        /// <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class DisallowNullAttribute : Attribute
-        { }
-
-        /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class MaybeNullAttribute : Attribute
-        { }
-
-        /// <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
-        [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class NotNullAttribute : Attribute
-        { }
-
-        /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
-        [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class MaybeNullWhenAttribute : Attribute
+        namespace Diagnostics.CodeAnalysis
         {
-            /// <summary>Initializes the attribute with the specified return value condition.</summary>
-            /// <param name="returnValue">
-            /// The return value condition. If the method returns this value, the associated parameter may be null.
-            /// </param>
-            public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+            /// <summary>Specifies that null is allowed as an input even if the corresponding type disallows it.</summary>
+            [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+            public sealed class AllowNullAttribute : Attribute { }
 
-            /// <summary>Gets the return value condition.</summary>
-            public bool ReturnValue { get; }
-        }
+            /// <summary>Specifies that null is disallowed as an input even if the corresponding type allows it.</summary>
+            [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property, Inherited = false)]
+            public sealed class DisallowNullAttribute : Attribute { }
 
-        /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
-        [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class NotNullWhenAttribute : Attribute
-        {
-            /// <summary>Initializes the attribute with the specified return value condition.</summary>
-            /// <param name="returnValue">
-            /// The return value condition. If the method returns this value, the associated parameter will not be null.
-            /// </param>
-            public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+            /// <summary>Specifies that an output may be null even if the corresponding type disallows it.</summary>
+            [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+            public sealed class MaybeNullAttribute : Attribute { }
 
-            /// <summary>Gets the return value condition.</summary>
-            public bool ReturnValue { get; }
-        }
+            /// <summary>Specifies that an output will not be null even if the corresponding type allows it.</summary>
+            [AttributeUsage(AttributeTargets.Field | AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, Inherited = false)]
+            public sealed class NotNullAttribute : Attribute { }
 
-        /// <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
-        [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class NotNullIfNotNullAttribute : Attribute
-        {
-            /// <summary>Initializes the attribute with the associated parameter name.</summary>
-            /// <param name="parameterName">
-            /// The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
-            /// </param>
-            public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
-
-            /// <summary>Gets the associated parameter name.</summary>
-            public string ParameterName { get; }
-        }
-
-        /// <summary>Applied to a method that will never return under any circumstance.</summary>
-        [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class DoesNotReturnAttribute : Attribute
-        { }
-
-        /// <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
-        [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
-        #if INTERNAL_NULLABLE_ATTRIBUTES
-			internal
-        #else
-            public
-        #endif
-        sealed class DoesNotReturnIfAttribute : Attribute
-        {
-            /// <summary>Initializes the attribute with the specified parameter value.</summary>
-            /// <param name="parameterValue">
-            /// The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
-            /// the associated parameter matches this value.
-            /// </param>
-            public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
-
-            /// <summary>Gets the condition parameter value.</summary>
-            public bool ParameterValue { get; }
-        }
-    }
-
-
-    #endif
-
-    #nullable enable
-    #pragma warning disable CS1591
-
-    /// <summary>
-    /// The Microsoft's base class for the Internal Runtime Resource Handler.
-    /// This class , however , does only contain some formatting methods that you might need when you migrate code.
-    /// Be noted , this class does not conflict with the original <see cref="System.SR"/> class ,
-    /// because that class is internally used in mscorlib for .NET Framework and System.Private.CoreLib for .NET .
-    /// </summary>
-    public static class SR
-    {
-
-        private static bool UsingResourceKeys() => AppContext.TryGetSwitch("System.Resources.UseSystemResourceKeys", out bool usingResourceKeys) ? usingResourceKeys : false;
-
-        public static System.String Format(string resourceFormat, object? p1)
-        {
-            if (UsingResourceKeys())
+            /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter may be null even if the corresponding type disallows it.</summary>
+            [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+            public sealed class MaybeNullWhenAttribute : Attribute
             {
-                return string.Join(", ", resourceFormat, p1);
+                /// <summary>Initializes the attribute with the specified return value condition.</summary>
+                /// <param name="returnValue">
+                /// The return value condition. If the method returns this value, the associated parameter may be null.
+                /// </param>
+                public MaybeNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+
+                /// <summary>Gets the return value condition.</summary>
+                public bool ReturnValue { get; }
             }
 
-            return string.Format(resourceFormat, p1);
-        }
-
-        public static System.String Format(string resourceFormat, object? p1, object? p2)
-        {
-            if (UsingResourceKeys())
+            /// <summary>Specifies that when a method returns <see cref="ReturnValue"/>, the parameter will not be null even if the corresponding type allows it.</summary>
+            [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+            public sealed class NotNullWhenAttribute : Attribute
             {
-                return string.Join(", ", resourceFormat, p1, p2);
+                /// <summary>Initializes the attribute with the specified return value condition.</summary>
+                /// <param name="returnValue">
+                /// The return value condition. If the method returns this value, the associated parameter will not be null.
+                /// </param>
+                public NotNullWhenAttribute(bool returnValue) => ReturnValue = returnValue;
+
+                /// <summary>Gets the return value condition.</summary>
+                public bool ReturnValue { get; }
             }
 
-            return string.Format(resourceFormat, p1, p2);
-        }
-
-        public static System.String Format(string resourceFormat, object? p1, object? p2, object? p3)
-        {
-            if (UsingResourceKeys())
+            /// <summary>Specifies that the output will be non-null if the named parameter is non-null.</summary>
+            [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.ReturnValue, AllowMultiple = true, Inherited = false)]
+            public sealed class NotNullIfNotNullAttribute : Attribute
             {
-                return string.Join(", ", resourceFormat, p1, p2, p3);
+                /// <summary>Initializes the attribute with the associated parameter name.</summary>
+                /// <param name="parameterName">
+                /// The associated parameter name.  The output will be non-null if the argument to the parameter specified is non-null.
+                /// </param>
+                public NotNullIfNotNullAttribute(string parameterName) => ParameterName = parameterName;
+
+                /// <summary>Gets the associated parameter name.</summary>
+                public string ParameterName { get; }
             }
 
-            return string.Format(resourceFormat, p1, p2, p3);
-        }
+            /// <summary>Applied to a method that will never return under any circumstance.</summary>
+            [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+            public sealed class DoesNotReturnAttribute : Attribute { }
 
-        public static System.String Format(string resourceFormat, params object?[]? args)
-        {
-            if (args != null)
+            /// <summary>Specifies that the method will not return if the associated Boolean parameter is passed the specified value.</summary>
+            [AttributeUsage(AttributeTargets.Parameter, Inherited = false)]
+            public sealed class DoesNotReturnIfAttribute : Attribute
             {
-                if (UsingResourceKeys())
-                {
-                    return resourceFormat + ", " + string.Join(", ", args);
-                }
+                /// <summary>Initializes the attribute with the specified parameter value.</summary>
+                /// <param name="parameterValue">
+                /// The condition parameter value. Code after the method will be considered unreachable by diagnostics if the argument to
+                /// the associated parameter matches this value.
+                /// </param>
+                public DoesNotReturnIfAttribute(bool parameterValue) => ParameterValue = parameterValue;
 
-                return string.Format(resourceFormat, args);
+                /// <summary>Gets the condition parameter value.</summary>
+                public bool ParameterValue { get; }
             }
-
-            return resourceFormat;
         }
-
-        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1)
-        {
-            if (UsingResourceKeys())
-            {
-                return string.Join(", ", resourceFormat, p1);
-            }
-
-            return string.Format(provider, resourceFormat, p1);
-        }
-
-        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2)
-        {
-            if (UsingResourceKeys())
-            {
-                return string.Join(", ", resourceFormat, p1, p2);
-            }
-
-            return string.Format(provider, resourceFormat, p1, p2);
-        }
-
-        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2, object? p3)
-        {
-            if (UsingResourceKeys())
-            {
-                return string.Join(", ", resourceFormat, p1, p2, p3);
-            }
-
-            return string.Format(provider, resourceFormat, p1, p2, p3);
-        }
-
-        public static System.String Format(IFormatProvider? provider, string resourceFormat, params object?[]? args)
-        {
-            if (args != null)
-            {
-                if (UsingResourceKeys())
-                {
-                    return resourceFormat + ", " + string.Join(", ", args);
-                }
-
-                return string.Format(provider, resourceFormat, args);
-            }
-
-            return resourceFormat;
-        }
-
-    }
-
-
-    #pragma warning restore CS1591
-    #nullable disable
+#endif
 
     internal static class DecimalDecCalc
     {
@@ -2941,7 +2754,7 @@ namespace System
         private static uint DigitsToInt(ReadOnlySpan<byte> digits, int count)
         {
             uint value; int bytesConsumed;
-            bool flag = Utf8Parser.TryParse(digits.Slice(0, count), out value, out bytesConsumed, 'D');
+            bool flag = System.Buffers.Text.Utf8Parser.TryParse(digits.Slice(0, count), out value, out bytesConsumed, 'D');
             return value;
         }
 
@@ -3027,37 +2840,21 @@ namespace System
 
         public const int BufferSize = 51;
 
-        private byte _b0; private byte _b1; private byte _b2;
-
-        private byte _b3; private byte _b4; private byte _b5; 
+        private byte _b0; private byte _b1; private byte _b2; private byte _b3; private byte _b4; private byte _b5; 
         
-        private byte _b6; private byte _b7; private byte _b8;
-
-        private byte _b9; private byte _b10; private byte _b11; 
+        private byte _b6; private byte _b7; private byte _b8; private byte _b9; private byte _b10; private byte _b11; 
         
-        private byte _b12; private byte _b13; private byte _b14;
+        private byte _b12; private byte _b13; private byte _b14; private byte _b15; private byte _b16; private byte _b17;
 
-        private byte _b15; private byte _b16; private byte _b17;
+        private byte _b18; private byte _b19; private byte _b20; private byte _b21; private byte _b22; private byte _b23;
 
-        private byte _b18; private byte _b19; private byte _b20;
+        private byte _b24; private byte _b25; private byte _b26; private byte _b27; private byte _b28; private byte _b29;
 
-        private byte _b21; private byte _b22; private byte _b23;
+        private byte _b30; private byte _b31; private byte _b32; private byte _b33; private byte _b34; private byte _b35; 
+        
+        private byte _b36; private byte _b37; private byte _b38; private byte _b39; private byte _b40; private byte _b41;
 
-        private byte _b24; private byte _b25; private byte _b26;
-
-        private byte _b27; private byte _b28; private byte _b29;
-
-        private byte _b30; private byte _b31; private byte _b32;
-
-        private byte _b33; private byte _b34; private byte _b35;
-
-        private byte _b36; private byte _b37; private byte _b38;
-
-        private byte _b39; private byte _b40; private byte _b41;
-
-        private byte _b42; private byte _b43; private byte _b44;
-
-        private byte _b45; private byte _b46; private byte _b47; 
+        private byte _b42; private byte _b43; private byte _b44; private byte _b45; private byte _b46; private byte _b47; 
         
         private byte _b48; private byte _b49; private byte _b50;
 
@@ -3072,7 +2869,7 @@ namespace System
 
         public override string ToString()
         {
-            StringBuilder stringBuilder = new StringBuilder();
+            System.Text.StringBuilder stringBuilder = new();
             stringBuilder.Append('[');
             stringBuilder.Append('"');
             Span<byte> digits = Digits;
@@ -3213,12 +3010,12 @@ namespace System
             return false;
         }
 
-        public static void ThrowArgumentValidationException<T>(ReadOnlySequenceSegment<T> startSegment, int startIndex, ReadOnlySequenceSegment<T> endSegment)
+        public static void ThrowArgumentValidationException<T>(Buffers.ReadOnlySequenceSegment<T> startSegment, int startIndex, Buffers.ReadOnlySequenceSegment<T> endSegment)
         {
             throw CreateArgumentValidationException(startSegment, startIndex, endSegment);
         }
 
-        private static Exception CreateArgumentValidationException<T>(ReadOnlySequenceSegment<T> startSegment, int startIndex, ReadOnlySequenceSegment<T> endSegment)
+        private static Exception CreateArgumentValidationException<T>(Buffers.ReadOnlySequenceSegment<T> startSegment, int startIndex, Buffers.ReadOnlySequenceSegment<T> endSegment)
         {
             if (startSegment == null)
             {
@@ -3294,6 +3091,142 @@ namespace System
 
 }
 
+#endif
+
+// Types exposed in any .NET flavor or version.
+
+namespace System
+{
+    #nullable enable
+    #pragma warning disable CS1591
+
+    /// <summary>
+    /// The Microsoft's base class for the Internal Runtime Resource Handler.
+    /// This class , however , does only contain some formatting methods that you might need when you migrate code.
+    /// Be noted , this class does not conflict with the original <see cref="System.SR"/> class ,
+    /// because that class is internally used in mscorlib for .NET Framework and System.Private.CoreLib for .NET .
+    /// </summary>
+    public static class SR
+    {
+
+        private static bool UsingResourceKeys() => AppContext.TryGetSwitch("System.Resources.UseSystemResourceKeys", out bool usingResourceKeys) ? usingResourceKeys : false;
+
+        public static System.String Format(string resourceFormat, object? p1)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1);
+            }
+
+            return string.Format(resourceFormat, p1);
+        }
+
+        public static System.String Format(string resourceFormat, object? p1, object? p2)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1, p2);
+            }
+
+            return string.Format(resourceFormat, p1, p2);
+        }
+
+        public static System.String Format(string resourceFormat, object? p1, object? p2, object? p3)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1, p2, p3);
+            }
+
+            return string.Format(resourceFormat, p1, p2, p3);
+        }
+
+        public static System.String Format(string resourceFormat, params object?[]? args)
+        {
+            if (args != null)
+            {
+                if (UsingResourceKeys())
+                {
+                    return resourceFormat + ", " + string.Join(", ", args);
+                }
+
+                return string.Format(resourceFormat, args);
+            }
+
+            return resourceFormat;
+        }
+
+        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1);
+            }
+
+            return string.Format(provider, resourceFormat, p1);
+        }
+
+        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1, p2);
+            }
+
+            return string.Format(provider, resourceFormat, p1, p2);
+        }
+
+        public static System.String Format(IFormatProvider? provider, string resourceFormat, object? p1, object? p2, object? p3)
+        {
+            if (UsingResourceKeys())
+            {
+                return string.Join(", ", resourceFormat, p1, p2, p3);
+            }
+
+            return string.Format(provider, resourceFormat, p1, p2, p3);
+        }
+
+        public static System.String Format(IFormatProvider? provider, string resourceFormat, params object?[]? args)
+        {
+            if (args != null)
+            {
+                if (UsingResourceKeys())
+                {
+                    return resourceFormat + ", " + string.Join(", ", args);
+                }
+
+                return string.Format(provider, resourceFormat, args);
+            }
+
+            return resourceFormat;
+        }
+
+    }
+
+    #pragma warning restore CS1591
+
+    namespace Runtime.InteropServices
+    {
+        [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
+        internal sealed class LibraryImportAttribute : Attribute
+        {
+            public string LibraryName { get; }
+
+            public string? EntryPoint { get; set; }
+
+            public StringMarshalling StringMarshalling { get; set; }
+
+            public Type? StringMarshallingCustomType { get; set; }
+
+            public bool SetLastError { get; set; }
+
+            public LibraryImportAttribute(string libraryName) { LibraryName = libraryName; }
+        }
+
+        #nullable disable
+        internal enum StringMarshalling { Custom, Utf8, Utf16 }
+    }
+}
 
 /// <summary>
 /// The subsetted clone of the global::Interop class used to 

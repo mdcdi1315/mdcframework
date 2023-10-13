@@ -130,3 +130,70 @@ In this minor release , some more NuGet packages are now embedded , allowing mor
 
    \-> New Manifest properties defined globally in the assembly can help you detect if the 
    assembly you are using is in debug or release flavor.
+
+## Minor Version 1.5.5.5:
+In this minor release , even more NuGet packages will be embedded , allowing even more possiblities.
+
+This , however , does not stop here. Some new of this framework-specific features are finalised and added too.
+
+  - The Visual Basic Runtime Library , Plus the `System.IO.Compression.FileSystem` DLL's will be removed in 
+    the 1.5.5.6 Minor Version.
+  - Inside the `ROOT.Archives` namespace , there have been even more changes:
+        
+      1. Added a new `CurrentProgress` class.
+                
+            This class is the base implementation for getting the archiving progress in the classes defined
+            in this namespace. 
+            
+            \->  There is full support for the ZIP and Cabinet Archives , and partial support for the other formats.
+             Full support for it is expected to be done in the next minor release.
+          
+            \-> To access the actual progress instance , you must use the field `Progress` of the class 
+            `ROOT.Archives.GlobalArchiveProgress`. All the archiving classes defined herein depend on this field.
+      2. Added more support for Cabinet Archives , plus the compression level is now adjustable.
+            
+            \-> The Cabinet Compression Level enumeration can be found as `CabinetCompressionLevel`.
+      3. The Experimental classes are now moving out of Experimental Mode.
+            
+            \-> In the next minor release , these classes will be finalised and the `Experimental_` prefix 
+            will be removed.
+   - Added the `AsInterface` Attribute and a tool that checks the attribute correctness
+            
+      \-> The primary usage of the attribute is to describe that a class uses the 
+      exactly same members of an existing interface without the need of referencing it.
+        
+       \-> To verify that your implementation makes correct usage of the attribute , you can
+       use the `ROOT.AsInterfaceChecker` class or the Checker Tool shipped with this project.
+  - Fixed some issues about the Console Interop used , and some of the file functions are now
+  also invoked through interop.
+  - Added the ability to create an Windows Internet Shortcut
+      
+    \-> Creating Internet Shortcuts in Windows was the most difficult part for many developers ,
+    especially in .NET , which does not even have such support of it. 
+           
+    The problem was that only Windows Explorer can actually create such shortcuts and use 
+    the Windows Shell to run them.
+       
+    Now , just plainly calling `ROOT.MAIN.CreateInternetShortcut` with the required arguments
+    can create a new Windows Internet Shortcut directly.
+          
+    Be noted , the shortcut creator is fully written in .NET and DOES NOT use any P/Invoke 
+    signatures to do the actual work.
+      
+  - Added the [`Microsoft.IO.RecyclableMemoryStream`](http://github.com/microsoft/Microsoft.IO.RecyclableMemoryStream) package.
+      
+     \-> For API accessibility reasons , you can also find the package 
+     as `System.IO.RecyclableMemoryStream` instead.
+
+  - Added ALL the [`NAudio`](http://github.com/naudio/NAudio) packages.
+         
+      \-> `NAudio` is a series of packages that can play audio files to your computer
+      using mainly P/Invoke signatures. More documentation on it is provided in the 
+      GitHub repository , which is [here](http://github.com/naudio/NAudio).
+        
+      \-> All the `NAudio` packages are included as they are , in the `NAudio` namespace.
+  - Added 2 NuGet packages , these are `System.Threading.Channels` and
+   `System.Numerics.Tensors`.
+   
+More features are coming out in the next minor release of MDCFR , with even more interesting stuff
+to explore and find out.

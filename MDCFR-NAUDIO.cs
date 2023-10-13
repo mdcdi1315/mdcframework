@@ -14,10 +14,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SO
 
 using System;
 using System.IO;
-using System.Text;
 using System.Linq;
-using System.Security;
+using System.Text;
 using Microsoft.Win32;
+using System.Security;
 using System.Threading;
 using System.Reflection;
 using System.Diagnostics;
@@ -45996,10 +45996,10 @@ namespace NAudio.Wave.Compression
 		/// </summary>        
 		public delegate bool AcmFormatChooseHookProc(IntPtr windowHandle, int message, IntPtr wParam, IntPtr lParam);
 
-		[DllImport("msacm32.dll")]
+		[DllImport("Msacm32.dll")]
 		public static extern MmResult acmDriverAdd(out IntPtr driverHandle, IntPtr driverModule, IntPtr driverFunctionAddress, int priority, AcmDriverAddFlags flags);
 
-		[DllImport("msacm32.dll")]
+		[DllImport("Msacm32.dll")]
 		public static extern MmResult acmDriverRemove(IntPtr driverHandle, int removeFlags);
 
 		[DllImport("Msacm32.dll")]

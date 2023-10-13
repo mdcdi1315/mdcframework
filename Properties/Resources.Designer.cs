@@ -565,6 +565,114 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The participantCount argument must be a positive value..
+        /// </summary>
+        internal static string Barrier_AddParticipants_NonPositive_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_AddParticipants_NonPositive_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Adding participantCount participants would result in the number of participants exceeding the maximum number allowed..
+        /// </summary>
+        internal static string Barrier_AddParticipants_Overflow_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_AddParticipants_Overflow_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The participantCount argument must be non-negative and less than or equal to 32767..
+        /// </summary>
+        internal static string Barrier_ctor_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_ctor_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The barrier has been disposed..
+        /// </summary>
+        internal static string Barrier_Dispose {
+            get {
+                return ResourceManager.GetString("Barrier_Dispose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This method may not be called from within the postPhaseAction..
+        /// </summary>
+        internal static string Barrier_InvalidOperation_CalledFromPHA {
+            get {
+                return ResourceManager.GetString("Barrier_InvalidOperation_CalledFromPHA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The participantCount argument must be less than or equal the number of participants..
+        /// </summary>
+        internal static string Barrier_RemoveParticipants_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_RemoveParticipants_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The participantCount argument is greater than the number of participants that haven&apos;t yet arrived at the barrier in this phase..
+        /// </summary>
+        internal static string Barrier_RemoveParticipants_InvalidOperation {
+            get {
+                return ResourceManager.GetString("Barrier_RemoveParticipants_InvalidOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The participantCount argument must be a positive value..
+        /// </summary>
+        internal static string Barrier_RemoveParticipants_NonPositive_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_RemoveParticipants_NonPositive_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified timeout must represent a value between -1 and Int32.MaxValue, inclusive..
+        /// </summary>
+        internal static string Barrier_SignalAndWait_ArgumentOutOfRange {
+            get {
+                return ResourceManager.GetString("Barrier_SignalAndWait_ArgumentOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The number of threads using the barrier exceeded the total number of registered participants..
+        /// </summary>
+        internal static string Barrier_SignalAndWait_InvalidOperation_ThreadsExceeded {
+            get {
+                return ResourceManager.GetString("Barrier_SignalAndWait_InvalidOperation_ThreadsExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The barrier has no registered participants..
+        /// </summary>
+        internal static string Barrier_SignalAndWait_InvalidOperation_ZeroTotal {
+            get {
+                return ResourceManager.GetString("Barrier_SignalAndWait_InvalidOperation_ZeroTotal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The postPhaseAction failed with an exception..
+        /// </summary>
+        internal static string BarrierPostPhaseException {
+            get {
+                return ResourceManager.GetString("BarrierPostPhaseException", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot compare {0} to {1}..
         /// </summary>
         internal static string CannotCompare {
@@ -678,6 +786,42 @@ namespace MDCFR.Properties {
         internal static string CollectionModifiedDuringEnumeration {
             get {
                 return ResourceManager.GetString("CollectionModifiedDuringEnumeration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The operation was canceled..
+        /// </summary>
+        internal static string Common_OperationCanceled {
+            get {
+                return ResourceManager.GetString("Common_OperationCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid attempt made to decrement the event&apos;s count below zero..
+        /// </summary>
+        internal static string CountdownEvent_Decrement_BelowZero {
+            get {
+                return ResourceManager.GetString("CountdownEvent_Decrement_BelowZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The increment operation would cause the CurrentCount to overflow..
+        /// </summary>
+        internal static string CountdownEvent_Increment_AlreadyMax {
+            get {
+                return ResourceManager.GetString("CountdownEvent_Increment_AlreadyMax", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The event is already signaled and cannot be incremented..
+        /// </summary>
+        internal static string CountdownEvent_Increment_AlreadyZero {
+            get {
+                return ResourceManager.GetString("CountdownEvent_Increment_AlreadyZero", resourceCulture);
             }
         }
         
@@ -2180,12 +2324,91 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to A read lock may not be acquired with the write lock held in this mode..
+        /// </summary>
+        internal static string LockRecursionException_ReadAfterWriteNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_ReadAfterWriteNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recursive read lock acquisitions not allowed in this mode..
+        /// </summary>
+        internal static string LockRecursionException_RecursiveReadNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_RecursiveReadNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recursive upgradeable lock acquisitions not allowed in this mode..
+        /// </summary>
+        internal static string LockRecursionException_RecursiveUpgradeNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_RecursiveUpgradeNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Recursive write lock acquisitions not allowed in this mode..
+        /// </summary>
+        internal static string LockRecursionException_RecursiveWriteNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_RecursiveWriteNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgradeable lock may not be acquired with read lock held..
+        /// </summary>
+        internal static string LockRecursionException_UpgradeAfterReadNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_UpgradeAfterReadNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upgradeable lock may not be acquired with write lock held in this mode. Acquiring Upgradeable lock gives the ability to read along with an option to upgrade to a writer..
+        /// </summary>
+        internal static string LockRecursionException_UpgradeAfterWriteNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_UpgradeAfterWriteNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write lock may not be acquired with read lock held. This pattern is prone to deadlocks. Please ensure that read locks are released before taking a write lock. If an upgrade is necessary, use an upgrade lock in place of the read lock..
+        /// </summary>
+        internal static string LockRecursionException_WriteAfterReadNotAllowed {
+            get {
+                return ResourceManager.GetString("LockRecursionException_WriteAfterReadNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to [InternetShortcut]
         ///URL={0}.
         /// </summary>
         internal static string MDCFR_INTS_CREATE {
             get {
                 return ResourceManager.GetString("MDCFR_INTS_CREATE", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to [{{000214A0-0000-0000-C000-000000000046}}]
+        ///Prop3=19,11
+        ///[InternetShortcut]
+        ///IDList=
+        ///URL={0}
+        ///IconIndex={1}
+        ///HotKey=0
+        ///IconFile={2}.
+        /// </summary>
+        internal static string MDCFR_INTS_CREATE2 {
+            get {
+                return ResourceManager.GetString("MDCFR_INTS_CREATE2", resourceCulture);
             }
         }
         
@@ -2529,6 +2752,42 @@ namespace MDCFR.Properties {
         internal static string Resources_StreamNotValid {
             get {
                 return ResourceManager.GetString("Resources_StreamNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The lock is being disposed while still being used. It either is being held by a thread and/or has active waiters waiting to acquire the lock..
+        /// </summary>
+        internal static string SynchronizationLockException_IncorrectDispose {
+            get {
+                return ResourceManager.GetString("SynchronizationLockException_IncorrectDispose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The read lock is being released without being held..
+        /// </summary>
+        internal static string SynchronizationLockException_MisMatchedRead {
+            get {
+                return ResourceManager.GetString("SynchronizationLockException_MisMatchedRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The upgradeable lock is being released without being held..
+        /// </summary>
+        internal static string SynchronizationLockException_MisMatchedUpgrade {
+            get {
+                return ResourceManager.GetString("SynchronizationLockException_MisMatchedUpgrade", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The write lock is being released without being held..
+        /// </summary>
+        internal static string SynchronizationLockException_MisMatchedWrite {
+            get {
+                return ResourceManager.GetString("SynchronizationLockException_MisMatchedWrite", resourceCulture);
             }
         }
         

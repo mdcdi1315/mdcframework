@@ -4,6 +4,9 @@
 
 /.vs
 /bin/Debug
-/obj
+/obj # Reserved for backwards compatibility
 /bin/Release
 /bin
+/Objects
+/Tools/AsInterfaceChecker/bin
+/Tools/AsInterfaceChecker/Objects

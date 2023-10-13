@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <RootNamespace>MDCFR</RootNamespace>
+	<StartupObject>MDCFR.AsInterfaceValidator</StartupObject>
+	<!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->  
+	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	<!-- This option specifies that the resulting assembly will almost be the same size between compilations. -->
+	<Deterministic>True</Deterministic>
+	<!-- Becuase we want multitargeting, we must exclude the items we don't require. Comment the below line to enable the default excludes. -->
+	<DefaultItemExcludesInProjectFolder>*\**.*</DefaultItemExcludesInProjectFolder>
+	<AssemblyName>Checker</AssemblyName>
+	<!-- Corrects dependency errors. -->
+	<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+	<LangVersion>10</LangVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+	<Compile Include=".\MDCFR-CHECK.cs" />
+	<Compile Include=".\MDCFR-CHECK-PROPS.cs" />
+	<None Remove="$(BaseIntermediateOutputPath)\**" />
+    <ProjectReference Include="..\..\MDCFR.csproj" />
+  </ItemGroup>
+
+</Project>

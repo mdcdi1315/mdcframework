@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" InitialTargets="">
+
+	<!-- Global pre-configurations that should be used before MSBuild loads up a specific project. -->
+  <PropertyGroup>
+	  <!-- Supply the object intermediate path -->
+	  <BaseIntermediateOutputPath>.\Objects</BaseIntermediateOutputPath>
+	  <!-- Suppress the warning shown when MSBuild finds the temporary object files store is different than the MSBuild set at the beginning. -->
+	  <!-- This warning is acknownledged and should not be displayed to the user. -->
+	  <EnableBaseIntermediateOutputPathMismatchWarning>false</EnableBaseIntermediateOutputPathMismatchWarning>
+	  <!-- Supply the Supported OS Version. If less than the defined , cannot be run. -->
+	  <SupportedOSPlatformVersion>8.0</SupportedOSPlatformVersion>
+	  <!-- Set To True if you need to import DLL's. Useful enough.-->
+	  <ImportProjectExtensionTargets>True</ImportProjectExtensionTargets>
+	  <!-- Do not add the netX.X folder. Pass the contents immediately to /bin/debug , for example.-->
+	  <AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+  </PropertyGroup>
+
+</Project>
