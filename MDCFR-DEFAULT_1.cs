@@ -23,11 +23,11 @@ namespace ROOT
 	public static class MAIN
 	{
 
-		/// <summary>
-		/// This property is filled out when any of the <see cref="MAIN"/> class functions called failed for a reason.
-		/// This is done so as to be given more information about 'invisible exceptions'.
-		/// </summary>
-		public static System.Exception ExceptionData { get; set; }
+        /// <summary>
+        /// This property is filled out when any of the <see cref="MAIN"/> class functions called failed for a reason.
+        /// This is done so as to be given more information about 'invisible exceptions'.
+        /// </summary>
+        public static System.Exception ExceptionData { get; set; }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static System.String ToURL(SystemLinks link)
@@ -177,34 +177,58 @@ namespace ROOT
 		{
 			System.IO.FileStream Out = null;
 			HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
-			System.Boolean executed = false;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: {URL}");
+#endif
+            System.Boolean executed = false;
 			System.Net.WebException err = null;
 			req.OnSuccess(df => { executed = true; });
 			req.OnFail(dg => { executed = true; err = dg; });
 			req.Go();
-			while (executed == false) { HaltApplicationThread(130); }
+			while (executed == false) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) WAITINGREP: {URL}: 130 ms");
+#endif
+                HaltApplicationThread(130); 
+			}
 			req = null;
 			if (err != null) { err = null; goto G_ExitErr; }
-			err = null;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: true");
+#endif
+            err = null;
 			if (FileExists(Path))
 			{
 				if (OverwriteIfExists)
 				{
 					Out = ClearAndWriteAFile(Path);
-					if (Out == null) { goto G_ExitErr; }
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: ClearAndWriteAFile()");
+#endif
+                    if (Out == null) { goto G_ExitErr; }
 				}
 				else { goto G_ExitErr; }
 			}
 			else
 			{
 				Out = CreateANewFile(Path);
-				if (Out == null) { goto G_ExitErr; }
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: CreateANewFile()");
+#endif
+                if (Out == null) { goto G_ExitErr; }
 			}
-			PassNewContentsToFile(String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE, URL.ToString()), Out);
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) PROCESS_ACTION");
+#endif
+            PassNewContentsToFile(String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE, URL.ToString()), Out);
 			Out.Close();
 			Out.Dispose();
 			Out = null;
-			goto G_Succ;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) RESULT: Success");
+#endif
+            goto G_Succ;
 			G_ExitErr: { if (Out != null) { Out.Close(); Out.Dispose(); } return false; }
 			G_Succ: { if (Out != null) { Out.Close(); Out.Dispose(); } return true; }
 		}
@@ -226,39 +250,66 @@ namespace ROOT
 		{
 			System.IO.FileStream Out = null;
 			if (FileExists(CustomIconFile) == false) { goto G_ExitErr; }
-			HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.CreateInternetShortcut(... , ...)) ACTIVATION: Success");
+#endif
+            HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
 			System.Boolean executed = false;
 			System.Net.WebException err = null;
 			req.OnSuccess(df => { executed = true; });
 			req.OnFail(dg => { executed = true; err = dg; });
 			req.Go();
-			while (executed == false) { HaltApplicationThread(130); }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: {URL}");
+#endif
+            while (executed == false) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) WAITINGREP: {URL}: 130 ms");
+#endif
+                HaltApplicationThread(130); 
+			}
 			req = null;
 			if (err != null) { err = null; goto G_ExitErr; }
-			err = null;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: true");
+#endif
+            err = null;
 			if (FileExists(Path))
 			{
 				if (OverwriteIfExists)
 				{
 					Out = ClearAndWriteAFile(Path);
-					if (Out == null) { goto G_ExitErr; }
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: ClearAndWriteAFile()");
+#endif
+                    if (Out == null) { goto G_ExitErr; }
 				}
 				else { goto G_ExitErr; }
 			}
 			else
 			{
 				Out = CreateANewFile(Path);
-				if (Out == null) { goto G_ExitErr; }
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: CreateANewFile()");
+#endif
+                if (Out == null) { goto G_ExitErr; }
 			}
 			if (IconFileNumToUse < 0) { goto G_ExitErr; }
 			if (IconFileNumToUse > System.Byte.MaxValue) { goto G_ExitErr; }
-			PassNewContentsToFile(System.String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE2,
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) PROCESS_ACTION");
+#endif
+            PassNewContentsToFile(System.String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE2,
 				new System.String[] { URL.ToString(), $"{IconFileNumToUse}" ,
 					new System.IO.FileInfo(CustomIconFile).FullName}) , Out);
 			Out.Close();
 			Out.Dispose();
 			Out = null;
-			goto G_Succ;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) RESULT: Success");
+#endif
+            goto G_Succ;
 			G_ExitErr: { if (Out != null) { Out.Close(); Out.Dispose(); } return false; }
 			G_Succ: { if (Out != null) { Out.Close(); Out.Dispose(); } return true; }
         }
@@ -274,7 +325,10 @@ namespace ROOT
 		public static System.Boolean OpenSystemApp(System.String link)
 		{
 			if (link.EndsWith("://") == false) { return false; }
-			return StartUWPApp(link);
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.OpenSystemApp(... , ...) ACTIVATION: Success)");
+#endif
+            return StartUWPApp(link);
 		}
 
 		/// <summary>
@@ -290,6 +344,9 @@ namespace ROOT
 		public static System.Boolean OpenSystemApp(System.String link, IWin32Window Window)
 		{
 			if (link.EndsWith("://") == false) { return false; }
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.OpenSystemApp(... , ...) ACTIVATION: Success)");
+#endif
 			return StartUWPApp(link, Window);
 		}
 
@@ -477,19 +534,6 @@ namespace ROOT
 			ConsoleExtensions.SetBackColor(BACK);
 		}
 
-		/// <summary>
-		/// (For informational purposes only) The Current Visual Basic Runtime Library version that is used by the runtime.
-		/// </summary>
-		/// <returns>A <see cref="System.String"/> which contains the Visual Basic Runtime Library version.</returns>
-		[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version.", true)]
-		public static System.String GetVBRuntimeInfo()
-		{
-			return Microsoft.VisualBasic.Globals.ScriptEngine + " Engine , Version " +
-			Microsoft.VisualBasic.Globals.ScriptEngineMajorVersion.ToString() + "." +
-			Microsoft.VisualBasic.Globals.ScriptEngineMinorVersion.ToString() +
-			"." + Microsoft.VisualBasic.Globals.ScriptEngineBuildVersion.ToString();
-		}
-
 #if NET472_OR_GREATER
 
 		/// <summary>
@@ -527,11 +571,15 @@ namespace ROOT
 		public static System.String OSProcessorArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
-			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in OSProcessorArchitecture()) VALUE: {RRD}");
+#endif
+            if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
 			else if (System.Runtime.InteropServices.Architecture.X64 == RRD) { return "AMD64"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm == RRD) { return "ARM"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm64 == RRD) { return "ARM64"; } else { return "Error"; }
 		}
+		
 		/// <summary>
 		/// This method returns the application's compiled platform.
 		/// </summary>
@@ -541,6 +589,9 @@ namespace ROOT
 		public static System.String ProcessArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture;
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ProcessArchitecture()) VALUE: {RRD}");
+#endif
 			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
 			else if (System.Runtime.InteropServices.Architecture.X64 == RRD) { return "AMD64"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm == RRD) { return "ARM"; }
@@ -590,7 +641,10 @@ namespace ROOT
 		{
 			System.Char[] array = Stringtoreplacechar.ToCharArray();
 			if (array == null || array.Length < 1) { return "Error"; }
-			System.String Result = null;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.ChangeDefinedChar(... , {Chartochange} , {Chartobechanged})) VALIDARRAY: true");
+#endif
+            System.String Result = null;
 			for (System.Int32 I = 0; I < array.Length; I++)
 			{
 				if (array[I] == Chartochange)
@@ -599,7 +653,10 @@ namespace ROOT
 				}
 				else { Result += array[I]; }
 			}
-			return Result;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.ChangeDefinedChar(... , {Chartochange} , {Chartobechanged})) RESULT: Success");
+#endif
+            return Result;
 		}
 
 		/// <summary>
@@ -617,6 +674,9 @@ namespace ROOT
 			System.Char[] CharString = StringToClear.ToCharArray();
 			if (CharString.Length <= 0) { return null; }
 			if (CharToClear.Length <= 0) { return null; }
+#if DEBUG
+			Debugger.DebuggingInfo("(in ROOT.MAIN.RemoveDefinedChars(... , ...)) VALIDARRAY: true");
+#endif
 			System.Boolean Keeper = false;
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER < CharString.Length; ITER++)
@@ -629,24 +689,12 @@ namespace ROOT
 			}
 			CharString = null;
 			CharToClear = null;
-			return Result;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.RemoveDefinedChars(... , ...)) RESULT: Success");
+#endif
+            return Result;
 		}
 
-		/// <summary>
-		/// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
-		/// </summary>
-		/// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
-		/// <param name="Title">The window's title.</param>
-		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
-		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
-		[System.Obsolete("The Visual Basic Runtime Library will be removed in the next major version. Use instead the GetAStringFromTheUserNew function.", true)]
-		[SupportedOSPlatform("windows")]
-		public static System.String GetAStringFromTheUser(System.String Prompt,
-		System.String Title, System.String DefaultResponse)
-		{
-			System.String RETVAL = Microsoft.VisualBasic.Interaction.InputBox(Prompt, Title, DefaultResponse);
-			if (RETVAL == "") { return null; } else { return RETVAL; }
-		}
 
 		/// <summary>
 		/// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
@@ -656,17 +704,25 @@ namespace ROOT
 		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
 		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
 		/// <remarks>Note: This uses the <see cref="ROOT.IntuitiveInteraction.GetAStringFromTheUser"/> class instead of the 
-		/// <see cref="Microsoft.VisualBasic.Interaction.InputBox(string, string, string, int, int)"/> method.</remarks>
+		/// Microsoft.VisualBasic.Interaction.InputBox() method.</remarks>
 		[SupportedOSPlatform("windows")]
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 		public static System.String GetAStringFromTheUserNew(System.String Prompt,
 		System.String Title, System.String DefaultResponse)
 		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) CREATE: Dialog");
+#endif
 			IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt, Title, DefaultResponse);
 			switch (DZ.ButtonClicked)
 			{
-				case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer: return null;
-				default: return DZ.ValueReturned;
+				case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer:
+					return null;
+				default:
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) RESULT: {DZ.ValueReturned}");
+#endif
+                    return DZ.ValueReturned;
 			}
 		}
 
@@ -675,21 +731,39 @@ namespace ROOT
 		/// </summary>
 		/// <param name="Path">The <see cref="System.String"/> which is a filepath to check if the file exists.</param>
 		/// <returns>If the file exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
-		public static System.Boolean FileExists(System.String Path) { return FileInterop.FileExists(Path); }
+		public static System.Boolean FileExists(System.String Path) 
+		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.FileExists({Path})) EXISTS: {FileInterop.FileExists(Path)}");
+#endif
+			return FileInterop.FileExists(Path); 
+		}
 
 		/// <summary>
 		/// Checks whether a directory exists or not by the <paramref name="Path"/> supplied.
 		/// </summary>
 		/// <param name="Path">The <see cref="System.String"/> which is a directory path to check if the directory exists.</param>
 		/// <returns>If the directory exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
-		public static System.Boolean DirExists(System.String Path) { if (System.IO.Directory.Exists(Path)) { return true; } else { return false; } }
+		public static System.Boolean DirExists(System.String Path) 
+		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.DirExists({Path}) EXISTS: {System.IO.Directory.Exists(Path)})");
+#endif
+			if (System.IO.Directory.Exists(Path)) { return true; } else { return false; } 
+		}
 
 		/// <summary>
 		/// Creates a directory specified by the <paramref name="Path"/> parameter.
 		/// </summary>
 		/// <param name="Path">The directory path to create.</param>
 		/// <returns><c>true</c> if the directory was created sucessfully; otherwise , <c>false</c>.</returns>
-		public static System.Boolean CreateADir(System.String Path) { return FileInterop.CreateDir(Path) != 0; }
+		public static System.Boolean CreateADir(System.String Path) 
+		{
+#if DEBUG
+			Debugger.DebuggingInfo("(in ROOT.MAIN.CreateADir(...)) CREATING");
+#endif
+			return FileInterop.CreateDir(Path) != 0; 
+		}
 
 		/// <summary>
 		/// Deletes a directory specified by the <paramref name="Path"/> parameter.
@@ -701,23 +775,45 @@ namespace ROOT
 		/// <returns><c>true</c> if the directory was deleted sucessfully; otherwise , <c>false</c>.</returns>
 		public static System.Boolean DeleteADir(System.String Path, System.Boolean DeleteAll)
 		{
-			if (DeleteAll == false) 
+			if (DeleteAll == false) { return FileInterop.RemoveDir(Path) != 0; } 
+			if ((FileInterop.RemoveDir(Path) == 0) && (DeleteAll))
 			{
-				return FileInterop.RemoveDir(Path) != 0;
-			} else if ((FileInterop.RemoveDir(Path) == 0) && (DeleteAll))
-			{
-				System.IO.FileSystemInfo[] Array = new System.IO.DirectoryInfo(Path).GetFileSystemInfos("*" , System.IO.SearchOption.AllDirectories);
-				foreach (System.IO.FileSystemInfo a in Array)
+                // Find all directories first to delete.
+                List<System.String> info = new List<System.String>() { Path };
+                for (System.Int32 I = 0; I < info.Count; I++)
 				{
-					if (a is System.IO.FileInfo) 
+                    foreach (System.IO.DirectoryInfo DS in new System.IO.DirectoryInfo(info[I]).GetDirectories()) { info.Add(DS.FullName); }
+                }
+				//Enumerate through them , delete all the files , then the directories , and exit.
+				//In case that any of the native functions fail during deletion  , function ends with a false value.
+				System.IO.DirectoryInfo DI;
+				foreach (System.String A in info)
+				{
+					DI = new(A);
+					foreach (System.IO.FileInfo I in DI.GetFiles())
 					{
-						if (FileInterop.DeleteFile(a.FullName) != 0) { return false; }
-					} else if (a is System.IO.DirectoryInfo) 
-					{
-						if (FileInterop.RemoveDir(a.FullName) != 0) { return false; }
+                        // Call native function: Deletes the file.
+                        // This function fails if returned from it 0. Exit with false in this case.
+#if DEBUG
+                        Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteADir({Path} , {DeleteAll})) DELETE: {I.FullName}");
+#endif
+                        if (FileInterop.DeleteFile(I.FullName) == 0) { return false; }
 					}
 				}
-			}
+				// Now that the directories are empty , we are safe to delete them.
+				// The RemoveDirectoryW function has this requirement.
+				// Note: recursion here must happen in reverse order as they were found.
+				for (System.Int32 I = info.Count - 1; I > 0; I--)
+				{
+                    // Call native function: Deletes the directory.
+                    // This function fails if returned from it 0. Exit with false in this case.
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteADir({Path} , {DeleteAll})) DELETE: {info[I]}");
+#endif
+                    if (FileInterop.RemoveDir(info[I]) == 0) { return false; }
+				}
+                return FileInterop.RemoveDir(Path) != 0;
+            }
 			return true;
 		}
 
@@ -729,7 +825,10 @@ namespace ROOT
 		/// <returns><c>true</c> if the file or directory was moved; otherwise , <c>false</c>.</returns>
 		public static System.Boolean MoveFilesOrDirs(System.String SourcePath, System.String DestPath)
 		{
-			return FileInterop.MoveFileOrDir(SourcePath, DestPath) != 0;
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.MoveFileOrDir(... , ...)) MOVING");
+#endif
+            return FileInterop.MoveFileOrDir(SourcePath, DestPath) != 0;
 		}
 
 		/// <summary>
@@ -742,7 +841,10 @@ namespace ROOT
 		public static System.Boolean CopyFile(System.String SourceFilePath,
 		System.String DestPath, System.Boolean OverWriteAllowed = false)
 		{
-			return FileInterop.CopyFile(SourceFilePath, DestPath, OverWriteAllowed == false) != 0;
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.CopyFile(... , ...)) COPYING");
+#endif
+            return FileInterop.CopyFile(SourceFilePath, DestPath, OverWriteAllowed == false) != 0;
 		}
 
 		/// <summary>
@@ -766,18 +868,54 @@ namespace ROOT
 		/// </summary>
 		/// <param name="Path">The file path where the file will be created. Example: <![CDATA[C:\Files\Start.txt]]> .</param>
 		/// <returns>A new <see cref="System.IO.FileStream"/> object if no error occured; otherwise , <c>null</c>.</returns>
-		public static System.IO.FileStream CreateANewFile(System.String Path) { try { return System.IO.File.OpenWrite(Path); } catch (System.Exception e) { ExceptionData = e; return null; } }
+		public static System.IO.FileStream CreateANewFile(System.String Path) 
+		{ 
+			try 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.CreateANewFile(...)) INFO: Attempting to create it.");
+#endif
+                return System.IO.File.OpenWrite(Path); 
+			} catch (System.Exception e) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateANewFile(...)) INFO: Error detected!\n{e}");
+#endif
+                ExceptionData = e; 
+				return null; 
+			}
+		}
 
 		/// <summary>
-		/// Opens an handle for the existing file as a <see cref="System.IO.FileStream"/>.
+		/// Opens an handle for the existing file as a <see cref="System.IO.FileStream"/>.<br />
 		/// The file is opened with both Read and Write permissions.
 		/// </summary>
 		/// <param name="Path">The file path where the file is located to.</param>
+		/// <param name="AllowAccessToOthers">This parameter specifies whether to give other processes the
+		/// permission to read or write the file too. By default , this is set to <see langword="false"/>.</param>
 		/// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
-		public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path)
+		public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path , System.Boolean AllowAccessToOthers = false)
 		{
 			if (FileExists(Path) == false) { return null; }
-			try { return System.IO.File.Open(Path, System.IO.FileMode.Open); } catch (System.Exception e) { ExceptionData = e; return null; }
+			try 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.ReadAFileUsingFileStream(...)) INFO: Attempting to open it with R/W permissions.");
+#endif
+				if (AllowAccessToOthers)
+				{
+					return System.IO.File.Open(Path, System.IO.FileMode.Open, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
+				} else
+				{
+                    return System.IO.File.Open(Path, System.IO.FileMode.Open, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None);
+                }
+			} catch (System.Exception e) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.ReadAFileUsingFileStream(...)) INFO: Error detected!\n{e}");
+#endif
+                ExceptionData = e; return null; 
+			}
 		}
 
 		/// <summary>
@@ -789,7 +927,20 @@ namespace ROOT
 		public static System.IO.FileStream ClearAndWriteAFile(System.String Path)
 		{
 			if (FileExists(Path) == false) { return null; }
-			try { return System.IO.File.Open(Path, System.IO.FileMode.Truncate); } catch (System.Exception e) { ExceptionData = e; return null; }
+			try
+			{
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.ClearAndWriteAFile(...)) INFO: Attempting to open it with R/W permissions.");
+#endif
+                return System.IO.File.Open(Path, System.IO.FileMode.Truncate);
+			}
+			catch (System.Exception e)
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.ClearAndWriteAFile(...)) INFO: Error detected!\n{e}");
+#endif
+                ExceptionData = e; return null;
+			}
 		}
 
 		/// <summary>
@@ -802,10 +953,23 @@ namespace ROOT
 			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents + System.Environment.NewLine);
 			try
 			{
-				FileStreamObject.Write(EMDK, 0, EMDK.Length);
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Attempting to write data to the target.");
+#endif
+                FileStreamObject.Write(EMDK, 0, EMDK.Length);
 			}
-			catch (System.Exception) { }
-			EMDK = null;
+			catch (System.Exception E) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Error detected!\n{E}");
+#endif
+				ExceptionData = E; 
+				return;
+            }
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Clearing up. Sucessfull data flush.");
+#endif
+            EMDK = null;
 			return;
 		}
 
@@ -819,10 +983,23 @@ namespace ROOT
 			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents);
 			try
 			{
-				FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Attempting to write data to the target.");
+#endif
+                FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
 			}
-			catch (System.Exception) { }
-			EMDK = null;
+			catch (System.Exception E) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Error detected!\n{E}");
+#endif
+                ExceptionData = E;
+                return;
+            }
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Clearing up. Sucessfull data flush.");
+#endif
+            EMDK = null;
 			return;
 		}
 
@@ -866,10 +1043,13 @@ namespace ROOT
 				case HashDigestSelection.SHA512: EDI = new System.Security.Cryptography.SHA512Managed(); break;
 				case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
 				default:
-					WriteConsoleText($"Error - Option {HashToSelect} Is Invalid!!!");
+					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
 					return "Error";
 			}
-			System.Byte[] RSS = EDI.ComputeHash(Contents);
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
+#endif
+            System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -910,10 +1090,13 @@ namespace ROOT
 					EDI = System.Security.Cryptography.MD5.Create();
 					break;
 				default:
-					WriteConsoleText("Error - Option " + HashToSelect + " Is Invalid!!!");
-					return "Error";
+                    ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
+                    return "Error";
 			}
-			System.Byte[] RSS = EDI.ComputeHash(Contents);
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
+#endif
+            System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -933,8 +1116,10 @@ namespace ROOT
 		public static System.Boolean DeleteAFile(System.String Path)
 		{
 			if (FileExists(Path) == false) { return false; }
-			try { System.IO.File.Delete(Path); } catch (System.Exception) { return false; }
-			return true;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteAFile(...)) INFO: Attempting to delete the target.");
+#endif
+            return FileInterop.DeleteFile(Path) != 0;
 		}
 
 #pragma warning disable CS1591
@@ -980,19 +1165,23 @@ namespace ROOT
 		System.Windows.Forms.MessageBoxButtons MessageButton = 0,
 		System.Windows.Forms.MessageBoxIcon MessageIcon = 0)
 		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {MessageIcon}))" +
+				" INFO: Calling native method instead. Deferral will NOT pass from the custom message handler.");
+#endif
 			System.Windows.Forms.DialogResult RET = System.Windows.Forms.MessageBox.Show(MessageString, Title, MessageButton, MessageIcon);
-			switch (RET)
-			{
-				case System.Windows.Forms.DialogResult.OK: return 1;
-				case System.Windows.Forms.DialogResult.Cancel: return 2;
-				case System.Windows.Forms.DialogResult.Abort: return 3;
-				case System.Windows.Forms.DialogResult.Retry: return 4;
-				case System.Windows.Forms.DialogResult.Ignore: return 5;
-				case System.Windows.Forms.DialogResult.Yes: return 6;
-				case System.Windows.Forms.DialogResult.No: return 7;
-				default: return 0;
-			}
-		}
+            return RET switch
+            {
+                DialogResult.OK => 1,
+                DialogResult.Cancel => 2,
+                DialogResult.Abort => 3,
+                DialogResult.Retry => 4,
+                DialogResult.Ignore => 5,
+                DialogResult.Yes => 6,
+                DialogResult.No => 7,
+                _ => 0,
+            };
+        }
 
 		/// <summary>
 		/// This is a modified Windows Message box made by me.
@@ -1008,19 +1197,23 @@ namespace ROOT
 		public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title,
 			ROOT.IntuitiveInteraction.ButtonSelection MessageButton, ROOT.IntuitiveInteraction.IconSelection IconToSelect)
 		{
-			ROOT.IntuitiveInteraction.IntuitiveMessageBox DX = new(MessageString, Title, MessageButton, IconToSelect);
-			switch (DX.ButtonSelected)
-			{
-				case ROOT.IntuitiveInteraction.ButtonReturned.OK: return 1;
-				case ROOT.IntuitiveInteraction.ButtonReturned.Cancel: return 2;
-				case ROOT.IntuitiveInteraction.ButtonReturned.Abort: return 3;
-				case ROOT.IntuitiveInteraction.ButtonReturned.Retry: return 4;
-				case ROOT.IntuitiveInteraction.ButtonReturned.Ignore: return 5;
-				case ROOT.IntuitiveInteraction.ButtonReturned.Yes: return 6;
-				case ROOT.IntuitiveInteraction.ButtonReturned.No: return 7;
-				default: return 0;
-			}
-		}
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {IconToSelect}))" +
+                " INFO: Calling Internal class instead , because of the programmer's intention.");
+#endif
+            IntuitiveInteraction.IntuitiveMessageBox DX = new(MessageString, Title, MessageButton, IconToSelect);
+            return DX.ButtonSelected switch
+            {
+                IntuitiveInteraction.ButtonReturned.OK => 1,
+                IntuitiveInteraction.ButtonReturned.Cancel => 2,
+                IntuitiveInteraction.ButtonReturned.Abort => 3,
+                IntuitiveInteraction.ButtonReturned.Retry => 4,
+                IntuitiveInteraction.ButtonReturned.Ignore => 5,
+                IntuitiveInteraction.ButtonReturned.Yes => 6,
+                IntuitiveInteraction.ButtonReturned.No => 7,
+                _ => 0,
+            };
+        }
 
 		/// <summary>
 		/// This spawns a new and classical Windows Load File dialog to the user.
@@ -1511,25 +1704,34 @@ namespace ROOT
 		}
 
 #endif
-		/// <summary>
-		/// Stops the application execution for the specified time (Counted in milliseconds).
-		/// Think it like that the application gets to a "HALT" state for that time.
-		/// </summary>
-		/// <param name="TimeoutEpoch">The time to stop the execution.</param>
-		public static void HaltApplicationThread(System.Int32 TimeoutEpoch) { System.Threading.Thread.Sleep(TimeoutEpoch); }
+        /// <summary>
+        /// Stops the application execution for the specified time (Counted in milliseconds).
+        /// Think it like that the application gets to a "HALT" state for that time.
+        /// </summary>
+        /// <param name="TimeoutEpoch">The time to stop the execution.</param>
+        public static void HaltApplicationThread(System.Int32 TimeoutEpoch) 
+		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.HaltApplicationThread({TimeoutEpoch})) INFO: Getting to \'HALT\' state for {TimeoutEpoch} ms...");
+#endif
+			System.Threading.Thread.Sleep(TimeoutEpoch);
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.HaltApplicationThread({TimeoutEpoch})) INFO: Exited HALT state...");
+#endif
+        }
 
-		/// <summary>
-		/// Launches a new process defined by the parameters.
-		/// </summary>
-		/// <param name="PathOfExecToRun">The path of executable or document to open.</param>
-		/// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
-		/// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
-		/// <param name="WaitToClose">Wait for the app to close.</param>
-		/// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
-		/// otherwise , the process exit code. 
-		/// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
-		/// <c>-10337881</c> for any other generic error.</returns>
-		[SupportedOSPlatform("windows")]
+        /// <summary>
+        /// Launches a new process defined by the parameters.
+        /// </summary>
+        /// <param name="PathOfExecToRun">The path of executable or document to open.</param>
+        /// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
+        /// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
+        /// <param name="WaitToClose">Wait for the app to close.</param>
+        /// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
+        /// otherwise , the process exit code. 
+        /// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
+        /// <c>-10337881</c> for any other generic error.</returns>
+        [SupportedOSPlatform("windows")]
 		public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
 		System.Boolean ImplicitSearch, System.Boolean WaitToClose)
 		{

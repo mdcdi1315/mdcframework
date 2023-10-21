@@ -79,11 +79,56 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Array may not be empty..
+        /// </summary>
+        internal static string Arg_EmptyArray {
+            get {
+                return ResourceManager.GetString("Arg_EmptyArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Literal value was not found..
+        /// </summary>
+        internal static string Arg_EnumLitValueNotFound {
+            get {
+                return ResourceManager.GetString("Arg_EnumLitValueNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hashtable&apos;s capacity overflowed and went negative. Check load factor, capacity and the current size of the table..
+        /// </summary>
+        internal static string Arg_HTCapacityOverflow {
+            get {
+                return ResourceManager.GetString("Arg_HTCapacityOverflow", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to At least {0} element(s) are expected in the parameter &quot;{1}&quot;..
         /// </summary>
         internal static string Arg_InsufficientNumberOfElements {
             get {
                 return ResourceManager.GetString("Arg_InsufficientNumberOfElements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested operation cannot be used on objects loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string Arg_InvalidOperation_Reflection {
+            get {
+                return ResourceManager.GetString("Arg_InvalidOperation_Reflection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The path &apos;{0}&apos; is not valid..
+        /// </summary>
+        internal static string Arg_InvalidPath {
+            get {
+                return ResourceManager.GetString("Arg_InvalidPath", resourceCulture);
             }
         }
         
@@ -97,11 +142,83 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Type provided must be an enum..
+        /// </summary>
+        internal static string Arg_MustBeEnum {
+            get {
+                return ResourceManager.GetString("Arg_MustBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type must be a type provided by the MetadataLoadContext..
+        /// </summary>
+        internal static string Arg_MustBeType {
+            get {
+                return ResourceManager.GetString("Arg_MustBeType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a GenericMethodDefinition. MakeGenericMethod may only be called on a method for which MethodBase.IsGenericMethodDefinition is true..
+        /// </summary>
+        internal static string Arg_NotGenericMethodDefinition {
+            get {
+                return ResourceManager.GetString("Arg_NotGenericMethodDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method may only be called on a type for which Type.IsGenericParameter is true..
+        /// </summary>
+        internal static string Arg_NotGenericParameter {
+            get {
+                return ResourceManager.GetString("Arg_NotGenericParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} is not a GenericTypeDefinition. MakeGenericType may only be called on a type for which Type.IsGenericTypeDefinition is true..
+        /// </summary>
+        internal static string Arg_NotGenericTypeDefinition {
+            get {
+                return ResourceManager.GetString("Arg_NotGenericTypeDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The method was called with a null array argument..
         /// </summary>
         internal static string Arg_NullArgumentNullRef {
             get {
                 return ResourceManager.GetString("Arg_NullArgumentNullRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested operation cannot be used on objects loaded by a MetadataLoadContext. Use CustomAttributeData instead..
+        /// </summary>
+        internal static string Arg_ReflectionOnlyCA {
+            get {
+                return ResourceManager.GetString("Arg_ReflectionOnlyCA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot invoke a method on objects loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string Arg_ReflectionOnlyInvoke {
+            get {
+                return ResourceManager.GetString("Arg_ReflectionOnlyInvoke", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to It is illegal to request the default value on a ParameterInfo loaded by a MetadataLoadContext. Use RawDefaultValue instead..
+        /// </summary>
+        internal static string Arg_ReflectionOnlyParameterDefaultValue {
+            get {
+                return ResourceManager.GetString("Arg_ReflectionOnlyParameterDefaultValue", resourceCulture);
             }
         }
         
@@ -205,6 +322,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The number of generic arguments provided does not match the number of generic parameters..
+        /// </summary>
+        internal static string Argument_GenericArgsCount {
+            get {
+                return ResourceManager.GetString("Argument_GenericArgsCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The &apos;G&apos; format combined with a precision is not supported..
         /// </summary>
         internal static string Argument_GWithPrecisionNotSupported {
@@ -214,11 +340,29 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Must be an array type..
+        /// </summary>
+        internal static string Argument_HasToBeArrayClass {
+            get {
+                return ResourceManager.GetString("Argument_HasToBeArrayClass", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to String contains invalid Unicode code points..
         /// </summary>
         internal static string Argument_InvalidCharSequenceNoIndex {
             get {
                 return ResourceManager.GetString("Argument_InvalidCharSequenceNoIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The enum type should contain one and only one instance field..
+        /// </summary>
+        internal static string Argument_InvalidEnum {
+            get {
+                return ResourceManager.GetString("Argument_InvalidEnum", resourceCulture);
             }
         }
         
@@ -430,6 +574,24 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The maximum configured depth of {0} has been exceeded. Cannot read next JSON array..
+        /// </summary>
+        internal static string ArrayDepthTooLarge {
+            get {
+                return ResourceManager.GetString("ArrayDepthTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Number was less than 0..
+        /// </summary>
+        internal static string ArrayIndexNegative {
+            get {
+                return ResourceManager.GetString("ArrayIndexNegative", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Object is not an array with the same initialization state as the array to compare it to..
         /// </summary>
         internal static string ArrayInitializedStateNotEqual {
@@ -453,6 +615,24 @@ namespace MDCFR.Properties {
         internal static string ArrayMustContainElements {
             get {
                 return ResourceManager.GetString("ArrayMustContainElements", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination array was not long enough..
+        /// </summary>
+        internal static string ArrayTooSmall {
+            get {
+                return ResourceManager.GetString("ArrayTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assembly already added..
+        /// </summary>
+        internal static string AssemblyAlreadyAdded {
+            get {
+                return ResourceManager.GetString("AssemblyAlreadyAdded", resourceCulture);
             }
         }
         
@@ -565,6 +745,24 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Assembly &apos;{0}&apos; contains a type reference &apos;{1}&apos; that contains an invalid scope token..
+        /// </summary>
+        internal static string BadImageFormat_TypeRefBadScopeType {
+            get {
+                return ResourceManager.GetString("BadImageFormat_TypeRefBadScopeType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Assembly &apos;{0}&apos; contains a type reference &apos;{1}&apos; that references a module not in the manifest..
+        /// </summary>
+        internal static string BadImageFormat_TypeRefModuleNotInManifest {
+            get {
+                return ResourceManager.GetString("BadImageFormat_TypeRefModuleNotInManifest", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The participantCount argument must be a positive value..
         /// </summary>
         internal static string Barrier_AddParticipants_NonPositive_ArgumentOutOfRange {
@@ -673,6 +871,69 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Base reader must be a full metadata reader..
+        /// </summary>
+        internal static string BaseReaderMustBeFullMetadataReader {
+            get {
+                return ResourceManager.GetString("BaseReaderMustBeFullMetadataReader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Blob is to large..
+        /// </summary>
+        internal static string BlobTooLarge {
+            get {
+                return ResourceManager.GetString("BlobTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot allocate a buffer of size {0}..
+        /// </summary>
+        internal static string BufferMaximumSizeExceeded {
+            get {
+                return ResourceManager.GetString("BufferMaximumSizeExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot advance past the end of the buffer, which has a size of {0}..
+        /// </summary>
+        internal static string BufferWriterAdvancedTooFar {
+            get {
+                return ResourceManager.GetString("BufferWriterAdvancedTooFar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The operation is not valid on this builder as it has been linked with another one..
+        /// </summary>
+        internal static string BuilderAlreadyLinked {
+            get {
+                return ResourceManager.GetString("BuilderAlreadyLinked", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Builder must be aligned to 4 byte boundary..
+        /// </summary>
+        internal static string BuilderMustAligned {
+            get {
+                return ResourceManager.GetString("BuilderMustAligned", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON writer needs to be flushed before getting the current state. There are {0} bytes that have not been committed to the output..
+        /// </summary>
+        internal static string CallFlushToAvoidDataLoss {
+            get {
+                return ResourceManager.GetString("CallFlushToAvoidDataLoss", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot compare {0} to {1}..
         /// </summary>
         internal static string CannotCompare {
@@ -736,6 +997,33 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot decode JSON text that is not encoded as valid Base64 to bytes..
+        /// </summary>
+        internal static string CannotDecodeInvalidBase64 {
+            get {
+                return ResourceManager.GetString("CannotDecodeInvalidBase64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot encode invalid UTF-16 text as JSON. Invalid surrogate value: &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotEncodeInvalidUTF16 {
+            get {
+                return ResourceManager.GetString("CannotEncodeInvalidUTF16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot encode invalid UTF-8 text as JSON. Invalid input: &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotEncodeInvalidUTF8 {
+            get {
+                return ResourceManager.GetString("CannotEncodeInvalidUTF8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot find the old value..
         /// </summary>
         internal static string CannotFindOldValue {
@@ -745,11 +1033,164 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The collection type &apos;{0}&apos; is abstract, an interface, or is read only, and could not be instantiated and populated..
+        /// </summary>
+        internal static string CannotPopulateCollection {
+            get {
+                return ResourceManager.GetString("CannotPopulateCollection", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot read incomplete UTF-16 JSON text as string with missing low surrogate..
+        /// </summary>
+        internal static string CannotReadIncompleteUTF16 {
+            get {
+                return ResourceManager.GetString("CannotReadIncompleteUTF16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot read invalid UTF-16 JSON text as string. Invalid surrogate value: &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotReadInvalidUTF16 {
+            get {
+                return ResourceManager.GetString("CannotReadInvalidUTF16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot reshape array due to mismatch in lengths, currently {0} would become {1}..
         /// </summary>
         internal static string CannotReshapeArrayDueToMismatchInLengths {
             get {
                 return ResourceManager.GetString("CannotReshapeArrayDueToMismatchInLengths", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; of property &apos;{1}&apos; on type &apos;{2}&apos; is invalid for serialization or deserialization because it is a pointer type, is a ref struct, or contains generic parameters that have not been replaced by specific types..
+        /// </summary>
+        internal static string CannotSerializeInvalidMember {
+            get {
+                return ResourceManager.GetString("CannotSerializeInvalidMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is invalid for serialization or deserialization because it is a pointer type, is a ref struct, or contains generic parameters that have not been replaced by specific types..
+        /// </summary>
+        internal static string CannotSerializeInvalidType {
+            get {
+                return ResourceManager.GetString("CannotSerializeInvalidType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot skip tokens on partial JSON. Either get the whole payload and create a Utf8JsonReader instance where isFinalBlock is true or call TrySkip..
+        /// </summary>
+        internal static string CannotSkip {
+            get {
+                return ResourceManager.GetString("CannotSkip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write the start of an object/array after a single JSON value or outside of an existing closed object/array. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotStartObjectArrayAfterPrimitiveOrClose {
+            get {
+                return ResourceManager.GetString("CannotStartObjectArrayAfterPrimitiveOrClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write the start of an object or array without a property name. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotStartObjectArrayWithoutProperty {
+            get {
+                return ResourceManager.GetString("CannotStartObjectArrayWithoutProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot transcode invalid UTF-16 string to UTF-8 JSON text..
+        /// </summary>
+        internal static string CannotTranscodeInvalidUtf16 {
+            get {
+                return ResourceManager.GetString("CannotTranscodeInvalidUtf16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot transcode invalid UTF-8 JSON text to UTF-16 string..
+        /// </summary>
+        internal static string CannotTranscodeInvalidUtf8 {
+            get {
+                return ResourceManager.GetString("CannotTranscodeInvalidUtf8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write a comment value which contains the end of comment delimiter..
+        /// </summary>
+        internal static string CannotWriteCommentWithEmbeddedDelimiter {
+            get {
+                return ResourceManager.GetString("CannotWriteCommentWithEmbeddedDelimiter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid following a property name..
+        /// </summary>
+        internal static string CannotWriteEndAfterProperty {
+            get {
+                return ResourceManager.GetString("CannotWriteEndAfterProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write a JSON property name following another property name. A JSON value is missing..
+        /// </summary>
+        internal static string CannotWritePropertyAfterProperty {
+            get {
+                return ResourceManager.GetString("CannotWritePropertyAfterProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write a JSON property within an array or as the first JSON token. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotWritePropertyWithinArray {
+            get {
+                return ResourceManager.GetString("CannotWritePropertyWithinArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write a JSON value after a single JSON value or outside of an existing closed object/array. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotWriteValueAfterPrimitiveOrClose {
+            get {
+                return ResourceManager.GetString("CannotWriteValueAfterPrimitiveOrClose", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot write a JSON value within an object without a property name. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string CannotWriteValueWithinObject {
+            get {
+                return ResourceManager.GetString("CannotWriteValueWithinObject", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t get a heap offset for a virtual heap handle.
+        /// </summary>
+        internal static string CantGetOffsetForVirtualHeapHandle {
+            get {
+                return ResourceManager.GetString("CantGetOffsetForVirtualHeapHandle", resourceCulture);
             }
         }
         
@@ -781,6 +1222,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Collection is read-only..
+        /// </summary>
+        internal static string CollectionIsReadOnly {
+            get {
+                return ResourceManager.GetString("CollectionIsReadOnly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Collection was modified; enumeration operation may not execute..
         /// </summary>
         internal static string CollectionModifiedDuringEnumeration {
@@ -790,11 +1240,92 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to One of the provided resolvers is null..
+        /// </summary>
+        internal static string CombineOneOfResolversIsNull {
+            get {
+                return ResourceManager.GetString("CombineOneOfResolversIsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JsonCommentHandling enum must be set to one of the supported values..
+        /// </summary>
+        internal static string CommentHandlingMustBeValid {
+            get {
+                return ResourceManager.GetString("CommentHandlingMustBeValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The operation was canceled..
         /// </summary>
         internal static string Common_OperationCanceled {
             get {
                 return ResourceManager.GetString("Common_OperationCanceled", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The deserialization constructor for type &apos;{0}&apos; contains parameters with null names. This might happen because the parameter names have been trimmed by the linker. Consider using the source generated serializer instead..
+        /// </summary>
+        internal static string ConstructorContainsNullParameterNames {
+            get {
+                return ResourceManager.GetString("ConstructorContainsNullParameterNames", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The deserialization constructor on type &apos;{0}&apos; may not have more than 64 parameters for deserialization..
+        /// </summary>
+        internal static string ConstructorMaxOf64Parameters {
+            get {
+                return ResourceManager.GetString("ConstructorMaxOf64Parameters", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Each parameter in the deserialization constructor on type &apos;{0}&apos; must bind to an object property or field on deserialization. Each parameter name must match with a property or field on the object. Fields are only considered when &apos;JsonSerializerOptions.IncludeFields&apos; is enabled. The match can be case-insensitive..
+        /// </summary>
+        internal static string ConstructorParamIncompleteBinding {
+            get {
+                return ResourceManager.GetString("ConstructorParamIncompleteBinding", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t emit a branch or exception region, the current encoder not created with a control flow builder..
+        /// </summary>
+        internal static string ControlFlowBuilderNotAvailable {
+            get {
+                return ResourceManager.GetString("ControlFlowBuilderNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; handles type &apos;{1}&apos; but is being asked to convert type &apos;{2}&apos;. Either create a separate converter for type &apos;{2}&apos; or change the converter&apos;s &apos;CanConvert&apos; method to only return &apos;true&apos; for a single type..
+        /// </summary>
+        internal static string ConverterCanConvertMultipleTypes {
+            get {
+                return ResourceManager.GetString("ConverterCanConvertMultipleTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The generic type of the converter for property &apos;{0}.{1}&apos; must match with the specified converter type &apos;{2}&apos;. The converter must not be &apos;null&apos;..
+        /// </summary>
+        internal static string ConverterForPropertyMustBeValid {
+            get {
+                return ResourceManager.GetString("ConverterForPropertyMustBeValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find core type &apos;{0}&apos;.
+        /// </summary>
+        internal static string CoreTypeNotFound {
+            get {
+                return ResourceManager.GetString("CoreTypeNotFound", resourceCulture);
             }
         }
         
@@ -826,6 +1357,123 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The converter for type &apos;{0}&apos; does not support setting &apos;CreateObject&apos; delegates..
+        /// </summary>
+        internal static string CreateObjectConverterNotCompatible {
+            get {
+                return ResourceManager.GetString("CreateObjectConverterNotCompatible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Data too big to fit in memory..
+        /// </summary>
+        internal static string DataTooBig {
+            get {
+                return ResourceManager.GetString("DataTooBig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;IgnoreNullValues&apos; and &apos;DefaultIgnoreCondition&apos; cannot both be set to non-default values..
+        /// </summary>
+        internal static string DefaultIgnoreConditionAlreadySpecified {
+            get {
+                return ResourceManager.GetString("DefaultIgnoreConditionAlreadySpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value cannot be &apos;JsonIgnoreCondition.Always&apos;..
+        /// </summary>
+        internal static string DefaultIgnoreConditionInvalid {
+            get {
+                return ResourceManager.GetString("DefaultIgnoreConditionInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to CurrentDepth ({0}) is equal to or larger than the maximum allowed depth of {1}. Cannot write the next JSON object or array..
+        /// </summary>
+        internal static string DepthTooLarge {
+            get {
+                return ResourceManager.GetString("DepthTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialization of types without a parameterless constructor, a singular parameterized constructor, or a parameterized constructor annotated with &apos;{0}&apos; is not supported. Type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DeserializeNoConstructor {
+            get {
+                return ResourceManager.GetString("DeserializeNoConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialization of interface types is not supported. Type &apos;{0}&apos;..
+        /// </summary>
+        internal static string DeserializePolymorphicInterface {
+            get {
+                return ResourceManager.GetString("DeserializePolymorphicInterface", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to assign &apos;null&apos; to the property or field of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string DeserializeUnableToAssignNull {
+            get {
+                return ResourceManager.GetString("DeserializeUnableToAssignNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unable to cast object of type &apos;{0}&apos; to type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DeserializeUnableToAssignValue {
+            get {
+                return ResourceManager.GetString("DeserializeUnableToAssignValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON value could not be converted to {0}..
+        /// </summary>
+        internal static string DeserializeUnableToConvertValue {
+            get {
+                return ResourceManager.GetString("DeserializeUnableToConvertValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The specified type {0} must derive from the specific value&apos;s type {1}..
+        /// </summary>
+        internal static string DeserializeWrongType {
+            get {
+                return ResourceManager.GetString("DeserializeWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Destination is too short..
+        /// </summary>
+        internal static string DestinationTooShort {
+            get {
+                return ResourceManager.GetString("DestinationTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not a supported dictionary key using converter of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string DictionaryKeyTypeNotSupported {
+            get {
+                return ResourceManager.GetString("DictionaryKeyTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Dimensions must be positive and non-zero..
         /// </summary>
         internal static string DimensionsMustBePositiveAndNonZero {
@@ -844,11 +1492,56 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The distance between the instruction {0} (offset {1}) and the target label doesn&apos;t fit the operand size: {2}.
+        /// </summary>
+        internal static string DistanceBetweenInstructionAndLabelTooBig {
+            get {
+                return ResourceManager.GetString("DistanceBetweenInstructionAndLabelTooBig", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An element with the same key but a different value already exists. Key: &apos;{0}&apos;.
         /// </summary>
         internal static string DuplicateKey {
             get {
                 return ResourceManager.GetString("DuplicateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Writing an empty JSON payload (excluding comments) is invalid..
+        /// </summary>
+        internal static string EmptyJsonIsInvalid {
+            get {
+                return ResourceManager.GetString("EmptyJsonIsInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to EnCMap table not sorted or has missing records..
+        /// </summary>
+        internal static string EnCMapNotSorted {
+            get {
+                return ResourceManager.GetString("EnCMapNotSorted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected end of comment, but instead reached end of data..
+        /// </summary>
+        internal static string EndOfCommentNotFound {
+            get {
+                return ResourceManager.GetString("EndOfCommentNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected end of string, but instead reached end of data..
+        /// </summary>
+        internal static string EndOfStringNotFound {
+            get {
+                return ResourceManager.GetString("EndOfStringNotFound", resourceCulture);
             }
         }
         
@@ -872,11 +1565,380 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected array of size {0}..
+        /// </summary>
+        internal static string ExpectedArrayOfSize {
+            get {
+                return ResourceManager.GetString("ExpectedArrayOfSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid after a single JSON value. Expected end of data..
+        /// </summary>
+        internal static string ExpectedEndAfterSingleJson {
+            get {
+                return ResourceManager.GetString("ExpectedEndAfterSingleJson", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid end of a number. Expected a delimiter..
+        /// </summary>
+        internal static string ExpectedEndOfDigitNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedEndOfDigitNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid JSON literal. Expected the literal &apos;false&apos;..
+        /// </summary>
+        internal static string ExpectedFalse {
+            get {
+                return ResourceManager.GetString("ExpectedFalse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The input does not contain any JSON tokens. Expected the input to start with a valid JSON token, when isFinalBlock is true..
+        /// </summary>
+        internal static string ExpectedJsonTokens {
+            get {
+                return ResourceManager.GetString("ExpectedJsonTokens", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected list of size {0}..
+        /// </summary>
+        internal static string ExpectedListOfSize {
+            get {
+                return ResourceManager.GetString("ExpectedListOfSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid end of a number. Expected &apos;E&apos; or &apos;e&apos;..
+        /// </summary>
+        internal static string ExpectedNextDigitEValueNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedNextDigitEValueNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected non-empty array..
+        /// </summary>
+        internal static string ExpectedNonEmptyArray {
+            get {
+                return ResourceManager.GetString("ExpectedNonEmptyArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected non-empty list..
+        /// </summary>
+        internal static string ExpectedNonEmptyList {
+            get {
+                return ResourceManager.GetString("ExpectedNonEmptyList", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected non-empty string..
+        /// </summary>
+        internal static string ExpectedNonEmptyString {
+            get {
+                return ResourceManager.GetString("ExpectedNonEmptyString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid JSON literal. Expected the literal &apos;null&apos;..
+        /// </summary>
+        internal static string ExpectedNull {
+            get {
+                return ResourceManager.GetString("ExpectedNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The input does not contain any complete JSON tokens. Expected the input to have at least one valid, complete, JSON token..
+        /// </summary>
+        internal static string ExpectedOneCompleteToken {
+            get {
+                return ResourceManager.GetString("ExpectedOneCompleteToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid after a property name. Expected a &apos;:&apos;..
+        /// </summary>
+        internal static string ExpectedSeparatorAfterPropertyNameNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedSeparatorAfterPropertyNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid start of a property name. Expected a &apos;&quot;&apos;..
+        /// </summary>
+        internal static string ExpectedStartOfPropertyNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedStartOfPropertyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid start of a property name or value, after a comment..
+        /// </summary>
+        internal static string ExpectedStartOfPropertyOrValueAfterComment {
+            get {
+                return ResourceManager.GetString("ExpectedStartOfPropertyOrValueAfterComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected start of a property name or value, but instead reached end of data..
+        /// </summary>
+        internal static string ExpectedStartOfPropertyOrValueNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedStartOfPropertyOrValueNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid start of a value..
+        /// </summary>
+        internal static string ExpectedStartOfValueNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedStartOfValueNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid JSON literal. Expected the literal &apos;true&apos;..
+        /// </summary>
+        internal static string ExpectedTrue {
+            get {
+                return ResourceManager.GetString("ExpectedTrue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a value, but instead reached end of data..
+        /// </summary>
+        internal static string ExpectedValueAfterPropertyNameNotFound {
+            get {
+                return ResourceManager.GetString("ExpectedValueAfterPropertyNameNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The extension data property &apos;{0}&apos; on type &apos;{1}&apos; cannot bind with a parameter in the deserialization constructor..
+        /// </summary>
+        internal static string ExtensionDataCannotBindToCtorParam {
+            get {
+                return ResourceManager.GetString("ExtensionDataCannotBindToCtorParam", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An assembly that was not created by this MetadataLoadContext object was returned from its MetadataAssemblyResolver..
+        /// </summary>
+        internal static string ExternalAssemblyReturnedByMetadataAssemblyResolver {
+            get {
+                return ResourceManager.GetString("ExternalAssemblyReturnedByMetadataAssemblyResolver", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;IBufferWriter&apos; could not provide an output buffer that is large enough to continue writing..
+        /// </summary>
+        internal static string FailedToGetLargerSpan {
+            get {
+                return ResourceManager.GetString("FailedToGetLargerSpan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A &apos;field&apos; member cannot be &apos;virtual&apos;. See arguments for the &apos;{0}&apos; and &apos;{1}&apos; parameters. .
+        /// </summary>
+        internal static string FieldCannotBeVirtual {
+            get {
+                return ResourceManager.GetString("FieldCannotBeVirtual", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The assembly &apos;{0}&apos; has already loaded been loaded into this MetadataLoadContext..
+        /// </summary>
+        internal static string FileLoadDuplicateAssemblies {
+            get {
+                return ResourceManager.GetString("FileLoadDuplicateAssemblies", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find assembly &apos;{0}&apos;. Either explicitly load this assembly using a method such as LoadFromAssemblyPath() or use a MetadataAssemblyResolver that returns a valid assembly..
+        /// </summary>
+        internal static string FileNotFoundAssembly {
+            get {
+                return ResourceManager.GetString("FileNotFoundAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the module file for &apos;{0}&apos;..
+        /// </summary>
+        internal static string FileNotFoundModule {
+            get {
+                return ResourceManager.GetString("FileNotFoundModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Too many bytes in what should have been a 7 bit encoded Int32..
         /// </summary>
         internal static string Format_Bad7BitInt32 {
             get {
                 return ResourceManager.GetString("Format_Bad7BitInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for an unsigned byte..
+        /// </summary>
+        internal static string FormatByte {
+            get {
+                return ResourceManager.GetString("FormatByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON value is either too large or too small for a Decimal..
+        /// </summary>
+        internal static string FormatDecimal {
+            get {
+                return ResourceManager.GetString("FormatDecimal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a Double..
+        /// </summary>
+        internal static string FormatDouble {
+            get {
+                return ResourceManager.GetString("FormatDouble", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for an Int16..
+        /// </summary>
+        internal static string FormatInt16 {
+            get {
+                return ResourceManager.GetString("FormatInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for an Int32..
+        /// </summary>
+        internal static string FormatInt32 {
+            get {
+                return ResourceManager.GetString("FormatInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for an Int64..
+        /// </summary>
+        internal static string FormatInt64 {
+            get {
+                return ResourceManager.GetString("FormatInt64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a signed byte..
+        /// </summary>
+        internal static string FormatSByte {
+            get {
+                return ResourceManager.GetString("FormatSByte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a Single..
+        /// </summary>
+        internal static string FormatSingle {
+            get {
+                return ResourceManager.GetString("FormatSingle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a UInt16..
+        /// </summary>
+        internal static string FormatUInt16 {
+            get {
+                return ResourceManager.GetString("FormatUInt16", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a UInt32..
+        /// </summary>
+        internal static string FormatUInt32 {
+            get {
+                return ResourceManager.GetString("FormatUInt32", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Either the JSON value is not in a supported format, or is out of bounds for a UInt64..
+        /// </summary>
+        internal static string FormatUInt64 {
+            get {
+                return ResourceManager.GetString("FormatUInt64", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid after a value. Expected either &apos;,&apos;, &apos;}}&apos;, or &apos;]&apos;..
+        /// </summary>
+        internal static string FoundInvalidCharacter {
+            get {
+                return ResourceManager.GetString("FoundInvalidCharacter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to F# discriminated union serialization is not supported. Consider authoring a custom converter for the type..
+        /// </summary>
+        internal static string FSharpDiscriminatedUnionsNotSupported {
+            get {
+                return ResourceManager.GetString("FSharpDiscriminatedUnionsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A type specification contained an out of range index for a generic method parameter &apos;{0}&apos;..
+        /// </summary>
+        internal static string GenericMethodParamIndexOutOfRange {
+            get {
+                return ResourceManager.GetString("GenericMethodParamIndexOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A type specification contained an out of range index for a generic type parameter &apos;{0}&apos;..
+        /// </summary>
+        internal static string GenericTypeParamIndexOutOfRange {
+            get {
+                return ResourceManager.GetString("GenericTypeParamIndexOutOfRange", resourceCulture);
             }
         }
         
@@ -2150,6 +3212,69 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Handle belongs to a future generation.
+        /// </summary>
+        internal static string HandleBelongsToFutureGeneration {
+            get {
+                return ResourceManager.GetString("HandleBelongsToFutureGeneration", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Hash must be at least {0}B long..
+        /// </summary>
+        internal static string HashTooShort {
+            get {
+                return ResourceManager.GetString("HashTooShort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The limit on the size of {0} heap has been exceeded..
+        /// </summary>
+        internal static string HeapSizeLimitExceeded {
+            get {
+                return ResourceManager.GetString("HeapSizeLimitExceeded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The ignore condition &apos;JsonIgnoreCondition.WhenWritingNull&apos; is not valid on value-type member &apos;{0}&apos; on type &apos;{1}&apos;. Consider using &apos;JsonIgnoreCondition.WhenWritingDefault&apos;..
+        /// </summary>
+        internal static string IgnoreConditionOnValueTypeInvalid {
+            get {
+                return ResourceManager.GetString("IgnoreConditionOnValueTypeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Illegal tables in compressed metadata stream..
+        /// </summary>
+        internal static string IllegalTablesInCompressedMetadataStream {
+            get {
+                return ResourceManager.GetString("IllegalTablesInCompressedMetadataStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image is too small..
+        /// </summary>
+        internal static string ImageTooSmall {
+            get {
+                return ResourceManager.GetString("ImageTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Image is either too small or contains an invalid byte offset or count..
+        /// </summary>
+        internal static string ImageTooSmallOrContainsInvalidOffsetOrCount {
+            get {
+                return ResourceManager.GetString("ImageTooSmallOrContainsInvalidOffsetOrCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
         /// </summary>
         internal static System.Drawing.Icon Information {
@@ -2170,11 +3295,272 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot get the value of a token type &apos;{0}&apos; as a {1}..
+        /// </summary>
+        internal static string InvalidCast {
+            get {
+                return ResourceManager.GetString("InvalidCast", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid escapable character within a JSON string. The string should be correctly escaped..
+        /// </summary>
+        internal static string InvalidCharacterAfterEscapeWithinString {
+            get {
+                return ResourceManager.GetString("InvalidCharacterAfterEscapeWithinString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid after &apos;/&apos; at the beginning of the comment. Expected either &apos;/&apos; or &apos;*&apos;..
+        /// </summary>
+        internal static string InvalidCharacterAtStartOfComment {
+            get {
+                return ResourceManager.GetString("InvalidCharacterAtStartOfComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid within a JSON string. The string should be correctly escaped..
+        /// </summary>
+        internal static string InvalidCharacterWithinString {
+            get {
+                return ResourceManager.GetString("InvalidCharacterWithinString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid coded index..
+        /// </summary>
+        internal static string InvalidCodedIndex {
+            get {
+                return ResourceManager.GetString("InvalidCodedIndex", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot compare the value of a token type &apos;{0}&apos; to text..
+        /// </summary>
+        internal static string InvalidComparison {
+            get {
+                return ResourceManager.GetString("InvalidComparison", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid compressed integer..
+        /// </summary>
+        internal static string InvalidCompressedInteger {
+            get {
+                return ResourceManager.GetString("InvalidCompressedInteger", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid constant value..
+        /// </summary>
+        internal static string InvalidConstantValue {
+            get {
+                return ResourceManager.GetString("InvalidConstantValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value of type &apos;{0}&apos; is not a constant..
+        /// </summary>
+        internal static string InvalidConstantValueOfType {
+            get {
+                return ResourceManager.GetString("InvalidConstantValueOfType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid COR header size..
+        /// </summary>
+        internal static string InvalidCorHeaderSize {
+            get {
+                return ResourceManager.GetString("InvalidCorHeaderSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of field Characteristics in debug directory entry must be zero..
+        /// </summary>
+        internal static string InvalidDebugDirectoryEntryCharacteristics {
+            get {
+                return ResourceManager.GetString("InvalidDebugDirectoryEntryCharacteristics", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid directory relative virtual address..
+        /// </summary>
+        internal static string InvalidDirectoryRVA {
+            get {
+                return ResourceManager.GetString("InvalidDirectoryRVA", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid directory size..
+        /// </summary>
+        internal static string InvalidDirectorySize {
+            get {
+                return ResourceManager.GetString("InvalidDirectorySize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid document name..
+        /// </summary>
+        internal static string InvalidDocumentName {
+            get {
+                return ResourceManager.GetString("InvalidDocumentName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation does not apply to an empty instance..
         /// </summary>
         internal static string InvalidEmptyOperation {
             get {
                 return ResourceManager.GetString("InvalidEmptyOperation", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is an invalid token type for the end of the JSON payload. Expected either &apos;EndArray&apos; or &apos;EndObject&apos;..
+        /// </summary>
+        internal static string InvalidEndOfJsonNonPrimitive {
+            get {
+                return ResourceManager.GetString("InvalidEndOfJsonNonPrimitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid entry point token: 0x{0:8X}.
+        /// </summary>
+        internal static string InvalidEntryPointToken {
+            get {
+                return ResourceManager.GetString("InvalidEntryPointToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid exception region bounds: start offset ({0}) is greater than end offset ({1})..
+        /// </summary>
+        internal static string InvalidExceptionRegionBounds {
+            get {
+                return ResourceManager.GetString("InvalidExceptionRegionBounds", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid handle..
+        /// </summary>
+        internal static string InvalidHandle {
+            get {
+                return ResourceManager.GetString("InvalidHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is not a hex digit following &apos;\u&apos; within a JSON string. The string should be correctly escaped..
+        /// </summary>
+        internal static string InvalidHexCharacterWithinString {
+            get {
+                return ResourceManager.GetString("InvalidHexCharacterWithinString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid import definition kind: {0}..
+        /// </summary>
+        internal static string InvalidImportDefinitionKind {
+            get {
+                return ResourceManager.GetString("InvalidImportDefinitionKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid JsonTypeInfo operation for JsonTypeInfoKind &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidJsonTypeInfoOperationForKind {
+            get {
+                return ResourceManager.GetString("InvalidJsonTypeInfoOperationForKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid leading zero before &apos;{0}&apos;..
+        /// </summary>
+        internal static string InvalidLeadingZeroInNumber {
+            get {
+                return ResourceManager.GetString("InvalidLeadingZeroInNumber", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid local signature token: 0x{0:X8}.
+        /// </summary>
+        internal static string InvalidLocalSignatureToken {
+            get {
+                return ResourceManager.GetString("InvalidLocalSignatureToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid metadata section span..
+        /// </summary>
+        internal static string InvalidMetadataSectionSpan {
+            get {
+                return ResourceManager.GetString("InvalidMetadataSectionSpan", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid Metadata stream format..
+        /// </summary>
+        internal static string InvalidMetadataStreamFormat {
+            get {
+                return ResourceManager.GetString("InvalidMetadataStreamFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid method header: 0x{0:X2}.
+        /// </summary>
+        internal static string InvalidMethodHeader1 {
+            get {
+                return ResourceManager.GetString("InvalidMethodHeader1", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid method header: 0x{0:X2} 0x{1:X2}.
+        /// </summary>
+        internal static string InvalidMethodHeader2 {
+            get {
+                return ResourceManager.GetString("InvalidMethodHeader2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid relative virtual address (RVA): 0x{0:X8}.
+        /// </summary>
+        internal static string InvalidMethodRva {
+            get {
+                return ResourceManager.GetString("InvalidMethodRva", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid number of sections declared in PE header..
+        /// </summary>
+        internal static string InvalidNumberOfSections {
+            get {
+                return ResourceManager.GetString("InvalidNumberOfSections", resourceCulture);
             }
         }
         
@@ -2252,6 +3638,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to This property is not supported on assemblies loaded by a MetadataLoadContext as there is no trust level to evaluate these against..
+        /// </summary>
+        internal static string InvalidOperation_IsSecurity {
+            get {
+                return ResourceManager.GetString("InvalidOperation_IsSecurity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The target does not have the message reserved..
         /// </summary>
         internal static string InvalidOperation_MessageNotReservedByTarget {
@@ -2266,6 +3661,15 @@ namespace MDCFR.Properties {
         internal static string InvalidOperation_MultipleContinuations {
             get {
                 return ResourceManager.GetString("InvalidOperation_MultipleContinuations", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This operation is only valid on generic types..
+        /// </summary>
+        internal static string InvalidOperation_NotGenericType {
+            get {
+                return ResourceManager.GetString("InvalidOperation_NotGenericType", resourceCulture);
             }
         }
         
@@ -2311,6 +3715,186 @@ namespace MDCFR.Properties {
         internal static string InvalidOperationOnDefaultArray {
             get {
                 return ResourceManager.GetString("InvalidOperationOnDefaultArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid PDB Checksum data format..
+        /// </summary>
+        internal static string InvalidPdbChecksumDataFormat {
+            get {
+                return ResourceManager.GetString("InvalidPdbChecksumDataFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid PE signature..
+        /// </summary>
+        internal static string InvalidPESignature {
+            get {
+                return ResourceManager.GetString("InvalidPESignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid row count: {0}.
+        /// </summary>
+        internal static string InvalidRowCount {
+            get {
+                return ResourceManager.GetString("InvalidRowCount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid SEH header: 0x{0:X2}.
+        /// </summary>
+        internal static string InvalidSehHeader {
+            get {
+                return ResourceManager.GetString("InvalidSehHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid serialized string..
+        /// </summary>
+        internal static string InvalidSerializedString {
+            get {
+                return ResourceManager.GetString("InvalidSerializedString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid signature..
+        /// </summary>
+        internal static string InvalidSignature {
+            get {
+                return ResourceManager.GetString("InvalidSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid token..
+        /// </summary>
+        internal static string InvalidToken {
+            get {
+                return ResourceManager.GetString("InvalidToken", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid type size..
+        /// </summary>
+        internal static string InvalidTypeSize {
+            get {
+                return ResourceManager.GetString("InvalidTypeSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments cannot be stored in a JsonDocument, only the Skip and Disallow comment handling modes are supported..
+        /// </summary>
+        internal static string JsonDocumentDoesNotSupportComments {
+            get {
+                return ResourceManager.GetString("JsonDocumentDoesNotSupportComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested operation requires an element of type &apos;{0}&apos;, but the target element has type &apos;{1}&apos;..
+        /// </summary>
+        internal static string JsonElementHasWrongType {
+            get {
+                return ResourceManager.GetString("JsonElementHasWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The non-public property &apos;{0}&apos; on type &apos;{1}&apos; is annotated with &apos;JsonIncludeAttribute&apos; which is invalid..
+        /// </summary>
+        internal static string JsonIncludeOnNonPublicInvalid {
+            get {
+                return ResourceManager.GetString("JsonIncludeOnNonPublicInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parameter already associated with a different JsonTypeInfo instance..
+        /// </summary>
+        internal static string JsonPolymorphismOptionsAssociatedWithDifferentJsonTypeInfo {
+            get {
+                return ResourceManager.GetString("JsonPolymorphismOptionsAssociatedWithDifferentJsonTypeInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JsonPropertyInfo with name &apos;{0}&apos; for type &apos;{1}&apos; is already bound to different JsonTypeInfo..
+        /// </summary>
+        internal static string JsonPropertyInfoBoundToDifferentParent {
+            get {
+                return ResourceManager.GetString("JsonPropertyInfoBoundToDifferentParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JsonPropertyInfo &apos;{0}&apos; defined in type &apos;{1}&apos; is marked both as required and as an extension data property. This combination is not supported..
+        /// </summary>
+        internal static string JsonPropertyRequiredAndExtensionData {
+            get {
+                return ResourceManager.GetString("JsonPropertyRequiredAndExtensionData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JsonPropertyInfo &apos;{0}&apos; defined in type &apos;{1}&apos; is marked required but does not specify a setter..
+        /// </summary>
+        internal static string JsonPropertyRequiredAndNotDeserializable {
+            get {
+                return ResourceManager.GetString("JsonPropertyRequiredAndNotDeserializable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JSON deserialization for type &apos;{0}&apos; was missing required properties, including the following: {1}.
+        /// </summary>
+        internal static string JsonRequiredPropertiesMissing {
+            get {
+                return ResourceManager.GetString("JsonRequiredPropertiesMissing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Comments cannot be stored when deserializing objects, only the Skip and Disallow comment handling modes are supported..
+        /// </summary>
+        internal static string JsonSerializerDoesNotSupportComments {
+            get {
+                return ResourceManager.GetString("JsonSerializerDoesNotSupportComments", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JsonTypeInfo metadata references a JsonSerializerOptions instance that doesn&apos;t specify a TypeInfoResolver..
+        /// </summary>
+        internal static string JsonTypeInfoUsedButTypeInfoResolverNotSet {
+            get {
+                return ResourceManager.GetString("JsonTypeInfoUsedButTypeInfoResolverNotSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified label doesn&apos;t belong to the current builder..
+        /// </summary>
+        internal static string LabelDoesntBelongToBuilder {
+            get {
+                return ResourceManager.GetString("LabelDoesntBelongToBuilder", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Label {0} has not been marked..
+        /// </summary>
+        internal static string LabelNotMarked {
+            get {
+                return ResourceManager.GetString("LabelNotMarked", resourceCulture);
             }
         }
         
@@ -2383,6 +3967,33 @@ namespace MDCFR.Properties {
         internal static string LockRecursionException_WriteAfterReadNotAllowed {
             get {
                 return ResourceManager.GetString("LockRecursionException_WriteAfterReadNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This type &apos;{0}&apos; was not loaded by the MetadataLoadContext that loaded the generic type or method..
+        /// </summary>
+        internal static string MakeGenericType_NotLoadedByMetadataLoadContext {
+            get {
+                return ResourceManager.GetString("MakeGenericType_NotLoadedByMetadataLoadContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A manifest resource entry specified a filename that does not appear in the assembly manifest: &apos;{0}&apos;..
+        /// </summary>
+        internal static string ManifestResourceInfoReferencedBadModule {
+            get {
+                return ResourceManager.GetString("ManifestResourceInfoReferencedBadModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Max depth must be positive..
+        /// </summary>
+        internal static string MaxDepthMustBePositive {
+            get {
+                return ResourceManager.GetString("MaxDepthMustBePositive", resourceCulture);
             }
         }
         
@@ -2593,6 +4204,260 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cannot parse a JSON object containing metadata properties like &apos;$id&apos; or &apos;$type&apos; into an array or immutable collection type. Type &apos;{0}&apos;..
+        /// </summary>
+        internal static string MetadataCannotParsePreservedObjectToImmutable {
+            get {
+                return ResourceManager.GetString("MetadataCannotParsePreservedObjectToImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value of the &apos;$id&apos; metadata property &apos;{0}&apos; conflicts with an existing identifier..
+        /// </summary>
+        internal static string MetadataDuplicateIdFound {
+            get {
+                return ResourceManager.GetString("MetadataDuplicateIdFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialized object contains a duplicate type discriminator metadata property..
+        /// </summary>
+        internal static string MetadataDuplicateTypeProperty {
+            get {
+                return ResourceManager.GetString("MetadataDuplicateTypeProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata header too small..
+        /// </summary>
+        internal static string MetadataHeaderTooSmall {
+            get {
+                return ResourceManager.GetString("MetadataHeaderTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The metadata property &apos;$id&apos; must be the first reference preservation property in the JSON object..
+        /// </summary>
+        internal static string MetadataIdIsNotFirstProperty {
+            get {
+                return ResourceManager.GetString("MetadataIdIsNotFirstProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata image doesn&apos;t represent an assembly..
+        /// </summary>
+        internal static string MetadataImageDoesNotRepresentAnAssembly {
+            get {
+                return ResourceManager.GetString("MetadataImageDoesNotRepresentAnAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A JSON object containing metadata for a nested array includes a non-metadata property &apos;{0}&apos;..
+        /// </summary>
+        internal static string MetadataInvalidPropertyInArrayMetadata {
+            get {
+                return ResourceManager.GetString("MetadataInvalidPropertyInArrayMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Properties that start with &apos;$&apos; are not allowed in types that support metadata. Either escape the character or disable reference preservation and polymorphic deserialization..
+        /// </summary>
+        internal static string MetadataInvalidPropertyWithLeadingDollarSign {
+            get {
+                return ResourceManager.GetString("MetadataInvalidPropertyWithLeadingDollarSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid reference to value type &apos;{0}&apos;..
+        /// </summary>
+        internal static string MetadataInvalidReferenceToValueType {
+            get {
+                return ResourceManager.GetString("MetadataInvalidReferenceToValueType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;$values&apos; metadata property must be a JSON array. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string MetadataInvalidTokenAfterValues {
+            get {
+                return ResourceManager.GetString("MetadataInvalidTokenAfterValues", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This object is no longer valid because the MetadataLoadContext that created it has been disposed..
+        /// </summary>
+        internal static string MetadataLoadContextDisposed {
+            get {
+                return ResourceManager.GetString("MetadataLoadContextDisposed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Deserialization failed for one of these reasons:
+        ///1. {0}
+        ///2. {1}.
+        /// </summary>
+        internal static string MetadataPreservedArrayFailed {
+            get {
+                return ResourceManager.GetString("MetadataPreservedArrayFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A JSON object that contains a &apos;$ref&apos; metadata property must not contain any other properties..
+        /// </summary>
+        internal static string MetadataReferenceCannotContainOtherProperties {
+            get {
+                return ResourceManager.GetString("MetadataReferenceCannotContainOtherProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Reference &apos;{0}&apos; was not found..
+        /// </summary>
+        internal static string MetadataReferenceNotFound {
+            get {
+                return ResourceManager.GetString("MetadataReferenceNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The object with reference id &apos;{0}&apos; of type &apos;{1}&apos; cannot be assigned to the type &apos;{2}&apos;..
+        /// </summary>
+        internal static string MetadataReferenceOfTypeCannotBeAssignedToType {
+            get {
+                return ResourceManager.GetString("MetadataReferenceOfTypeCannotBeAssignedToType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid COR20 header signature..
+        /// </summary>
+        internal static string MetadataSignature {
+            get {
+                return ResourceManager.GetString("MetadataSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A &apos;$values&apos; metadata property must always be preceded by other metadata properties, such as &apos;$id&apos; or &apos;$type&apos;..
+        /// </summary>
+        internal static string MetadataStandaloneValuesProperty {
+            get {
+                return ResourceManager.GetString("MetadataStandaloneValuesProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The MetadataStringDecoder instance used to instantiate the Metadata reader must have a UTF8 encoding..
+        /// </summary>
+        internal static string MetadataStringDecoderEncodingMustBeUtf8 {
+            get {
+                return ResourceManager.GetString("MetadataStringDecoderEncodingMustBeUtf8", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata table header too small..
+        /// </summary>
+        internal static string MetadataTableHeaderTooSmall {
+            get {
+                return ResourceManager.GetString("MetadataTableHeaderTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata table {0} not sorted..
+        /// </summary>
+        internal static string MetadataTableNotSorted {
+            get {
+                return ResourceManager.GetString("MetadataTableNotSorted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata tables too small..
+        /// </summary>
+        internal static string MetadataTablesTooSmall {
+            get {
+                return ResourceManager.GetString("MetadataTablesTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The metadata property is either not supported by the type or is not the first property in the deserialized JSON object..
+        /// </summary>
+        internal static string MetadataUnexpectedProperty {
+            get {
+                return ResourceManager.GetString("MetadataUnexpectedProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The &apos;$id&apos;, &apos;$ref&apos; or &apos;$type&apos; metadata properties must be JSON strings. Current token type is &apos;{0}&apos;..
+        /// </summary>
+        internal static string MetadataValueWasNotString {
+            get {
+                return ResourceManager.GetString("MetadataValueWasNotString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata version too long..
+        /// </summary>
+        internal static string MetadataVersionTooLong {
+            get {
+                return ResourceManager.GetString("MetadataVersionTooLong", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Method body was created with no exception regions..
+        /// </summary>
+        internal static string MethodHasNoExceptionRegions {
+            get {
+                return ResourceManager.GetString("MethodHasNoExceptionRegions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid without a matching open..
+        /// </summary>
+        internal static string MismatchedObjectArray {
+            get {
+                return ResourceManager.GetString("MismatchedObjectArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The constructor invoked by a custom attribute cannot be found on type &apos;{0}&apos;..
+        /// </summary>
+        internal static string MissingCustomAttributeConstructor {
+            get {
+                return ResourceManager.GetString("MissingCustomAttributeConstructor", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing data directory..
+        /// </summary>
+        internal static string MissingDataDirectory {
+            get {
+                return ResourceManager.GetString("MissingDataDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not find a resource entry for the encoding codepage &apos;{0} - {1}&apos;.
         /// </summary>
         internal static string MissingEncodingNameResource {
@@ -2602,11 +4467,317 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Could not locate required member &apos;{0}&apos; from FSharp.Core. This might happen because your application has enabled member-level trimming..
+        /// </summary>
+        internal static string MissingFSharpCoreMember {
+            get {
+                return ResourceManager.GetString("MissingFSharpCoreMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Module already added..
+        /// </summary>
+        internal static string ModuleAlreadyAdded {
+            get {
+                return ResourceManager.GetString("ModuleAlreadyAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to ModuleResolve handlers may only return Modules loaded by the MetadataLoadContext that loaded the parent assembly..
+        /// </summary>
+        internal static string ModuleResolveEventReturnedExternalModule {
+            get {
+                return ResourceManager.GetString("ModuleResolveEventReturnedExternalModule", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Invalid number of rows of Module table: {0}..
+        /// </summary>
+        internal static string ModuleTableInvalidNumberOfRows {
+            get {
+                return ResourceManager.GetString("ModuleTableInvalidNumberOfRows", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Members &apos;{0}&apos; and &apos;{1}&apos; on type &apos;{2}&apos; cannot both bind with parameter &apos;{3}&apos; in the deserialization constructor..
+        /// </summary>
+        internal static string MultipleMembersBindWithConstructorParameter {
+            get {
+                return ResourceManager.GetString("MultipleMembersBindWithConstructorParameter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Tensor {0} must have at least one dimension..
         /// </summary>
         internal static string MustHaveAtLeastOneDimension {
             get {
                 return ResourceManager.GetString("MustHaveAtLeastOneDimension", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to {0} must not return null..
+        /// </summary>
+        internal static string MustNotReturnNull {
+            get {
+                return ResourceManager.GetString("MustNotReturnNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The naming policy &apos;{0}&apos; cannot return null..
+        /// </summary>
+        internal static string NamingPolicyReturnNull {
+            get {
+                return ResourceManager.GetString("NamingPolicyReturnNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The node already has a parent..
+        /// </summary>
+        internal static string NodeAlreadyHasParent {
+            get {
+                return ResourceManager.GetString("NodeAlreadyHasParent", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A node cycle was detected..
+        /// </summary>
+        internal static string NodeCycleDetected {
+            get {
+                return ResourceManager.GetString("NodeCycleDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An item with the same key has already been added. Key: {0}.
+        /// </summary>
+        internal static string NodeDuplicateKey {
+            get {
+                return ResourceManager.GetString("NodeDuplicateKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The element cannot be an object or array..
+        /// </summary>
+        internal static string NodeElementCannotBeObjectOrArray {
+            get {
+                return ResourceManager.GetString("NodeElementCannotBeObjectOrArray", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The element must be of type &apos;{0}&apos;.
+        /// </summary>
+        internal static string NodeElementWrongType {
+            get {
+                return ResourceManager.GetString("NodeElementWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A custom converter for JsonObject is not allowed on an extension property..
+        /// </summary>
+        internal static string NodeJsonObjectCustomConverterNotAllowedOnExtensionProperty {
+            get {
+                return ResourceManager.GetString("NodeJsonObjectCustomConverterNotAllowedOnExtensionProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A value of type &apos;{0}&apos; cannot be converted to a &apos;{1}&apos;..
+        /// </summary>
+        internal static string NodeUnableToConvert {
+            get {
+                return ResourceManager.GetString("NodeUnableToConvert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An element of type &apos;{0}&apos; cannot be converted to a &apos;{1}&apos;..
+        /// </summary>
+        internal static string NodeUnableToConvertElement {
+            get {
+                return ResourceManager.GetString("NodeUnableToConvertElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A JsonNode cannot be used as a value..
+        /// </summary>
+        internal static string NodeValueNotAllowed {
+            get {
+                return ResourceManager.GetString("NodeValueNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The node must be of type &apos;{0}&apos;..
+        /// </summary>
+        internal static string NodeWrongType {
+            get {
+                return ResourceManager.GetString("NodeWrongType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Types loaded by a MetadataLoadContext cannot pass any of these BindingFlags: InvokeMethod, CreateInstance, GetProperty, SetProperty..
+        /// </summary>
+        internal static string NoInvokeMember {
+            get {
+                return ResourceManager.GetString("NoInvokeMember", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Metadata for type &apos;{0}&apos; was not provided by TypeInfoResolver of type &apos;{1}&apos;. If using source generation, ensure that all root types passed to the serializer have been indicated with &apos;JsonSerializableAttribute&apos;, along with any types that might be serialized polymorphically..
+        /// </summary>
+        internal static string NoMetadataForType {
+            get {
+                return ResourceManager.GetString("NoMetadataForType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TypeInfoResolver &apos;{0}&apos; did not provide constructor parameter metadata for type &apos;{1}&apos;..
+        /// </summary>
+        internal static string NoMetadataForTypeCtorParams {
+            get {
+                return ResourceManager.GetString("NoMetadataForTypeCtorParams", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TypeInfoResolver &apos;{0}&apos; did not provide property metadata for type &apos;{1}&apos;..
+        /// </summary>
+        internal static string NoMetadataForTypeProperties {
+            get {
+                return ResourceManager.GetString("NoMetadataForTypeProperties", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This PE image is not a managed executable..
+        /// </summary>
+        internal static string NoMetadataInPeImage {
+            get {
+                return ResourceManager.GetString("NoMetadataInPeImage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This ExceptionHandlingClause is not a clause..
+        /// </summary>
+        internal static string NotAClause {
+            get {
+                return ResourceManager.GetString("NotAClause", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This ExceptionHandlingClause is not a filter..
+        /// </summary>
+        internal static string NotAFilter {
+            get {
+                return ResourceManager.GetString("NotAFilter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is not enough data to read through the entire JSON array or object..
+        /// </summary>
+        internal static string NotEnoughData {
+            get {
+                return ResourceManager.GetString("NotEnoughData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for Blob stream..
+        /// </summary>
+        internal static string NotEnoughSpaceForBlobStream {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForBlobStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for GUID stream..
+        /// </summary>
+        internal static string NotEnoughSpaceForGUIDStream {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForGUIDStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for Metadata stream..
+        /// </summary>
+        internal static string NotEnoughSpaceForMetadataStream {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForMetadataStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for stream header name..
+        /// </summary>
+        internal static string NotEnoughSpaceForStreamHeaderName {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForStreamHeaderName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for String stream..
+        /// </summary>
+        internal static string NotEnoughSpaceForStringStream {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForStringStream", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Not enough space for version string..
+        /// </summary>
+        internal static string NotEnoughSpaceForVersionString {
+            get {
+                return ResourceManager.GetString("NotEnoughSpaceForVersionString", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified handle is not a valid metadata heap handle..
+        /// </summary>
+        internal static string NotMetadataHeapHandle {
+            get {
+                return ResourceManager.GetString("NotMetadataHeapHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified handle is not a valid metadata table or UserString heap handle..
+        /// </summary>
+        internal static string NotMetadataTableOrUserStringHandle {
+            get {
+                return ResourceManager.GetString("NotMetadataTableOrUserStringHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The CodeBase property is not supported on assemblies loaded by a MetadataLoadContext. Use Assembly.Location to find the origin of an Assembly..
+        /// </summary>
+        internal static string NotSupported_AssemblyCodeBase {
+            get {
+                return ResourceManager.GetString("NotSupported_AssemblyCodeBase", resourceCulture);
             }
         }
         
@@ -2638,6 +4809,60 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Passing true for ignoreCase is not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_CaseInsensitive {
+            get {
+                return ResourceManager.GetString("NotSupported_CaseInsensitive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Parsing function pointer types in signatures is not supported..
+        /// </summary>
+        internal static string NotSupported_FunctionPointers {
+            get {
+                return ResourceManager.GetString("NotSupported_FunctionPointers", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetBaseDefinition() is not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_GetBaseDefinition {
+            get {
+                return ResourceManager.GetString("NotSupported_GetBaseDefinition", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InterfaceMapping is not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_InterfaceMapping {
+            get {
+                return ResourceManager.GetString("NotSupported_InterfaceMapping", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Passing signature types to this implementation of MakeGenericType() is not supported..
+        /// </summary>
+        internal static string NotSupported_MakeGenericType_SignatureTypes {
+            get {
+                return ResourceManager.GetString("NotSupported_MakeGenericType_SignatureTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to MDStreamVersion is not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_MDStreamVersion {
+            get {
+                return ResourceManager.GetString("NotSupported_MDStreamVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This member is not supported on this dataflow block. The block is intended for a specific purpose that does not utilize this member..
         /// </summary>
         internal static string NotSupported_MemberNotNeeded {
@@ -2656,11 +4881,29 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Resolving tokens is not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_ResolvingTokens {
+            get {
+                return ResourceManager.GetString("NotSupported_ResolvingTokens", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cannot read resources that depend on serialization..
         /// </summary>
         internal static string NotSupported_ResourceObjectSerialization {
             get {
                 return ResourceManager.GetString("NotSupported_ResourceObjectSerialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Satellite assemblies are not supported on assemblies loaded by a MetadataLoadContext..
+        /// </summary>
+        internal static string NotSupported_SatelliteAssembly {
+            get {
+                return ResourceManager.GetString("NotSupported_SatelliteAssembly", resourceCulture);
             }
         }
         
@@ -2683,11 +4926,47 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified handle is not a TypeDefinitionHandle or TypeRefererenceHandle..
+        /// </summary>
+        internal static string NotTypeDefOrRefHandle {
+            get {
+                return ResourceManager.GetString("NotTypeDefOrRefHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified handle is not a TypeDefinitionHandle, TypeRefererenceHandle, or TypeSpecificationHandle..
+        /// </summary>
+        internal static string NotTypeDefOrRefOrSpecHandle {
+            get {
+                return ResourceManager.GetString("NotTypeDefOrRefOrSpecHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The number of elements in the Tensor is greater than the available space from index to the end of the destination array..
         /// </summary>
         internal static string NumberGreaterThenAvailableSpace {
             get {
                 return ResourceManager.GetString("NumberGreaterThenAvailableSpace", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;JsonNumberHandlingAttribute&apos; is only valid on a number or a collection of numbers when applied to a property or field. See member &apos;{0}&apos; on type &apos;{1}&apos;..
+        /// </summary>
+        internal static string NumberHandlingOnPropertyInvalid {
+            get {
+                return ResourceManager.GetString("NumberHandlingOnPropertyInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The maximum configured depth of {0} has been exceeded. Cannot read next JSON object..
+        /// </summary>
+        internal static string ObjectDepthTooLarge {
+            get {
+                return ResourceManager.GetString("ObjectDepthTooLarge", resourceCulture);
             }
         }
         
@@ -2701,6 +4980,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Reference metadata is not supported when deserializing constructor parameters. See type &apos;{0}&apos;..
+        /// </summary>
+        internal static string ObjectWithParameterizedCtorRefMetadataNotSupported {
+            get {
+                return ResourceManager.GetString("ObjectWithParameterizedCtorRefMetadataNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Only single dimensional arrays are supported for the requested action..
         /// </summary>
         internal static string OnlySingleDimensionalArraysSupported {
@@ -2710,11 +4998,164 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Read out of bounds..
+        /// </summary>
+        internal static string OutOfBoundsRead {
+            get {
+                return ResourceManager.GetString("OutOfBoundsRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Write out of bounds..
+        /// </summary>
+        internal static string OutOfBoundsWrite {
+            get {
+                return ResourceManager.GetString("OutOfBoundsWrite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Release all references before disposing this instance..
         /// </summary>
         internal static string OutstandingReferences {
             get {
                 return ResourceManager.GetString("OutstandingReferences", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PE image does not have metadata..
+        /// </summary>
+        internal static string PEImageDoesNotHaveMetadata {
+            get {
+                return ResourceManager.GetString("PEImageDoesNotHaveMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to PE image not available..
+        /// </summary>
+        internal static string PEImageNotAvailable {
+            get {
+                return ResourceManager.GetString("PEImageNotAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter for polymorphic type &apos;{0}&apos; does not support metadata writes or reads..
+        /// </summary>
+        internal static string Polymorphism_BaseConverterDoesNotSupportMetadata {
+            get {
+                return ResourceManager.GetString("Polymorphism_BaseConverterDoesNotSupportMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Polymorphic configuration for type &apos;{0}&apos; should specify at least one derived type..
+        /// </summary>
+        internal static string Polymorphism_ConfigurationDoesNotSpecifyDerivedTypes {
+            get {
+                return ResourceManager.GetString("Polymorphism_ConfigurationDoesNotSpecifyDerivedTypes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter for derived type &apos;{0}&apos; does not support metadata writes or reads..
+        /// </summary>
+        internal static string Polymorphism_DerivedConverterDoesNotSupportMetadata {
+            get {
+                return ResourceManager.GetString("Polymorphism_DerivedConverterDoesNotSupportMetadata", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The polymorphic type &apos;{0}&apos; has already specified derived type &apos;{1}&apos;..
+        /// </summary>
+        internal static string Polymorphism_DerivedTypeIsAlreadySpecified {
+            get {
+                return ResourceManager.GetString("Polymorphism_DerivedTypeIsAlreadySpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified type &apos;{0}&apos; is not a supported derived type for the polymorphic type &apos;{1}&apos;. Derived types must be assignable to the base type, must not be generic and cannot be abstact classes or interfaces unless &apos;JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor&apos; is specified..
+        /// </summary>
+        internal static string Polymorphism_DerivedTypeIsNotSupported {
+            get {
+                return ResourceManager.GetString("Polymorphism_DerivedTypeIsNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The metadata property names &apos;$id&apos;, &apos;$ref&apos;, and &apos;$values&apos; are reserved and cannot be used as custom type discriminator property names..
+        /// </summary>
+        internal static string Polymorphism_InvalidCustomTypeDiscriminatorPropertyName {
+            get {
+                return ResourceManager.GetString("Polymorphism_InvalidCustomTypeDiscriminatorPropertyName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runtime type &apos;{0}&apos; has a diamond ambiguity between derived types &apos;{1}&apos; and &apos;{2}&apos; of polymorphic type &apos;{3}&apos;. Consider either removing one of the derived types or removing the &apos;JsonUnknownDerivedTypeHandling.FallBackToNearestAncestor&apos; setting..
+        /// </summary>
+        internal static string Polymorphism_RuntimeTypeDiamondAmbiguity {
+            get {
+                return ResourceManager.GetString("Polymorphism_RuntimeTypeDiamondAmbiguity", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Runtime type &apos;{0}&apos; is not supported by polymorphic type &apos;{1}&apos;..
+        /// </summary>
+        internal static string Polymorphism_RuntimeTypeNotSupported {
+            get {
+                return ResourceManager.GetString("Polymorphism_RuntimeTypeNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The polymorphic type &apos;{0}&apos; has already specified a type discriminator &apos;{1}&apos;..
+        /// </summary>
+        internal static string Polymorphism_TypeDicriminatorIdIsAlreadySpecified {
+            get {
+                return ResourceManager.GetString("Polymorphism_TypeDicriminatorIdIsAlreadySpecified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Specified type &apos;{0}&apos; does not support polymorphism. Polymorphic types cannot be structs, sealed types, generic types or System.Object..
+        /// </summary>
+        internal static string Polymorphism_TypeDoesNotSupportPolymorphism {
+            get {
+                return ResourceManager.GetString("Polymorphism_TypeDoesNotSupportPolymorphism", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Read unrecognized type discriminator id &apos;{0}&apos;..
+        /// </summary>
+        internal static string Polymorphism_UnrecognizedTypeDiscriminator {
+            get {
+                return ResourceManager.GetString("Polymorphism_UnrecognizedTypeDiscriminator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This JsonTypeInfo instance is marked read-only or has already been used in serialization or deserialization..
+        /// </summary>
+        internal static string PropertyInfoImmutable {
+            get {
+                return ResourceManager.GetString("PropertyInfoImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON property name of length {0} is too large and not supported..
+        /// </summary>
+        internal static string PropertyNameTooLarge {
+            get {
+                return ResourceManager.GetString("PropertyNameTooLarge", resourceCulture);
             }
         }
         
@@ -2729,11 +5170,74 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Specified readers must be minimal delta metadata readers..
+        /// </summary>
+        internal static string ReadersMustBeDeltaReaders {
+            get {
+                return ResourceManager.GetString("ReadersMustBeDeltaReaders", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid within a number, immediately after a decimal point (&apos;.&apos;). Expected a digit (&apos;0&apos;-&apos;9&apos;)..
+        /// </summary>
+        internal static string RequiredDigitNotFoundAfterDecimal {
+            get {
+                return ResourceManager.GetString("RequiredDigitNotFoundAfterDecimal", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; is invalid within a number, immediately after a sign character (&apos;+&apos; or &apos;-&apos;). Expected a digit (&apos;0&apos;-&apos;9&apos;)..
+        /// </summary>
+        internal static string RequiredDigitNotFoundAfterSign {
+            get {
+                return ResourceManager.GetString("RequiredDigitNotFoundAfterSign", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected a digit (&apos;0&apos;-&apos;9&apos;), but instead reached end of data..
+        /// </summary>
+        internal static string RequiredDigitNotFoundEndOfData {
+            get {
+                return ResourceManager.GetString("RequiredDigitNotFoundEndOfData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The IJsonTypeInfoResolver returned a JsonTypeInfo instance whose JsonSerializerOptions setting does not match the provided argument..
+        /// </summary>
+        internal static string ResolverTypeInfoOptionsNotCompatible {
+            get {
+                return ResourceManager.GetString("ResolverTypeInfoOptionsNotCompatible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The IJsonTypeInfoResolver returned an incompatible JsonTypeInfo instance of type &apos;{0}&apos;, expected type &apos;{1}&apos;..
+        /// </summary>
+        internal static string ResolverTypeNotCompatible {
+            get {
+                return ResourceManager.GetString("ResolverTypeNotCompatible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use of ResourceManager for custom types is disabled. Set the MSBuild Property CustomResourceTypesSupport to true in order to enable it..
         /// </summary>
         internal static string ResourceManager_ReflectionNotAllowed {
             get {
                 return ResourceManager.GetString("ResourceManager_ReflectionNotAllowed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The requested operation cannot be used on a module that returns true for IsResource()..
+        /// </summary>
+        internal static string ResourceOnlyModule {
+            get {
+                return ResourceManager.GetString("ResourceOnlyModule", resourceCulture);
             }
         }
         
@@ -2752,6 +5256,339 @@ namespace MDCFR.Properties {
         internal static string Resources_StreamNotValid {
             get {
                 return ResourceManager.GetString("Resources_StreamNotValid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The size of the builder returned by {0}.{1} is smaller than requested..
+        /// </summary>
+        internal static string ReturnedBuilderSizeTooSmall {
+            get {
+                return ResourceManager.GetString("ReturnedBuilderSizeTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Row count must be zero for table #{0}..
+        /// </summary>
+        internal static string RowCountMustBeZero {
+            get {
+                return ResourceManager.GetString("RowCountMustBeZero", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Row count specified for table index {0} is out of allowed range..
+        /// </summary>
+        internal static string RowCountOutOfRange {
+            get {
+                return ResourceManager.GetString("RowCountOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Row ID or heap offset is too large..
+        /// </summary>
+        internal static string RowIdOrHeapOffsetTooLarge {
+            get {
+                return ResourceManager.GetString("RowIdOrHeapOffsetTooLarge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Section too small..
+        /// </summary>
+        internal static string SectionTooSmall {
+            get {
+                return ResourceManager.GetString("SectionTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sequence point value is out of range..
+        /// </summary>
+        internal static string SequencePointValueOutOfRange {
+            get {
+                return ResourceManager.GetString("SequencePointValueOutOfRange", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; is not compatible with the type &apos;{1}&apos;..
+        /// </summary>
+        internal static string SerializationConverterNotCompatible {
+            get {
+                return ResourceManager.GetString("SerializationConverterNotCompatible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter specified on &apos;{0}&apos; does not derive from JsonConverter or have a public parameterless constructor..
+        /// </summary>
+        internal static string SerializationConverterOnAttributeInvalid {
+            get {
+                return ResourceManager.GetString("SerializationConverterOnAttributeInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter specified on &apos;{0}&apos; is not compatible with the type &apos;{1}&apos;..
+        /// </summary>
+        internal static string SerializationConverterOnAttributeNotCompatible {
+            get {
+                return ResourceManager.GetString("SerializationConverterOnAttributeNotCompatible", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; read too much or not enough..
+        /// </summary>
+        internal static string SerializationConverterRead {
+            get {
+                return ResourceManager.GetString("SerializationConverterRead", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; wrote too much or not enough..
+        /// </summary>
+        internal static string SerializationConverterWrite {
+            get {
+                return ResourceManager.GetString("SerializationConverterWrite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The extension data property &apos;{0}.{1}&apos; is invalid. It must implement &apos;IDictionary&lt;string, JsonElement&gt;&apos; or &apos;IDictionary&lt;string, object&gt;&apos;, or be &apos;JsonObject&apos;..
+        /// </summary>
+        internal static string SerializationDataExtensionPropertyInvalid {
+            get {
+                return ResourceManager.GetString("SerializationDataExtensionPropertyInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The attribute &apos;{0}&apos; cannot exist more than once on &apos;{1}&apos;..
+        /// </summary>
+        internal static string SerializationDuplicateAttribute {
+            get {
+                return ResourceManager.GetString("SerializationDuplicateAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; cannot have more than one member that has the attribute &apos;{1}&apos;..
+        /// </summary>
+        internal static string SerializationDuplicateTypeAttribute {
+            get {
+                return ResourceManager.GetString("SerializationDuplicateTypeAttribute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value must be greater than zero..
+        /// </summary>
+        internal static string SerializationInvalidBufferSize {
+            get {
+                return ResourceManager.GetString("SerializationInvalidBufferSize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The unsupported member type is located on type &apos;{0}&apos;..
+        /// </summary>
+        internal static string SerializationNotSupportedParentType {
+            get {
+                return ResourceManager.GetString("SerializationNotSupportedParentType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; is not supported..
+        /// </summary>
+        internal static string SerializationNotSupportedType {
+            get {
+                return ResourceManager.GetString("SerializationNotSupportedType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JsonSerializerOptions instances cannot be modified once encapsulated by a JsonSerializerContext. Such encapsulation can happen either when calling &apos;JsonSerializerOptions.AddContext&apos; or when passing the options instance to a JsonSerializerContext constructor..
+        /// </summary>
+        internal static string SerializerContextOptionsImmutable {
+            get {
+                return ResourceManager.GetString("SerializerContextOptionsImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; cannot return an instance of JsonConverterFactory..
+        /// </summary>
+        internal static string SerializerConverterFactoryReturnsJsonConverterFactory {
+            get {
+                return ResourceManager.GetString("SerializerConverterFactoryReturnsJsonConverterFactory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The converter &apos;{0}&apos; cannot return a null value..
+        /// </summary>
+        internal static string SerializerConverterFactoryReturnsNull {
+            get {
+                return ResourceManager.GetString("SerializerConverterFactoryReturnsNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to A possible object cycle was detected. This can either be due to a cycle or if the object depth is larger than the maximum allowed depth of {0}. Consider using ReferenceHandler.Preserve on JsonSerializerOptions to support cycles..
+        /// </summary>
+        internal static string SerializerCycleDetected {
+            get {
+                return ResourceManager.GetString("SerializerCycleDetected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This JsonSerializerOptions instance is read-only or has already been used in serialization or deserialization..
+        /// </summary>
+        internal static string SerializerOptionsImmutable {
+            get {
+                return ResourceManager.GetString("SerializerOptionsImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON property name for &apos;{0}.{1}&apos; collides with another property..
+        /// </summary>
+        internal static string SerializerPropertyNameConflict {
+            get {
+                return ResourceManager.GetString("SerializerPropertyNameConflict", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON property name for &apos;{0}.{1}&apos; cannot be null..
+        /// </summary>
+        internal static string SerializerPropertyNameNull {
+            get {
+                return ResourceManager.GetString("SerializerPropertyNameNull", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Serialization and deserialization of &apos;{0}&apos; instances are not supported..
+        /// </summary>
+        internal static string SerializeTypeInstanceNotSupported {
+            get {
+                return ResourceManager.GetString("SerializeTypeInstanceNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The object or value could not be serialized..
+        /// </summary>
+        internal static string SerializeUnableToSerialize {
+            get {
+                return ResourceManager.GetString("SerializeUnableToSerialize", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Can&apos;t add vararg parameters to non-vararg signature..
+        /// </summary>
+        internal static string SignatureNotVarArg {
+            get {
+                return ResourceManager.GetString("SignatureNotVarArg", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signature provider returned invalid signature..
+        /// </summary>
+        internal static string SignatureProviderReturnedInvalidSignature {
+            get {
+                return ResourceManager.GetString("SignatureProviderReturnedInvalidSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Signature type sequence must have at least one element..
+        /// </summary>
+        internal static string SignatureTypeSequenceMustHaveAtLeastOneElement {
+            get {
+                return ResourceManager.GetString("SignatureTypeSequenceMustHaveAtLeastOneElement", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Declared size doesn&apos;t correspond to the actual size..
+        /// </summary>
+        internal static string SizeMismatch {
+            get {
+                return ResourceManager.GetString("SizeMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to .NET number values such as positive and negative infinity cannot be written as valid JSON. To make it work when using &apos;JsonSerializer&apos;, consider specifying &apos;JsonNumberHandling.AllowNamedFloatingPointLiterals&apos; (see https://docs.microsoft.com/dotnet/api/system.text.json.serialization.jsonnumberhandling)..
+        /// </summary>
+        internal static string SpecialNumberValuesNotSupported {
+            get {
+                return ResourceManager.GetString("SpecialNumberValuesNotSupported", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The module or file name &apos;{0}&apos; is not specified in the assembly&apos;s manifest..
+        /// </summary>
+        internal static string SpecifiedFileNameInvalid {
+            get {
+                return ResourceManager.GetString("SpecifiedFileNameInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Standalone debug metadata image doesn&apos;t contain Module table..
+        /// </summary>
+        internal static string StandaloneDebugMetadataImageDoesNotContainModuleTable {
+            get {
+                return ResourceManager.GetString("StandaloneDebugMetadataImageDoesNotContainModuleTable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream header too small..
+        /// </summary>
+        internal static string StreamHeaderTooSmall {
+            get {
+                return ResourceManager.GetString("StreamHeaderTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream must support read and seek operations..
+        /// </summary>
+        internal static string StreamMustSupportReadAndSeek {
+            get {
+                return ResourceManager.GetString("StreamMustSupportReadAndSeek", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream is not writable..
+        /// </summary>
+        internal static string StreamNotWritable {
+            get {
+                return ResourceManager.GetString("StreamNotWritable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream length minus starting position is too large to hold a PEImage..
+        /// </summary>
+        internal static string StreamTooLarge {
+            get {
+                return ResourceManager.GetString("StreamTooLarge", resourceCulture);
             }
         }
         
@@ -2792,11 +5629,182 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Table row count space to small..
+        /// </summary>
+        internal static string TableRowCountSpaceTooSmall {
+            get {
+                return ResourceManager.GetString("TableRowCountSpaceTooSmall", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to TextEncoder does not implement MaxOutputCharsPerInputChar correctly..
+        /// </summary>
+        internal static string TextEncoderDoesNotImplementMaxOutputCharsPerInputChar {
+            get {
+                return ResourceManager.GetString("TextEncoderDoesNotImplementMaxOutputCharsPerInputChar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are too many exception regions..
+        /// </summary>
+        internal static string TooManyExceptionRegions {
+            get {
+                return ResourceManager.GetString("TooManyExceptionRegions", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There are too many subnamespaces..
+        /// </summary>
+        internal static string TooManySubnamespaces {
+            get {
+                return ResourceManager.GetString("TooManySubnamespaces", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON array contains a trailing comma at the end which is not supported in this mode. Change the reader options..
+        /// </summary>
+        internal static string TrailingCommaNotAllowedBeforeArrayEnd {
+            get {
+                return ResourceManager.GetString("TrailingCommaNotAllowedBeforeArrayEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON object contains a trailing comma at the end which is not supported in this mode. Change the reader options..
+        /// </summary>
+        internal static string TrailingCommaNotAllowedBeforeObjectEnd {
+            get {
+                return ResourceManager.GetString("TrailingCommaNotAllowedBeforeObjectEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to This JsonTypeInfo instance is marked read-only or has already been used in serialization or deserialization..
+        /// </summary>
+        internal static string TypeInfoImmutable {
+            get {
+                return ResourceManager.GetString("TypeInfoImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot add callbacks to the &apos;Modifiers&apos; property after the resolver has been used for the first time..
+        /// </summary>
+        internal static string TypeInfoResolverImmutable {
+            get {
+                return ResourceManager.GetString("TypeInfoResolverImmutable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Could not load a converter for type {0}..
         /// </summary>
         internal static string TypeLoadException_CannotLoadConverter {
             get {
                 return ResourceManager.GetString("TypeLoadException_CannotLoadConverter", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find type &apos;{0}&apos; in assembly &apos;{1}&apos;..
+        /// </summary>
+        internal static string TypeNotFound {
+            get {
+                return ResourceManager.GetString("TypeNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; can only be serialized using async serialization methods..
+        /// </summary>
+        internal static string TypeRequiresAsyncSerialization {
+            get {
+                return ResourceManager.GetString("TypeRequiresAsyncSerialization", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find core assembly. Either specify a valid core assembly name in the MetadataLoadContext constructor or provide a MetadataAssemblyResolver that can load the core assembly..
+        /// </summary>
+        internal static string UnableToDetermineCoreAssembly {
+            get {
+                return ResourceManager.GetString("UnableToDetermineCoreAssembly", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected array of length {0}..
+        /// </summary>
+        internal static string UnexpectedArrayLength {
+            get {
+                return ResourceManager.GetString("UnexpectedArrayLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected CodeView data signature value..
+        /// </summary>
+        internal static string UnexpectedCodeViewDataSignature {
+            get {
+                return ResourceManager.GetString("UnexpectedCodeViewDataSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The Debug directory was not of type {0}..
+        /// </summary>
+        internal static string UnexpectedDebugDirectoryType {
+            get {
+                return ResourceManager.GetString("UnexpectedDebugDirectoryType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected Embedded Portable PDB data signature value..
+        /// </summary>
+        internal static string UnexpectedEmbeddedPortablePdbDataSignature {
+            get {
+                return ResourceManager.GetString("UnexpectedEmbeddedPortablePdbDataSignature", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected end of data while reading a comment..
+        /// </summary>
+        internal static string UnexpectedEndOfDataWhileReadingComment {
+            get {
+                return ResourceManager.GetString("UnexpectedEndOfDataWhileReadingComment", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Found invalid line or paragraph separator character while reading a comment..
+        /// </summary>
+        internal static string UnexpectedEndOfLineSeparator {
+            get {
+                return ResourceManager.GetString("UnexpectedEndOfLineSeparator", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected handle kind: {0}..
+        /// </summary>
+        internal static string UnexpectedHandleKind {
+            get {
+                return ResourceManager.GetString("UnexpectedHandleKind", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected op-code: {0}..
+        /// </summary>
+        internal static string UnexpectedOpCode {
+            get {
+                return ResourceManager.GetString("UnexpectedOpCode", resourceCulture);
             }
         }
         
@@ -2810,11 +5818,146 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Expected signature header for &apos;{0}&apos;, but found &apos;{1}&apos; (0x{2:x2})..
+        /// </summary>
+        internal static string UnexpectedSignatureHeader {
+            get {
+                return ResourceManager.GetString("UnexpectedSignatureHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected signature header for &apos;{0}&apos; or &apos;{1}&apos;, but found &apos;{2}&apos; (0x{3:x2})..
+        /// </summary>
+        internal static string UnexpectedSignatureHeader2 {
+            get {
+                return ResourceManager.GetString("UnexpectedSignatureHeader2", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected SignatureTypeCode: (0x{0:x})..
+        /// </summary>
+        internal static string UnexpectedSignatureTypeCode {
+            get {
+                return ResourceManager.GetString("UnexpectedSignatureTypeCode", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected stream end..
+        /// </summary>
+        internal static string UnexpectedStreamEnd {
+            get {
+                return ResourceManager.GetString("UnexpectedStreamEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enum &apos;{0}&apos; has invalid underlying type &apos;{1}&apos;..
+        /// </summary>
+        internal static string UnexpectedUnderlyingEnumType {
+            get {
+                return ResourceManager.GetString("UnexpectedUnderlyingEnumType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected value &apos;{0}&apos; of type &apos;{1}&apos;.
+        /// </summary>
+        internal static string UnexpectedValue {
+            get {
+                return ResourceManager.GetString("UnexpectedValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unexpected value &apos;{0}&apos; of unknown type..
+        /// </summary>
+        internal static string UnexpectedValueUnknownType {
+            get {
+                return ResourceManager.GetString("UnexpectedValueUnknownType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown file format..
+        /// </summary>
+        internal static string UnknownFileFormat {
+            get {
+                return ResourceManager.GetString("UnknownFileFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown PE Magic value..
+        /// </summary>
+        internal static string UnknownPEMagicValue {
+            get {
+                return ResourceManager.GetString("UnknownPEMagicValue", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown section name: &apos;{0}&apos;..
+        /// </summary>
+        internal static string UnknownSectionName {
+            get {
+                return ResourceManager.GetString("UnknownSectionName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown tables: 0x{0:x16}..
+        /// </summary>
+        internal static string UnknownTables {
+            get {
+                return ResourceManager.GetString("UnknownTables", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The JSON value is not in a supported {0} format..
+        /// </summary>
+        internal static string UnsupportedFormat {
+            get {
+                return ResourceManager.GetString("UnsupportedFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unsupported format version: {0}.
+        /// </summary>
+        internal static string UnsupportedFormatVersion {
+            get {
+                return ResourceManager.GetString("UnsupportedFormatVersion", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The value &quot;{0}&quot; is not of type &quot;{1}&quot; and cannot be used in this generic collection..
         /// </summary>
         internal static string ValueIsNotOfType {
             get {
                 return ResourceManager.GetString("ValueIsNotOfType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value must be multiple of {0}..
+        /// </summary>
+        internal static string ValueMustBeMultiple {
+            get {
+                return ResourceManager.GetString("ValueMustBeMultiple", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Value is too large..
+        /// </summary>
+        internal static string ValueTooLarge {
+            get {
+                return ResourceManager.GetString("ValueTooLarge", resourceCulture);
             }
         }
         
@@ -2825,6 +5968,24 @@ namespace MDCFR.Properties {
             get {
                 object obj = ResourceManager.GetObject("Warning", resourceCulture);
                 return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Missing mscorlib reference in AssemblyRef table..
+        /// </summary>
+        internal static string WinMDMissingMscorlibRef {
+            get {
+                return ResourceManager.GetString("WinMDMissingMscorlibRef", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Expected depth to be zero at the end of the JSON payload. There is an open JSON object or array that should be closed..
+        /// </summary>
+        internal static string ZeroDepthAtEnd {
+            get {
+                return ResourceManager.GetString("ZeroDepthAtEnd", resourceCulture);
             }
         }
     }

@@ -18,6 +18,7 @@ namespace System.Threading
         using System.Collections;
         using System.Collections.Generic;
         using System.Collections.Concurrent;
+        using System.Runtime.ExceptionServices;
 
         internal interface IProducerConsumerQueue<T> : IEnumerable<T>, System.Collections.IEnumerable
         {
@@ -447,6 +448,267 @@ namespace System.Threading
                 TResult GetResult(short token);
             }
 
+            #nullable disable
+            /// <summary>Provides the core logic for implementing a manual-reset <see cref="IValueTaskSource" /> or <see cref="IValueTaskSource{T}" />.</summary>
+            /// <typeparam name="TResult"></typeparam>
+            [StructLayout(LayoutKind.Auto)]
+            public struct ManualResetValueTaskSourceCore<TResult>
+            {
+                /// <summary>
+                /// The callback to invoke when the operation completes if <see cref="ManualResetValueTaskSourceCore{T}.OnCompleted(System.Action{System.Object},System.Object,System.Int16,System.Threading.Tasks.Sources.ValueTaskSourceOnCompletedFlags)" /> was called before the operation completed,
+                /// or <see cref="ManualResetValueTaskSourceCoreShared.s_sentinel" /> if the operation completed before a callback was supplied,
+                /// or null if a callback hasn't yet been provided and the operation hasn't yet completed.
+                /// </summary>
+                private Action<object> _continuation;
+
+                /// <summary>State to pass to <see cref="ManualResetValueTaskSourceCore{T}._continuation" />.</summary>
+                private object _continuationState;
+
+                /// <summary><see cref="System.Threading.ExecutionContext" /> to flow to the callback, or null if no flowing is required.</summary>
+                private ExecutionContext _executionContext;
+
+                /// <summary>
+                /// A "captured" <see cref="System.Threading.SynchronizationContext" /> or <see cref="System.Threading.Tasks.TaskScheduler" /> with which to invoke the callback,
+                /// or null if no special context is required.
+                /// </summary>
+                private object _capturedContext;
+
+                /// <summary>Whether the current operation has completed.</summary>
+                private bool _completed;
+
+                /// <summary>The result with which the operation succeeded, or the default value if it hasn't yet completed or failed.</summary>
+                private TResult _result;
+
+                /// <summary>The exception with which the operation failed, or null if it hasn't yet completed or completed successfully.</summary>
+                private ExceptionDispatchInfo _error;
+
+                /// <summary>The current version of this value, used to help prevent misuse.</summary>
+                private short _version;
+
+                /// <summary>Gets or sets whether to force continuations to run asynchronously.</summary>
+                /// <remarks>Continuations may run asynchronously if this is false, but they'll never run synchronously if this is true.</remarks>
+                public bool RunContinuationsAsynchronously { get; set; }
+
+                /// <summary>Gets the operation version.</summary>
+                public short Version => _version;
+
+                /// <summary>Resets to prepare for the next operation.</summary>
+                public void Reset()
+                {
+                    _version++;
+                    _completed = false;
+                    _result = default(TResult);
+                    _error = null;
+                    _executionContext = null;
+                    _capturedContext = null;
+                    _continuation = null;
+                    _continuationState = null;
+                }
+
+                /// <summary>Completes with a successful result.</summary>
+                /// <param name="result">The result.</param>
+                public void SetResult(TResult result)
+                {
+                    _result = result;
+                    SignalCompletion();
+                }
+
+                /// <summary>Complets with an error.</summary>
+                /// <param name="error"></param>
+                public void SetException(Exception error)
+                {
+                    _error = ExceptionDispatchInfo.Capture(error);
+                    SignalCompletion();
+                }
+
+                /// <summary>Gets the status of the operation.</summary>
+                /// <param name="token">Opaque value that was provided to the <see cref="T:System.Threading.Tasks.ValueTask" />'s constructor.</param>
+                public ValueTaskSourceStatus GetStatus(short token)
+                {
+                    ValidateToken(token);
+                    if (_continuation != null && _completed)
+                    {
+                        if (_error != null)
+                        {
+                            if (!(_error.SourceException is OperationCanceledException))
+                            {
+                                return ValueTaskSourceStatus.Faulted;
+                            }
+                            return ValueTaskSourceStatus.Canceled;
+                        }
+                        return ValueTaskSourceStatus.Succeeded;
+                    }
+                    return ValueTaskSourceStatus.Pending;
+                }
+
+                /// <summary>Gets the result of the operation.</summary>
+                /// <param name="token">Opaque value that was provided to the <see cref="T:System.Threading.Tasks.ValueTask" />'s constructor.</param>
+                public TResult GetResult(short token)
+                {
+                    ValidateToken(token);
+                    if (!_completed)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    _error?.Throw();
+                    return _result;
+                }
+
+                /// <summary>Schedules the continuation action for this operation.</summary>
+                /// <param name="continuation">The continuation to invoke when the operation has completed.</param>
+                /// <param name="state">The state object to pass to <paramref name="continuation" /> when it's invoked.</param>
+                /// <param name="token">Opaque value that was provided to the <see cref="ValueTask" />'s constructor.</param>
+                /// <param name="flags">The flags describing the behavior of the continuation.</param>
+                #nullable enable
+                public void OnCompleted(Action<object?> continuation, object? state, short token, ValueTaskSourceOnCompletedFlags flags)
+                {
+                #nullable disable
+                    if (continuation == null)
+                    {
+                        throw new ArgumentNullException("continuation");
+                    }
+                    ValidateToken(token);
+                    if ((flags & ValueTaskSourceOnCompletedFlags.FlowExecutionContext) != 0)
+                    {
+                        _executionContext = ExecutionContext.Capture();
+                    }
+                    if ((flags & ValueTaskSourceOnCompletedFlags.UseSchedulingContext) != 0)
+                    {
+                        SynchronizationContext current = SynchronizationContext.Current;
+                        if (current != null && current.GetType() != typeof(SynchronizationContext))
+                        {
+                            _capturedContext = current;
+                        }
+                        else
+                        {
+                            TaskScheduler current2 = TaskScheduler.Current;
+                            if (current2 != TaskScheduler.Default)
+                            {
+                                _capturedContext = current2;
+                            }
+                        }
+                    }
+                    object obj = _continuation;
+                    if (obj == null)
+                    {
+                        _continuationState = state;
+                        obj = Interlocked.CompareExchange(ref _continuation, continuation, null);
+                    }
+                    if (obj == null)
+                    {
+                        return;
+                    }
+                    if (obj != ManualResetValueTaskSourceCoreShared.s_sentinel)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    object capturedContext = _capturedContext;
+                    if (capturedContext != null)
+                    {
+                        if (!(capturedContext is SynchronizationContext synchronizationContext))
+                        {
+                            if (capturedContext is TaskScheduler scheduler)
+                            {
+                                Task.Factory.StartNew(continuation, state, CancellationToken.None, TaskCreationOptions.DenyChildAttach, scheduler);
+                            }
+                        }
+                        else
+                        {
+                            synchronizationContext.Post(delegate (object s)
+                            {
+                                Tuple<Action<object>, object> tuple = (Tuple<Action<object>, object>)s;
+                                tuple.Item1(tuple.Item2);
+                            }, Tuple.Create(continuation, state));
+                        }
+                    }
+                    else
+                    {
+                        Task.Factory.StartNew(continuation, state, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
+                    }
+                }
+
+                /// <summary>Ensures that the specified token matches the current version.</summary>
+                /// <param name="token">The token supplied by <see cref="T:System.Threading.Tasks.ValueTask" />.</param>
+                private void ValidateToken(short token)
+                {
+                    if (token != _version)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                }
+
+                /// <summary>Signals that the operation has completed.  Invoked after the result or error has been set.</summary>
+                private void SignalCompletion()
+                {
+                    if (_completed)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    _completed = true;
+                    if (_continuation == null && Interlocked.CompareExchange(ref _continuation, ManualResetValueTaskSourceCoreShared.s_sentinel, null) == null)
+                    {
+                        return;
+                    }
+                    if (_executionContext != null)
+                    {
+                        ExecutionContext.Run(_executionContext, delegate (object s)
+                        {
+                            ((ManualResetValueTaskSourceCore<TResult>)s).InvokeContinuation();
+                        }, this);
+                    }
+                    else
+                    {
+                        InvokeContinuation();
+                    }
+                }
+
+                /// <summary>
+                /// Invokes the continuation with the appropriate captured context / scheduler.
+                /// This assumes that if <see cref="F:System.Threading.Tasks.Sources.ManualResetValueTaskSourceCore`1._executionContext" /> is not null we're already
+                /// running within that <see cref="T:System.Threading.ExecutionContext" />.
+                /// </summary>
+                private void InvokeContinuation()
+                {
+                    object capturedContext = _capturedContext;
+                    if (capturedContext != null)
+                    {
+                        if (!(capturedContext is SynchronizationContext synchronizationContext))
+                        {
+                            if (capturedContext is TaskScheduler scheduler)
+                            {
+                                Task.Factory.StartNew(_continuation, _continuationState, CancellationToken.None, TaskCreationOptions.DenyChildAttach, scheduler);
+                            }
+                        }
+                        else
+                        {
+                            synchronizationContext.Post(delegate (object s)
+                            {
+                                Tuple<Action<object>, object> tuple = (Tuple<Action<object>, object>)s;
+                                tuple.Item1(tuple.Item2);
+                            }, Tuple.Create(_continuation, _continuationState));
+                        }
+                    }
+                    else if (RunContinuationsAsynchronously)
+                    {
+                        Task.Factory.StartNew(_continuation, _continuationState, CancellationToken.None, TaskCreationOptions.DenyChildAttach, TaskScheduler.Default);
+                    }
+                    else
+                    {
+                        _continuation(_continuationState);
+                    }
+                }
+            }
+
+            internal static class ManualResetValueTaskSourceCoreShared
+            {
+                internal static readonly Action<object> s_sentinel = CompletionSentinel;
+
+                private static void CompletionSentinel(object _)
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+            #nullable enable
         }
 
 
@@ -1248,6 +1510,39 @@ namespace System.Threading
                 }
 
                 return string.Empty;
+            }
+        }
+
+        /// <summary>Provides a set of static methods for configuring <see cref="T:System.Threading.Tasks.Task" />-related behaviors on asynchronous enumerables and disposables.</summary>
+        public static class TaskAsyncEnumerableExtensions
+        {
+            /// <summary>Configures how awaits on the tasks returned from an async disposable will be performed.</summary>
+            /// <param name="source">The source async disposable.</param>
+            /// <param name="continueOnCapturedContext">Whether to capture and marshal back to the current context.</param>
+            /// <returns>The configured async disposable.</returns>
+            public static ConfiguredAsyncDisposable ConfigureAwait(this IAsyncDisposable source, bool continueOnCapturedContext)
+            {
+                return new ConfiguredAsyncDisposable(source, continueOnCapturedContext);
+            }
+
+            /// <summary>Configures how awaits on the tasks returned from an async iteration will be performed.</summary>
+            /// <typeparam name="T">The type of the objects being iterated.</typeparam>
+            /// <param name="source">The source enumerable being iterated.</param>
+            /// <param name="continueOnCapturedContext">Whether to capture and marshal back to the current context.</param>
+            /// <returns>The configured enumerable.</returns>
+            public static ConfiguredCancelableAsyncEnumerable<T> ConfigureAwait<T>(this IAsyncEnumerable<T> source, bool continueOnCapturedContext)
+            {
+                return new ConfiguredCancelableAsyncEnumerable<T>(source, continueOnCapturedContext, default(CancellationToken));
+            }
+
+            /// <summary>Sets the <see cref="T:System.Threading.CancellationToken" /> to be passed to <see cref="M:System.Collections.Generic.IAsyncEnumerable`1.GetAsyncEnumerator(System.Threading.CancellationToken)" /> when iterating.</summary>
+            /// <typeparam name="T">The type of the objects being iterated.</typeparam>
+            /// <param name="source">The source enumerable being iterated.</param>
+            /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> to use.</param>
+            /// <returns>The configured enumerable.</returns>
+            public static ConfiguredCancelableAsyncEnumerable<T> WithCancellation<T>(this IAsyncEnumerable<T> source, CancellationToken cancellationToken)
+            {
+                return new ConfiguredCancelableAsyncEnumerable<T>(source, continueOnCapturedContext: true, cancellationToken);
             }
         }
 

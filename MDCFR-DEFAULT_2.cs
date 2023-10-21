@@ -486,33 +486,54 @@ namespace ROOT
         /// </summary>
         public class CurrentProgress
         {
+            private System.Int32 TFS = 0;
+            private System.Int32 FPD = 0;
+            private System.String WOF = null;
+            private System.String WOFP = null;
+            private CurrentOperation OP = CurrentOperation.None;
+
+            /// <summary>
+            /// Initialises a new instance of the <see cref="CurrentProgress"/> class. <br />
+            /// When the initialisation completes , it fires up the <see cref="GlobalArchiveProgress.ProgressChanged"/>
+            /// event.
+            /// </summary>
+            public CurrentProgress() { GlobalArchiveProgress.FireChanged(); }
+
             /// <summary>
             /// The number of the files that will be added to the archive.
             /// </summary>
-            public System.Int32 TotalFiles;
+            public System.Int32 TotalFiles { get { return TFS; } set { TFS = value; GlobalArchiveProgress.FireChanged(); } }
             /// <summary>
-            /// The number of processed files that were added to the archive.
+            /// The number of processed files that were added to or extracted from the archive.
             /// </summary>
-            public System.Int32 FilesProcessed;
+            public System.Int32 FilesProcessed { get { return FPD; } set { FPD = value; GlobalArchiveProgress.FireChanged(); } }
             /// <summary>
             /// The name of the file that the operation is working on.
             /// </summary>
-            public System.String WorkingOnFile;
+            public System.String WorkingOnFile { get { return WOF; } set { WOF = value; GlobalArchiveProgress.FireChanged(); } }
             /// <summary>
             /// The fully qualified path of the file that the operation is running on.
             /// </summary>
-            public System.String WorkingOnFileFullPath;
+            public System.String WorkingOnFileFullPath { get { return WOFP; } set { WOFP = value; GlobalArchiveProgress.FireChanged(); } }
             /// <summary>
             /// The current operation undertaken. A default instance of this class auto-fills this value with <see cref="CurrentOperation.None"/> .
             /// </summary>
-            public CurrentOperation Operation = CurrentOperation.None;
+            public CurrentOperation Operation { get { return OP; } set { OP = value; GlobalArchiveProgress.FireChanged(); } }
 
             /// <summary>
             /// The remaining files to be processed. This is actually a subtraction of 
             /// <see cref="TotalFiles"/> and <see cref="FilesProcessed"/>
-            /// fields.
+            /// properties.
             /// </summary>
-            public System.Int32 FilesRemaining { get { if (TotalFiles != 0 && FilesProcessed != 0) { return TotalFiles - FilesProcessed; } else { return 0; } } }
+            public System.Int32 FilesRemaining 
+            { 
+                get 
+                { 
+                    if (TotalFiles >= 0 && FilesProcessed >= 0) 
+                    { return TotalFiles - FilesProcessed; } 
+                    else { return 0; } 
+                }
+            }
 
             /// <summary>
             /// Gets a value whether this operation compresses a multiple of files.
@@ -549,6 +570,21 @@ namespace ROOT
                 if (Num < 0) { Value = Value * (-1); }
                 return Value;
             }
+
+            static GlobalArchiveProgress() 
+            {
+                ProgressChanged = new(NullEventHandler);
+                Progress = new();
+            }
+
+            /// <summary>
+            /// This event is fired up when one of the properties of the <see cref="CurrentProgress"/> class was changed.
+            /// </summary>
+            public static event System.EventHandler ProgressChanged;
+
+            internal static void FireChanged() { ProgressChanged.Invoke(typeof(GlobalArchiveProgress) , EventArgs.Empty); }
+
+            private static void NullEventHandler(System.Object sender , System.EventArgs e) { }
 
             internal static System.Boolean IsDecompOpForCab { get; set; }
 
@@ -604,229 +640,11 @@ namespace ROOT
             Failed = 5
         }
 
+
         /// <summary>
-        /// Archive files using the GZIP algorithm.
+        /// Archive files using the GZIP algorithm from the ZIP managed library.
         /// </summary>
         public static class GZipArchives
-        {
-            /* A Class that abstracts the GZIP archive format.
-               USAGE NOTE: You can only add one file per archive each time.
-               This style is adopted by the UNIX Systems and can be used to transfer data to an UNIX operating system.
-               You can use this class with three ways:
-                1 ->  Supply the file paths.
-                       You supply the file paths to the function and it will create or extract the archive respectively.
-                2 -> Use GZ UNIX filename format.
-                        You only supply the filepath and the function creates automagically the Gzip archive filename.
-                        You can also extract from it with about the same way.
-                3 -> Use an already initialised FileStream.
-                        Using this way , you can customize the file creation options , and how the file should be created or read.
-                        See http://learn.microsoft.com/en-us/dotnet/api/system.io?view=netframework-4.8 for more details on how exactly the 
-                        the files can be read or written.
-              NOTES: 
-              1: Using GZIP methods do not expose any exception to be thrown. Any found exception will be thrown to the console.
-              2: These methods are only allowed to return System.Boolean values , which means that only True or False values can be displayed only.
-              3: True determines that the operation was completed sucessfully; while False means that something broke up the execution and the file was not created OR
-              it was created the result , but it is empty.
-              4: Be careful when using the File Paths methods , because if one archive with the same name is already existing , it will be overwritten.
-            */
-
-            private static System.Boolean CheckFilePath(System.String Path)
-            {
-                if (System.String.IsNullOrEmpty(Path)) { return false; }
-                if (!(System.IO.File.Exists(Path))) { return false; }
-                return true;
-            }
-
-            /// <summary>
-            /// Compress the specified file to GZIP format.
-            /// </summary>
-            /// <param name="FilePath">The file to compress.</param>
-            /// <param name="ArchivePath">The output file.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
-            {
-                if (!(CheckFilePath(FilePath))) { return false; }
-                System.String OutputFile;
-                if (System.String.IsNullOrEmpty(ArchivePath))
-                {
-                    System.IO.FileInfo FSIData = new System.IO.FileInfo(FilePath);
-                    OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.gz";
-                    FSIData = null;
-                }
-                else { OutputFile = ArchivePath; }
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-                try { FSI = System.IO.File.OpenRead(FilePath); }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                try
-                { FSO = System.IO.File.OpenWrite(ArchivePath); }
-                catch (System.Exception EX)
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                try
-                {
-                    using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(FSO, System.IO.Compression.CompressionMode.Compress))
-                    {
-                        FSI.CopyTo(CMP);
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                finally
-                {
-                    if (FSI != null)
-                    {
-                        FSI.Close();
-                        FSI.Dispose();
-                    }
-                    if (FSO != null)
-                    {
-                        FSO.Close();
-                        FSO.Dispose();
-                    }
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
-            /// compress to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
-            /// <param name="OutputFileStream">The compressed data.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
-            {
-                if (InputFileStream.CanRead == false) { return false; }
-                if (OutputFileStream.CanWrite == false) { return false; }
-                try
-                {
-                    using (System.IO.Compression.GZipStream CMP = new System.IO.Compression.GZipStream(OutputFileStream, System.IO.Compression.CompressionMode.Compress))
-                    {
-                        InputFileStream.CopyTo(CMP);
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress a GZIP archive back to the file.
-            /// </summary>
-            /// <param name="ArchiveFile">The Archive file path.</param>
-            /// <param name="OutputPath">Path to put the decompressed data.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
-            {
-                if (!(CheckFilePath(ArchiveFile))) { return false; }
-                System.String OutputFile;
-                if (System.String.IsNullOrEmpty(OutputPath))
-                {
-                    System.IO.FileInfo ArchInfo = new System.IO.FileInfo(ArchiveFile);
-                    System.String FinalPath = ArchInfo.DirectoryName;
-                    System.String TruncatePath = ArchiveFile.Substring(FinalPath.Length + 1);
-                    System.String FPH = TruncatePath.Remove(TruncatePath.Length - 3);
-                    OutputFile = FinalPath + @"\" + FPH;
-                    FPH = null;
-                    ArchInfo = null;
-                    FinalPath = null;
-                    TruncatePath = null;
-                }
-                else
-                {
-                    OutputFile = OutputPath;
-                }
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-                try
-                {
-                    FSI = System.IO.File.OpenRead(ArchiveFile);
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                try
-                {
-                    FSO = System.IO.File.OpenWrite(OutputFile);
-                }
-                catch (System.Exception EX)
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                try
-                {
-                    using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(FSI, System.IO.Compression.CompressionMode.Decompress))
-                    {
-                        DCMP.CopyTo(FSO);
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                finally
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    FSO.Close();
-                    FSO.Dispose();
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
-            /// to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="ArchiveFileStream">The compressed data.</param>
-            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
-            {
-                if (ArchiveFileStream.CanRead == false) { return false; }
-                if (DecompressedFileStream.CanWrite == false) { return false; }
-                try
-                {
-                    using (System.IO.Compression.GZipStream DCMP = new System.IO.Compression.GZipStream(ArchiveFileStream, System.IO.Compression.CompressionMode.Decompress))
-                    {
-                        DCMP.CopyTo(DecompressedFileStream);
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                return true;
-            }
-
-        }
-
-        /// <summary>
-        /// Archive files using the GZIP algorithm from the ZIP managed library. (Experimental class)
-        /// </summary>
-        public static class Experimental_GZipArchives
         {
 
             /// <summary>
@@ -1012,9 +830,9 @@ namespace ROOT
         }
 
         /// <summary>
-        /// Archive files using the BZip2 format (Experimental class).
+        /// Archive files using the BZip2 format.
         /// </summary>
-        public static class Experimental_BZip2Archives
+        public static class BZip2Archives
         {
             /// <summary>
             /// Compress the specified file to GZIP format.
@@ -1170,143 +988,6 @@ namespace ROOT
         }
 
         /// <summary>
-        /// Archive files using the well-known ZIP format.
-        /// </summary>
-        public static class ZipArchives
-        {
-            /// <summary>
-            /// Extract all the contents of a ZIP file to the specified directory path.
-            /// </summary>
-            /// <param name="PathOfZip">The archive file.</param>
-            /// <param name="PathToExtract">The directory to put the extracted data.</param>
-            /// <returns><c>true</c> if extraction succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean ExtractZipFileToSpecifiedLocation(System.String PathOfZip, System.String PathToExtract)
-            {
-                if (!(System.IO.File.Exists(PathOfZip))) { return false; }
-                if (!(System.IO.Directory.Exists(PathToExtract))) { return false; }
-                try
-                {
-                    System.IO.Compression.ZipFile.ExtractToDirectory(PathOfZip, PathToExtract);
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Create a new ZIP archive by capturing data from a specified directory.
-            /// </summary>
-            /// <param name="PathOfZipToMake">The file path that the archive will be created.</param>
-            /// <param name="PathToCollect">The directory path to capture data from.</param>
-            /// <returns><c>true</c> if the operation succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean MakeZipFromDir(System.String PathOfZipToMake, System.String PathToCollect)
-            {
-                if (System.String.IsNullOrEmpty(PathOfZipToMake)) { return false; }
-                if (!(System.IO.Directory.Exists(PathToCollect))) { return false; }
-                try
-                {
-                    System.IO.Compression.ZipFile.CreateFromDirectory(PathToCollect, PathOfZipToMake);
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Create a new ZIP archive stream so as to customize it.
-            /// </summary>
-            /// <param name="PathofZipToCreate">The file path of the archive to be created , or the existing one , if modified.</param>
-            /// <param name="ArchModeSelector">One of the <see cref="ZipArchiveMode"/> enumerations which indicate at which mode the archive should be opened.</param>
-            /// <returns>A new <see cref="ZipArchive"/> object if the command was sucessfull ; otherwise , <c>null</c>.</returns>
-            [System.Obsolete("Start using the Experimental_ZipArchives class functions instead. If you want a custom implementation , " +
-                "use the namespace ExternalArchivingMethods.SharpZipLib .", false)]
-            public static System.IO.Compression.ZipArchive InitZipFileStream(System.String PathofZipToCreate, System.IO.Compression.ZipArchiveMode ArchModeSelector)
-            {
-                if ((!(System.IO.File.Exists(PathofZipToCreate))) && (System.Convert.ToInt32(ArchModeSelector) != 2))
-                {
-                    MAIN.WriteConsoleText("Cannot Call 'InitZipFileStream' method with the argument ArchModeSelector set to " + ArchModeSelector + " and PathOfZipToMake: " + PathofZipToCreate + " resolves to False.");
-                    return null;
-                }
-                try
-                {
-                    return System.IO.Compression.ZipFile.Open(PathofZipToCreate, ArchModeSelector);
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return null;
-                }
-            }
-
-            /// <summary>
-            /// Add a new file to the root directory of the ZIP archive.
-            /// </summary>
-            /// <param name="Path">The path of the file where it is located.</param>
-            /// <param name="ArchFileStream">The alive <see cref="ZipArchive"/> stream to write data to.</param>
-            /// <param name="CompLevel">The compression level that should be applied to the file.</param>
-            /// <returns><c>true</c> if the file was added to the stream; otherwise , <c>false</c>.</returns>
-            [System.Obsolete("Start using the Experimental_ZipArchives class functions instead. If you want a custom implementation , " +
-                "use the namespace ExternalArchivingMethods.SharpZipLib .", false)]
-            public static System.Boolean AddNewFileEntryToZip(System.String Path, System.IO.Compression.ZipArchive ArchFileStream, System.IO.Compression.CompressionLevel CompLevel)
-            {
-                if (!(System.IO.File.Exists(Path))) { return false; }
-                System.IO.FileInfo RDF = new System.IO.FileInfo(Path);
-                try
-                {
-                    ArchFileStream.CreateEntryFromFile(RDF.FullName, RDF.Name, CompLevel);
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Add all the files detected in a <see cref="System.IO.FileSystemInfo"/>[] array to the root of the ZIP archive.
-            /// </summary>
-            /// <param name="PathofZipToCreate">The file path of the existing archive.</param>
-            /// <param name="InfoObject">The <see cref="System.IO.FileSystemInfo"/> array to purge and add the files to the archive.</param>
-            /// <param name="ENTCMPL">The compression level to apply while processing the files.</param>
-            /// <returns><c>true</c> if all the files were added to the archive.; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CreateZipArchiveViaFileSystemInfo(System.String PathofZipToCreate, System.IO.FileSystemInfo[] InfoObject, System.IO.Compression.CompressionLevel ENTCMPL)
-            {
-                if (!(System.IO.File.Exists(PathofZipToCreate))) { return false; }
-                System.IO.FileStream Zipper = null;
-                try
-                {
-                    Zipper = new(PathofZipToCreate, System.IO.FileMode.Open);
-                    using (System.IO.Compression.ZipArchive ArchZip = new(Zipper, System.IO.Compression.ZipArchiveMode.Update))
-                    {
-                        foreach (System.IO.FileSystemInfo T in InfoObject) { if (T is System.IO.FileInfo) { ArchZip.CreateEntryFromFile(T.FullName, T.Name, ENTCMPL); } }
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                finally
-                {
-                    if (Zipper != null)
-                    {
-                        Zipper.Close();
-                        Zipper.Dispose();
-                    }
-                }
-                return true;
-            }
-
-        }
-
-        /// <summary>
         /// Zip Files compression level.
         /// </summary>
         public enum ZipCompressionLevel : System.Int32
@@ -1335,9 +1016,9 @@ namespace ROOT
         }
 
         /// <summary>
-        /// Experimental class that abstracts the methods of the ZIP managed library.
+        /// Class that abstracts the methods of the ZIP managed library.
         /// </summary>
-        public static class Experimental_ZipArchives
+        public static class ZipArchives
         {
 
             /// <summary>
@@ -1380,6 +1061,7 @@ namespace ROOT
                         {
                             ROOT.MAIN.DeleteAFile($"{OutputPath}\\{g}");
                         }
+                        GlobalArchiveProgress.Progress.FilesProcessed++;
                         DI = null;
                     }
                 }
@@ -1497,6 +1179,7 @@ namespace ROOT
                         GDX.Close();
                         GDX.Dispose();
                         DI.CloseEntry();
+                        GlobalArchiveProgress.Progress.FilesProcessed++;
                         GDX = null;
                     }
                 }
@@ -1511,8 +1194,7 @@ namespace ROOT
                 EDI.Dispose();
                 GlobalArchiveProgress.Progress.SetOpNone();
                 return true;
-            GI_ERR:
-                {
+                GI_ERR: {
                     if (DI != null) { DI.Close(); DI.Dispose(); }
                     if (EDI != null) { EDI.Close(); EDI.Dispose(); }
                     if (GDX != null) { GDX.Close(); GDX.Dispose(); }
@@ -1520,8 +1202,7 @@ namespace ROOT
                     GlobalArchiveProgress.Progress.SetOpFailed();
                     return false;
                 }
-            GI_ERR2:
-                {
+                GI_ERR2: {
                     GlobalArchiveProgress.Progress.SetOpFailed();
                     return false;
                 }
@@ -1545,6 +1226,7 @@ namespace ROOT
                 ExternalArchivingMethods.SharpZipLib.ZipOutputStream DI = new(EDI);
                 System.IO.FileStream GDX = null;
                 System.Byte[] TempBuf = null;
+                GlobalArchiveProgress.Progress.TotalFiles = InfoObject.Length;
                 foreach (System.IO.FileSystemInfo DF in InfoObject)
                 {
                     if (DF is System.IO.FileInfo)
@@ -1580,6 +1262,7 @@ namespace ROOT
                         GDX.Close();
                         GDX.Dispose();
                         DI.CloseEntry();
+                        GlobalArchiveProgress.Progress.FilesProcessed++;
                         GDX = null;
                     }
                 }
@@ -1615,7 +1298,7 @@ namespace ROOT
             {
                 GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
                 GlobalArchiveProgress.IsDecompOpForCab = false;
-                if (System.IO.Directory.Exists(DirToCapture) == false) { return false; }
+                if (MAIN.DirExists(DirToCapture) == false) { return false; }
                 ExternalArchivingMethods.Cabinets.CabEngine DC = new();
                 try
                 {
@@ -1650,8 +1333,8 @@ namespace ROOT
             {
                 GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
                 GlobalArchiveProgress.IsDecompOpForCab = true;
-                if (System.IO.Directory.Exists(DestDir) == false) { ROOT.MAIN.CreateADir(DestDir); }
-                if (System.IO.File.Exists(ArchiveFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
+                if (MAIN.DirExists(DestDir) == false) { ROOT.MAIN.CreateADir(DestDir); }
+                if (MAIN.FileExists(ArchiveFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
                 GlobalArchiveProgress.Progress.SetOpDcmp();
                 try
                 {
@@ -1681,8 +1364,8 @@ namespace ROOT
             {
                 GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
                 GlobalArchiveProgress.IsDecompOpForCab = false;
-                if (System.IO.File.Exists(CabinetFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (System.IO.File.Exists(FilePath) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
+                if (ROOT.MAIN.FileExists(CabinetFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
+                if (ROOT.MAIN.FileExists(FilePath) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
                 try
                 {
                     System.IO.FileInfo FI = new System.IO.FileInfo(FilePath);
@@ -2080,7 +1763,7 @@ namespace ROOT
             get { return Progc; }
             set
             {
-                System.Char[] InvalidChars = new System.Char[] { '\a', '\b', '\\', '\'', '\"', '\r', '\n', '\0', '\f' };
+                System.Char[] InvalidChars = { '\a', '\b', '\\', '\'', '\"', '\r', '\n', '\0', '\f' };
                 for (System.Int32 D = 0; D < InvalidChars.Length; D++)
                 {
                     if (InvalidChars[D] == value) { throw new System.ArgumentException("The character is illegal."); }
@@ -2210,7 +1893,7 @@ namespace ROOT
 #pragma warning restore CS1591
 
         /// <summary>
-        /// A class that extends the default <see cref="Microsoft.VisualBasic.Interaction.InputBox"/> method.
+        /// A class that extends the default Microsoft.VisualBasic.Interaction.InputBox() method.
         /// </summary>
         [SupportedOSPlatform("windows")]
         public class GetAStringFromTheUser : System.IDisposable
@@ -2403,6 +2086,7 @@ namespace ROOT
                 Menu.ShowDialog();
             }
         }
+        
         /// <summary>
         /// A class that extends the <see cref="System.Windows.Forms.MessageBox"/> class by adding it new features.
         /// </summary>

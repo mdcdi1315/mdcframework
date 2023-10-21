@@ -4,13 +4,10 @@
 
 
 using System.Threading;
-using System.Diagnostics;
-using System.Globalization;
+using System.ComponentModel;
 using System.Diagnostics.Tracing;
 using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
-using System.Buffers;
-using System.ComponentModel;
 
 namespace System
 {
@@ -1655,7 +1652,7 @@ namespace System
                             break;
                     }
                     string text = format.ToString();
-                    string text2 = value.ToString(text, CultureInfo.InvariantCulture);
+                    string text2 = value.ToString(text, System.Globalization.CultureInfo.InvariantCulture);
                     int length = text2.Length;
                     if (length > destination.Length)
                     {
@@ -6836,6 +6833,52 @@ namespace System
 
             }
 
+            /// <summary>
+            /// Represents the validity of a UTF code unit sequence.
+            /// </summary>
+            public enum SequenceValidity
+            {
+                /// <summary>
+                /// The sequence is empty.
+                /// </summary>
+                Empty,
+                /// <summary>
+                /// The sequence is well-formed and unambiguously represents a proper Unicode scalar value.
+                /// </summary>
+                /// <remarks>
+                /// [ 20 ] (U+0020 SPACE) is a well-formed UTF-8 sequence.
+                /// [ C3 A9 ] (U+00E9 LATIN SMALL LETTER E WITH ACUTE) is a well-formed UTF-8 sequence.
+                /// [ F0 9F 98 80 ] (U+1F600 GRINNING FACE) is a well-formed UTF-8 sequence.
+                /// [ D83D DE00 ] (U+1F600 GRINNING FACE) is a well-formed UTF-16 sequence.
+                /// </remarks>
+                WellFormed,
+                /// <summary>
+                /// The sequence is not well-formed on its own, but it could appear as a prefix
+                /// of a longer well-formed sequence. More code units are needed to make a proper
+                /// determination as to whether this sequence is well-formed. Incomplete sequences
+                /// can only appear at the end of a string.
+                /// </summary>
+                /// <remarks>
+                /// [ C2 ] is an incomplete UTF-8 sequence if it is followed by nothing.
+                /// [ F0 9F ] is an incomplete UTF-8 sequence if it is followed by nothing.
+                /// [ D83D ] is an incomplete UTF-16 sequence if it is followed by nothing.
+                /// </remarks>
+                Incomplete,
+                /// <summary>
+                /// The sequence is never well-formed anywhere, or this sequence can never appear as a prefix
+                /// of a longer well-formed sequence, or the sequence was improperly terminated by the code
+                /// unit which appeared immediately after this sequence.
+                /// </summary>
+                /// <remarks>
+                /// [ 80 ] is an invalid UTF-8 sequence (code unit cannot appear at start of sequence).
+                /// [ FE ] is an invalid UTF-8 sequence (sequence is never well-formed anywhere in UTF-8 string).
+                /// [ C2 ] is an invalid UTF-8 sequence if it is followed by [ 20 ] (sequence improperly terminated).
+                /// [ ED A0 ] is an invalid UTF-8 sequence (sequence is never well-formed anywhere in UTF-8 string).
+                /// [ DE00 ] is an invalid UTF-16 sequence (code unit cannot appear at start of sequence).
+                /// </remarks>
+                Invalid
+            }
+
         }
 
         namespace Binary
@@ -8121,7 +8164,7 @@ namespace System
 
                 internal Bucket(int bufferLength, int numberOfBuffers, int poolId)
                 {
-                    _lock = new SpinLock(Debugger.IsAttached);
+                    _lock = new SpinLock(System.Diagnostics.Debugger.IsAttached);
                     _buffers = new T[numberOfBuffers][];
                     _bufferLength = bufferLength;
                     _poolId = poolId;
@@ -8496,10 +8539,10 @@ namespace System
 
         internal sealed class ReadOnlySequenceDebugView<T>
         {
-            [DebuggerDisplay("Count: {Segments.Length}", Name = "Segments")]
+            [System.Diagnostics.DebuggerDisplay("Count: {Segments.Length}", Name = "Segments")]
             public struct ReadOnlySequenceDebugViewSegments
             {
-                [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+                [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.RootHidden)]
                 public ReadOnlyMemory<T>[] Segments { get; set; }
             }
 
@@ -8509,7 +8552,7 @@ namespace System
 
             public ReadOnlySequenceDebugViewSegments BufferSegments => _segments;
 
-            [DebuggerBrowsable(DebuggerBrowsableState.RootHidden)]
+            [System.Diagnostics.DebuggerBrowsable(System.Diagnostics.DebuggerBrowsableState.RootHidden)]
             public T[] Items => _array;
 
             public ReadOnlySequenceDebugView(ReadOnlySequence<T> sequence)
@@ -8564,8 +8607,8 @@ namespace System
         /// Represents a sequence that can read a sequential series of <typeparamref name="T"/>.
         /// </summary>
         /// <typeparam name="T">The type of the elements in the read-only sequence.</typeparam>
-        [DebuggerTypeProxy(typeof(ReadOnlySequenceDebugView<>))]
-        [DebuggerDisplay("{ToString(),raw}")]
+        [System.Diagnostics.DebuggerTypeProxy(typeof(ReadOnlySequenceDebugView<>))]
+        [System.Diagnostics.DebuggerDisplay("{ToString(),raw}")]
         public readonly struct ReadOnlySequence<T>
         {
 
@@ -9513,6 +9556,196 @@ namespace System
             protected abstract void Dispose(bool disposing);
         }
 
+        /// <summary>
+        /// Represents a heap-based, array-backed output sink into which <typeparam name="T" /> data can be written.
+        /// </summary>
+        public sealed class ArrayBufferWriter<T> : IBufferWriter<T>
+        {
+            private const int ArrayMaxLength = 2147483591;
+
+            private const int DefaultInitialBufferSize = 256;
+
+            private T[] _buffer;
+
+            private int _index;
+
+            /// <summary>
+            /// Returns the data written to the underlying buffer so far, as a <see cref="T:System.ReadOnlyMemory`1" />.
+            /// </summary>
+            public ReadOnlyMemory<T> WrittenMemory => _buffer.AsMemory(0, _index);
+
+            /// <summary>
+            /// Returns the data written to the underlying buffer so far, as a <see cref="T:System.ReadOnlySpan`1" />.
+            /// </summary>
+            public ReadOnlySpan<T> WrittenSpan => _buffer.AsSpan(0, _index);
+
+            /// <summary>
+            /// Returns the amount of data written to the underlying buffer so far.
+            /// </summary>
+            public int WrittenCount => _index;
+
+            /// <summary>
+            /// Returns the total amount of space within the underlying buffer.
+            /// </summary>
+            public int Capacity => _buffer.Length;
+
+            /// <summary>
+            /// Returns the amount of space available that can still be written into without forcing the underlying buffer to grow.
+            /// </summary>
+            public int FreeCapacity => _buffer.Length - _index;
+
+            /// <summary>
+            /// Creates an instance of an <see cref="System.Buffers.ArrayBufferWriter{T}" />, in which data can be written to,
+            /// with the default initial capacity.
+            /// </summary>
+            public ArrayBufferWriter()
+            {
+                _buffer = Array.Empty<T>();
+                _index = 0;
+            }
+
+            /// <summary>
+            /// Creates an instance of an <see cref="System.Buffers.ArrayBufferWriter{T}" />, in which data can be written to,
+            /// with an initial capacity specified.
+            /// </summary>
+            /// <param name="initialCapacity">The minimum capacity with which to initialize the underlying buffer.</param>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="initialCapacity" /> is not positive (i.e. less than or equal to 0).
+            /// </exception>
+            public ArrayBufferWriter(int initialCapacity)
+            {
+                if (initialCapacity <= 0)
+                {
+                    throw new ArgumentException(null, "initialCapacity");
+                }
+                _buffer = new T[initialCapacity];
+                _index = 0;
+            }
+
+            /// <summary>
+            /// Clears the data written to the underlying buffer.
+            /// </summary>
+            /// <remarks>
+            /// You must clear the <see cref="T:System.Buffers.ArrayBufferWriter`1" /> before trying to re-use it.
+            /// </remarks>
+            public void Clear()
+            {
+                _buffer.AsSpan(0, _index).Clear();
+                _index = 0;
+            }
+
+            /// <summary>
+            /// Notifies <see cref="System.Buffers.IBufferWriter{T}" /> that <paramref name="count" /> amount of data was written to the output <see cref="T:System.Span`1" />/<see cref="T:System.Memory`1" />
+            /// </summary>
+            /// <exception cref="System.ArgumentException">
+            /// Thrown when <paramref name="count" /> is negative.
+            /// </exception>
+            /// <exception cref="System.InvalidOperationException">
+            /// Thrown when attempting to advance past the end of the underlying buffer.
+            /// </exception>
+            /// <remarks>
+            /// You must request a new buffer after calling Advance to continue writing more data and cannot write to a previously acquired buffer.
+            /// </remarks>
+            public void Advance(int count)
+            {
+                if (count < 0)
+                {
+                    throw new ArgumentException(null, "count");
+                }
+                if (_index > _buffer.Length - count)
+                {
+                    ThrowInvalidOperationException_AdvancedTooFar(_buffer.Length);
+                }
+                _index += count;
+            }
+
+            /// <summary>
+            /// Returns a <see cref="T:System.Memory`1" /> to write to that is at least the requested length (specified by <paramref name="sizeHint" />).
+            /// If no <paramref name="sizeHint" /> is provided (or it's equal to <code>0</code>), some non-empty buffer is returned.
+            /// </summary>
+            /// <exception cref="T:System.ArgumentException">
+            /// Thrown when <paramref name="sizeHint" /> is negative.
+            /// </exception>
+            /// <remarks>
+            /// This will never return an empty <see cref="T:System.Memory`1" />.
+            /// </remarks>
+            /// <remarks>
+            /// There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
+            /// </remarks>
+            /// <remarks>
+            /// You must request a new buffer after calling Advance to continue writing more data and cannot write to a previously acquired buffer.
+            /// </remarks>
+            public Memory<T> GetMemory(int sizeHint = 0)
+            {
+                CheckAndResizeBuffer(sizeHint);
+                return _buffer.AsMemory(_index);
+            }
+
+            /// <summary>
+            /// Returns a <see cref="T:System.Span`1" /> to write to that is at least the requested length (specified by <paramref name="sizeHint" />).
+            /// If no <paramref name="sizeHint" /> is provided (or it's equal to <code>0</code>), some non-empty buffer is returned.
+            /// </summary>
+            /// <exception cref="T:System.ArgumentException">
+            /// Thrown when <paramref name="sizeHint" /> is negative.
+            /// </exception>
+            /// <remarks>
+            /// This will never return an empty <see cref="T:System.Span`1" />.
+            /// </remarks>
+            /// <remarks>
+            /// There is no guarantee that successive calls will return the same buffer or the same-sized buffer.
+            /// </remarks>
+            /// <remarks>
+            /// You must request a new buffer after calling Advance to continue writing more data and cannot write to a previously acquired buffer.
+            /// </remarks>
+            public Span<T> GetSpan(int sizeHint = 0)
+            {
+                CheckAndResizeBuffer(sizeHint);
+                return _buffer.AsSpan(_index);
+            }
+
+            private void CheckAndResizeBuffer(int sizeHint)
+            {
+                if (sizeHint < 0)
+                {
+                    throw new ArgumentException("sizeHint");
+                }
+                if (sizeHint == 0)
+                {
+                    sizeHint = 1;
+                }
+                if (sizeHint <= FreeCapacity)
+                {
+                    return;
+                }
+                int num = _buffer.Length;
+                int num2 = Math.Max(sizeHint, num);
+                if (num == 0)
+                {
+                    num2 = Math.Max(num2, 256);
+                }
+                int num3 = num + num2;
+                if ((uint)num3 > 2147483647u)
+                {
+                    uint num4 = (uint)(num - FreeCapacity + sizeHint);
+                    if (num4 > 2147483591)
+                    {
+                        ThrowOutOfMemoryException(num4);
+                    }
+                    num3 = 2147483591;
+                }
+                Array.Resize(ref _buffer, num3);
+            }
+
+            private static void ThrowInvalidOperationException_AdvancedTooFar(int capacity)
+            {
+                throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.BufferWriterAdvancedTooFar, capacity));
+            }
+
+            private static void ThrowOutOfMemoryException(uint capacity)
+            {
+                throw new OutOfMemoryException(System.SR.Format(MDCFR.Properties.Resources.BufferMaximumSizeExceeded, capacity));
+            }
+        }
 
     }
 
@@ -9563,7 +9796,7 @@ namespace System
         /// <param name="other">The sequence position to compare with the current instance.</param>
         /// <returns><c>true</c> if the two instances are equal; <c>false</c> otherwise.</returns>
         /// <remarks>
-        /// Equality does not guarantee that the two instances point to the same location in a <see cref="ReadOnlySequence{T}"/>.
+        /// Equality does not guarantee that the two instances point to the same location in a <see cref="Buffers.ReadOnlySequence{T}"/>.
         /// </remarks>
         public bool Equals(SequencePosition other)
         {

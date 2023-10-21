@@ -12,7 +12,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
 [assembly: AssemblyFileVersionAttribute(mdcdi1315.VersionNumber)]
 [assembly: AssemblyInformationalVersionAttribute($"{mdcdi1315.VersionNumber} Built by: © MDCDI1315.")]
-[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 5")]
+[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 6")]
 [assembly: AssemblyVersionAttribute("4.4.0.0")]
 [assembly: DefaultDllImportSearchPathsAttribute((DllImportSearchPath) mdcdi1315.DefaultDllImportSearchPathConst)]
 [assembly: AssemblyMetadataAttribute(mdcdi1315.Author , mdcdi1315.AuthorLinkGitHub)]
@@ -78,7 +78,7 @@ internal static class mdcdi1315
     /// <summary>
     /// The current version of the MDCFR .
     /// </summary>
-    public const System.String VersionNumber = "1.5.5.05";
+    public const System.String VersionNumber = "1.5.5.06";
 
     /// <summary>
     /// This is the result of the bit-wise combination of <see cref="DllImportSearchPath.AssemblyDirectory"/> and <see cref="DllImportSearchPath.System32"/> enumeration values.

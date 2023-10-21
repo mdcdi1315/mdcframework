@@ -1706,6 +1706,45 @@ namespace ROOT
         
     }
 
+    internal static class Debugger
+    {
+        // Internal debugger tag that helps in debugging the library's functions.
+        internal const System.String DBGINFOShow = "[MDCFRDBGINFO]";
+        private static System.Boolean Executed = false;
+
+        // This debugger constant will specify when to use the debugging services.
+#if DEBUG
+        private const System.Boolean UseDebugger = true;
+#else
+        private const System.Boolean UseDebugger = false;
+#endif
+
+        private static void EnsureConsoleOpen()
+        {
+            if (Executed == false)
+            {
+                if (ROOT.MAIN.CreateConsole() == false) { ConsoleExtensions.Detached = false; }
+                if (ConsoleExtensions.Detached) { ROOT.MAIN.CreateConsole(); }
+                Executed = true;
+            }
+        }
+
+#if DEBUG == false
+        #pragma warning disable CS0162
+#endif
+        internal static void DebuggingInfo(System.String Info)
+        {
+            if (UseDebugger) 
+            {
+                EnsureConsoleOpen();
+                ROOT.MAIN.WriteConsoleText(DBGINFOShow + " " + Info);
+            }
+        }
+#if DEBUG == false
+        #pragma warning restore CS0162
+#endif
+    }
+
 }
 
 namespace ExternalHashCaculators
@@ -2269,7 +2308,7 @@ internal static class FileInterop
 {
     [DllImport(Interop.Libraries.Kernel32, 
         CallingConvention = CallingConvention.Winapi,
-        EntryPoint = "GetFullPathNameW", PreserveSig = true, 
+        EntryPoint = "GetFullPathNameW" , 
         SetLastError = true , CharSet = CharSet.Unicode)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -2281,7 +2320,7 @@ internal static class FileInterop
         [Out][MarshalAs(UnmanagedType.LPWStr)] System.String DirOrFile);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode, PreserveSig = true,
+        EntryPoint = "CreateDirectoryW", CharSet = CharSet.Unicode ,
         SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -2289,7 +2328,7 @@ internal static class FileInterop
     public static extern System.Int32 CreateDir([In] System.String Path, [Out][Optional] FileInterop_SECURITY_ATTRIBUTES Desc);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        EntryPoint = "CopyFileW", CharSet = CharSet.Unicode, PreserveSig = true, SetLastError = true)]
+        EntryPoint = "CopyFileW", CharSet = CharSet.Unicode , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
@@ -2299,7 +2338,7 @@ internal static class FileInterop
         [In] System.Boolean TerminateIfExists);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "MoveFileW", PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "MoveFileW" , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
@@ -2308,7 +2347,7 @@ internal static class FileInterop
         [In][MarshalAs(UnmanagedType.LPWStr)] System.String NewLocation);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "CreateHardLinkW", PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "CreateHardLinkW" , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
@@ -2318,21 +2357,21 @@ internal static class FileInterop
         [In][Optional] FileInterop_SECURITY_ATTRIBUTES MustBeNull);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "RemoveDirectoryW", PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "RemoveDirectoryW" , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
     public static extern System.Int32 RemoveDir([In][MarshalAs(UnmanagedType.LPWStr)] System.String PathToDir);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "DeleteFileW", PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "DeleteFileW" , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
-    public static extern System.Int32 DeleteFile([In][MarshalAs(UnmanagedType.LPWStr)] System.String Path);
+    public static extern System.Int32 DeleteFile([MarshalAs(UnmanagedType.LPWStr)] System.String Path);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "CreateSymbolicLinkW", PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "CreateSymbolicLinkW" , SetLastError = true)]
     [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         MayLeakOnAbort = true, SecurityInfrastructure = true)]
@@ -2342,22 +2381,19 @@ internal static class FileInterop
         [In] FileInterop_SYMLINK_FLAGS Flags);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "FindFirstFileW", PreserveSig = true, SetLastError = true)]
-    [System.Security.Permissions.HostProtection(System.Security.Permissions.SecurityAction.Assert,
-        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
-        MayLeakOnAbort = true, SecurityInfrastructure = true)]
+        CharSet = CharSet.Unicode, EntryPoint = "FindFirstFileW", SetLastError = true)]
     public static extern System.IntPtr FindFile(
         [In][MarshalAs(UnmanagedType.LPWStr)] System.String PathToSearch,
-        [Out] FileInterop_WIN32_FIND_DATA_W Result);
+        ref FileInterop_WIN32_FIND_DATA_W Result);
 
     [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi , 
-        CharSet = CharSet.Unicode , EntryPoint = "FindClose" , PreserveSig = true, SetLastError = true)]
+        CharSet = CharSet.Unicode , EntryPoint = "FindClose"  , SetLastError = true)]
     public static extern System.Boolean CloseFind([In][Out] System.IntPtr PtrToClose);
 
     public static System.Boolean FileExists(System.String Path)
     {
         FileInterop_WIN32_FIND_DATA_W G = new();
-        System.IntPtr FA = FindFile(Path, G);
+        System.IntPtr FA = FindFile(Path, ref G);
         if (FA != (System.IntPtr)(-1)) 
         {
             CloseFind(FA);
@@ -2433,20 +2469,20 @@ internal unsafe struct FileInterop_WIN32_FIND_DATA_W
     public System.UInt32 nFileSizeLow;
     public System.UInt32 dwReserved0;
     public System.UInt32 dwReserved1;
-    public fixed System.Char _cFileName[400];
-    public fixed System.Char _cAlternateFileName[14];
+    public fixed System.Char cFileName[400];
+    public fixed System.Char cAlternateFileName[14];
     public System.UInt32 dwFileType;
     public System.UInt32 dwCreatorType;
     public System.UInt32 wFinderFlags;
 
-    public System.ReadOnlySpan<System.Char> cFileName 
+    public System.ReadOnlySpan<System.Char> FileName 
     {  get 
-        { fixed (System.Char* ptr = _cFileName)  { return new System.ReadOnlySpan<System.Char>(ptr, 400); } } 
+        { fixed (System.Char* ptr = cFileName)  { return new System.ReadOnlySpan<System.Char>(ptr, 400); } } 
     }
 
-    public System.ReadOnlySpan<System.Char> cAlternateFileName 
+    public System.ReadOnlySpan<System.Char> AlternateFileName 
     {
-        get { fixed (System.Char* ptr = _cAlternateFileName) { return new System.ReadOnlySpan<System.Char>(ptr, 14); } }
+        get { fixed (System.Char* ptr = cAlternateFileName) { return new System.ReadOnlySpan<System.Char>(ptr, 14); } }
     }
 }
 
