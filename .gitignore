@@ -3,10 +3,21 @@
 ################################################################################
 
 /.vs
-/bin/Debug
-/obj # Reserved for backwards compatibility
-/bin/Release
-/bin
-/Objects
+/bin/Debug    #
+/obj          #
+/bin/Release  # Reserved for backwards compatibility
+/bin          #
+/Objects      #
 /Tools/AsInterfaceChecker/bin
 /Tools/AsInterfaceChecker/Objects
+/Tools/ResGen/bin
+/Tools/ResGen/Objects
+/Tools/ResGen/ResGen_SR.Designer.cs
+/Tools/ResGen/ResGen_CommonResStrings.Designer.cs
+/Source/MDCFR/bin
+/Source/MDCFR/Objects
+/Source/MDCFR-DEP_HTTPLIB/bin
+/Source/MDCFR-DEP_HTTPLIB/Objects
+/Source/MDCFR/Properties/Resources.Designer.cs
+/Source/MDCFR/Properties/NAudio.WinForms.Gui.VolumeSlider.Designer.cs
+/Source/MDCFR/Properties/NAudio.WinForms.Gui.PanSlider.Designer.cs
