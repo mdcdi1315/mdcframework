@@ -1,0 +1,14 @@
+#
+# (C) MDCDI1315. All Rights Reserved.
+# This file is a custom script file that is used only by Build.cmd file , which is located to 
+# the top directory of the project. This file , among with ALL .script files , can be only 
+# handled by Build.cmd itself.
+# These files were added due to the need to gather up all the artifacts in ONE directory.
+# 
+
+# Restore and Build the MDCFR Library itself.
+[Restore:MDCFR.csproj]
+[Build:MDCFR.csproj]
+# Copy some files. The rest of them will be copied after it finishes out.
+[Copy:.\Imports\zstd.dll$..\..\bin\zstd.dll]
+[Copy:.\Imports\xxhash.dll$..\..\bin\xxhash.dll]

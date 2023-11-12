@@ -29,6 +29,8 @@ using System.Runtime.InteropServices;
 /// <summary>
 /// An internal class defining the author's reserved strings.
 /// </summary>
+[System.Runtime.CompilerServices.SpecialName]
+[System.Runtime.CompilerServices.CompilerGlobalScope]
 internal static class mdcdi1315
 {
     /// <summary>

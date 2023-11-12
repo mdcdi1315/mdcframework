@@ -1,0 +1,48 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	
+   <ItemGroup>
+		<Reference Include="System.Xml" />
+		<Reference Include="System.Design" />
+   </ItemGroup>
+  
+  <PropertyGroup>
+    <AssemblyName>ResGen</AssemblyName>
+    <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+    <OutputType>Exe</OutputType>
+    <UseWindowsForms>True</UseWindowsForms>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>9.0</LangVersion>
+    <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+    <ApplicationManifest>ResGen.manifest</ApplicationManifest>
+	<StartupObject>System.ResGen</StartupObject>
+	<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath>
+	<DefaultItemExcludesInProjectFolder>*.csproj;*.vbproj;*.vb;*.cs;*.txt;*.cmd;*.resx;*.resources</DefaultItemExcludesInProjectFolder>
+	<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+	<Deterministic>True</Deterministic>
+	<!-- Sign your assembly using an Strong Name Key. Use "False" to disable signing. -->
+	<SignAssembly>True</SignAssembly>  
+	<!-- The Strong Key .snk file to sign the assembly with. -->
+	<AssemblyOriginatorKeyFile>msft.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+  <ItemGroup>
+	<Compile Include="ResGen.cs" />
+	<Compile Include="ResGen_CommonResStrings.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>ResGen_CommonResStrings.resx</DependentUpon>
+	</Compile>
+	<Compile Include="ResGen_SR.Designer.cs">
+	  <DesignTime>True</DesignTime>
+	  <AutoGen>True</AutoGen>
+	  <DependentUpon>ResGen_SR.resx</DependentUpon>
+	</Compile>
+	<EmbeddedResource Include="ResGen_SR.resx" LogicalName="SR.resources">
+	  <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResGen_SR.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+	<EmbeddedResource Include="ResGen_CommonResStrings.resx" LogicalName="CommonResStrings.resources">
+	  <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>ResGen_CommonResStrings.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>

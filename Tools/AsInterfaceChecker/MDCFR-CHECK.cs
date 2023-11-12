@@ -133,6 +133,7 @@ namespace MDCFR
 
     internal enum OperationType { Default = 0, AllTypesInAssembly, SpecificType }
 
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     internal class Runner
     {
         public System.Reflection.Assembly LoadedAssembly;
@@ -177,9 +178,49 @@ namespace MDCFR
             catch (System.Security.SecurityException e) { Logger.WriteException(e); return; }
             Logger.WriteVerbose("Assembly loaded. Data:\n" +
                 $"Assembly Full Name: {LoadedAssembly.FullName} \n" +
-                $"Assembly Trust Information: {LoadedAssembly.PermissionSet.ToXml().Text} \n" +
+                $"Assembly Host Context Information: {LoadedAssembly.HostContext.ToString("x")} \n" +
                 $"Assembly loaded with full trust: {LoadedAssembly.IsFullyTrusted} \n" +
                 $"Assembly created at .NET version: {LoadedAssembly.ImageRuntimeVersion}");
+
+            Logger.WriteVerbose("Detecting Assembly Dependencies...");
+            System.Reflection.AssemblyName[] AD = LoadedAssembly.GetReferencedAssemblies();
+            if (AD == System.Array.Empty<System.Reflection.AssemblyName>())
+            {
+                Logger.WriteVerbose("No more dependencies detected , proceeding normally...");
+            }
+            else
+            {
+                Logger.WriteVerbose($"Loading found dependencies... ({AD.LongLength} dependencies found)");
+                System.Boolean FD = false;
+                foreach (System.Reflection.AssemblyName AN in AD)
+                {
+                    Logger.WriteVerbose($"Loading assembly {AN.FullName} ...");
+                    System.Reflection.Assembly[] ASE = AppDomain.CurrentDomain.GetAssemblies();
+                    foreach(System.Reflection.Assembly assembly in ASE)
+                    {
+                        if (assembly.GetName() == AN) { Logger.WriteVerbose(
+                            $"The assembly {AN.FullName} has already been loaded\n" +
+                            $"in this context. Skipping loading for this one."); FD = true; break; }
+                    }
+                    if (FD) 
+                    {
+                        Logger.WriteVerbose($"Assembly {AN.Name} with culture {AN.CultureInfo.Name} and version {AN.Version}\n" +
+                            $"is already loaded , therefore loading was cancelled.");
+                        FD = false;
+                        continue; 
+                    }
+                    try
+                    {
+                        System.AppDomain.CurrentDomain.Load(AN.FullName);
+                    } catch (System.IO.FileNotFoundException e) { Logger.WriteException(e); return; }
+                    catch (System.IO.FileLoadException e) { Logger.WriteException(e); return; }
+                    catch (System.IO.PathTooLongException e) { Logger.WriteException(e); return; }
+                    catch (System.BadImageFormatException e) { Logger.WriteException(e); return; }
+                    catch (System.Security.SecurityException e) { Logger.WriteException(e); return; }
+                    Logger.WriteVerbose($"Loaded assembly {AN.Name} with culture {AN.CultureInfo.Name} and version {AN.Version}");
+                }
+                Logger.WriteVerbose("Done loading assembly dependencies.");
+            }
 
             if (AsInterfaceValidator.OP != OperationType.AllTypesInAssembly)
             {
@@ -291,13 +332,16 @@ namespace MDCFR
         public System.Type ClassType;
     }
 
+    [System.Runtime.CompilerServices.SpecialName]
+    [System.Runtime.Versioning.SupportedOSPlatform("windows")]
     internal class AsInterfaceValidator
 	{
         private static System.String ThisExe => $"{System.Environment.GetCommandLineArgs()[0]}";
         internal static CmdLineData ProgramTempValues = new CmdLineData();
         internal static OperationType OP = OperationType.SpecificType;
 
-		public static System.Int32 Main(System.String[] Args)
+        [System.Runtime.CompilerServices.SpecialName]
+        public static System.Int32 Main(System.String[] Args)
 		{
             System.String DF;
             System.Int32 I = 0;
@@ -432,6 +476,9 @@ internal struct Internals
     public const System.String ClassThatUsesTheAttrArgName = "{ClassThatUsesTheAttribute}";
 }
 
+[System.Runtime.CompilerServices.SpecialName]
+[System.Runtime.CompilerServices.CompilerGlobalScope]
+[System.Runtime.Versioning.SupportedOSPlatform("windows")]
 internal static class Logger
 {
 

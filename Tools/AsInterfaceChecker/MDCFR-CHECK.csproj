@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFrameworks>net48;net70-windows10.0.19041</TargetFrameworks>
     <RootNamespace>MDCFR</RootNamespace>
 	<StartupObject>MDCFR.AsInterfaceValidator</StartupObject>
 	<!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->  
@@ -21,7 +21,7 @@
 	<Compile Include=".\MDCFR-CHECK.cs" />
 	<Compile Include=".\MDCFR-CHECK-PROPS.cs" />
 	<None Remove="$(BaseIntermediateOutputPath)\**" />
-    <ProjectReference Include="..\..\MDCFR.csproj" />
+    <ProjectReference Include="..\..\Source\MDCFR\MDCFR.csproj" />
   </ItemGroup>
 
 </Project>

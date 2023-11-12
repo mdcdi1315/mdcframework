@@ -1,0 +1,15 @@
+# This is a custom build script boss file.
+# This file is executed always first and once between Build.cmd invokations and makes either global settings
+# or executes simple actions at startup.
+# CreateDir action will create a new directory.
+[CreateDir:bin]
+[CreateDir:bin\NET48]
+[CreateDir:bin\NET70]
+[CreateDir:bin\Release]
+[CreateDir:bin\Release\NET48]
+[CreateDir:bin\Release\NET70]
+# The Console action writes the specified text to the console.
+[Console:Starting Up Build...]
+# The Wait action freezes the build continuation for the specified amount of seconds.
+# If not supplied , it is supposed to be then one second.
+[Wait:3]

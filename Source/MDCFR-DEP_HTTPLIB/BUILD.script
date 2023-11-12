@@ -1,0 +1,12 @@
+# This file will create the deprecated component for .NET 7 , the HTTPLIB.
+[Restore:MDCFR-DEP_HTTPLIB.csproj]
+[Build:MDCFR-DEP_HTTPLIB.csproj]
+# Move the resulting binary to the top-level bin directory.
+[Move:.\bin\Debug\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll]
+[Move:.\bin\Debug\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
+[Move:.\bin\Debug\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml]
+# (For debug builds) Transfer the debug symbols produced too.
+[Move:.\bin\Debug\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.pdb$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.pdb]
+[Move:.\bin\Release\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll]
+[Move:.\bin\Release\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
+[Move:.\bin\Release\net7.0\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml]

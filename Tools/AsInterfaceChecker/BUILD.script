@@ -1,0 +1,5 @@
+# This builds out the Checker binary.
+# Then , it will output the result 
+# using the GlobalAfter file to the bin directory.
+[Restore:MDCFR-CHECK.csproj]
+[Build:MDCFR-CHECK.csproj]

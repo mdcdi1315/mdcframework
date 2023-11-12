@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net7.0</TargetFramework>
+    <RootNamespace>ROOT</RootNamespace>
+	  <!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->
+	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+	  <!-- This option specifies that the resulting assembly will almost be the same size between compilations. -->
+	  <Deterministic>True</Deterministic>
+	  <!-- Becuase we want multitargeting, we must exclude the items we don't require. Comment the below line to enable the default excludes. -->
+	  <DefaultItemExcludesInProjectFolder>*\**.*</DefaultItemExcludesInProjectFolder>
+	  <AssemblyName>DEPRECATION_COMPONENTS_HTTPLIB</AssemblyName>
+	  <!-- Corrects dependency errors. -->
+	  <EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+	  <!-- The Strong Key .snk file to sign the assembly with. -->
+	  <AssemblyOriginatorKeyFile>..\PublicKey.snk</AssemblyOriginatorKeyFile>
+	  <!-- Sign your assembly using an Strong Name Key. Use "False" to disable signing. -->
+	  <SignAssembly>True</SignAssembly>
+	  <!-- Allows to search and find XML documentation on source files and to generate it as a seperate file for usage in Visual Studio. -->
+	  <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\MDCFR\MDCFR.csproj" />
+    <Compile Include="MDCFR-DEP_API.cs" />
+	<Compile Include="MDCFR-HTTPLIB.cs" />
+	<Compile Include="MDCFR-PROPS.cs" />
+	<Compile Include="..\MDCFR\MDCFR-PROPS_INTERNAL.cs" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,18 @@
+# This file will output the results to the top-level bin directory.
+# We do not care if , for example , it was built only the Debug configuration.
+# This because those errors are silently ignored , so this allows us to not have
+# conditional statements so as to check and move these files.
+[Move:.\bin\Debug\net48\Checker.exe$..\..\bin\NET48\Checker.exe]
+[Move:.\bin\Debug\net48\Checker.pdb$..\..\bin\NET48\Checker.pdb]
+[Move:.\bin\Debug\net48\Checker.exe.config$..\..\bin\NET48\Checker.exe.config]
+[Move:.\bin\Debug\net70-windows10.0.19041\Checker.exe$..\..\bin\NET70\Checker.exe]
+[Move:.\bin\Debug\net70-windows10.0.19041\Checker.dll$..\..\bin\NET70\Checker.dll]
+[Move:.\bin\Debug\net70-windows10.0.19041\Checker.pdb$..\..\bin\NET70\Checker.pdb]
+[Move:.\bin\Debug\net70-windows10.0.19041\Checker.deps.json$..\..\bin\NET70\Checker.deps.json]
+[Move:.\bin\Debug\net70-windows10.0.19041\Checker.runtimeconfig.json$..\..\bin\NET70\Checker.runtimeconfig.json]
+[Move:.\bin\Release\net48\Checker.exe$..\..\bin\Release\NET48\Checker.exe]
+[Move:.\bin\Release\net48\Checker.exe.config$..\..\bin\Release\NET48\Checker.exe.config]
+[Move:.\bin\Release\net70-windows10.0.19041\Checker.exe$..\..\bin\Release\NET70\Checker.exe]
+[Move:.\bin\Release\net70-windows10.0.19041\Checker.dll$..\..\bin\Release\NET70\Checker.dll]
+[Move:.\bin\Release\net70-windows10.0.19041\Checker.deps.json$..\..\bin\Release\NET70\Checker.deps.json]
+[Move:.\bin\Release\net70-windows10.0.19041\Checker.runtimeconfig.json$..\..\bin\Release\NET70\Checker.runtimeconfig.json]
