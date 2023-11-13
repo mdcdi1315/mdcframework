@@ -12,4 +12,7 @@
 [Console:Starting Up Build...]
 # The Wait action freezes the build continuation for the specified amount of seconds.
 # If not supplied , it is supposed to be then one second.
-[Wait:3]
+[Wait:2]
+# The SetVariable action sets a new environment variable , given it's name and value.
+[SetVariable:G_Generated$True]
+[Wait:1]

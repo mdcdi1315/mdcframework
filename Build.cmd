@@ -51,11 +51,15 @@ for /f "tokens=1,2,3,4,5,6,7 delims= " %%d in ("%*") do (
 )
 Echo Starting out...
 if not defined DOTNT_PATH (
+Echo INFO: The DOTNT_PATH environment variable not set. Attempting to find a valid 
+Echo INFO: .NET SDK installation...
 for /f "tokens=*" %%1 in ('where dotnet.exe') do Set "DOTNT_PATH=%%~dp1"
 if not defined DOTNT_PATH (
 Echo ERROR: DOTNT_PATH environment variable not set.
 Echo INFO: Supply this variable with a valid .NET SDK ^> 7 path and retry.
 call :Exit 3
+) else (
+Echo INFO: .NET SDK installation was found through searching. Using this one.
 )) else (
 if not exist "%DOTNT_PATH%\dotnet.exe" (
 Echo ERROR: The path supplied in DOTNT_PATH variable is invalid.
@@ -103,7 +107,7 @@ for /f "tokens=* delims=" %%$ in ('dir /a:D /b /d /s "%cd%\*"') do (
 		Echo INFO: Script file executed sucessfully.
 		if exist "%%$\GlobalAfter.script" (
 			Echo INFO: Found global script file that must be executed after the normal build file. Executing it...
-			Call :GlobalAfterLoadFile "%%$"
+			Call :GlobalLoadFile "%%$" "True"
 			Echo INFO: Script file executed sucessfully.
 		)
 		popd
@@ -257,62 +261,11 @@ Echo   require the OtherParameter parameter frequently.
 Echo   There are many actions available for usage , such as Wait , CreateDir , Move , Copy , etc.
 Echo   These actions are easy to learn and use and you will notice that when writing such files.
 Echo.  
-Exit 1
-
-
-
-:GlobalAfterLoadFile
-Rem The LoadFile procedure will track down , open and find the situation to do.
-Rem The commands will be located in seperate script files and the commands 
-Rem will be executed in the order they appear.
-Rem All the commands are written inside brackets ([]).
-Rem Single-line only comments can be specified using the hash (#) character at start.
-Echo Getting into %cd% ...
-for /f "tokens=*" %%@ in ('more "%1\GlobalAfter.script"') do (
-	for /f "eol=# tokens=1,2,3,4* delims=[]:$" %%a in ("%%@") do (
-		if "%%a" == "Copy" (
-			Echo Copying %%b to %%c ...
-			1>nul 2>nul Copy /Y /V "%%b" "%%c"
-			if not errorlevel 0 Call :Exit %Errorlevel%
-			Echo Done copying.
-		) else if "%%a" == "Move" (
-			Echo Moving %%b to %%c ...
-			1>nul 2>nul Move /Y "%%b" "%%c"
-			if not errorlevel 0 Call :Exit %Errorlevel%
-			Echo Done moving.
-		) else if "%%a" == "CreateDir" (
-			Echo Creating directory %%b...
-			if not exist "%%b" (mkdir "%%b")
-			Echo Directory %%b created.
-		) else if "%%a" == "DeleteDir" (
-			Echo Deleting Directory %%b...
-			if exist "%%b" (rd /s /q "%%b")
-			Echo Directory %%b was deleted sucessfully...
-		) else if "%%a" == "Wait" (
-			if "%%b" == ""  (
-				1>nul timeout.exe /t 1 /nobreak
-			) else (
-				1>nul timeout.exe /t %%b /nobreak
-			)
-		) else if "%%a" == "Console" (
-			if "%%b" == "" (Echo.) else (Echo %%b)
-		) else (
-			Echo WARNING: Action "%%b" is unrecognized.
-			Echo INFO: Check that the name "%%b" is a valid Action Identifier.
-		)
-	)
-)
-Echo Done!
-Echo Exiting current directory (Global After script) , %1.
-exit /b 
-
-
-
-
+Exit /b 1
 
 
 :BossLoadFile
-Rem The LoadFile procedure will track down , open and find the situation to do.
+Rem The BossLoadFile procedure will track down , open and find the situation to do.
 Rem The commands will be located in seperate script files and the commands 
 Rem will be executed in the order they appear.
 Rem All the commands are written inside brackets ([]).
@@ -344,6 +297,49 @@ for /f "tokens=*" %%@ in ('more "%1\BOSS.script"') do (
 			) else (
 				1>nul timeout.exe /t %%b /nobreak
 			)
+		) else if "%%a" == "CreateFile" (
+			Rem CreateFile Action: Creates a new and empty UTF-8 file.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo. > "%%b"
+			)
+		) else if "%%a" == "Stamp" (
+			Rem Stamp Action: Creates a new file that contains the current date and time.
+			Rem Tools can use this value to determine when , for example , a build was actually run.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo "%date%" "%time%" > "%%b"
+			)
+		) else if "%%a" == "DeleteFile" (
+			Rem DeleteFile Action: Deletes the specfied file.
+			Echo Deleting file %%b...
+			1>nul del /f /q "%%b"
+			Echo File %%b deleted.
+		) else if "%%a" == "SetVariable" (
+			Rem SetVariable Action: Sets a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set "%%b=%%c"&Set _1033=)
+		) else if "%%a" == "DeleteVariable" (
+			Rem DeleteVariable Action: Deletes a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set %%b= &Set _1033=)
+		) else if "%%a" == "Execute" (
+			Rem Executes the specified command for this session.
+			Rem Note that the environment block passed to the command
+			Rem is empty so as to prohibit the modification of the current environment.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot execute the command since a command was not supplied to execute.
+			) else (
+				start /D "%cd%" /I /Wait /B cmd.exe /c %%b
+			)
 		) else if "%%a" == "Console" (
 			if "%%b" == "" (Echo.) else (Echo %%b)
 		) else (
@@ -353,18 +349,21 @@ for /f "tokens=*" %%@ in ('more "%1\BOSS.script"') do (
 	)
 )
 Echo Done!
-Echo Exiting current directory (boss script) , %1.
+Echo Exiting current directory ^(Boss script^) , %1.
 exit /b 
 
 
 :GlobalLoadFile
-Rem The LoadFile procedure will track down , open and find the situation to do.
+Rem The GlobalLoadFile procedure will track down , open and find the situation to do.
 Rem The commands will be located in seperate script files and the commands 
 Rem will be executed in the order they appear.
 Rem All the commands are written inside brackets ([]).
 Rem Single-line only comments can be specified using the hash (#) character at start.
+Rem This procedure represents both GlobalAfter and Global scripts , since at scripting-level
+Rem they are the same.
 Echo Getting into %cd% ...
-for /f "tokens=*" %%@ in ('more "%1\Global.script"') do (
+If /I "%2" == "True" (Set _EX=more "%1\Global.script") else (Set _EX=more "%1\GlobalAfter.script")
+for /f "tokens=*" %%@ in ('%_EX%') do (
 	for /f "eol=# tokens=1,2,3,4* delims=[]:$" %%a in ("%%@") do (
 		if "%%a" == "Copy" (
 			Echo Copying %%b to %%c ...
@@ -390,6 +389,41 @@ for /f "tokens=*" %%@ in ('more "%1\Global.script"') do (
 			) else (
 				1>nul timeout.exe /t %%b /nobreak
 			)
+		) else if "%%a" == "CreateFile" (
+			Rem CreateFile Action: Creates a new and empty UTF-8 file.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo. > "%%b"
+			)
+		) else if "%%a" == "DeleteFile" (
+			Rem DeleteFile Action: Deletes the specfied file.
+			Echo Deleting file %%b...
+			1>nul del /f /q "%%b"
+			Echo File %%b deleted.
+		) else if "%%a" == "Execute" (
+			Rem Executes the specified command for this session.
+			Rem Note that the environment block passed to the command
+			Rem is empty so as to prohibit the modification of the current environment.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot execute the command since a command was not supplied to execute.
+			) else (
+				start /D "%cd%" /I /Wait /B cmd.exe /c %%b
+			)
+		) else if "%%a" == "SetVariable" (
+			Rem SetVariable Action: Sets a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set "%%b=%%c"&Set _1033=)
+		) else if "%%a" == "DeleteVariable" (
+			Rem DeleteVariable Action: Deletes a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set %%b= &Set _1033=)
 		) else if "%%a" == "Console" (
 			if "%%b" == "" (Echo.) else (Echo %%b)
 		) else (
@@ -399,7 +433,12 @@ for /f "tokens=*" %%@ in ('more "%1\Global.script"') do (
 	)
 )
 Echo Done!
-Echo Exiting current directory (Global script) , %1.
+Set _EX=
+if /I "%2" == "True" (
+Echo Exiting current directory ^(Global After script^) , %1 .
+) else (
+Echo Exiting current directory ^(Global script^) , %1 .
+)
 exit /b 
 
 
@@ -413,48 +452,99 @@ Echo Getting into %cd% ...
 for /f "tokens=*" %%@ in ('more "%1\BUILD.script"') do (
 	for /f "eol=# tokens=1,2,3,4* delims=[]:$" %%a in ("%%@") do (
 		if "%%a" == "Restore" (
-			Rem Target Restore: Restore the dependencies of the specified project.
+			Rem Restore Action: Restore the dependencies of the specified project.
 			Echo Restoring %%b ...
 			"%DOTNT_PATH%\dotnet.exe" restore "%1\%%b" --force %CUSTOM_DOTNT_RESTORE_ARGS% 
 			if not errorlevel 0 Call :Exit %Errorlevel%
 			Echo Done restoring.
 		) else if "%%a" == "Build" (
-			Rem Target Build: Build the specified project.
+			Rem Build Action: Build the specified project.
 			Echo Building %%b ...
 			"%DOTNT_PATH%\dotnet.exe" build "%1\%%b" --no-restore %CUSTOM_DOTNT_BUILD_ARGS% 
 			if not errorlevel 0 Call :Exit %Errorlevel%
 			Echo Done building.
 		) else if "%%a" == "Copy" (
+			Rem Copy Action: Copy the specfied set of files to an destination.
 			Echo Copying %%b to %%c ...
 			1>nul 2>nul Copy /Y /V "%%b" "%%c"
 			if not errorlevel 0 Call :Exit %Errorlevel%
 			Echo Done copying.
 		) else if "%%a" == "Move" (
+			Rem Move Action: Move the specfied set of files to an destination.
 			Echo Moving %%b to %%c ...
 			1>nul 2>nul Move /Y "%%b" "%%c"
 			if not errorlevel 0 Call :Exit %Errorlevel%
 			Echo Done moving.
 		) else if "%%a" == "Clean" (
+			Rem Build Action: Clean the build artifacts of the specified project.
 			Echo Cleaning %%b...
 			"%DOTNT_PATH%\dotnet.exe" clean "%1\%%b" %CUSTOM_DOTNT_BUILD_ARGS%
 			if not errorlevel 0 Call :Exit %Errorlevel%
 			Echo Done cleaning.
 		) else if "%%a" == "CreateDir" (
+			Rem CreateDir Action: Creates the specified directory.
 			Echo Creating directory %%b...
 			if not exist "%%b" (mkdir "%%b")
 			Echo Directory %%b created.
 		) else if "%%a" == "DeleteDir" (
+			Rem DeleteDir Action: Deletes the specfied directory.
 			Echo Deleting Directory %%b...
 			if exist "%%b" (rd /s /q "%%b")
 			Echo Directory %%b was deleted sucessfully...
 		) else if "%%a" == "Wait" (
+			Rem Wait Action: Halts build procedure for a specfied amount of seconds.
+			Rem If not seconds provided , it is assumed that it is ONE second.
 			if "%%b" == ""  (
 				1>nul timeout.exe /t 1 /nobreak
 			) else (
 				1>nul timeout.exe /t %%b /nobreak
 			)
+		) else if "%%a" == "DeleteFile" (
+			Rem DeleteFile Action: Deletes the specfied file.
+			Echo Deleting file %%b...
+			1>nul del /f /q "%%b"
+			Echo File %%b deleted.
 		) else if "%%a" == "Console" (
+			Rem Console Action: Writes the specified text to the console.
 			if "%%b" == "" (Echo.) else (Echo %%b)
+		) else if "%%a" == "CreateFile" (
+			Rem CreateFile Action: Creates a new and empty UTF-8 file.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo. > "%%b"
+			)
+		) else if "%%a" == "Stamp" (
+			Rem Stamp Action: Creates a new file that contains the current date and time.
+			Rem Tools can use this value to determine when , for example , a build was actually run.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo "%date%" "%time%" > "%%b"
+			)
+		) else if "%%a" == "Execute" (
+			Rem Executes the specified command for this session.
+			Rem Note that the environment block passed to the command
+			Rem is empty so as to prohibit the modification of the current environment.
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot execute the command since a command was not supplied to execute.
+			) else (
+				start /D "%cd%" /I /Wait /B cmd.exe /c %%b
+			)
+		) else if "%%a" == "SetVariable" (
+			Rem SetVariable Action: Sets a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set "%%b=%%c"&Set _1033=)
+		) else if "%%a" == "DeleteVariable" (
+			Rem DeleteVariable Action: Deletes a new environment variable with the specfied value.
+			Set _1033=1
+			for /f "tokens=1,2,3,4,5,6,7,8 delims= " %%f in ("cd ComSpec Prompt Path OS SystemRoot TEMP TMP") do (
+				If /I "%%f" == "%%b" (Echo ERROR: Cannot modify a reserved environment variable.&Set _1033=)
+			)
+			if defined _1033 (Set %%b= &Set _1033=)
 		) else (
 			Echo WARNING: Action "%%b" is unrecognized.
 			Echo INFO: Check that the name "%%b" is a valid Action Identifier.
@@ -462,7 +552,7 @@ for /f "tokens=*" %%@ in ('more "%1\BUILD.script"') do (
 	)
 )
 Echo Done!
-Echo Exiting current directory , %1.
+Echo Exiting current directory , %1 .
 exit /b 
 
 
@@ -470,5 +560,5 @@ exit /b
 :Exit
 if not "%1" == "0" (Echo Error detected while executing: Returned code %1.)
 Echo Exiting...
-Exit %1
-exit /b %1
+goto :EOF
+Exit /b %1

@@ -9,5 +9,5 @@ This is the usage documentation for using the MDCFR Library.
 - 3> The [ExternalHashCaculators](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ExtHashCac.md) Namespace.
 - 4> The [ExtrenalCryptographicMethods](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/ExtCrypt.md) Namespace.
 - 5> The [HTTPLIB](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/httplib.md) Namespace.
-
+- 6> More infromation about the .script files and the usage of Build.cmd file: Open [here](http://github.com/mdcdi1315/mdcframework/blob/main/Documentation/BuildUsage.md).
 

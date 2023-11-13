@@ -3,11 +3,9 @@
 ################################################################################
 
 /.vs
-/bin/Debug    #
-/obj          #
-/bin/Release  # Reserved for backwards compatibility
-/bin          #
-/Objects      #
+/obj
+/bin
+/Objects
 /Tools/AsInterfaceChecker/bin
 /Tools/AsInterfaceChecker/Objects
 /Tools/ResGen/bin
@@ -21,4 +19,3 @@
 /Source/MDCFR/Properties/Resources.Designer.cs
 /Source/MDCFR/Properties/NAudio.WinForms.Gui.PanSlider.Designer.cs
 /Source/MDCFR/Properties/NAudio.WinForms.Gui.VolumeSlider.Designer.cs
-/bin

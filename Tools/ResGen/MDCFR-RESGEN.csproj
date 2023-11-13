@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	
    <ItemGroup>
 		<Reference Include="System.Xml" />
@@ -26,16 +26,6 @@
   </PropertyGroup>
   <ItemGroup>
 	<Compile Include="ResGen.cs" />
-	<Compile Include="ResGen_CommonResStrings.Designer.cs">
-	  <DesignTime>True</DesignTime>
-	  <AutoGen>True</AutoGen>
-	  <DependentUpon>ResGen_CommonResStrings.resx</DependentUpon>
-	</Compile>
-	<Compile Include="ResGen_SR.Designer.cs">
-	  <DesignTime>True</DesignTime>
-	  <AutoGen>True</AutoGen>
-	  <DependentUpon>ResGen_SR.resx</DependentUpon>
-	</Compile>
 	<EmbeddedResource Include="ResGen_SR.resx" LogicalName="SR.resources">
 	  <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>ResGen_SR.Designer.cs</LastGenOutput>
