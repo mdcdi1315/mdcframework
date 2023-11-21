@@ -35739,7 +35739,9 @@ namespace System.Text.Json
                 {
                     public readonly List<TElement> _buffer = new List<TElement>();
 
+#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
                     public async IAsyncEnumerator<TElement> GetAsyncEnumerator(CancellationToken _)
+#pragma warning restore CS1998 // Async method lacks 'await' operators and will run synchronously
                     {
                         foreach (TElement item in _buffer)
                         {

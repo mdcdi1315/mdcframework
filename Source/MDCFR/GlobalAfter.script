@@ -1,5 +1,7 @@
 # This script file moves the the build artifacts to the top-level bin directory.
 [Move:.\bin\Debug\net48\*.*$..\..\bin\NET48]
-[Move:.\bin\Debug\net70\*.*$..\..\bin\NET70]
+[Move:.\bin\Debug\net70-windows10.0.19041.0\*.*$..\..\bin\NET70]
 [Move:.\bin\Release\net48\*.*$..\..\bin\Release\NET48]
-[Move:.\bin\Release\net70\*.*$..\..\bin\Release\NET70]
+[Move:.\bin\Release\net70-windows10.0.19041.0\*.*$..\..\bin\Release\NET70]
+[Move:.\bin\Release\net70\*.*$..\..\bin\Release\NET70-NW]
+[Move:.\bin\Debug\net70\*.*$..\..\bin\NET70-NW]

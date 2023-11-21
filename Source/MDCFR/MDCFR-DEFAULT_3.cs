@@ -18,12 +18,7 @@ namespace ROOT
     /// </summary>
     public static class ConsoleExtensions
     {
-        internal enum ConsoleHandleOptions : System.UInt32
-        {
-            Input = 0xFFFFFFF6,
-            Output = 0xFFFFFFF5,
-            Error = 0xFFFFFFF4
-        }
+        internal enum ConsoleHandleOptions : System.UInt32 { Input = 0xFFFFFFF6, Output = 0xFFFFFFF5, Error = 0xFFFFFFF4 }
 
         // This value indicates whether the console is detached , and therefore 
         // it notifies the console functions to 'not' actually call the console code.
@@ -74,14 +69,21 @@ namespace ROOT
         /// Gets the underlying KERNEL32 handle which this implementation uses to write any kind of data to console.
         /// </summary>
         /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for writing data to the console.</returns>
+        /// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
         [System.Security.SecurityCritical]
         public static System.IntPtr GetOutputHandle()
         {
+#if IsWindows
             if (ConsoleInterop.OutputHandle == System.IntPtr.Zero)
             {
                 ConsoleInterop.OutputHandle = ConsoleInterop.GetConsoleStream(ConsoleHandleOptions.Output);  
             }
             return ConsoleInterop.OutputHandle;
+#else
+            throw new System.PlatformNotSupportedException("This API is not supported for non-Windows operating systems.");
+#endif
         }
 
         /// <summary>
@@ -89,14 +91,21 @@ namespace ROOT
         /// </summary>
         /// <returns>A new <see cref="System.IntPtr"/> handle which is the handle for reading data 
         /// from the console.</returns>
+        /// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
         [System.Security.SecurityCritical]
         public static System.IntPtr GetInputHandle()
         {
+#if IsWindows
             if (ConsoleInterop.InputHandle == System.IntPtr.Zero)
             {
                 ConsoleInterop.InputHandle = ConsoleInterop.GetConsoleStream(ConsoleHandleOptions.Output);
             }
             return ConsoleInterop.InputHandle;
+#else
+            throw new System.PlatformNotSupportedException("This API is not supported for non-Windows operating systems.");
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -112,10 +121,12 @@ namespace ROOT
 
         /// <summary>
         /// Globally set or get the console foreground color. This property is used for the exported MDCFR functions , 
-        /// and this is equivalent to <see cref="System.Console.ForegroundColor"/> property.
+        /// and this is equivalent to <see cref="System.Console.ForegroundColor"/> property. <br />
+        /// On other platforms except Windows , this will fall back to the default <see cref="System.Console.ForegroundColor"/> property.
         /// </summary>
         public static System.ConsoleColor ForegroundColor
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             get
             {
@@ -130,14 +141,22 @@ namespace ROOT
                 InitIfNotInitOut();
                 SetForeColor(value);
             }
+#else
+            [System.Security.SecurityCritical]
+            get { return System.Console.ForegroundColor; }
+            [System.Security.SecurityCritical]
+            set { System.Console.ForegroundColor = value; }
+#endif
         }
 
         /// <summary>
         /// Globally set or get the console background color. This property is used for the exported MDCFR functions , 
-        /// and this is equivalent to <see cref="System.Console.BackgroundColor"/> property.
+        /// and this is equivalent to <see cref="System.Console.BackgroundColor"/> property. <br />
+        /// On other platforms except Windows , this will fall back to the default <see cref="System.Console.BackgroundColor"/> property.
         /// </summary>
         public static System.ConsoleColor BackgroundColor
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             get
             {
@@ -152,18 +171,27 @@ namespace ROOT
                 InitIfNotInitOut();
                 SetBackColor(value);
             }
+#else
+            [System.Security.SecurityCritical]
+            get { return System.Console.BackgroundColor; }
+            [System.Security.SecurityCritical]
+            set { System.Console.BackgroundColor = value; }
+#endif
         }
 
         /// <summary>
-        /// Get or Set the Console's Output encoding as an <see cref="System.Text.Encoding"/> class.
+        /// Get or Set the Console's Output encoding as an <see cref="System.Text.Encoding"/> class. <br />
+        /// In case that this API was called from other platforms than Windows , then this will call the
+        /// <see cref="System.Console.OutputEncoding"/> property.
         /// </summary>
-        /// <exception cref="AggregateException">
+        /// <exception cref="ExecutionException">
         /// Occurs when the Code Page defined to the 
         /// console does not exist as an <see cref="System.Text.Encoding"/> class.</exception>
         /// <exception cref="InvalidOperationException">
         /// Occurs when the specified Code Page is invalid for the console.</exception>
         public static System.Text.Encoding OutputEncoding
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
@@ -171,7 +199,7 @@ namespace ROOT
                 System.UInt32 CP = ConsoleInterop.GetOutputEnc();
                 if (CP == 0)
                 {
-                    throw new AggregateException("Error occured while getting the current code page!!!");
+                    throw new ExecutionException("Error occured while getting the current code page: Native call returned 0.");
                 }
                 System.Text.Encoding TI = null;
                 TI = System.Text.CodePagesEncodingProvider.Instance.GetEncoding((System.Int32)CP);
@@ -184,7 +212,7 @@ namespace ROOT
                     }
                     catch (System.Exception EX)
                     {
-                        throw new AggregateException($"Could not get the codepage set to the console: {CP} .", EX);
+                        throw new ExecutionException($"Could not get the codepage set to the console: {CP} .", EX);
                     }
                 }
                 else { return TI; }
@@ -204,19 +232,27 @@ namespace ROOT
                         $"Code Page Windows Name: {value.WindowsCodePage}");
                 }
             }
-
+#else
+            [System.Security.SecurityCritical]
+            get { return System.Console.OutputEncoding; }
+            [System.Security.SecurityCritical]
+            set { System.Console.OutputEncoding = value; }
+#endif
         }
 
         /// <summary>
-        /// Get or Set the Console's Input encoding as an <see cref="System.Text.Encoding"/> class.
+        /// Get or Set the Console's Input encoding as an <see cref="System.Text.Encoding"/> class. <br />
+        /// In case that this API was called from other platforms than Windows , then this will call the
+        /// <see cref="System.Console.InputEncoding"/> property.
         /// </summary>
-        /// <exception cref="AggregateException">
+        /// <exception cref="ExecutionException">
         /// Occurs when the Code Page defined to the 
         /// console does not exist as an <see cref="System.Text.Encoding"/> class.</exception>
         /// <exception cref="InvalidOperationException">
         /// Occurs when the specified Code Page is invalid for the console.</exception>
         public static System.Text.Encoding InputEncoding
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
@@ -224,7 +260,7 @@ namespace ROOT
                 System.UInt32 CP = ConsoleInterop.GetInputEnc();
                 if (CP == 0)
                 {
-                    throw new AggregateException("Error occured while getting the current code page!!!");
+                    throw new ExecutionException("Error occured while getting the current code page!!!");
                 }
                 System.Text.Encoding TI = null;
                 TI = System.Text.CodePagesEncodingProvider.Instance.GetEncoding((System.Int32)CP);
@@ -237,7 +273,7 @@ namespace ROOT
                     }
                     catch (System.Exception EX)
                     {
-                        throw new AggregateException($"Could not get the codepage set to the console: {CP} .", EX);
+                        throw new ExecutionException($"Could not get the codepage set to the console: {CP} .", EX);
                     }
                 }
                 else { return TI; }
@@ -250,21 +286,29 @@ namespace ROOT
                 System.UInt32 CP = (System.UInt32)value.CodePage;
                 if (ConsoleInterop.SetInputEnc(CP) == 0)
                 {
-                    throw new InvalidOperationException("Cannot apply the specific code page as a console input encoding. \n" +
+                    throw new InvalidOperationException(
+                        "Cannot apply the specific code page as a console input encoding. \n" +
                         $"Code Page Identifier: {CP} \n" +
                         $"Code Page Name: {value.BodyName} \n" +
                         $"Code Page Web Name: {value.WebName} \n" +
                         $"Code Page Windows Name: {value.WindowsCodePage}");
                 }
             }
-
+#else
+            [System.Security.SecurityCritical]
+            get { return System.Console.InputEncoding; }
+            [System.Security.SecurityCritical]
+            set { System.Console.InputEncoding = value; }
+#endif
         }
 
         /// <summary>
-        /// Get or Set the current console title. This property is equivalent to <see cref="System.Console.Title"/> property.
+        /// Get or Set the current console title. This property is equivalent to <see cref="System.Console.Title"/> property. <br />
+        /// In case that you use this API in other platforms than Windows , this will fall back to the original <see cref="System.Console.Title"/> property.
         /// </summary>
         public static System.String Title
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
@@ -276,13 +320,26 @@ namespace ROOT
             }
             [System.Security.SecurityCritical]
             set { ConsoleInterop.SetTitle(value); }
+#else
+            get 
+            {
+                return System.Console.Title;
+            }
+            set { System.Console.Title = value; }
+#endif
         }
 
         /// <summary>
-        /// Gets the original title , when the application attached to the console.
+        /// Gets the original title , when the application attached to the console. <br />
+        /// Note: This API is only supported for Windows. On other platforms , such as Unix , 
+        /// it will throw a new <see cref="PlatformNotSupportedException"/>.
         /// </summary>
+        /// <exception cref="PlatformNotSupportedException">
+        /// This API was used in other platform than Windows.
+        /// </exception>
         public static System.String OriginalTitle
         {
+#if IsWindows
             [System.Security.SecurityCritical]
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             get
@@ -292,6 +349,12 @@ namespace ROOT
                 T = T2;
                 return MAIN.RemoveDefinedChars(I, '\0');
             }
+#else
+            get
+            {
+                throw new System.PlatformNotSupportedException("This API is only supported for Windows.");
+            }
+#endif
         }
 
         // Global Windows C structure defining the coordinates of an window.
@@ -441,15 +504,24 @@ namespace ROOT
         }
 
         /// <summary>
-        /// Revert the current implementation's back to default console colors , when it is initiated.
+        /// Revert the current implementation's back to default console colors , when it is initiated. <br />
+        /// Note: This API is only for Windows. If it is called on other operating systems, it will throw a
+        /// <see cref="PlatformNotSupportedException"/>.
         /// </summary>
+        /// <exception cref="PlatformNotSupportedException">
+        /// Thrown when the MDCFR is used in other platforms , such as Unix.
+        /// </exception>
         public static void ToDefaultColors()
         {
+#if IsWindows
             InitIfNotInitOut();
             ConsoleControlChars F = ConsoleColorToColorAttribute(System.ConsoleColor.Black, true);
             ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, (System.Int16)F);
             F = ConsoleColorToColorAttribute(System.ConsoleColor.Gray, false);
             ConsoleInterop.DefineNewAttributes(ConsoleInterop.OutputHandle, (System.Int16)F);
+#else
+            throw new System.PlatformNotSupportedException("This API is only supported for Windows.");
+#endif
         }
     }
 
@@ -1725,40 +1797,44 @@ namespace ROOT
         private static System.Boolean Executed = false;
 
         // This debugger constant will specify when to use the debugging services.
-        #if DEBUG
+#if DEBUG
             private const System.Boolean UseDebugger = true;
-        #else
+#else
             private const System.Boolean UseDebugger = false;
-        #endif
+#endif
 
         private static void EnsureConsoleOpen()
         {
+#if IsWindows
             if (Executed == false)
             {
                 if (ROOT.MAIN.CreateConsole() == false) { ConsoleExtensions.Detached = false; }
                 if (ConsoleExtensions.Detached) { ROOT.MAIN.CreateConsole(); }
                 Executed = true;
             }
+#else
+            if (Executed == false) { Executed = true; }
+#endif
         }
 
-    #if DEBUG == false
-        #pragma warning disable CS0162
-    #endif
+#if DEBUG == false
+#pragma warning disable CS0162
+#endif
         internal static void DebuggingInfo(System.String Info)
         {
             if (UseDebugger) 
             {
                 EnsureConsoleOpen();
-#if NET7_0_OR_GREATER
-                System.Console.WriteLine(DBGINFOShow + " " + Info);
-#else
+#if IsWindows
                 MAIN.WriteConsoleText(DBGINFOShow + " " + Info);
+#else
+                System.Console.WriteLine(DBGINFOShow + " " + Info);
 #endif
             }
         }
-    #if DEBUG == false
-        #pragma warning restore CS0162
-    #endif
+#if DEBUG == false
+#pragma warning restore CS0162
+#endif
     }
 
 
@@ -1813,6 +1889,10 @@ namespace ROOT
         /// <see cref="Options"/> are set either to <see cref="ProcessCreationOptions.NoConsoleWindow"/> or
         /// <see cref="ProcessCreationOptions.NoOptions"/>.
         /// </remarks>
+        /// <exception cref="InvalidOperationException">
+        /// The Title property cannot be set when the <see cref="ProcessCreationOptions.NoConsoleWindow"/> or
+        /// <see cref="ProcessCreationOptions.NoOptions"/> are used.
+        /// </exception>
         public System.String Title 
         {
             get { return _Title; }
@@ -1824,8 +1904,8 @@ namespace ROOT
                     _Title = "";
                     throw new InvalidOperationException(
                     "This option cannot be defined when NoConsoleWindow option is specified.\n" +
-                    "Either set it to other value , or do not set it at all."
-                    ); }
+                    "Either set it to other value , or do not set it at all."); 
+                }
                 _Title = value; 
             }
         }
@@ -1925,6 +2005,10 @@ namespace ROOT
     /// <summary>
     /// Creates and launches a new process context.
     /// </summary>
+    /// <remarks>Although that it is an alternative to 
+    /// <see cref="System.Diagnostics.Process"/> class,
+    /// this only works for Windows platforms.
+    /// </remarks>
     [RequiresPreviewFeatures]
     [SupportedOSPlatform("windows")]
     public class ProcessCreator : System.IDisposable
@@ -1934,6 +2018,32 @@ namespace ROOT
         private ProcessInterop_StartupInfo startupInfo = new();
         private ProcessInterop_App_Memory_Information memInf = new();
         private System.IO.FileInfo fileinfo = null;
+        private System.Boolean isdisposed = false;
+        private System.Boolean hasnotstartedyet = true;
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="ProcessCreator"/> class.
+        /// </summary>
+        public ProcessCreator() { }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="ProcessCreator"/> class and
+        /// launches a new process , given the provided path, arguments and working directory.
+        /// </summary>
+        /// <param name="Path">The process path. The path supplied must exist.</param>
+        /// <param name="Arguments">The arguments to pass.</param>
+        /// <param name="WorkingDirectory">The process working directory.</param>
+        public ProcessCreator(System.String Path, 
+            System.String Arguments = " ",
+            System.String WorkingDirectory = null)
+        { Launch(Path, Arguments, WorkingDirectory); }
+
+        /// <summary>
+        /// Initialises a new instance of <see cref="ProcessCreator"/> class and
+        /// launches a new process , given the process data provided.
+        /// </summary>
+        /// <param name="Data">The process data that will be used to launch the application.</param>
+        public ProcessCreator(ProcessCreatorData Data) { LaunchInternal(Data); }
 
         /// <summary>
         /// Launches a new process , given the process data provided.
@@ -1944,7 +2054,7 @@ namespace ROOT
         /// <summary>
         /// Launches a new process , given the provided path, arguments and working directory.
         /// </summary>
-        /// <param name="Path">The process path. Must exist.</param>
+        /// <param name="Path">The process path. The path supplied must exist.</param>
         /// <param name="Arguments">The arguments to pass.</param>
         /// <param name="WorkingDirectory">The process working directory.</param>
         public void Launch(System.String Path , System.String Arguments = " " , System.String WorkingDirectory = null)
@@ -1956,7 +2066,6 @@ namespace ROOT
             D.Options = ProcessCreationOptions.NoOptions;
             D.X = 0;
             D.Y = 0;
-            D.Title = null;
             D.LaunchFullScreen = false;
             LaunchInternal(D);
         }
@@ -1964,8 +2073,10 @@ namespace ROOT
         /// <summary>
         /// Gets the current process data and translates them to a new <see cref="ProcessCreator"/> class.
         /// </summary>
+        [System.Security.SuppressUnmanagedCodeSecurity]
         public void GetFromCurrentProcess()
         {
+            EnsureNotStarted();
             iscurrentprocess = true;
             result = new();
             result.ProcessH.ProcessHandle = ProcessInterop.GetThisProcess();
@@ -1973,14 +2084,20 @@ namespace ROOT
             result.ProcessH.ProcessPID = (System.Int32)ProcessInterop.GetProcessPID(result.ProcessH.ProcessHandle);
             result.ProcessH.ProcessTID = (System.Int32)ProcessInterop.GetThreadID(result.ProcessH.ThreadHandle);
             memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+            hasnotstartedyet = false;
             result.Success = true;
         }
 
         // This method translates the structure data given to proper native initialisation settings.
+        [System.Security.SuppressUnmanagedCodeSecurity]
         private void LaunchInternal(ProcessCreatorData Data)
         {
+            EnsureNotDisposed();
+            EnsureNotStarted();
+            result = new();
             fileinfo = new(Data.Path);
-            if (fileinfo.Exists == false) { result.Success = false; return; } 
+            if (fileinfo == null) { result.Success = false; return; }
+            if (fileinfo?.Exists == false) { result.Success = false; return; }
             if (System.String.IsNullOrEmpty(Data.WorkingDirectory)) 
             { Data.WorkingDirectory = fileinfo.DirectoryName; }
             if (System.String.IsNullOrEmpty(Data.Title) && Data.X == 0 && Data.Y == 0)
@@ -2014,7 +2131,11 @@ namespace ROOT
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO , Dir , false);
             result = PR;
-            if (result.Success) { memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle); }
+            if (result.Success) 
+            { 
+                memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+                hasnotstartedyet = false;
+            }
             return;
         }
 
@@ -2023,49 +2144,89 @@ namespace ROOT
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO, Dir, false , start);
             result = PR;
-            if (result.Success) { memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle); }
+            if (result.Success) 
+            { 
+                memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+                hasnotstartedyet = false;
+            }
             return;
         }
+
+        private void EnsureNotDisposed() { if (isdisposed) { throw new ObjectDisposedException("This instance is disposed and cannot be reused."); } }
+
+        private void EnsureStarted() { if (hasnotstartedyet) { throw new InvalidOperationException("This instance has not been attached to a process yet."); } }
+
+        private void EnsureNotStarted() { if (hasnotstartedyet == false && (result?.Success == true)) { throw new InvalidOperationException("This instance is already attached to a process."); } }
 
         /// <summary>
         /// Gets a value whether the process was sucessfully launched.
         /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        /// Thrown when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.Boolean ExecutedSucessfully 
         {
             [System.Security.SecuritySafeCritical]
-            get { return result.Success; } 
+            get 
+            { 
+                EnsureNotDisposed();
+                try { return result.Success; } catch (System.NullReferenceException) { return false; }
+            }
         }
 
         /// <summary>
         /// Returns the native process handle of the spawned process.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This exception is thrown when this instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Thrown when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.IntPtr NativeProcessHandle 
         {
             [System.Security.SecuritySafeCritical]
             [System.Security.SuppressUnmanagedCodeSecurity]
-            get { return result.ProcessH.ProcessHandle; } 
+            get { EnsureNotDisposed(); EnsureStarted(); return result.ProcessH.ProcessHandle;  }
         }
 
         /// <summary>
         /// Returns the native process thread handle of the spawned process.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.IntPtr NativeThreadHandle 
         {
             [System.Security.SecuritySafeCritical]
             [System.Security.SuppressUnmanagedCodeSecurity]
-            get { return result.ProcessH.ThreadHandle; } 
+            get { EnsureNotDisposed(); EnsureStarted(); return result.ProcessH.ThreadHandle; } 
         }
 
         /// <summary>
         /// Gets the memory information for this process.
         /// </summary>
-        [RequiresPreviewFeatures]
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public ProcessMemoryInfo MemoryInfo 
         {
             [System.Security.SecuritySafeCritical]
             [System.Security.SuppressUnmanagedCodeSecurity]
             get
             {
+                EnsureNotDisposed();
+                EnsureStarted();
                 return new ProcessMemoryInfo() 
                 {
                     AvailableMemoryCommit = (System.Int64)memInf.AvailableCommit / 1024,
@@ -2081,26 +2242,47 @@ namespace ROOT
         /// <see cref="ProcessCreationOptions.SpawnSuspended"/> option.
         /// </summary>
         /// <returns><see langword="true"/> if the native function succeeded; otherwise , <see langword="false"/>.</returns>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         [System.Security.SecuritySafeCritical]
         [System.Security.SuppressUnmanagedCodeSecurity]
-        public System.Boolean Unsuspend() { return Interop.Kernel32.ResumeAppThread(result.ProcessH.ThreadHandle); }
+        public System.Boolean Unsuspend() { EnsureNotDisposed(); EnsureStarted(); return Interop.Kernel32.ResumeAppThread(result.ProcessH.ThreadHandle); }
 
         /// <summary>
         /// The process ID , if it is still available.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.Int32 PID 
         {
             [System.Security.SecuritySafeCritical]
-            get { return result.ProcessH.ProcessPID; } 
+            get { EnsureNotDisposed(); EnsureStarted(); return result.ProcessH.ProcessPID; } 
         }
 
         /// <summary>
         /// The process thread ID , if it is still available.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.Int32 TID 
         {
             [System.Security.SecuritySafeCritical]
-            get { return result.ProcessH.ProcessTID; } 
+            get { EnsureNotDisposed(); EnsureStarted(); return result.ProcessH.ProcessTID; } 
         }
 
         /// <summary>
@@ -2113,23 +2295,36 @@ namespace ROOT
         /// <see cref="Launch(ProcessCreatorData)"/> or
         /// <see cref="Launch(string, string, string)"/> methods.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.IO.FileInfo FileInfo 
         {
             [System.Security.SecuritySafeCritical]
             get 
             {
-                if (iscurrentprocess) 
-                { 
-                    throw new InvalidOperationException("This operation is invalid for this instance."); 
-                } 
+                EnsureNotDisposed();
+                EnsureStarted();
+                if (iscurrentprocess) { throw new InvalidOperationException("This operation is invalid for this instance."); } 
                 return fileinfo; 
             } 
         }
-        
+
         /// <summary>
-        /// Returns a value whether the process is a critical process.
+        /// Returns a value whether the process launched is a critical process.
         /// </summary>
-        public System.Boolean IsCritical { get { return Interop.Kernel32.IsCritical(result.ProcessH.ProcessHandle); } }
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
+        public System.Boolean IsCritical { get { EnsureNotDisposed(); EnsureStarted(); return Interop.Kernel32.IsCritical(result.ProcessH.ProcessHandle); } }
 
         /// <summary>
         /// Terminates the current process with the specified error code which Windows will use to notify other processes.
@@ -2142,8 +2337,17 @@ namespace ROOT
         /// <see cref="System.Environment.Exit(int)"/> <br />
         /// method, which shuts down safely the CLR and then calls the native function to terminate the process.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public void Terminate(System.Boolean DisposeAfterTerminate, System.Int32 ExitCode = 0)
         {
+            EnsureNotDisposed();
+            EnsureStarted();
             if (iscurrentprocess) { throw new InvalidOperationException("Terminating the current process handle is " +
                 "dangerous and therefore , it is prohibited."); }
             if (Interop.Kernel32.TermProc(result.ProcessH.ProcessHandle, 
@@ -2151,27 +2355,59 @@ namespace ROOT
         }
 
         /// <summary>
+        /// Suspends the thread where this method was called until the process launched
+        /// terminated itself.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
+        public void WaitForExit() { EnsureNotDisposed(); EnsureStarted(); while (ExitCode == 259) { System.Threading.Thread.Sleep(50); } }
+
+        /// <summary>
         /// The Exit code of the exited process , if any.
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">
+        /// <exception cref="NativeCallErrorException">
         /// The native method call failed.
         /// </exception>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
         public System.UInt32 ExitCode 
-        { 
+        {
+            [System.Security.SecurityCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
             get 
             {
-                System.UInt32 Code = 0;
-                Code = Interop.Kernel32.GetExitCode(result.ProcessH.ProcessHandle); 
+                EnsureNotDisposed();
+                EnsureStarted();
+                System.UInt32 Code = Interop.Kernel32.GetExitCode(result.ProcessH.ProcessHandle); 
                 if (Code == System.UInt32.MaxValue) 
                 {
-                    throw new System.InvalidOperationException("Native method returned unexpected value.");
+                    throw new NativeCallErrorException("Native method returned unexpected value.");
                 } else { return Code; }
-            } 
+            }
         }
 
         /// <summary>
-        /// Disposes the process data , if any.
+        /// Disposes the process data , if any. <br />
+        /// However , after calling this method , you cannot re-use this class and you must construct a new one.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
+        [System.Security.SuppressUnmanagedCodeSecurity]
         public void Dispose() 
         {
             if (result != null)
@@ -2182,13 +2418,24 @@ namespace ROOT
             }
             if (fileinfo != null) { fileinfo.Refresh(); fileinfo = null; }
             startupInfo = default;
+            isdisposed = true;
         }
-    
+
         /// <summary>
         /// Refreshes the instance state.
         /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
+        [System.Security.SuppressUnmanagedCodeSecurity]
         public void Refresh()
         {
+            EnsureNotDisposed();
+            EnsureStarted();
             result.ProcessH.ProcessTID = (System.Int32)ProcessInterop.GetThreadID(result.ProcessH.ThreadHandle);
             memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
             if (iscurrentprocess == false) { fileinfo.Refresh(); }

@@ -6,6 +6,8 @@
 /obj
 /bin
 /Objects
+/Documentation/API
+/Documentation/HTML
 /Tools/AsInterfaceChecker/bin
 /Tools/AsInterfaceChecker/Objects
 /Tools/ResGen/bin
@@ -13,9 +15,7 @@
 /Tools/ResGen/ResGen_SR.Designer.cs
 /Tools/ResGen/ResGen_CommonResStrings.Designer.cs
 /Source/MDCFR/bin
+/Source/API-Website
 /Source/MDCFR/Objects
 /Source/MDCFR-DEP_HTTPLIB/bin
 /Source/MDCFR-DEP_HTTPLIB/Objects
-/Source/MDCFR/Properties/Resources.Designer.cs
-/Source/MDCFR/Properties/NAudio.WinForms.Gui.PanSlider.Designer.cs
-/Source/MDCFR/Properties/NAudio.WinForms.Gui.VolumeSlider.Designer.cs

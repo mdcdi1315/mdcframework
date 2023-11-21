@@ -11,6 +11,10 @@ using System.Runtime.Versioning;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
+#if (WPFExists == false) && NET7_0_OR_GREATER
+#pragma warning disable CS1574
+#endif
+
 namespace ROOT
 {
 	// A Collection Namespace which includes Microsoft's Managed code.
@@ -21,11 +25,11 @@ namespace ROOT
 	/// </summary>
 	public static class MAIN
 	{
-        /// <summary>
-        /// This property is filled out when any of the <see cref="MAIN"/> class functions called failed for a reason.
-        /// This is done so as to be given more information about 'invisible exceptions'.
-        /// </summary>
-        public static System.Exception ExceptionData { get; set; }
+		/// <summary>
+		/// This property is filled out when any of the <see cref="MAIN"/> class functions called failed for a reason.
+		/// This is done so as to be given more information about 'invisible exceptions'.
+		/// </summary>
+		public static System.Exception ExceptionData { get; set; }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static System.String ToURL(SystemLinks link)
@@ -64,9 +68,9 @@ namespace ROOT
 			return Interop.Shell32.ExecuteApp(System.IntPtr.Zero,
 				Interop.Shell32.ExecuteVerbs.Open, URL, "", null, 9) >= 32;
 #endif
-        }
+		}
 
-        [SupportedOSPlatform("windows")]
+		[SupportedOSPlatform("windows")]
 		private static System.Boolean StartUWPApp(System.String URL, IWin32Window window)
 		{
 #if DEBUG
@@ -78,7 +82,7 @@ namespace ROOT
 			return Interop.Shell32.ExecuteApp(System.IntPtr.Zero,
 				Interop.Shell32.ExecuteVerbs.Open, URL, "", null, 9) >= 32;
 #endif
-        }
+		}
 
 #if NET47_OR_GREATER
 
@@ -173,25 +177,25 @@ namespace ROOT
 		/// <param name="Base">The base value to be raised.</param>
 		/// <param name="exponent">The value that specifies the power.</param>
 		/// <returns>The number <paramref name="Base"/> raised to the <paramref name="exponent"/> power.</returns>
-        public static System.Int64 Power(System.Int64 Base, System.Int64 exponent)
-        {
-            System.Int64 Result = 1;
-            for (System.Int64 I = 1; I < exponent; I++) { Result *= Base; }
-            return Result;
-        }
+		public static System.Int64 Power(System.Int64 Base, System.Int64 exponent)
+		{
+			System.Int64 Result = 1;
+			for (System.Int64 I = 1; I < exponent; I++) { Result *= Base; }
+			return Result;
+		}
 
 		/// <summary>
 		/// Calculates the absolute value of an number.
 		/// </summary>
 		/// <param name="Number">The number to find the absolute value for.</param>
 		/// <returns>The absolute value of <paramref name="Number"/> .</returns>
-        public static System.Int64 Absolute(System.Int64 Number)
-        {
-            System.Int64 Result;
-            if (Number < 0) { Result = Number * (-1); } else { Result = Number; }
+		public static System.Int64 Absolute(System.Int64 Number)
+		{
+			System.Int64 Result;
+			if (Number < 0) { Result = Number * (-1); } else { Result = Number; }
 			if (Number == System.Int64.MinValue) { Result = System.Int64.MaxValue; }
-            return Result;
-        }
+			return Result;
+		}
 
 		/// <summary>
 		/// Finds the larger number from two numbers.
@@ -199,33 +203,33 @@ namespace ROOT
 		/// <param name="one">The first one number.</param>
 		/// <param name="two">The second one number.</param>
 		/// <returns>The larger number of the two numbers.</returns>
-        public static System.Int64 Max(System.Int64 one, System.Int64 two)
-        {
-            System.Int64 Result;
-            if (one > two) { Result = one; } else if (two > one) { Result = two; } else { Result = one; }
-            return Result;
-        }
+		public static System.Int64 Max(System.Int64 one, System.Int64 two)
+		{
+			System.Int64 Result;
+			if (one > two) { Result = one; } else if (two > one) { Result = two; } else { Result = one; }
+			return Result;
+		}
 
-        /// <summary>
-        /// Finds the smaller number from two numbers.
-        /// </summary>
-        /// <param name="One">The first one number.</param>
-        /// <param name="Two">The second one number.</param>
-        /// <returns>The smaller number of the two numbers.</returns>
-        public static System.Int64 Min(System.Int64 One, System.Int64 Two)
-        {
-            System.Int64 Result;
-            if (Two < One) { Result = Two; } else if (One < Two) { Result = One; } else { Result = One; }
-            return Result;
-        }
+		/// <summary>
+		/// Finds the smaller number from two numbers.
+		/// </summary>
+		/// <param name="One">The first one number.</param>
+		/// <param name="Two">The second one number.</param>
+		/// <returns>The smaller number of the two numbers.</returns>
+		public static System.Int64 Min(System.Int64 One, System.Int64 Two)
+		{
+			System.Int64 Result;
+			if (Two < One) { Result = Two; } else if (One < Two) { Result = One; } else { Result = One; }
+			return Result;
+		}
 
-        /// <summary>
-        /// Finds the remainder from a division operation.
-        /// </summary>
-        /// <param name="One">The first number to divide.</param>
-        /// <param name="Two">The second number to divide.</param>
-        /// <returns>The remainder of the two divided numbers.</returns>
-        public static System.Int64 Mod(System.Double One, System.Double Two) { return System.Convert.ToInt64(One % Two); }
+		/// <summary>
+		/// Finds the remainder from a division operation.
+		/// </summary>
+		/// <param name="One">The first number to divide.</param>
+		/// <param name="Two">The second number to divide.</param>
+		/// <returns>The remainder of the two divided numbers.</returns>
+		public static System.Int64 Mod(System.Double One, System.Double Two) { return System.Convert.ToInt64(One % Two); }
 
 		/// <summary>
 		/// Rounds the specified double value to the nearest integer value.
@@ -236,54 +240,54 @@ namespace ROOT
 		public static System.Int64 Round(System.Double Num)
 		{
 			System.Int64 Result;
-			if (Num - IntegerPart(Num) > 0.5) 
+			if (Num - IntegerPart(Num) > 0.5)
 			{ Result = IntegerPart(Num) + 1; } else
 			{ Result = IntegerPart(Num); }
 			return Result;
 		}
 
-        /// <summary>
-        /// Returns the integer part of a double value.
-        /// </summary>
-        /// <param name="Num">The number to return it's integer part.</param>
-        /// <returns>The integer part of <paramref name="Num"/> as <see cref="System.Int64"/>.</returns>
+		/// <summary>
+		/// Returns the integer part of a double value.
+		/// </summary>
+		/// <param name="Num">The number to return it's integer part.</param>
+		/// <returns>The integer part of <paramref name="Num"/> as <see cref="System.Int64"/>.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static System.Int64 IntegerPart(System.Double Num)
+		public static System.Int64 IntegerPart(System.Double Num)
 		{
 			System.String Tmp = Num.ToString(default(IFormatProvider));
 			if (Tmp.IndexOf('.') != -1) { Tmp = Tmp.Remove(Tmp.IndexOf('.')); }
-			return System.Int64.Parse(Tmp , style: System.Globalization.NumberStyles.None , default(IFormatProvider));
+			return System.Int64.Parse(Tmp, style: System.Globalization.NumberStyles.None, default(IFormatProvider));
 		}
 
-        /// <summary>
-        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-        /// before the one tested.
-        /// </summary>
-        /// <param name="one">The <see cref="System.String"/> to check.</param>
-        /// <param name="two">The second <see cref="System.String"/> to check.</param>
-        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+		/// <summary>
+		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+		/// before the one tested.
+		/// </summary>
+		/// <param name="one">The <see cref="System.String"/> to check.</param>
+		/// <param name="two">The second <see cref="System.String"/> to check.</param>
+		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
 		/// <exception cref="System.IndexOutOfRangeException">
 		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
 		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
 		/// </exception>
-        public static System.Boolean StringIsLessThan(this System.String one , System.String two)
+		public static System.Boolean StringIsLessThan(this System.String one, System.String two)
 		{
-            if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
-            if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
-            System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
+			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
+			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
+			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
 			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
-			System.Int64 Len = Max(Array1.LongLength , Array2.LongLength);
+			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
 			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] < Array2[I]) { return true; } }
 			return false;
 		}
 
-        /// <summary>
-        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-        /// before or is equal to the one tested.
-        /// </summary>
-        /// <param name="one">The <see cref="System.String"/> to check.</param>
-        /// <param name="two">The second <see cref="System.String"/> to check.</param>
-        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+		/// <summary>
+		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+		/// before or is equal to the one tested.
+		/// </summary>
+		/// <param name="one">The <see cref="System.String"/> to check.</param>
+		/// <param name="two">The second <see cref="System.String"/> to check.</param>
+		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
 		/// <exception cref="System.IndexOutOfRangeException">
 		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
 		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
@@ -291,86 +295,87 @@ namespace ROOT
 		/// <exception cref="System.ArgumentNullException">
 		/// The arguments provided were null.
 		/// </exception>
-        public static System.Boolean StringIsLessOrEqualThan(this System.String one, System.String two)
-        {
-            if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
-            if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
-            System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
-            System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
-            System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-            for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] <= Array2[I]) { return true; } }
-            return false;
-        }
-
-        /// <summary>
-        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-        /// later the one tested.
-        /// </summary>
-        /// <param name="one">The <see cref="System.String"/> to check.</param>
-        /// <param name="two">The second <see cref="System.String"/> to check.</param>
-        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
-		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
-		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
-		/// </exception>
-		/// <exception cref="System.ArgumentNullException">
-		/// The arguments provided were null.
-		/// </exception>
-        public static System.Boolean StringIsGreaterThan(this System.String one, System.String two)
-        {
-            if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
-            if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
-            System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
-            System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
-            System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-            for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] > Array2[I]) { return true; } }
-            return false;
-        }
-
-        /// <summary>
-        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-        /// later or equal the one tested.
-        /// </summary>
-        /// <param name="one">The <see cref="System.String"/> to check.</param>
-        /// <param name="two">The second <see cref="System.String"/> to check.</param>
-        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
-		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
-		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
-		/// </exception>
-		/// <exception cref="System.ArgumentNullException">
-		/// The arguments provided were null.
-		/// </exception>
-        public static System.Boolean StringIsGreaterOrEqualThan(this System.String one, System.String two)
-        {
+		public static System.Boolean StringIsLessOrEqualThan(this System.String one, System.String two)
+		{
 			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
-            if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
-            System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
-            System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
-            System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-            for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] >= Array2[I]) { return true; } }
-            return false;
-        }
+			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
+			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
+			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
+			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
+			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] <= Array2[I]) { return true; } }
+			return false;
+		}
 
-        /// <summary>
-        /// Finds the quotient from a division operation.
-        /// </summary>
-        /// <param name="One">The first number to divide.</param>
-        /// <param name="Two">The second number to divide.</param>
-        /// <returns>The quotient of the two divided numbers.</returns>
-        public static System.Int64 Div(System.Double One, System.Double Two) { return System.Convert.ToInt64(One / Two); }
+		/// <summary>
+		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+		/// later the one tested.
+		/// </summary>
+		/// <param name="one">The <see cref="System.String"/> to check.</param>
+		/// <param name="two">The second <see cref="System.String"/> to check.</param>
+		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+		/// <exception cref="System.IndexOutOfRangeException">
+		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
+		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+		/// </exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// The arguments provided were null.
+		/// </exception>
+		public static System.Boolean StringIsGreaterThan(this System.String one, System.String two)
+		{
+			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
+			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
+			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
+			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
+			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
+			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] > Array2[I]) { return true; } }
+			return false;
+		}
 
-        /// <summary>
-        /// Opens a Windows UWP App.
-        /// </summary>
-        /// <param name="link">One of the values of the <see cref="SystemLinks"/> enumeration.</param>
-        /// <param name="Window">The function will show messages to the specified window , if needed.</param>
-        /// <returns>A <see cref="System.Boolean"/> determining whether the 
-        /// specified UWP App was opened or restored.</returns>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+		/// later or equal the one tested.
+		/// </summary>
+		/// <param name="one">The <see cref="System.String"/> to check.</param>
+		/// <param name="two">The second <see cref="System.String"/> to check.</param>
+		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+		/// <exception cref="System.IndexOutOfRangeException">
+		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
+		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+		/// </exception>
+		/// <exception cref="System.ArgumentNullException">
+		/// The arguments provided were null.
+		/// </exception>
+		public static System.Boolean StringIsGreaterOrEqualThan(this System.String one, System.String two)
+		{
+			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
+			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
+			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
+			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
+			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
+			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] >= Array2[I]) { return true; } }
+			return false;
+		}
+
+		/// <summary>
+		/// Finds the quotient from a division operation.
+		/// </summary>
+		/// <param name="One">The first number to divide.</param>
+		/// <param name="Two">The second number to divide.</param>
+		/// <returns>The quotient of the two divided numbers.</returns>
+		public static System.Int64 Div(System.Double One, System.Double Two) { return System.Convert.ToInt64(One / Two); }
+
+		/// <summary>
+		/// Opens a Windows UWP App.
+		/// </summary>
+		/// <param name="link">One of the values of the <see cref="SystemLinks"/> enumeration.</param>
+		/// <param name="Window">The function will show messages to the specified window , if needed.</param>
+		/// <returns>A <see cref="System.Boolean"/> determining whether the 
+		/// specified UWP App was opened or restored.</returns>
+		[SupportedOSPlatform("windows")]
 		public static System.Boolean OpenSystemApp(SystemLinks link, IWin32Window Window) { return StartUWPApp(ToURL(link), Window); }
 
 #if NEEDS_HTTPLIB == false
+		
 		/// <summary>
 		/// Creates a new Windows Internet Shortcut.
 		/// </summary>
@@ -545,12 +550,12 @@ namespace ROOT
 		[SupportedOSPlatform("windows")]
 		public static System.Boolean OpenSystemApp(System.String link)
 		{
-            if (link == null) { return false; }
-            if (link.EndsWith("://" , StringComparison.OrdinalIgnoreCase) == false) { return false; }
+			if (link == null) { return false; }
+			if (link.EndsWith("://", StringComparison.OrdinalIgnoreCase) == false) { return false; }
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.OpenSystemApp(... , ...) ACTIVATION: Success)");
 #endif
-            return StartUWPApp(link);
+			return StartUWPApp(link);
 		}
 
 		/// <summary>
@@ -566,20 +571,20 @@ namespace ROOT
 		public static System.Boolean OpenSystemApp(System.String link, IWin32Window Window)
 		{
 			if (link == null) { return false; }
-			if (link.EndsWith("://" , StringComparison.OrdinalIgnoreCase) == false) { return false; }
+			if (link.EndsWith("://", StringComparison.OrdinalIgnoreCase) == false) { return false; }
 #if DEBUG
 			Debugger.DebuggingInfo($"(in ROOT.MAIN.OpenSystemApp(... , ...) ACTIVATION: Success)");
 #endif
 			return StartUWPApp(link, Window);
 		}
 
-        /// <summary>
-        /// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
-        /// </summary>
-        /// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
-        /// <returns>The full file path returned by the dialog.</returns>
-        [SupportedOSPlatform("windows")]
-        public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
+		/// <summary>
+		/// Gets from an instance of the <see cref="DialogsReturner"/> class the file path given by the dialog.
+		/// </summary>
+		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
+		/// <returns>The full file path returned by the dialog.</returns>
+		[SupportedOSPlatform("windows")]
+		public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
 
 		/// <summary>
 		/// Gets from an instance of the <see cref="DialogsReturner"/> class if the dialog was executed sucessfully and a path was got.
@@ -590,20 +595,20 @@ namespace ROOT
 		[SupportedOSPlatform("windows")]
 		public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
 
-        /// <summary>
-        /// A static class which creates console colored messages to differentiate the types of errors or information given.
-        /// </summary>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", 
-			"CA1034:Nested types should not be visible", 
+		/// <summary>
+		/// A static class which creates console colored messages to differentiate the types of errors or information given.
+		/// </summary>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1034:Nested types should not be visible",
 			Justification = "Cannot be unnested due to API Compatibility Surface")]
-        public static class IntuitiveConsoleText
+		public static class IntuitiveConsoleText
 		{
-            /// <summary>
-            /// This writes the data specified on the console. These data are informational. The background is black and the foreground is gray.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            [SupportedOSPlatform("windows")]
-            public static void InfoText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are informational. The background is black and the foreground is gray.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			[SupportedOSPlatform("windows")]
+			public static void InfoText(System.String Text)
 			{
 				if (ROOT.ConsoleExtensions.Detached == true) { return; }
 				System.ConsoleColor FORE, BACK;
@@ -617,12 +622,12 @@ namespace ROOT
 				ConsoleExtensions.BackgroundColor = BACK;
 			}
 
-            /// <summary>
-            /// This writes the data specified on the console. These data are warnings. The background is black and the foreground is yellow.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            [SupportedOSPlatform("windows")]
-            public static void WarningText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are warnings. The background is black and the foreground is yellow.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			[SupportedOSPlatform("windows")]
+			public static void WarningText(System.String Text)
 			{
 				if (ROOT.ConsoleExtensions.Detached == true) { return; }
 				System.ConsoleColor FORE, BACK;
@@ -636,12 +641,12 @@ namespace ROOT
 				ConsoleExtensions.BackgroundColor = BACK;
 			}
 
-            /// <summary>
-            /// This writes the data specified on the console. These data are errors. The background is black and the foreground is red.
-            /// </summary>
-            /// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
-            [SupportedOSPlatform("windows")]
-            public static void ErrorText(System.String Text)
+			/// <summary>
+			/// This writes the data specified on the console. These data are errors. The background is black and the foreground is red.
+			/// </summary>
+			/// <param name="Text">The <see cref="System.String"/> to write to the console.</param>
+			[SupportedOSPlatform("windows")]
+			public static void ErrorText(System.String Text)
 			{
 				if (ROOT.ConsoleExtensions.Detached == true) { return; }
 				System.ConsoleColor FORE, BACK;
@@ -679,21 +684,24 @@ namespace ROOT
 		/// <summary>
 		/// This method plays a sound to the computer.
 		/// </summary>
+		/// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
 		[SupportedOSPlatform("windows")]
-		public static void EmitBeepSound() 
+		public static void EmitBeepSound()
 		{
 #if IsWindows
 			_ = Interop.Kernel32.ConsoleBeep(800, 210);
 #else
 			ExceptionData = new PlatformNotSupportedException("This API is not supported for this OS.");
 #endif
-        }
+		}
 
-        /// <summary>
-        /// This is a custom implementation of <see cref="System.Console.WriteLine()"/> which writes data to the console.
-        /// </summary>
-        /// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
-        /// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
+		/// <summary>
+		/// This is a custom implementation of <see cref="System.Console.WriteLine()"/> which writes data to the console.
+		/// </summary>
+		/// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
+		/// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
 		public static System.Boolean WriteConsoleText(System.String Text)
 		{
 #if IsWindows
@@ -705,18 +713,18 @@ namespace ROOT
 				return true;
 			} catch (System.IO.IOException E) { ExceptionData = E; return false; }
 #endif
-        }
+		}
 
-        /// <summary>
-        /// This is a custom implementation of <see cref="System.Console.Write(string)"/> which writes data to the console.
-        /// </summary>
-        /// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
-        /// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
-        [RequiresPreviewFeatures]
-        public static System.Boolean WriteConsole(System.String Text) 
+		/// <summary>
+		/// This is a custom implementation of <see cref="System.Console.Write(string)"/> which writes data to the console.
+		/// </summary>
+		/// <param name="Text">The <see cref="System.String"/> data to write to the console.</param>
+		/// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
+		[RequiresPreviewFeatures]
+		public static System.Boolean WriteConsole(System.String Text)
 		{
 #if IsWindows
-            return global::ConsoleInterop.WriteToConsole(Text);
+			return global::ConsoleInterop.WriteToConsole(Text);
 #else
 			try
 			{
@@ -724,13 +732,16 @@ namespace ROOT
 				return true;
 			} catch (System.IO.IOException E) { ExceptionData = E; return false; }
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Detaches the running console.
-        /// </summary>
-        /// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
-        public static System.Boolean DetachConsole()
+		/// <summary>
+		/// Detaches the running console.
+		/// </summary>
+		/// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
+		/// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
+		public static System.Boolean DetachConsole()
 		{
 #if IsWindows
 			if (ConsoleInterop.DetachConsole() != 0) { ConsoleExtensions.Detached = true; return false; } else { return true; }
@@ -738,15 +749,18 @@ namespace ROOT
 			ExceptionData = new PlatformNotSupportedException("This API is not supported for this OS.");
 			return false;
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Attach the current application to the specified console PID.
-        /// </summary>
-        /// <param name="ConsolePID">The Console's PID to attach to. If not defined , it will try to attach to the parent process console ,
-        /// if it exists and has spawned a console.</param>
-        /// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
-        public static System.Boolean AttachToConsole(System.Int32 ConsolePID = -1)
+		/// <summary>
+		/// Attach the current application to the specified console PID.
+		/// </summary>
+		/// <param name="ConsolePID">The Console's PID to attach to. If not defined , it will try to attach to the parent process console ,
+		/// if it exists and has spawned a console.</param>
+		/// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
+		/// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
+		public static System.Boolean AttachToConsole(System.Int32 ConsolePID = -1)
 		{
 #if IsWindows
 			if (ConsoleInterop.AttachToConsole(ConsolePID) != 0) { ConsoleExtensions.Detached = false; return true; } else { return false; }
@@ -754,13 +768,16 @@ namespace ROOT
 			ExceptionData = new PlatformNotSupportedException("This API is not supported for this OS.");
 			return false;
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Create (allocate) a new console for the current process.
-        /// </summary>
-        /// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
-        public static System.Boolean CreateConsole()
+		/// <summary>
+		/// Create (allocate) a new console for the current process.
+		/// </summary>
+		/// <returns>A <see cref="System.Boolean"/> value indicating if this method was executed sucessfully.</returns>
+		/// <exception cref="PlatformNotSupportedException">
+		/// This exception will be thrown when MDCFR was built and used for other platforms , such as Unix.
+		/// </exception>
+		public static System.Boolean CreateConsole()
 		{
 #if IsWindows
 			if (ConsoleInterop.CreateConsole() != 0) { ConsoleExtensions.Detached = false; return true; } else { return false; }
@@ -768,14 +785,14 @@ namespace ROOT
 			ExceptionData = new PlatformNotSupportedException("This API is not supported for this OS.");
 			return false;
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Read a text line from console. This uses a custom inplementation so as to get the data.
-        /// </summary>
-        /// <param name="Opt">The Buffer Size to set. If left undefined , then it is <see cref="ConsoleExtensions.ConsoleReadBufferOptions.Default"/></param>
-        /// <returns>The data read from the console. If any error found , then it will return the <c>"Error"</c> <see cref="System.String"/> .</returns>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// Read a text line from console. This uses a custom inplementation so as to get the data.
+		/// </summary>
+		/// <param name="Opt">The Buffer Size to set. If left undefined , then it is <see cref="ConsoleExtensions.ConsoleReadBufferOptions.Default"/></param>
+		/// <returns>The data read from the console. If any error found , then it will return the <c>"Error"</c> <see cref="System.String"/> .</returns>
+		[SupportedOSPlatform("windows")]
 		public static System.String ReadConsoleText(ROOT.ConsoleExtensions.ConsoleReadBufferOptions Opt =
 			ROOT.ConsoleExtensions.ConsoleReadBufferOptions.Default)
 		{
@@ -784,19 +801,19 @@ namespace ROOT
 #else
 			return System.Console.ReadLine();	
 #endif
-        }
+		}
 
-        /// <summary>
-        /// This writes a <see cref="System.Char"/>[] to the console. <see cref="System.Console.WriteLine()"/> also 
-        /// contains such a method , but this one is different and has no any relationship with that one.
-        /// </summary>
-        /// <param name="Text">The <see cref="System.Char"/>[] data to write.</param>
-        /// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// This writes a <see cref="System.Char"/>[] to the console. <see cref="System.Console.WriteLine()"/> also 
+		/// contains such a method , but this one is different and has no any relationship with that one.
+		/// </summary>
+		/// <param name="Text">The <see cref="System.Char"/>[] data to write.</param>
+		/// <returns>A <see cref="System.Boolean"/> value whether the native function suceeded.</returns>
+		[SupportedOSPlatform("windows")]
 		public static System.Boolean WriteConsoleText(System.Char[] Text)
 		{
 #if IsWindows
-            List<System.Char> LST = new List<System.Char>(Text) { '\r', '\n' };
+			List<System.Char> LST = new List<System.Char>(Text) { '\r', '\n' };
 			System.Boolean DS = ConsoleInterop.WriteToConsole(LST.ToArray());
 			LST.Clear();
 			LST = null;
@@ -808,15 +825,15 @@ namespace ROOT
 				 return true;
 			} catch (System.IO.IOException E) { ExceptionData = E; return false; }
 #endif
-        }
+		}
 
-        /// <summary>
-        /// This writes a custom colored text to console and returns to the current console color settings after written.
-        /// </summary>
-        /// <param name="Message">The <see cref="System.String"/> data to write to.</param>
-        /// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
-        /// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// This writes a custom colored text to console and returns to the current console color settings after written.
+		/// </summary>
+		/// <param name="Message">The <see cref="System.String"/> data to write to.</param>
+		/// <param name="ForegroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the foreground color.</param>
+		/// <param name="BackgroundColor">The <see cref="System.ConsoleColor"/> enumeration value that represents the background color.</param>
+		[SupportedOSPlatform("windows")]
 		public static void WriteCustomColoredText(System.String Message, System.ConsoleColor ForegroundColor, System.ConsoleColor BackgroundColor)
 		{
 			System.ConsoleColor FORE, BACK;
@@ -870,12 +887,12 @@ namespace ROOT
 #if DEBUG
             Debugger.DebuggingInfo($"(in OSProcessorArchitecture()) VALUE: {RRD}");
 #endif
-            if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
+			if (System.Runtime.InteropServices.Architecture.X86 == RRD) { return "x86"; }
 			else if (System.Runtime.InteropServices.Architecture.X64 == RRD) { return "AMD64"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm == RRD) { return "ARM"; }
 			else if (System.Runtime.InteropServices.Architecture.Arm64 == RRD) { return "ARM64"; } else { return "Error"; }
 		}
-		
+
 		/// <summary>
 		/// This method returns the application's compiled platform.
 		/// </summary>
@@ -903,13 +920,13 @@ namespace ROOT
 		/// <param name="PathToPoint">Path that will point to the link saved.</param>
 		/// <param name="WorkingDirectory">The working directory that the link will open to.</param>
 		/// <returns>This method will always throw <see cref="PlatformNotSupportedException"/>.</returns>
-		[Obsolete("This method has been deprecated due to the disability to create the target properly." , DiagnosticId = "MDCFR_DD1")]
+		[Obsolete("This method has been deprecated due to the disability to create the target properly.", DiagnosticId = "MDCFR_DD1")]
 		[SupportedOSPlatform("windows")]
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "The Internal Debugger depends on this general exception type.")]
-        public static System.Boolean CreateLink(System.String PathToSave , System.String PathToPoint , 
-			System.String WorkingDirectory = "") 
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
+			Justification = "The Internal Debugger depends on this general exception type.")]
+		public static System.Boolean CreateLink(System.String PathToSave, System.String PathToPoint,
+			System.String WorkingDirectory = "")
 		{
 			PlatformNotSupportedException F = new PlatformNotSupportedException("This method has been deprecated.");
 			ExceptionData = F;
@@ -949,7 +966,7 @@ namespace ROOT
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.ChangeDefinedChar(... , {Chartochange} , {Chartobechanged})) VALIDARRAY: true");
 #endif
-            System.String Result = null;
+			System.String Result = null;
 			for (System.Int32 I = 0; I < array.Length; I++)
 			{
 				if (array[I] == Chartochange)
@@ -961,7 +978,7 @@ namespace ROOT
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.ChangeDefinedChar(... , {Chartochange} , {Chartobechanged})) RESULT: Success");
 #endif
-            return Result;
+			return Result;
 		}
 
 		/// <summary>
@@ -998,41 +1015,7 @@ namespace ROOT
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.RemoveDefinedChars(... , ...)) RESULT: Success");
 #endif
-            return Result;
-		}
-
-
-		/// <summary>
-		/// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
-		/// </summary>
-		/// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
-		/// <param name="Title">The window's title.</param>
-		/// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
-		/// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
-		/// <remarks>Note: This uses the <see cref="ROOT.IntuitiveInteraction.GetAStringFromTheUser"/> class instead of the 
-		/// Microsoft.VisualBasic.Interaction.InputBox() method.</remarks>
-		[SupportedOSPlatform("windows")]
-		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-		public static System.String GetAStringFromTheUserNew(System.String Prompt,
-		System.String Title, System.String DefaultResponse)
-		{
-#if DEBUG
-			Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) CREATE: Dialog");
-#endif
-			IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt, Title, DefaultResponse);
-			try
-			{
-				switch (DZ.ButtonClicked)
-				{
-					case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer:
-						return null;
-					default:
-#if DEBUG
-                    Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) RESULT: {DZ.ValueReturned}");
-#endif
-						return DZ.ValueReturned;
-				}
-			} finally { DZ.Dispose(); }
+			return Result;
 		}
 
 		/// <summary>
@@ -1040,15 +1023,15 @@ namespace ROOT
 		/// </summary>
 		/// <param name="Path">The <see cref="System.String"/> which is a filepath to check if the file exists.</param>
 		/// <returns>If the file exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
-		public static System.Boolean FileExists(System.String Path) 
+		public static System.Boolean FileExists(System.String Path)
 		{
 			System.Boolean Ex = false;
 #if IsWindows
-		#if NET47_OR_GREATER
-					Ex = Microsoft.IO.File.Exists(Path);
-		#else
-					Ex = FileInterop.FileExists(Path);
-		#endif
+#if NET47_OR_GREATER
+			Ex = Microsoft.IO.File.Exists(Path);
+#else
+			Ex = FileInterop.FileExists(Path);
+#endif
 #else
 			Ex = System.IO.File.Exists(Path);
 #endif
@@ -1058,20 +1041,20 @@ namespace ROOT
 			return Ex;
 		}
 
-        /// <summary>
-        /// Checks whether a directory exists or not by the <paramref name="Path"/> supplied.
-        /// </summary>
-        /// <param name="Path">The <see cref="System.String"/> which is a directory path to check if the directory exists.</param>
-        /// <returns>If the directory exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
-        public static System.Boolean DirExists(System.String Path) 
+		/// <summary>
+		/// Checks whether a directory exists or not by the <paramref name="Path"/> supplied.
+		/// </summary>
+		/// <param name="Path">The <see cref="System.String"/> which is a directory path to check if the directory exists.</param>
+		/// <returns>If the directory exists in the <paramref name="Path"/> supplied , then <c>true</c>; otherwise <c>false</c>.</returns>
+		public static System.Boolean DirExists(System.String Path)
 		{
-            System.Boolean Ex = false;
+			System.Boolean Ex = false;
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 			Ex = Microsoft.IO.Directory.Exists(Path);
-	#else
+#else
 			Ex = System.IO.Directory.Exists(Path);
-	#endif
+#endif
 #else
 			Ex = System.IO.Directory.Exists(Path);
 #endif
@@ -1086,22 +1069,22 @@ namespace ROOT
 		/// </summary>
 		/// <param name="Path">The directory path to create.</param>
 		/// <returns><c>true</c> if the directory was created sucessfully; otherwise , <c>false</c>.</returns>
-		public static System.Boolean CreateADir(System.String Path) 
+		public static System.Boolean CreateADir(System.String Path)
 		{
 			System.Boolean Ex = false;
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 			Ex = Microsoft.IO.Directory.CreateDirectory(Path).Exists;
-	#else
+#else
 			Ex = FileInterop.CreateDir(Path) != 0;
-	#endif
+#endif
 #else
 			Ex = System.IO.Directory.CreateDirectory(Path).Exists;
 #endif
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateADir(...)) CREATED: {Ex}");
 #endif
-			return Ex; 
+			return Ex;
 		}
 
 		/// <summary>
@@ -1122,15 +1105,15 @@ namespace ROOT
 				return true;
 			} catch (System.Exception E) { ExceptionData = E; return false; }
 #else
-            if (DeleteAll == false) { return FileInterop.RemoveDir(Path) != 0; } 
+			if (DeleteAll == false) { return FileInterop.RemoveDir(Path) != 0; }
 			if ((FileInterop.RemoveDir(Path) == 0) && (DeleteAll))
 			{
-                // Find all directories first to delete.
-                List<System.String> info = new List<System.String>() { Path };
-                for (System.Int32 I = 0; I < info.Count; I++)
+				// Find all directories first to delete.
+				List<System.String> info = new List<System.String>() { Path };
+				for (System.Int32 I = 0; I < info.Count; I++)
 				{
-                    foreach (System.IO.DirectoryInfo DS in new System.IO.DirectoryInfo(info[I]).GetDirectories()) { info.Add(DS.FullName); }
-                }
+					foreach (System.IO.DirectoryInfo DS in new System.IO.DirectoryInfo(info[I]).GetDirectories()) { info.Add(DS.FullName); }
+				}
 				//Enumerate through them , delete all the files , then the directories , and exit.
 				//In case that any of the native functions fail during deletion  , function ends with a false value.
 				System.IO.DirectoryInfo DI;
@@ -1139,12 +1122,12 @@ namespace ROOT
 					DI = new(A);
 					foreach (System.IO.FileInfo I in DI.GetFiles())
 					{
-                        // Call native function: Deletes the file.
-                        // This function fails if returned from it 0. Exit with false in this case.
+						// Call native function: Deletes the file.
+						// This function fails if returned from it 0. Exit with false in this case.
 #if DEBUG
                         Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteADir({Path} , {DeleteAll})) DELETE: {I.FullName}");
 #endif
-                        if (FileInterop.DeleteFile(I.FullName) == 0) { return false; }
+						if (FileInterop.DeleteFile(I.FullName) == 0) { return false; }
 					}
 				}
 				// Now that the directories are empty , we are safe to delete them.
@@ -1152,16 +1135,16 @@ namespace ROOT
 				// Note: recursion here must happen in reverse order as they were found.
 				for (System.Int32 I = info.Count - 1; I > 0; I--)
 				{
-                    // Call native function: Deletes the directory.
-                    // This function fails if returned from it 0. Exit with false in this case.
+					// Call native function: Deletes the directory.
+					// This function fails if returned from it 0. Exit with false in this case.
 #if DEBUG
                     Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteADir({Path} , {DeleteAll})) DELETE: {info[I]}");
 #endif
-                    if (FileInterop.RemoveDir(info[I]) == 0) { return false; }
+					if (FileInterop.RemoveDir(info[I]) == 0) { return false; }
 				}
-                return FileInterop.RemoveDir(Path) != 0;
-            }
-            return true;
+				return FileInterop.RemoveDir(Path) != 0;
+			}
+			return true;
 #endif
 #else
 			try
@@ -1170,33 +1153,49 @@ namespace ROOT
 				return true;
 			} catch (System.Exception E) { ExceptionData = E; return false; }
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Move files or directories specified by the parameters. The <paramref name="SourcePath"/> must exist.
-        /// </summary>
-        /// <param name="SourcePath">The path to get the directory or file to move it.</param>
-        /// <param name="DestPath">The destination path that the file or directory should go to.</param>
-        /// <returns><c>true</c> if the file or directory was moved; otherwise , <c>false</c>.</returns>
-        public static System.Boolean MoveFilesOrDirs(System.String SourcePath, System.String DestPath)
+		/// <summary>
+		/// Move files or directories specified by the parameters. The <paramref name="SourcePath"/> must exist.
+		/// </summary>
+		/// <param name="SourcePath">The path to get the directory or file to move it.</param>
+		/// <param name="DestPath">The destination path that the file or directory should go to.</param>
+		/// <returns><c>true</c> if the file or directory was moved; otherwise , <c>false</c>.</returns>
+		public static System.Boolean MoveFilesOrDirs(System.String SourcePath, System.String DestPath)
 		{
 			System.Boolean Ex = false;
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 			try
 			{
-				Microsoft.IO.Directory.Move(SourcePath, DestPath);
-				Ex = true;
+				if (FileExists(SourcePath))
+				{
+					Microsoft.IO.File.Move(SourcePath, DestPath);
+					Ex = true;
+				}
+				else if (DirExists(SourcePath))
+				{
+					Microsoft.IO.Directory.Move(SourcePath, DestPath);
+					Ex = true;
+				}
 			}
 			catch (System.Exception E) { ExceptionData = E; Ex = false; }
-	#else
+#else
 			Ex = FileInterop.MoveFileOrDir(SourcePath, DestPath) != 0;
-	#endif
+#endif
 #else
 			try
             {
-                System.IO.Directory.Move(SourcePath, DestPath);
-                Ex = true;
+                if (FileExists(SourcePath))
+				{
+					System.IO.File.Move(SourcePath, DestPath);
+					Ex = true;
+				}
+				else if (DirExists(SourcePath))
+				{
+					System.IO.Directory.Move(SourcePath, DestPath);
+					Ex = true;
+				}
             }
             catch (System.Exception E) { ExceptionData = E; Ex = false; }
 #endif
@@ -1218,15 +1217,15 @@ namespace ROOT
 		{
 			System.Boolean Ex = false;
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 			try
 			{
 				Microsoft.IO.File.Copy(SourceFilePath, DestPath, OverWriteAllowed);
 				Ex = true;
 			} catch (System.Exception E) { ExceptionData = E; Ex = false;  }
-	#else
+#else
 			Ex = FileInterop.CopyFile(SourceFilePath, DestPath, OverWriteAllowed == false) != 0;
-	#endif
+#endif
 #else
 			try
 			{
@@ -1240,74 +1239,74 @@ namespace ROOT
 			return Ex;
 		}
 
-        /// <summary>
-        /// Gets a new <see cref="System.IO.FileSystemInfo"/> captured from the specified directory.
-        /// </summary>
-        /// <param name="Path">The directory to get the data from.</param>
-        /// <returns>A new <see cref="System.IO.FileSystemInfo"/> object containing the data; otherwise , <c>null</c> if an error occured.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "The Internal Debugger depends on this general exception type.")]
-        public static System.IO.FileSystemInfo[] GetANewFileSystemInfo(System.String Path)
+		/// <summary>
+		/// Gets a new <see cref="System.IO.FileSystemInfo"/> captured from the specified directory.
+		/// </summary>
+		/// <param name="Path">The directory to get the data from.</param>
+		/// <returns>A new <see cref="System.IO.FileSystemInfo"/> object containing the data; otherwise , <c>null</c> if an error occured.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
+			Justification = "The Internal Debugger depends on this general exception type.")]
+		public static System.IO.FileSystemInfo[] GetANewFileSystemInfo(System.String Path)
 		{
 			if (DirExists(Path) == false) { return null; }
 			try
 			{
 				System.IO.DirectoryInfo RFD = new System.IO.DirectoryInfo(Path);
-				return RFD.GetFileSystemInfos("*" , System.IO.SearchOption.AllDirectories);
+				return RFD.GetFileSystemInfos("*", System.IO.SearchOption.AllDirectories);
 			}
 			catch (System.Exception e) { ExceptionData = e; return null; }
 		}
 
-        /// <summary>
-        /// Creates a new and fresh file and opens a new handle for it by the <see cref="System.IO.FileStream"/>.
-        /// </summary>
-        /// <param name="Path">The file path where the file will be created. Example: <![CDATA[C:\Files\Start.txt]]> .</param>
-        /// <returns>A new <see cref="System.IO.FileStream"/> object if no error occured; otherwise , <c>null</c>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "The Internal Debugger depends on this general exception type.")]
-        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
-		public static System.IO.FileStream CreateANewFile(System.String Path) 
-		{ 
-			try 
+		/// <summary>
+		/// Creates a new and fresh file and opens a new handle for it by the <see cref="System.IO.FileStream"/>.
+		/// </summary>
+		/// <param name="Path">The file path where the file will be created. Example: <![CDATA[C:\Files\Start.txt]]> .</param>
+		/// <returns>A new <see cref="System.IO.FileStream"/> object if no error occured; otherwise , <c>null</c>.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
+			Justification = "The Internal Debugger depends on this general exception type.")]
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static System.IO.FileStream CreateANewFile(System.String Path)
+		{
+			try
 			{
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.CreateANewFile(...)) INFO: Attempting to create it.");
 #endif
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 				return Microsoft.IO.File.Create(Path);
-	#else
-				return System.IO.File.OpenWrite(Path);
-	#endif
 #else
 				return System.IO.File.OpenWrite(Path);
 #endif
-            }
-            catch (System.Exception e) 
+#else
+				return System.IO.File.OpenWrite(Path);
+#endif
+			}
+			catch (System.Exception e)
 			{
 #if DEBUG
                 Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateANewFile(...)) INFO: Error detected!\n{e}");
 #endif
-                ExceptionData = e; 
-				return null; 
+				ExceptionData = e;
+				return null;
 			}
 		}
 
-        /// <summary>
-        /// Opens an handle for the existing file as a <see cref="System.IO.FileStream"/>.<br />
-        /// The file is opened with both Read and Write permissions.
-        /// </summary>
-        /// <param name="Path">The file path where the file is located to.</param>
-        /// <param name="AllowAccessToOthers">This parameter specifies whether to give other processes the
-        /// permission to read or write the file too. By default , this is set to <see langword="false"/>.</param>
-        /// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
-        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
-        public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path , System.Boolean AllowAccessToOthers = false)
+		/// <summary>
+		/// Opens an handle for the existing file as a <see cref="System.IO.FileStream"/>.<br />
+		/// The file is opened with both Read and Write permissions.
+		/// </summary>
+		/// <param name="Path">The file path where the file is located to.</param>
+		/// <param name="AllowAccessToOthers">This parameter specifies whether to give other processes the
+		/// permission to read or write the file too. By default , this is set to <see langword="false"/>.</param>
+		/// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
+		public static System.IO.FileStream ReadAFileUsingFileStream(System.String Path, System.Boolean AllowAccessToOthers = false)
 		{
 			if (FileExists(Path) == false) { return null; }
-			try 
+			try
 			{
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.ReadAFileUsingFileStream(...)) INFO: Attempting to open it with R/W permissions.");
@@ -1317,27 +1316,27 @@ namespace ROOT
 					return System.IO.File.Open(Path, System.IO.FileMode.Open, System.IO.FileAccess.ReadWrite, System.IO.FileShare.ReadWrite);
 				} else
 				{
-                    return System.IO.File.Open(Path, System.IO.FileMode.Open, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None);
-                }
-			} catch (System.Exception e) 
+					return System.IO.File.Open(Path, System.IO.FileMode.Open, System.IO.FileAccess.ReadWrite, System.IO.FileShare.None);
+				}
+			} catch (System.Exception e)
 			{
 #if DEBUG
                 Debugger.DebuggingInfo($"(in ROOT.MAIN.ReadAFileUsingFileStream(...)) INFO: Error detected!\n{e}");
 #endif
-                ExceptionData = e; return null; 
+				ExceptionData = e; return null;
 			}
 		}
 
-        /// <summary>
-        /// Clears the pontential data that the file specified has and opens that file with Write permissions.
-        /// The file specified at the <paramref name="Path"/> parameter must exist.
-        /// </summary>
-        /// <param name="Path">The file path where the file is located to.</param>
-        /// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "The Internal Debugger depends on this general exception type.")]
-        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+		/// <summary>
+		/// Clears the pontential data that the file specified has and opens that file with Write permissions.
+		/// The file specified at the <paramref name="Path"/> parameter must exist.
+		/// </summary>
+		/// <param name="Path">The file path where the file is located to.</param>
+		/// <returns>A new <see cref="System.IO.FileStream"/> if no errors found; otherwise , <c>null</c>.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
+			Justification = "The Internal Debugger depends on this general exception type.")]
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
 		public static System.IO.FileStream ClearAndWriteAFile(System.String Path)
 		{
 			if (FileExists(Path) == false) { return null; }
@@ -1346,26 +1345,26 @@ namespace ROOT
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.ClearAndWriteAFile(...)) INFO: Attempting to open it with R/W permissions.");
 #endif
-                return System.IO.File.Open(Path, System.IO.FileMode.Truncate);
-            }
-            catch (System.Exception e)
+				return System.IO.File.Open(Path, System.IO.FileMode.Truncate);
+			}
+			catch (System.Exception e)
 			{
 #if DEBUG
                 Debugger.DebuggingInfo($"(in ROOT.MAIN.ClearAndWriteAFile(...)) INFO: Error detected!\n{e}");
 #endif
-                ExceptionData = e; return null;
+				ExceptionData = e; return null;
 			}
 		}
 
-        /// <summary>
-        /// This method writes the <see cref="System.String"/> data specified to an alive <see cref="System.IO.FileStream"/> object with Write permissions.
-        /// </summary>
-        /// <param name="Contents">The <see cref="System.String"/> contents to write to the file.</param>
-        /// <param name="FileStreamObject">The </param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
-            "CA1031:Do not catch general exception types",
-            Justification = "The Internal Debugger depends of this general exception type.")]
-        public static void PassNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
+		/// <summary>
+		/// This method writes the <see cref="System.String"/> data specified to an alive <see cref="System.IO.FileStream"/> object with Write permissions.
+		/// </summary>
+		/// <param name="Contents">The <see cref="System.String"/> contents to write to the file.</param>
+		/// <param name="FileStreamObject">The </param>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
+			Justification = "The Internal Debugger depends of this general exception type.")]
+		public static void PassNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
 			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents + System.Environment.NewLine);
 			try
@@ -1373,33 +1372,33 @@ namespace ROOT
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Attempting to write data to the target.");
 #endif
-                if (FileStreamObject == null) { return; }
-                FileStreamObject.Write(EMDK, 0, EMDK.Length);
+				if (FileStreamObject == null) { return; }
+				FileStreamObject.Write(EMDK, 0, EMDK.Length);
 			}
-			catch (System.Exception E) 
+			catch (System.Exception E)
 			{
 #if DEBUG
                 Debugger.DebuggingInfo($"(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Error detected!\n{E}");
 #endif
-				ExceptionData = E; 
+				ExceptionData = E;
 				return;
-            }
+			}
 #if DEBUG
             Debugger.DebuggingInfo("(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Clearing up. Sucessfull data flush.");
 #endif
-            EMDK = null;
+			EMDK = null;
 			return;
 		}
 
-        /// <summary>
-        /// This method appends the specified <see cref="System.String"/> contents at an alive <see cref="System.IO.FileStream"/> object.
-        /// </summary>
-        /// <param name="Contents">The <see cref="System.String"/> data to write to the file.</param>
-        /// <param name="FileStreamObject">The alive <see cref="System.IO.FileStream"/> to write the data to the opened file.</param>
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", 
-			"CA1031:Do not catch general exception types", 
+		/// <summary>
+		/// This method appends the specified <see cref="System.String"/> contents at an alive <see cref="System.IO.FileStream"/> object.
+		/// </summary>
+		/// <param name="Contents">The <see cref="System.String"/> data to write to the file.</param>
+		/// <param name="FileStreamObject">The alive <see cref="System.IO.FileStream"/> to write the data to the opened file.</param>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
+			"CA1031:Do not catch general exception types",
 			Justification = "The Internal Debugger depends of this general exception type.")]
-        public static void AppendNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
+		public static void AppendNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
 			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents);
 			try
@@ -1408,20 +1407,20 @@ namespace ROOT
                 Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Attempting to write data to the target.");
 #endif
 				if (FileStreamObject == null) { return; }
-                FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
+				FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
 			}
 			catch (System.Exception E)
 			{
 #if DEBUG
                 Debugger.DebuggingInfo($"(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Error detected!\n{E}");
 #endif
-                ExceptionData = E;
-                return;
-            }
+				ExceptionData = E;
+				return;
+			}
 #if DEBUG
             Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Clearing up. Sucessfull data flush.");
 #endif
-            EMDK = null;
+			EMDK = null;
 			return;
 		}
 
@@ -1470,23 +1469,23 @@ namespace ROOT
 					return "Error";
 			}
 #else
-            switch (HashToSelect)
-            {
-                case HashDigestSelection.SHA1: EDI = System.Security.Cryptography.SHA1.Create(); break;
-                case HashDigestSelection.SHA256: EDI = System.Security.Cryptography.SHA256.Create(); break;
-                case HashDigestSelection.SHA384: EDI = System.Security.Cryptography.SHA384.Create(); break;
-                case HashDigestSelection.SHA512: EDI = System.Security.Cryptography.SHA512.Create(); break;
-                case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
-                default:
-                    ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
-                    return "Error";
-            }
+			switch (HashToSelect)
+			{
+				case HashDigestSelection.SHA1: EDI = System.Security.Cryptography.SHA1.Create(); break;
+				case HashDigestSelection.SHA256: EDI = System.Security.Cryptography.SHA256.Create(); break;
+				case HashDigestSelection.SHA384: EDI = System.Security.Cryptography.SHA384.Create(); break;
+				case HashDigestSelection.SHA512: EDI = System.Security.Cryptography.SHA512.Create(); break;
+				case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
+				default:
+					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
+					return "Error";
+			}
 #endif
 
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
 #endif
-            System.Byte[] RSS = EDI.ComputeHash(Contents);
+			System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -1527,13 +1526,13 @@ namespace ROOT
 					EDI = System.Security.Cryptography.MD5.Create();
 					break;
 				default:
-                    ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
-                    return "Error";
+					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
+					return "Error";
 			}
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
 #endif
-            System.Byte[] RSS = EDI.ComputeHash(Contents);
+			System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -1552,15 +1551,15 @@ namespace ROOT
             Debugger.DebuggingInfo($"(in ROOT.MAIN.DeleteAFile(...)) INFO: Attempting to delete the target.");
 #endif
 #if IsWindows
-	#if NET47_OR_GREATER
+#if NET47_OR_GREATER
 			try
 			{
 				Microsoft.IO.File.Delete(Path);
 				return true;
 			} catch (System.Exception E) { ExceptionData = E; return false; }
-	#else
+#else
 			return FileInterop.DeleteFile(Path) != 0;
-	#endif
+#endif
 #else
 			try
 			{
@@ -1568,9 +1567,22 @@ namespace ROOT
 				return true;
 			} catch (System.Exception E) { ExceptionData = E; return false; }
 #endif
-        }
+		}
 
-#if NET472_OR_GREATER || NET7_0_OR_GREATER
+        /// <summary>
+        /// This method requests from the user to supply a <see cref="System.String"/> and return the result to the caller.
+        /// </summary>
+        /// <param name="Prompt">How to prompt the user so as to type the correct <see cref="System.String"/> needed.</param>
+        /// <param name="Title">The window's title.</param>
+        /// <param name="DefaultResponse">The default response or an example on what the user should type.</param>
+        /// <returns>If the user wrote something in the box and pressed 'OK' , then the <see cref="System.String"/> that supplied; otherwise , <c>null</c>.</returns>
+        /// <remarks>Note: This uses the <see cref="ROOT.IntuitiveInteraction.GetAStringFromTheUser"/> class instead of the 
+        /// Microsoft.VisualBasic.Interaction.InputBox() method.</remarks>
+        [SupportedOSPlatform("windows")]
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.String GetAStringFromTheUserNew(System.String Prompt,
+        System.String Title, System.String DefaultResponse) 
+		{ return MAINInternal.GetAStringFromTheUserNewInternal(Prompt, Title, DefaultResponse); }
 
         /// <summary>
         /// This shows the default Windows Message box on the screen.
@@ -1584,23 +1596,7 @@ namespace ROOT
 		public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title,
 		MessageBoxButtons MessageButton = 0,
 		MessageBoxIcon MessageIcon = 0)
-		{
-#if DEBUG
-			Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {MessageIcon}))" +
-				" INFO: Calling native method instead. Deferral will NOT pass from the custom message handler.");
-#endif
-            return MessageBox.Show(MessageString, Title, MessageButton, MessageIcon) switch
-            {
-                DialogResult.OK => 1,
-                DialogResult.Cancel => 2,
-                DialogResult.Abort => 3,
-                DialogResult.Retry => 4,
-                DialogResult.Ignore => 5,
-                DialogResult.Yes => 6,
-                DialogResult.No => 7,
-                _ => 0,
-            };
-        }
+		{ return MAINInternal.NewMessageBoxToUserInternal(MessageString , Title , MessageButton , MessageIcon); }
 
 		/// <summary>
 		/// This is a modified Windows Message box made by me.
@@ -1615,239 +1611,59 @@ namespace ROOT
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 		public static System.Int32 NewMessageBoxToUser(System.String MessageString, System.String Title,
 			ROOT.IntuitiveInteraction.ButtonSelection MessageButton, ROOT.IntuitiveInteraction.IconSelection IconToSelect)
+		{ return MAINInternal.NewMessageBoxToUserInternal(MessageString, Title, MessageButton, IconToSelect); }
+
+		/// <summary>
+		/// This spawns a new and classical Windows Load File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.String DirToPresent)
 		{
-#if DEBUG
-            Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {IconToSelect}))" +
-                " INFO: Calling Internal class instead , because of the programmer's intention.");
-#endif
-            return new IntuitiveInteraction.IntuitiveMessageBox(MessageString, 
-				Title, MessageButton, IconToSelect).ButtonSelected switch
-            {
-                IntuitiveInteraction.ButtonReturned.OK => 1,
-                IntuitiveInteraction.ButtonReturned.Cancel => 2,
-                IntuitiveInteraction.ButtonReturned.Abort => 3,
-                IntuitiveInteraction.ButtonReturned.Retry => 4,
-                IntuitiveInteraction.ButtonReturned.Ignore => 5,
-                IntuitiveInteraction.ButtonReturned.Yes => 6,
-                IntuitiveInteraction.ButtonReturned.No => 7,
-                _ => 0,
-            };
+			return MAINInternal.CreateLoadDialogInternal(FileFilterOfWin32, FileExtensionToPresent, 
+				FileDialogWindowTitle, DirToPresent);
+		}
+
+		/// <summary>
+		/// This spawns a new and classical Windows Save File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle, System.String DirToPresent)
+		{
+			return MAINInternal.CreateSaveDialogInternal(FileFilterOfWin32 , FileExtensionToPresent , 
+				FileDialogWindowTitle , DirToPresent);
+		}
+
+		/// <summary>
+		/// This spawns a new and classical Windows Load File dialog to the user.
+		/// </summary>
+		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
+		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
+		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
+		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
+		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
+		[SupportedOSPlatform("windows")]
+		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+		System.String FileDialogWindowTitle)
+		{
+            return MAINInternal.CreateLoadDialogInternal(FileFilterOfWin32, FileExtensionToPresent,
+                FileDialogWindowTitle);
         }
 
 		/// <summary>
-		/// This spawns a new and classical Windows Load File dialog to the user.
-		/// </summary>
-		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
-		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-		[SupportedOSPlatform("windows")]
-		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle, System.String DirToPresent)
-		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = FileDialogType.LoadFile;
-			if (System.String.IsNullOrEmpty(DirToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (DirExists(DirToPresent) == false)
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.OpenFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.Multiselect = false;
-			FLD.InitialDirectory = DirToPresent;
-			FLD.AddExtension = false;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = true;
-			FLD.CheckPathExists = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
-
-		/// <summary>
-		/// This spawns a new and classical Windows Save File dialog to the user.
-		/// </summary>
-		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-		/// <param name="DirToPresent">The initial directory that the dialog will start to.</param>
-		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-		[SupportedOSPlatform("windows")]
-		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle, System.String DirToPresent)
-		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = FileDialogType.CreateFile;
-			if (System.String.IsNullOrEmpty(DirToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (DirExists(DirToPresent) == false)
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.SaveFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.AddExtension = false;
-			FLD.InitialDirectory = DirToPresent;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = true;
-			FLD.CheckPathExists = true;
-			FLD.OverwritePrompt = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
-
-		/// <summary>
-		/// This spawns a new and classical Windows Load File dialog to the user.
-		/// </summary>
-		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
-		/// <param name="FileExtensionToPresent">The file extension from the <paramref name="FileFilterOfWin32"/> to select when the dialog will be invoked. Be noted , for this
-		/// to take effect , the <paramref name="FileFilterOfWin32"/> list must have more than two different file extensions.</param>
-		/// <param name="FileDialogWindowTitle">The title that will be shown when this dialog is invoked.</param>
-		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
-		[SupportedOSPlatform("windows")]
-		public static DialogsReturner CreateLoadDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
-		System.String FileDialogWindowTitle)
-		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = FileDialogType.LoadFile;
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.OpenFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.Multiselect = false;
-			FLD.AddExtension = false;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = true;
-			FLD.CheckPathExists = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
-
-		/// <summary>
 		/// This spawns a new and classical Windows Save File dialog to the user.
 		/// </summary>
 		/// <param name="FileFilterOfWin32">The file filter that the User will select from the options given. For example , "Zip Archives|*.zip|Log Files|*.log;*.txt"</param>
@@ -1859,56 +1675,9 @@ namespace ROOT
 		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
 		System.String FileDialogWindowTitle)
 		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = ROOT.FileDialogType.CreateFile;
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.SaveFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.AddExtension = false;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = true;
-			FLD.CheckPathExists = true;
-			FLD.OverwritePrompt = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
+            return MAINInternal.CreateSaveDialogInternal(FileFilterOfWin32, FileExtensionToPresent,
+                FileDialogWindowTitle);
+        }
 
 		/// <summary>
 		/// This spawns a new and classical Windows Save File dialog to the user.
@@ -1924,57 +1693,9 @@ namespace ROOT
 		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
 		System.String FileDialogWindowTitle, System.Boolean FileMustExist, System.String DirToPresent)
 		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = ROOT.FileDialogType.CreateFile;
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.SaveFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.AddExtension = false;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = FileMustExist;
-			FLD.InitialDirectory = DirToPresent;
-			FLD.CheckPathExists = true;
-			FLD.OverwritePrompt = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
+			return MAINInternal.CreateSaveDialogInternal(FileFilterOfWin32, FileExtensionToPresent,
+                FileDialogWindowTitle, FileMustExist , DirToPresent);
+        }
 
 		/// <summary>
 		/// This spawns a new and classical Windows Save File dialog to the user.
@@ -1989,56 +1710,9 @@ namespace ROOT
 		public static DialogsReturner CreateSaveDialog(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
 		System.String FileDialogWindowTitle, System.Boolean FileMustExist)
 		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = ROOT.FileDialogType.CreateFile;
-			if (System.String.IsNullOrEmpty(FileExtensionToPresent))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-			if (System.String.IsNullOrEmpty(FileFilterOfWin32))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new Microsoft.Win32.SaveFileDialog();
-
-			FLD.Title = FileDialogWindowTitle;
-			FLD.DefaultExt = FileExtensionToPresent;
-			FLD.Filter = FileFilterOfWin32;
-			// FileDialog Settings: <--
-			// If any link is given as path , the path given by the link must be only returned.
-			FLD.DereferenceLinks = true;
-			// Only one filepath is required.
-			FLD.AddExtension = false;
-			// Those two below check if the file path supplied is existing.
-			// If not , throw a warning.
-			FLD.CheckFileExists = FileMustExist;
-			FLD.CheckPathExists = true;
-			FLD.OverwritePrompt = true;
-			// -->
-			// Now , spawn the dialog after all these settings.
-			System.Boolean? REST = FLD.ShowDialog();
-
-			if (REST == true)
-			{
-				EDOut.FileNameFullPath = FLD.FileName;
-				EDOut.FileNameOnly = FLD.SafeFileName;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
+            return MAINInternal.CreateSaveDialogInternal(FileFilterOfWin32, FileExtensionToPresent,
+                FileDialogWindowTitle, FileMustExist);
+        }
 
 		/// <summary>
 		/// This spawns a Directory Selection dialog to the user.
@@ -2048,35 +1722,7 @@ namespace ROOT
 		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
 		[SupportedOSPlatform("windows")]
 		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle)
-		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = ROOT.FileDialogType.DirSelect;
-			if (System.String.IsNullOrEmpty(DialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-
-			var FLD = new System.Windows.Forms.FolderBrowserDialog();
-			// Settings for the FolderBrowserDialog.
-			FLD.ShowNewFolderButton = true;
-			FLD.Description = DialogWindowTitle;
-			FLD.RootFolder = DirToPresent;
-
-			DialogResult REST = FLD.ShowDialog();
-
-			if (REST == DialogResult.OK)
-			{
-				EDOut.DirPath = FLD.SelectedPath;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
+		{ return MAINInternal.GetADirDialogInternal(DirToPresent, DialogWindowTitle); }
 
 		/// <summary>
 		/// This spawns a Directory Selection dialog to the user.
@@ -2087,48 +1733,14 @@ namespace ROOT
 		/// <returns>A newly constructed <see cref="DialogsReturner"/> class which contains the data returned by this function.</returns>
 		[SupportedOSPlatform("windows")]
 		public static DialogsReturner GetADirDialog(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle, System.String AlternateDir)
-		{
-			DialogsReturner EDOut = new DialogsReturner();
-			EDOut.DialogType = ROOT.FileDialogType.DirSelect;
-			if (System.String.IsNullOrEmpty(DialogWindowTitle))
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
+        { return MAINInternal.GetADirDialogInternal(DirToPresent, DialogWindowTitle , AlternateDir); }
 
-			var FLD = new System.Windows.Forms.FolderBrowserDialog();
-			// Settings for the FolderBrowserDialog.
-			FLD.ShowNewFolderButton = true;
-			FLD.Description = DialogWindowTitle;
-			FLD.RootFolder = DirToPresent;
-			if (DirToPresent == Environment.SpecialFolder.MyComputer)
-			{
-				//Because the above returns the MyComputer directory , which is a virtual one , we can make use of it and pass a custom directory instead.
-				EDOut.DirPath = AlternateDir;
-			}
-
-			DialogResult REST = FLD.ShowDialog();
-
-			if (REST == DialogResult.OK)
-			{
-				EDOut.DirPath = FLD.SelectedPath;
-				EDOut.ErrorCode = "None";
-				return EDOut;
-			}
-			else
-			{
-				EDOut.ErrorCode = "Error";
-				return EDOut;
-			}
-		}
-
-#endif
         /// <summary>
         /// Stops the application execution for the specified time (Counted in milliseconds).
         /// Think it like that the application gets to a "HALT" state for that time.
         /// </summary>
         /// <param name="TimeoutEpoch">The time to stop the execution.</param>
-        public static void HaltApplicationThread(System.Int32 TimeoutEpoch) 
+        public static void HaltApplicationThread(System.Int32 TimeoutEpoch)
 		{
 #if DEBUG
 			Debugger.DebuggingInfo($"(in ROOT.MAIN.HaltApplicationThread({TimeoutEpoch})) INFO: Getting to \'HALT\' state for {TimeoutEpoch} ms...");
@@ -2137,20 +1749,20 @@ namespace ROOT
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.HaltApplicationThread({TimeoutEpoch})) INFO: Exited HALT state...");
 #endif
-        }
+		}
 
-        /// <summary>
-        /// Launches a new process defined by the parameters.
-        /// </summary>
-        /// <param name="PathOfExecToRun">The path of executable or document to open.</param>
-        /// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
-        /// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
-        /// <param name="WaitToClose">Wait for the app to close.</param>
-        /// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
-        /// otherwise , the process exit code. 
-        /// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
-        /// <c>-10337881</c> for any other generic error.</returns>
-        [SupportedOSPlatform("windows")]
+		/// <summary>
+		/// Launches a new process defined by the parameters.
+		/// </summary>
+		/// <param name="PathOfExecToRun">The path of executable or document to open.</param>
+		/// <param name="CommandLineArgs">The arguments to pass to the executable.</param>
+		/// <param name="ImplicitSearch">The %PATH% variable should be searched for this executable.</param>
+		/// <param name="WaitToClose">Wait for the app to close.</param>
+		/// <returns>0 when the process launched sucessfully and <paramref name="WaitToClose"/> was <c>false</c>;
+		/// otherwise , the process exit code. 
+		/// <c>-10337880</c> for the Windows Launcher Error , like architecture mismatch error.
+		/// <c>-10337881</c> for any other generic error.</returns>
+		[SupportedOSPlatform("windows")]
 		public static System.Int32 LaunchProcess(System.String PathOfExecToRun, System.String CommandLineArgs,
 		System.Boolean ImplicitSearch, System.Boolean WaitToClose)
 		{
@@ -2392,10 +2004,543 @@ namespace ROOT
 
 	}
 
-	/// <summary>
-	/// This enumeration has valid System links that exist across all Windows computers.
-	/// </summary>
-	[SupportedOSPlatform("windows")]
+	[System.Runtime.CompilerServices.SpecialName]
+	internal static class MAINInternal
+	{
+        private static NotSupportedException ThrowNotSupportedPlatform_WPFParts()
+        {
+            return new NotSupportedException(MDCFR.Properties.Resources.MDCFR_PlatformNotSupportedMsg);
+        }
+
+#if (NET472_OR_GREATER || NET7_0_OR_GREATER) && WPFExists
+
+		public static System.String GetAStringFromTheUserNewInternal(System.String Prompt, System.String Title , System.String DefaultResponse)
+		{
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) CREATE: Dialog");
+#endif
+            IntuitiveInteraction.GetAStringFromTheUser DZ = new(Prompt, Title, DefaultResponse);
+            try
+            {
+                switch (DZ.ButtonClicked)
+                {
+                    case ROOT.IntuitiveInteraction.ButtonReturned.NotAnAnswer:
+                        return null;
+                    default:
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) RESULT: {DZ.ValueReturned}");
+#endif
+                        return DZ.ValueReturned;
+                }
+            }
+            finally { DZ.Dispose(); }
+        }
+
+        public static System.Int32 NewMessageBoxToUserInternal(System.String MessageString, System.String Title,
+        MessageBoxButtons MessageButton = 0,
+        MessageBoxIcon MessageIcon = 0)
+        {
+#if DEBUG
+			Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {MessageIcon}))" +
+				" INFO: Calling native method instead. Deferral will NOT pass from the custom message handler.");
+#endif
+            return MessageBox.Show(MessageString, Title, MessageButton, MessageIcon) switch
+            {
+                DialogResult.OK => 1,
+                DialogResult.Cancel => 2,
+                DialogResult.Abort => 3,
+                DialogResult.Retry => 4,
+                DialogResult.Ignore => 5,
+                DialogResult.Yes => 6,
+                DialogResult.No => 7,
+                _ => 0,
+            };
+        }
+
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Int32 NewMessageBoxToUserInternal(System.String MessageString, System.String Title,
+            ROOT.IntuitiveInteraction.ButtonSelection MessageButton, ROOT.IntuitiveInteraction.IconSelection IconToSelect)
+        {
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.NewMessageBoxToUser({MessageString} , {Title} , {MessageButton} , {IconToSelect}))" +
+                " INFO: Calling Internal class instead , because of the programmer's intention.");
+#endif
+            return new IntuitiveInteraction.IntuitiveMessageBox(MessageString,
+                Title, MessageButton, IconToSelect).ButtonSelected switch
+            {
+                IntuitiveInteraction.ButtonReturned.OK => 1,
+                IntuitiveInteraction.ButtonReturned.Cancel => 2,
+                IntuitiveInteraction.ButtonReturned.Abort => 3,
+                IntuitiveInteraction.ButtonReturned.Retry => 4,
+                IntuitiveInteraction.ButtonReturned.Ignore => 5,
+                IntuitiveInteraction.ButtonReturned.Yes => 6,
+                IntuitiveInteraction.ButtonReturned.No => 7,
+                _ => 0,
+            };
+        }
+
+        public static DialogsReturner CreateLoadDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.String DirToPresent)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = FileDialogType.LoadFile;
+            if (System.String.IsNullOrEmpty(DirToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (MAIN.DirExists(DirToPresent) == false)
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.OpenFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.Multiselect = false;
+            FLD.InitialDirectory = DirToPresent;
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.String DirToPresent)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(DirToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (MAIN.DirExists(DirToPresent) == false)
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            FLD.InitialDirectory = DirToPresent;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateLoadDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = FileDialogType.LoadFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.OpenFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.Multiselect = false;
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = ROOT.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = true;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.Boolean FileMustExist, System.String DirToPresent)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = ROOT.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = FileMustExist;
+            FLD.InitialDirectory = DirToPresent;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.Boolean FileMustExist)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = ROOT.FileDialogType.CreateFile;
+            if (System.String.IsNullOrEmpty(FileExtensionToPresent))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileDialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+            if (System.String.IsNullOrEmpty(FileFilterOfWin32))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new Microsoft.Win32.SaveFileDialog();
+
+            FLD.Title = FileDialogWindowTitle;
+            FLD.DefaultExt = FileExtensionToPresent;
+            FLD.Filter = FileFilterOfWin32;
+            // FileDialog Settings: <--
+            // If any link is given as path , the path given by the link must be only returned.
+            FLD.DereferenceLinks = true;
+            // Only one filepath is required.
+            FLD.AddExtension = false;
+            // Those two below check if the file path supplied is existing.
+            // If not , throw a warning.
+            FLD.CheckFileExists = FileMustExist;
+            FLD.CheckPathExists = true;
+            FLD.OverwritePrompt = true;
+            // -->
+            // Now , spawn the dialog after all these settings.
+            System.Boolean? REST = FLD.ShowDialog();
+
+            if (REST == true)
+            {
+                EDOut.FileNameFullPath = FLD.FileName;
+                EDOut.FileNameOnly = FLD.SafeFileName;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner GetADirDialogInternal(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = ROOT.FileDialogType.DirSelect;
+            if (System.String.IsNullOrEmpty(DialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new System.Windows.Forms.FolderBrowserDialog();
+            // Settings for the FolderBrowserDialog.
+            FLD.ShowNewFolderButton = true;
+            FLD.Description = DialogWindowTitle;
+            FLD.RootFolder = DirToPresent;
+
+            DialogResult REST = FLD.ShowDialog();
+
+            if (REST == DialogResult.OK)
+            {
+                EDOut.DirPath = FLD.SelectedPath;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+        public static DialogsReturner GetADirDialogInternal(System.Environment.SpecialFolder DirToPresent, System.String DialogWindowTitle, System.String AlternateDir)
+        {
+            DialogsReturner EDOut = new DialogsReturner();
+            EDOut.DialogType = ROOT.FileDialogType.DirSelect;
+            if (System.String.IsNullOrEmpty(DialogWindowTitle))
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+
+            var FLD = new System.Windows.Forms.FolderBrowserDialog();
+            // Settings for the FolderBrowserDialog.
+            FLD.ShowNewFolderButton = true;
+            FLD.Description = DialogWindowTitle;
+            FLD.RootFolder = DirToPresent;
+            if (DirToPresent == Environment.SpecialFolder.MyComputer)
+            {
+                //Because the above returns the MyComputer directory , which is a virtual one , we can make use of it and pass a custom directory instead.
+                EDOut.DirPath = AlternateDir;
+            }
+
+            DialogResult REST = FLD.ShowDialog();
+
+            if (REST == DialogResult.OK)
+            {
+                EDOut.DirPath = FLD.SelectedPath;
+                EDOut.ErrorCode = "None";
+                return EDOut;
+            }
+            else
+            {
+                EDOut.ErrorCode = "Error";
+                return EDOut;
+            }
+        }
+
+#else
+
+		public static System.String GetAStringFromTheUserNewInternal(System.String Prompt, System.String Title , System.String DefaultResponse)
+		{ throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static System.Int32 NewMessageBoxToUserInternal(System.String MessageString, System.String Title,
+        MessageBoxButtons MessageButton = 0,
+        MessageBoxIcon MessageIcon = 0)
+		{ throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+        public static System.Int32 NewMessageBoxToUserInternal(System.String MessageString, System.String Title,
+            ROOT.IntuitiveInteraction.ButtonSelection MessageButton, ROOT.IntuitiveInteraction.IconSelection IconToSelect)
+			{ throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateLoadDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.String DirToPresent) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.String DirToPresent) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateLoadDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle) {  throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.Boolean FileMustExist, System.String DirToPresent)
+		{ throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner CreateSaveDialogInternal(System.String FileFilterOfWin32, System.String FileExtensionToPresent,
+        System.String FileDialogWindowTitle, System.Boolean FileMustExist) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner GetADirDialogInternal(System.Environment.SpecialFolder DirToPresent, 
+		System.String DialogWindowTitle) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+		public static DialogsReturner GetADirDialogInternal(System.Environment.SpecialFolder DirToPresent, 
+		System.String DialogWindowTitle, System.String AlternateDir) { throw ThrowNotSupportedPlatform_WPFParts(); }
+
+#endif
+    }
+
+
+    /// <summary>
+    /// This enumeration has valid System links that exist across all Windows computers.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
 	public enum SystemLinks
 	{
 		/// <summary>

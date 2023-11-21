@@ -5729,4 +5729,7 @@ IconFile={2}</value>
   <data name="IO_InconsistentLinkType" xml:space="preserve">
     <value>The link's file system entry type is inconsistent with that of its target: {0}</value>
   </data>
+  <data name="MDCFR_PlatformNotSupportedMsg" xml:space="preserve">
+    <value>This API is not supported for this platform.</value>
+  </data>
 </root>

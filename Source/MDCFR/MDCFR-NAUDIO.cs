@@ -8619,7 +8619,6 @@ namespace NAudio.Wave.SampleProviders
 	}
 }
 
-
 namespace NAudio.FileFormats.Wav
 {
 	using NAudio.Utils;
@@ -19931,7 +19930,6 @@ namespace NAudio.Extras
 	}
 }
 
-
 namespace NAudio.Midi
 {
 	using NAudio.Utils;
@@ -23503,7 +23501,6 @@ namespace NAudio.Midi
 		}
 	}
 }
-
 
 namespace NAudio.CoreAudioApi
 {
@@ -27152,7 +27149,6 @@ namespace NAudio.CoreAudioApi
 		}
 	}
 }
-
 
 namespace NAudio.CoreAudioApi.Interfaces
 {
@@ -48118,6 +48114,7 @@ namespace NAudio.Wave
 		}
 	}
 
+#if WPFExists
 	internal class WaveWindow : Form
 	{
 		private WaveInterop.WaveCallback waveCallback;
@@ -48189,6 +48186,7 @@ namespace NAudio.Wave
 			}
 		}
 	}
+#endif
 }
 
 namespace NAudio.WinForms.Gui

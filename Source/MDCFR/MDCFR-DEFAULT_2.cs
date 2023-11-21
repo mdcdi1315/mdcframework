@@ -7,11 +7,18 @@
 
 // Global namespaces
 using System;
-using System.Drawing;
-using System.Windows.Forms;
 using System.Runtime.Versioning;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+
+#if WPFExists
+using System.Drawing;
+using System.Windows.Forms;
+#endif
+
+#if (WPFExists == false) && NET7_0_OR_GREATER
+#pragma warning disable CS1574
+#endif
 
 namespace ROOT
 {
@@ -1974,64 +1981,9 @@ namespace ROOT
         }
     }
 
+#if WPFExists
     namespace IntuitiveInteraction
     {
-#pragma warning disable CS1591
-        /// <summary>
-        /// An enumeration of <see cref="System.Int32" /> that hold valid icon images allowed be shown when the class 
-        /// <see cref="IntuitiveMessageBox"/> is invoked.
-        /// </summary>
-        [Serializable]
-        public enum IconSelection : System.Int32
-        {
-            None = 0,
-            Error = 1,
-            Info = 2,
-            Info2 = 3,
-            Warning = 4,
-            Notice = 5,
-            InvalidOperation = 6,
-            Question = 7
-        }
-
-        /// <summary>
-        /// An enumeration of <see cref="System.Int32" /> that keeps valid button patterns for returning the button selected.
-        /// </summary>
-        /// <remarks>This is used only with the class <see cref="IntuitiveMessageBox"/>.</remarks>
-        [Serializable]
-        public enum ButtonSelection : System.Int32
-        {
-            OK = 0,
-            YesNo = 1,
-            OKCancel = 2,
-            AbortRetry = 3,
-            RetryCancel = 4,
-            IgnoreCancel = 5,
-            YesNoCancel = 6,
-            YesNoRetry = 7,
-            YesCancelAbort = 8
-        }
-
-        /// <summary>
-        /// An enumeration of <see cref="System.Int32" /> values which indicates which button pressed or presents an error.
-        /// </summary>
-        [Flags]
-        [Serializable]
-        public enum ButtonReturned : System.Int32
-        {
-            None = 0,
-            Error = 1,
-            OK = 2,
-            Cancel = 3,
-            Yes = 4,
-            No = 5,
-            Retry = 6,
-            Abort = 7,
-            Ignore = 8,
-            NotAnAnswer = Error | Cancel
-        }
-#pragma warning restore CS1591
-
         /// <summary>
         /// A class that extends the default Microsoft.VisualBasic.Interaction.InputBox() method.
         /// </summary>
@@ -2652,6 +2604,66 @@ namespace ROOT
             }
 
         }
+    }
+#endif
+
+    namespace IntuitiveInteraction
+    {
+#pragma warning disable CS1591
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> that hold valid icon images allowed be shown when the class 
+        /// <see cref="IntuitiveMessageBox"/> is invoked.
+        /// </summary>
+        [Serializable]
+        public enum IconSelection : System.Int32
+        {
+            None = 0,
+            Error = 1,
+            Info = 2,
+            Info2 = 3,
+            Warning = 4,
+            Notice = 5,
+            InvalidOperation = 6,
+            Question = 7
+        }
+
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> that keeps valid button patterns for returning the button selected.
+        /// </summary>
+        /// <remarks>This is used only with the class <see cref="IntuitiveMessageBox"/>.</remarks>
+        [Serializable]
+        public enum ButtonSelection : System.Int32
+        {
+            OK = 0,
+            YesNo = 1,
+            OKCancel = 2,
+            AbortRetry = 3,
+            RetryCancel = 4,
+            IgnoreCancel = 5,
+            YesNoCancel = 6,
+            YesNoRetry = 7,
+            YesCancelAbort = 8
+        }
+
+        /// <summary>
+        /// An enumeration of <see cref="System.Int32" /> values which indicates which button pressed or presents an error.
+        /// </summary>
+        [Flags]
+        [Serializable]
+        public enum ButtonReturned : System.Int32
+        {
+            None = 0,
+            Error = 1,
+            OK = 2,
+            Cancel = 3,
+            Yes = 4,
+            No = 5,
+            Retry = 6,
+            Abort = 7,
+            Ignore = 8,
+            NotAnAnswer = Error | Cancel
+        }
+#pragma warning restore CS1591
     }
 
     namespace RandomNumbers

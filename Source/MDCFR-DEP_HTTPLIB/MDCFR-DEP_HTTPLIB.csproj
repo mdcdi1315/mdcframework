@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net7.0</TargetFramework>
-    <RootNamespace>ROOT</RootNamespace>
+	  <TargetFrameworks>net70;net70-windows10.0.19041.0</TargetFrameworks>
+	  <RootNamespace>ROOT</RootNamespace>
 	  <!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->
 	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	  <!-- This option specifies that the resulting assembly will almost be the same size between compilations. -->

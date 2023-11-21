@@ -218,6 +218,8 @@ using System.Collections.Generic;
 	using Windows.Storage.Streams;
 #endif
 
+#pragma warning disable SYSLIB0014
+
 namespace HTTPLIB 
 {
     // Request.cs file: <--

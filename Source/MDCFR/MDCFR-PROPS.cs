@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
 [assembly: AssemblyFileVersionAttribute(mdcdi1315.VersionNumber)]
 [assembly: AssemblyInformationalVersionAttribute($"{mdcdi1315.VersionNumber} Built by: © MDCDI1315.")]
-[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 6")]
+[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 7.1")]
 #if NET7_0_OR_GREATER
     [assembly: AssemblyVersionAttribute("7.0.8.0")]
 #else
@@ -65,9 +65,9 @@ using System.Runtime.InteropServices;
 // dependency. Many of the NuGet dependencies can be just references in .NET 6 and 
 // later and are provided by the runtime , so no actual package overload is added , that
 // is the case for .NET Framework 4.8.
-[assembly: TypeForwardedTo(typeof(System.Numerics.Vector))]
 [assembly: TypeForwardedTo(typeof(System.Resources.Extensions.DeserializingResourceReader))]
 [assembly: TypeForwardedTo(typeof(System.Resources.Extensions.PreserializedResourceWriter))]
+[assembly: TypeForwardedTo(typeof(System.Numerics.Vector))]
 [assembly: TypeForwardedTo(typeof(System.Numerics.Vector<>))]
 [assembly: TypeForwardedTo(typeof(System.Text.Encodings.Web.HtmlEncoder))]
 [assembly: TypeForwardedTo(typeof(System.Text.Encodings.Web.JavaScriptEncoder))]
@@ -111,6 +111,7 @@ using System.Runtime.InteropServices;
 [assembly: TypeForwardedTo(typeof(SequencePosition))]
 [assembly: TypeForwardedTo(typeof(SuppressGCTransitionAttribute))]
 [assembly: TypeForwardedTo(typeof(IAsyncDisposable))]
+[assembly: TypeForwardedTo(typeof(IAsyncResult))]
 [assembly: TypeForwardedTo(typeof(Memory<>))]
 [assembly: TypeForwardedTo(typeof(Span<>))]
 [assembly: TypeForwardedTo(typeof(ReadOnlyMemory<>))]
@@ -409,7 +410,6 @@ using System.Runtime.InteropServices;
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableQueue<>))]
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableSortedDictionary<,>))]
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableSortedSet<>))]
-
 
 #endif
 //[assembly: TypeForwardedTo(typeof())]

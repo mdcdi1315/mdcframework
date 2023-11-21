@@ -49,7 +49,7 @@ internal static class mdcdi1315
     /// <summary>
     /// The current version of the MDCFR .
     /// </summary>
-    public const System.String VersionNumber = "1.5.5.07";
+    public const System.String VersionNumber = "1.5.5.071";
 
     /// <summary>
     /// This is the result of the bit-wise combination of <see cref="DllImportSearchPath.AssemblyDirectory"/> and <see cref="DllImportSearchPath.System32"/> enumeration values.
@@ -77,9 +77,9 @@ internal static class mdcdi1315
     /// This is the actual Deprecation Library Component runtime name , along with the public key.
     /// </summary>
     public const System.String DepHttpLibAssemblyName =
-    "DEPRECATION_COMPONENTS_HTTPLIB, PublicKey=002400000480000094000000060200000024000052534" +
-        "1310004000001000100f52e17f151e2df737ab4ffdd1299dd977215f3e686389cdabbcfbb2ca09cd3cff" +
-        "a331ece1b30fdf4b9d2933caffd50150aa29b8b5eff6f7aae6ac60e0316a2dc68e5da8b2b3024f92f96b" +
-        "4bc71d9433226a0c63c9cbfcc0e698fdff7e1e7097ea29d6e98058c7cd860a459748665d74c01cebec9" +
-        "ba063668c55fad090b27c8cb";
+    "DEPRECATION_COMPONENTS_HTTPLIB, PublicKey=002400000480000094000000060200000024000052534131" +
+    "0004000001000100f52e17f151e2df737ab4ffdd1299dd977215f3e686389cdabbcfbb2ca09cd3cffa331ec" +
+    "e1b30fdf4b9d2933caffd50150aa29b8b5eff6f7aae6ac60e0316a2dc68e5da8b2b3024f92f96b4bc71d943" +
+    "3226a0c63c9cbfcc0e698fdff7e1e7097ea29d6e98058c7cd860a459748665d74c01cebec9ba063668c55fa" +
+    "d090b27c8cb";
 }

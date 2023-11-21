@@ -8,7 +8,107 @@
 using System;
 using System.Runtime.Versioning;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
+#if WPFExists == false
+namespace System.Windows.Forms
+{
+    /// <summary>
+    /// Specifies constants defining which buttons to display on a System.Windows.Forms.MessageBox.
+    /// </summary>
+    public enum MessageBoxButtons
+    {
+        /// <summary>
+        /// The message box contains an OK button.
+        /// </summary>
+        OK,
+        /// <summary>
+        /// The message box contains OK and Cancel buttons.
+        /// </summary>
+        OKCancel,
+        /// <summary>
+        /// The message box contains Abort, Retry, and Ignore buttons.
+        /// </summary>
+        AbortRetryIgnore,
+        /// <summary>
+        /// The message box contains Yes, No, and Cancel buttons.
+        /// </summary>
+        YesNoCancel,
+        /// <summary>
+        /// The message box contains Yes and No buttons.
+        /// </summary>
+        YesNo,
+        /// <summary>
+        /// The message box contains Retry and Cancel buttons.
+        /// </summary>
+        RetryCancel
+    }
+
+    /// <summary>
+    ///  Specifies constants defining which information to display.
+    /// </summary>
+    public enum MessageBoxIcon
+    {
+        /// <summary>
+        /// The message box contains no symbols.
+        /// </summary>
+        None = 0,
+        /// <summary>
+        /// The message box contains a symbol consisting of a white X in a circle with a red background.
+        /// </summary>
+        Hand = 16,
+        /// <summary>
+        /// The message box contains a symbol consisting of a question mark in a circle.
+        ///     The question mark message icon is no longer recommended because it does not clearly
+        ///     represent a specific type of message and because the phrasing of a message as
+        ///     a question could apply to any message type. In addition, users can confuse the
+        ///     question mark symbol with a help information symbol. Therefore, do not use this
+        ///     question mark symbol in your message boxes. The system continues to support its
+        ///     inclusion only for backward compatibility.
+        /// </summary>
+        Question = 32,
+        /// <summary>
+        /// The message box contains a symbol consisting of an exclamation point in a triangle with a yellow background.
+        /// </summary>
+        Exclamation = 48,
+        /// <summary>
+        /// The message box contains a symbol consisting of a lowercase letter i in a circle.
+        /// </summary>
+        Asterisk = 64,
+        /// <summary>
+        /// The message box contains a symbol consisting of white X in a circle with a red background.
+        /// </summary>
+        Stop = 16,
+        /// <summary>
+        /// The message box contains a symbol consisting of white X in a circle with a red background.
+        /// </summary>
+        Error = 16,
+        /// <summary>
+        /// The message box contains a symbol consisting of an exclamation point in a triangle with a yellow background.
+        /// </summary>
+        Warning = 48,
+        /// <summary>
+        /// The message box contains a symbol consisting of a lowercase letter i in a circle.
+        /// </summary>
+        Information = 64
+    }
+
+    /// <summary>
+    /// Provides an interface to expose Win32 HWND handles.
+    /// </summary>
+    [Guid("458AB8A2-A1EA-4d7b-8EBE-DEE5D3D9442C")]
+    [InterfaceType(ComInterfaceType.InterfaceIsIUnknown)]
+    [ComVisible(true)]
+    public interface IWin32Window
+    {
+        /// <summary>
+        /// Gets the handle to the window represented by the implementer.
+        /// </summary>
+        /// <returns>A handle to the window represented by the implementer.</returns>
+        IntPtr Handle { get; }
+    }
+}
+#endif
 
 namespace ROOT
 {
@@ -881,6 +981,51 @@ namespace ROOT
             _SubKey_ = null;
             _DIAG_ = false;
         }
+    }
+
+    /// <summary>
+    /// The exception that it is thrown when an unexpected result was found.
+    /// </summary>
+    public class ExecutionException : System.Exception
+    {
+        /// <summary>
+        /// Creates a new instance of <see cref="ExecutionException"/> class with the specified error message.
+        /// </summary>
+        /// <param name="message">The error message to show.</param>
+        public ExecutionException(System.String message) : base(message) { }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="ExecutionException"/> class with the specified error message
+        /// and the <see cref="Exception"/> that caused this exception.
+        /// </summary>
+        /// <param name="message">The error message to show.</param>
+        /// <param name="InnerException">The inner exception that it is the root cause of this exception.</param>
+        public ExecutionException(System.String message , Exception InnerException) : base(message , InnerException) { }
+    }
+
+    /// <summary>
+    /// The exception that is thrown when a native P/Invoke call failed to give correct results.
+    /// </summary>
+    public class NativeCallErrorException : ExecutionException
+    {
+        /// <summary>
+        /// Creates a new instance of <see cref="NativeCallErrorException"/> class with the specified error message.
+        /// </summary>
+        /// <param name="message">The error message to show.</param>
+        public NativeCallErrorException(System.String message) : base(message) { }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="NativeCallErrorException"/> class with the specified error message
+        /// and the <see cref="Exception"/> that caused this exception.
+        /// </summary>
+        /// <param name="message">The error message to show.</param>
+        /// <param name="InnerException">The inner exception that it is the root cause of this exception.</param>
+        public NativeCallErrorException(System.String message, Exception InnerException) : base(message, InnerException) { }
+
+        /// <summary>
+        /// The error code of the native call , if it is available.
+        /// </summary>
+        public System.Int64 ErrorCode { get; set; }
     }
 
 }
