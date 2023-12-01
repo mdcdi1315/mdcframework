@@ -34,7 +34,7 @@ namespace System.Reflection
 	}
 
 	/// <summary>
-	/// The base class for binding algorithms used by <see cref="T:System.Reflection.MetadataLoadContext" />.
+	/// The base class for binding algorithms used by <see cref="MetadataLoadContext" />.
 	/// </summary>
 	public abstract class MetadataAssemblyResolver
 	{
@@ -246,7 +246,7 @@ namespace System.Reflection
         /// <summary>
         /// Create a new MetadataLoadContext object.
         /// </summary>
-        /// <param name="resolver">A <see cref="T:System.Reflection.MetadataAssemblyResolver" /> instance.</param>
+        /// <param name="resolver">A <see cref="System.Reflection.MetadataAssemblyResolver" /> instance.</param>
         /// <param name="coreAssemblyName">
         /// The name of the assembly that contains the core types such as System.Object. Typically, this would be "mscorlib".
         /// </param>
@@ -709,10 +709,10 @@ namespace System.Reflection
 		private readonly Dictionary<string, List<string>> _fileToPaths = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
 		/// <summary>
-		/// Initializes a new instance of the <see cref="T:System.Reflection.PathAssemblyResolver" /> class.
+		/// Initializes a new instance of the <see cref="System.Reflection.PathAssemblyResolver" /> class.
 		/// </summary>
-		/// <exception cref="T:System.ArgumentNullException">Thrown when assemblyPaths is null.</exception>
-		/// <exception cref="T:System.ArgumentException">Thrown when a path is invalid.</exception>
+		/// <exception cref="System.ArgumentNullException">Thrown when assemblyPaths is null.</exception>
+		/// <exception cref="System.ArgumentException">Thrown when a path is invalid.</exception>
 		public PathAssemblyResolver(IEnumerable<string> assemblyPaths)
 		{
 			if (assemblyPaths == null)
@@ -737,11 +737,13 @@ namespace System.Reflection
 				value.Add(assemblyPath);
 			}
 		}
-        #nullable enable
+
+		#nullable enable
+        /// <inheritdoc />
         public override Assembly? Resolve(MetadataLoadContext context, AssemblyName assemblyName)
 		{
-			Assembly assembly = null;
-			Assembly assembly2 = null;
+			Assembly? assembly = null;
+			Assembly? assembly2 = null;
 			if (_fileToPaths.TryGetValue(assemblyName.Name, out var value))
 			{
 				ReadOnlySpan<byte> span = assemblyName.GetPublicKeyToken();

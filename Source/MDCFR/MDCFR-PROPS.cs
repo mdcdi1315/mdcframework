@@ -15,7 +15,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
 [assembly: AssemblyFileVersionAttribute(mdcdi1315.VersionNumber)]
 [assembly: AssemblyInformationalVersionAttribute($"{mdcdi1315.VersionNumber} Built by: © MDCDI1315.")]
-[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 7.1")]
+[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 8.0")]
 #if NET7_0_OR_GREATER
     [assembly: AssemblyVersionAttribute("7.0.8.0")]
 #else

@@ -15,6 +15,8 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 #nullable enable
+#pragma warning disable SYSLIB0020 , CS8616 , CS8629
+
 namespace System.Text.Json
 {
     using System.IO;
@@ -30,12 +32,13 @@ namespace System.Text.Json
     using System.Collections.Concurrent;
     using System.Runtime.Serialization;
     using System.Runtime.ExceptionServices;
-    using System.Text.Json.Serialization.Metadata;
+    using Serialization.Metadata;
+
 
 
     internal static class AppContextSwitchHelper
     {
-        private static readonly bool s_isSourceGenReflectionFallbackEnabled = AppContext.TryGetSwitch("System.Text.Json.Serialization.EnableSourceGenReflectionFallback", out var isEnabled) && isEnabled;
+        private static readonly bool s_isSourceGenReflectionFallbackEnabled = AppContext.TryGetSwitch("EnableSourceGenReflectionFallback", out var isEnabled) && isEnabled;
 
         public static bool IsSourceGenReflectionFallbackEnabled => s_isSourceGenReflectionFallbackEnabled;
     }
@@ -361,12 +364,12 @@ namespace System.Text.Json
         /// <summary>
         /// By default, do no allow comments within the JSON input.
         /// Comments are treated as invalid JSON if found and a
-        /// <see cref="T:System.Text.Json.JsonException" /> is thrown.
+        /// <see cref="System.Text.Json.JsonException" /> is thrown.
         /// </summary>
         Disallow,
         /// <summary>
         /// Allow comments within the JSON input and ignore them.
-        /// The <see cref="T:System.Text.Json.Utf8JsonReader" /> will behave as if no comments were present.
+        /// The <see cref="System.Text.Json.Utf8JsonReader" /> will behave as if no comments were present.
         /// </summary>
         Skip,
         /// <summary>
@@ -859,7 +862,7 @@ namespace System.Text.Json
         internal bool IsDisposable { get; }
 
         /// <summary>
-        ///   The <see cref="T:System.Text.Json.JsonElement" /> representing the value of the document.
+        ///   The <see cref="System.Text.Json.JsonElement" /> representing the value of the document.
         /// </summary>
         public JsonElement RootElement => new JsonElement(this, 0);
 
@@ -901,14 +904,14 @@ namespace System.Text.Json
         ///  Write the document into the provided writer as a JSON value.
         /// </summary>
         /// <param name="writer"></param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   The <paramref name="writer" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This <see cref="P:System.Text.Json.JsonDocument.RootElement" />'s <see cref="P:System.Text.Json.JsonElement.ValueKind" /> would result in an invalid JSON.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public void WriteTo(Utf8JsonWriter writer)
         {
@@ -1640,7 +1643,7 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     The <see cref="T:System.ReadOnlyMemory`1" /> value will be used for the entire lifetime of the
+        ///     The <see cref="System.ReadOnlyMemory{T}" /> value will be used for the entire lifetime of the
         ///     JsonDocument object, and the caller must ensure that the data therein does not change during
         ///     the object lifetime.
         ///   </para>
@@ -1654,10 +1657,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static JsonDocument Parse(ReadOnlyMemory<byte> utf8Json, JsonDocumentOptions options = default(JsonDocumentOptions))
@@ -1670,7 +1673,7 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     The <see cref="T:System.Buffers.ReadOnlySequence`1" /> may be used for the entire lifetime of the
+        ///     The <see cref="System.Buffers.ReadOnlySequence{T}" /> may be used for the entire lifetime of the
         ///     JsonDocument object, and the caller must ensure that the data therein does not change during
         ///     the object lifetime.
         ///   </para>
@@ -1684,10 +1687,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static JsonDocument Parse(ReadOnlySequence<byte> utf8Json, JsonDocumentOptions options = default(JsonDocumentOptions))
@@ -1713,7 +1716,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Parse a <see cref="T:System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
+        ///   Parse a <see cref="System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
         ///   JsonDocument.  The Stream will be read to completion.
         /// </summary>
         /// <param name="utf8Json">JSON data to parse.</param>
@@ -1721,10 +1724,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static JsonDocument Parse(Stream utf8Json, JsonDocumentOptions options = default(JsonDocumentOptions))
@@ -1774,7 +1777,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Parse a <see cref="T:System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
+        ///   Parse a <see cref="System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
         ///   JsonDocument.  The Stream will be read to completion.
         /// </summary>
         /// <param name="utf8Json">JSON data to parse.</param>
@@ -1783,10 +1786,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A Task to produce a JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static Task<JsonDocument> ParseAsync(Stream utf8Json, JsonDocumentOptions options = default(JsonDocumentOptions), CancellationToken cancellationToken = default(CancellationToken))
@@ -1817,7 +1820,7 @@ namespace System.Text.Json
         ///   Parses text representing a single JSON value into a JsonDocument.
         /// </summary>
         /// <remarks>
-        ///   The <see cref="T:System.ReadOnlyMemory`1" /> value may be used for the entire lifetime of the
+        ///   The <see cref="System.ReadOnlyMemory{T}" /> value may be used for the entire lifetime of the
         ///   JsonDocument object, and the caller must ensure that the data therein does not change during
         ///   the object lifetime.
         /// </remarks>
@@ -1826,10 +1829,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static JsonDocument Parse([StringSyntax("Json")] ReadOnlyMemory<char> json, JsonDocumentOptions options = default(JsonDocumentOptions))
@@ -1878,10 +1881,10 @@ namespace System.Text.Json
         /// <returns>
         ///   A JsonDocument representation of the JSON value.
         /// </returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   <paramref name="json" /> does not represent a valid single JSON value.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="options" /> contains unsupported options.
         /// </exception>
         public static JsonDocument Parse([StringSyntax("Json")] string json, JsonDocumentOptions options = default(JsonDocumentOptions))
@@ -1922,13 +1925,13 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   The current <paramref name="reader" /> token does not start or represent a value.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   A value could not be read from the reader.
         /// </exception>
         public static bool TryParseValue(ref Utf8JsonReader reader, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out JsonDocument? document)
@@ -1962,13 +1965,13 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   The current <paramref name="reader" /> token does not start or represent a value.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   A value could not be read from the reader.
         /// </exception>
         public static JsonDocument ParseValue(ref Utf8JsonReader reader)
@@ -2431,7 +2434,7 @@ namespace System.Text.Json
     }
 
     /// <summary>
-	/// Provides the ability for the user to define custom behavior when parsing JSON to create a <see cref="T:System.Text.Json.JsonDocument" />.
+	/// Provides the ability for the user to define custom behavior when parsing JSON to create a <see cref="System.Text.Json.JsonDocument" />.
 	/// </summary>
 	public struct JsonDocumentOptions
     {
@@ -2442,13 +2445,13 @@ namespace System.Text.Json
         private JsonCommentHandling _commentHandling;
 
         /// <summary>
-        /// Defines how the <see cref="T:System.Text.Json.Utf8JsonReader" /> should handle comments when reading through the JSON.
+        /// Defines how the <see cref="System.Text.Json.Utf8JsonReader" /> should handle comments when reading through the JSON.
         /// </summary>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// Thrown when the comment handling enum is set to a value that is not supported (or not within the <see cref="T:System.Text.Json.JsonCommentHandling" /> enum range).
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the comment handling enum is set to a value that is not supported (or not within the <see cref="System.Text.Json.JsonCommentHandling" /> enum range).
         /// </exception>
         /// <remarks>
-        /// By default <exception cref="T:System.Text.Json.JsonException" /> is thrown if a comment is encountered.
+        /// By default <exception cref="System.Text.Json.JsonException" /> is thrown if a comment is encountered.
         /// </remarks>
         public JsonCommentHandling CommentHandling
         {
@@ -2469,11 +2472,11 @@ namespace System.Text.Json
         /// <summary>
         /// Gets or sets the maximum depth allowed when reading JSON, with the default (i.e. 0) indicating a max depth of 64.
         /// </summary>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// <exception cref="System.ArgumentOutOfRangeException">
         /// Thrown when the max depth is set to a negative value.
         /// </exception>
         /// <remarks>
-        /// Reading past this depth will throw a <exception cref="T:System.Text.Json.JsonException" />.
+        /// Reading past this depth will throw a <exception cref="System.Text.Json.JsonException" />.
         /// </remarks>
         public int MaxDepth
         {
@@ -2496,7 +2499,7 @@ namespace System.Text.Json
         /// is allowed (and ignored) within the JSON payload being read.
         /// </summary>
         /// <remarks>
-        /// By default, it's set to false, and <exception cref="T:System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
+        /// By default, it's set to false, and <exception cref="System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
         /// </remarks>
         public bool AllowTrailingCommas { get; set; }
 
@@ -2511,7 +2514,7 @@ namespace System.Text.Json
     }
 
     /// <summary>
-	///   Represents a specific JSON value within a <see cref="T:System.Text.Json.JsonDocument" />.
+	///   Represents a specific JSON value within a <see cref="System.Text.Json.JsonDocument" />.
 	/// </summary>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
     public readonly struct JsonElement
@@ -2555,7 +2558,7 @@ namespace System.Text.Json
             ///   Returns an enumerator that iterates through a collection.
             /// </summary>
             /// <returns>
-            ///   An <see cref="T:System.Text.Json.JsonElement.ArrayEnumerator" /> value that can be used to iterate
+            ///   An <see cref="System.Text.Json.JsonElement.ArrayEnumerator" /> value that can be used to iterate
             ///   through the array.
             /// </returns>
             public ArrayEnumerator GetEnumerator()
@@ -2647,7 +2650,7 @@ namespace System.Text.Json
             ///   Returns an enumerator that iterates the properties of an object.
             /// </summary>
             /// <returns>
-            ///   An <see cref="T:System.Text.Json.JsonElement.ObjectEnumerator" /> value that can be used to iterate
+            ///   An <see cref="System.Text.Json.JsonElement.ObjectEnumerator" /> value that can be used to iterate
             ///   through the object.
             /// </returns>
             /// <remarks>
@@ -2715,10 +2718,10 @@ namespace System.Text.Json
         private JsonTokenType TokenType => _parent?.GetJsonTokenType(_idx) ?? JsonTokenType.None;
 
         /// <summary>
-        ///   The <see cref="T:System.Text.Json.JsonValueKind" /> that the value is.
+        ///   The <see cref="System.Text.Json.JsonValueKind" /> that the value is.
         /// </summary>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public JsonValueKind ValueKind => TokenType.ToValueKind();
 
@@ -2726,14 +2729,14 @@ namespace System.Text.Json
         ///   Get the value at a specified index when the current value is a
         ///   <see cref="F:System.Text.Json.JsonValueKind.Array" />.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Array" />.
         /// </exception>
-        /// <exception cref="T:System.IndexOutOfRangeException">
+        /// <exception cref="System.IndexOutOfRangeException">
         ///   <paramref name="index" /> is not in the range [0, <see cref="M:System.Text.Json.JsonElement.GetArrayLength" />()).
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public JsonElement this[int index]
         {
@@ -2757,11 +2760,11 @@ namespace System.Text.Json
         ///   Get the number of values contained within the current array value.
         /// </summary>
         /// <returns>The number of values contained within the current array value.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Array" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public int GetArrayLength()
         {
@@ -2770,7 +2773,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets a <see cref="T:System.Text.Json.JsonElement" /> representing the value of a required property identified
+        ///   Gets a <see cref="System.Text.Json.JsonElement" /> representing the value of a required property identified
         ///   by <paramref name="propertyName" />.
         /// </summary>
         /// <remarks>
@@ -2781,20 +2784,20 @@ namespace System.Text.Json
         /// </remarks>
         /// <param name="propertyName">Name of the property whose value to return.</param>
         /// <returns>
-        ///   A <see cref="T:System.Text.Json.JsonElement" /> representing the value of the requested property.
+        ///   A <see cref="System.Text.Json.JsonElement" /> representing the value of the requested property.
         /// </returns>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         ///   No property was found with the requested name.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   <paramref name="propertyName" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public JsonElement GetProperty(string propertyName)
         {
@@ -2810,7 +2813,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets a <see cref="T:System.Text.Json.JsonElement" /> representing the value of a required property identified
+        ///   Gets a <see cref="System.Text.Json.JsonElement" /> representing the value of a required property identified
         ///   by <paramref name="propertyName" />.
         /// </summary>
         /// <remarks>
@@ -2825,17 +2828,17 @@ namespace System.Text.Json
         /// </remarks>
         /// <param name="propertyName">Name of the property whose value to return.</param>
         /// <returns>
-        ///   A <see cref="T:System.Text.Json.JsonElement" /> representing the value of the requested property.
+        ///   A <see cref="System.Text.Json.JsonElement" /> representing the value of the requested property.
         /// </returns>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         ///   No property was found with the requested name.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public JsonElement GetProperty(ReadOnlySpan<char> propertyName)
         {
@@ -2847,7 +2850,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets a <see cref="T:System.Text.Json.JsonElement" /> representing the value of a required property identified
+        ///   Gets a <see cref="System.Text.Json.JsonElement" /> representing the value of a required property identified
         ///   by <paramref name="utf8PropertyName" />.
         /// </summary>
         /// <remarks>
@@ -2864,16 +2867,16 @@ namespace System.Text.Json
         ///   The UTF-8 (with no Byte-Order-Mark (BOM)) representation of the name of the property to return.
         /// </param>
         /// <returns>
-        ///   A <see cref="T:System.Text.Json.JsonElement" /> representing the value of the requested property.
+        ///   A <see cref="System.Text.Json.JsonElement" /> representing the value of the requested property.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.Collections.Generic.KeyNotFoundException">
+        /// <exception cref="System.Collections.Generic.KeyNotFoundException">
         ///   No property was found with the requested name.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
         public JsonElement GetProperty(ReadOnlySpan<byte> utf8PropertyName)
@@ -2905,14 +2908,14 @@ namespace System.Text.Json
         /// <returns>
         ///   <see langword="true" /> if the property was found, <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   <paramref name="propertyName" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
         public bool TryGetProperty(string propertyName, out JsonElement value)
@@ -2945,11 +2948,11 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the property was found, <see langword="false" /> otherwise.
         /// </returns>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetProperty(ReadOnlySpan<char> propertyName, out JsonElement value)
         {
@@ -2980,11 +2983,11 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the property was found, <see langword="false" /> otherwise.
         /// </returns>
         /// <seealso cref="M:System.Text.Json.JsonElement.EnumerateObject" />
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetProperty(ReadOnlySpan<byte> utf8PropertyName, out JsonElement value)
         {
@@ -2993,18 +2996,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the value of the element as a <see cref="T:System.Boolean" />.
+        ///   Gets the value of the element as a <see cref="System.Boolean" />.
         /// </summary>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <returns>The value of the element as a <see cref="T:System.Boolean" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The value of the element as a <see cref="System.Boolean" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is neither <see cref="F:System.Text.Json.JsonValueKind.True" /> or
         ///   <see cref="F:System.Text.Json.JsonValueKind.False" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool GetBoolean()
         {
@@ -3022,17 +3025,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the value of the element as a <see cref="T:System.String" />.
+        ///   Gets the value of the element as a <see cref="System.String" />.
         /// </summary>
         /// <remarks>
         ///   This method does not create a string representation of values other than JSON strings.
         /// </remarks>
-        /// <returns>The value of the element as a <see cref="T:System.String" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The value of the element as a <see cref="System.String" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is neither <see cref="F:System.Text.Json.JsonValueKind.String" /> nor <see cref="F:System.Text.Json.JsonValueKind.Null" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.ToString" />
         public string? GetString()
@@ -3052,11 +3055,11 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the entire token value is encoded as valid Base64 text and can be successfully decoded to bytes.
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetBytesFromBase64([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out byte[]? value)
         {
@@ -3071,14 +3074,14 @@ namespace System.Text.Json
         ///   This method does not create a byte[] representation of values other than Base64 encoded JSON strings.
         /// </remarks>
         /// <returns>The value decode to bytes.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         ///   The value is not encoded as Base64 text and hence cannot be decoded to bytes.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.ToString" />
         public byte[] GetBytesFromBase64()
@@ -3091,21 +3094,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as an <see cref="T:System.SByte" />.
+        ///   Attempts to represent the current JSON number as an <see cref="System.SByte" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as an <see cref="T:System.SByte" />,
+        ///   <see langword="true" /> if the number can be represented as an <see cref="System.SByte" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public bool TryGetSByte(out sbyte value)
@@ -3115,17 +3118,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as an <see cref="T:System.SByte" />.
+        ///   Gets the current JSON number as an <see cref="System.SByte" />.
         /// </summary>
-        /// <returns>The current JSON number as an <see cref="T:System.SByte" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The current JSON number as an <see cref="System.SByte" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as an <see cref="T:System.SByte" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as an <see cref="System.SByte" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public sbyte GetSByte()
@@ -3138,21 +3141,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.Byte" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.Byte" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.Byte" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.Byte" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetByte(out byte value)
         {
@@ -3161,20 +3164,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.Byte" />.
+        ///   Gets the current JSON number as a <see cref="System.Byte" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.Byte" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.Byte" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Byte" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Byte" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public byte GetByte()
         {
@@ -3186,21 +3189,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as an <see cref="T:System.Int16" />.
+        ///   Attempts to represent the current JSON number as an <see cref="System.Int16" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as an <see cref="T:System.Int16" />,
+        ///   <see langword="true" /> if the number can be represented as an <see cref="System.Int16" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetInt16(out short value)
         {
@@ -3209,17 +3212,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as an <see cref="T:System.Int16" />.
+        ///   Gets the current JSON number as an <see cref="System.Int16" />.
         /// </summary>
-        /// <returns>The current JSON number as an <see cref="T:System.Int16" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The current JSON number as an <see cref="System.Int16" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as an <see cref="T:System.Int16" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as an <see cref="System.Int16" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public short GetInt16()
         {
@@ -3231,21 +3234,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.UInt16" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.UInt16" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.UInt16" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.UInt16" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public bool TryGetUInt16(out ushort value)
@@ -3255,20 +3258,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.UInt16" />.
+        ///   Gets the current JSON number as a <see cref="System.UInt16" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.UInt16" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.UInt16" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.UInt16" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.UInt16" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public ushort GetUInt16()
@@ -3281,21 +3284,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as an <see cref="T:System.Int32" />.
+        ///   Attempts to represent the current JSON number as an <see cref="System.Int32" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as an <see cref="T:System.Int32" />,
+        ///   <see langword="true" /> if the number can be represented as an <see cref="System.Int32" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetInt32(out int value)
         {
@@ -3304,17 +3307,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as an <see cref="T:System.Int32" />.
+        ///   Gets the current JSON number as an <see cref="System.Int32" />.
         /// </summary>
-        /// <returns>The current JSON number as an <see cref="T:System.Int32" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The current JSON number as an <see cref="System.Int32" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as an <see cref="T:System.Int32" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as an <see cref="System.Int32" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public int GetInt32()
         {
@@ -3326,21 +3329,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.UInt32" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.UInt32" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.UInt32" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.UInt32" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public bool TryGetUInt32(out uint value)
@@ -3350,20 +3353,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.UInt32" />.
+        ///   Gets the current JSON number as a <see cref="System.UInt32" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.UInt32" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.UInt32" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.UInt32" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.UInt32" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public uint GetUInt32()
@@ -3376,21 +3379,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.Int64" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.Int64" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.Int64" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.Int64" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetInt64(out long value)
         {
@@ -3399,20 +3402,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.Int64" />.
+        ///   Gets the current JSON number as a <see cref="System.Int64" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.Int64" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.Int64" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Int64" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Int64" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public long GetInt64()
         {
@@ -3424,21 +3427,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.UInt64" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.UInt64" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.UInt64" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.UInt64" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public bool TryGetUInt64(out ulong value)
@@ -3448,20 +3451,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.UInt64" />.
+        ///   Gets the current JSON number as a <see cref="System.UInt64" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.UInt64" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.UInt64" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.UInt64" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.UInt64" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         [CLSCompliant(false)]
         public ulong GetUInt64()
@@ -3474,7 +3477,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.Double" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.Double" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
@@ -3490,14 +3493,14 @@ namespace System.Text.Json
         ///   </para>
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.Double" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.Double" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetDouble(out double value)
         {
@@ -3506,9 +3509,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.Double" />.
+        ///   Gets the current JSON number as a <see cref="System.Double" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.Double" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.Double" />.</returns>
         /// <remarks>
         ///   <para>
         ///     This method does not parse the contents of a JSON string value.
@@ -3520,14 +3523,14 @@ namespace System.Text.Json
         ///     <see cref="F:System.Double.MaxValue" /> (or smaller than <see cref="F:System.Double.MinValue" />).
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Double" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Double" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public double GetDouble()
         {
@@ -3539,7 +3542,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.Single" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.Single" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
@@ -3555,14 +3558,14 @@ namespace System.Text.Json
         ///   </para>
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.Single" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.Single" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetSingle(out float value)
         {
@@ -3571,9 +3574,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.Single" />.
+        ///   Gets the current JSON number as a <see cref="System.Single" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.Single" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.Single" />.</returns>
         /// <remarks>
         ///   <para>
         ///     This method does not parse the contents of a JSON string value.
@@ -3585,14 +3588,14 @@ namespace System.Text.Json
         ///     <see cref="F:System.Single.MaxValue" /> (or smaller than <see cref="F:System.Single.MinValue" />).
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Single" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Single" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public float GetSingle()
         {
@@ -3604,21 +3607,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON number as a <see cref="T:System.Decimal" />.
+        ///   Attempts to represent the current JSON number as a <see cref="System.Decimal" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the number can be represented as a <see cref="T:System.Decimal" />,
+        ///   <see langword="true" /> if the number can be represented as a <see cref="System.Decimal" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.GetRawText" />
         public bool TryGetDecimal(out decimal value)
@@ -3628,20 +3631,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the current JSON number as a <see cref="T:System.Decimal" />.
+        ///   Gets the current JSON number as a <see cref="System.Decimal" />.
         /// </summary>
-        /// <returns>The current JSON number as a <see cref="T:System.Decimal" />.</returns>
+        /// <returns>The current JSON number as a <see cref="System.Decimal" />.</returns>
         /// <remarks>
         ///   This method does not parse the contents of a JSON string value.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Number" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Decimal" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Decimal" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.GetRawText" />
         public decimal GetDecimal()
@@ -3654,21 +3657,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON string as a <see cref="T:System.DateTime" />.
+        ///   Attempts to represent the current JSON string as a <see cref="System.DateTime" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not create a DateTime representation of values other than JSON strings.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the string can be represented as a <see cref="T:System.DateTime" />,
+        ///   <see langword="true" /> if the string can be represented as a <see cref="System.DateTime" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetDateTime(out DateTime value)
         {
@@ -3677,20 +3680,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the value of the element as a <see cref="T:System.DateTime" />.
+        ///   Gets the value of the element as a <see cref="System.DateTime" />.
         /// </summary>
         /// <remarks>
         ///   This method does not create a DateTime representation of values other than JSON strings.
         /// </remarks>
-        /// <returns>The value of the element as a <see cref="T:System.DateTime" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The value of the element as a <see cref="System.DateTime" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.DateTime" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.DateTime" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.ToString" />
         public DateTime GetDateTime()
@@ -3703,21 +3706,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON string as a <see cref="T:System.DateTimeOffset" />.
+        ///   Attempts to represent the current JSON string as a <see cref="System.DateTimeOffset" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not create a DateTimeOffset representation of values other than JSON strings.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the string can be represented as a <see cref="T:System.DateTimeOffset" />,
+        ///   <see langword="true" /> if the string can be represented as a <see cref="System.DateTimeOffset" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetDateTimeOffset(out DateTimeOffset value)
         {
@@ -3726,20 +3729,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the value of the element as a <see cref="T:System.DateTimeOffset" />.
+        ///   Gets the value of the element as a <see cref="System.DateTimeOffset" />.
         /// </summary>
         /// <remarks>
         ///   This method does not create a DateTimeOffset representation of values other than JSON strings.
         /// </remarks>
-        /// <returns>The value of the element as a <see cref="T:System.DateTimeOffset" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The value of the element as a <see cref="System.DateTimeOffset" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.DateTimeOffset" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.DateTimeOffset" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.ToString" />
         public DateTimeOffset GetDateTimeOffset()
@@ -3752,21 +3755,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Attempts to represent the current JSON string as a <see cref="T:System.Guid" />.
+        ///   Attempts to represent the current JSON string as a <see cref="System.Guid" />.
         /// </summary>
         /// <param name="value">Receives the value.</param>
         /// <remarks>
         ///   This method does not create a Guid representation of values other than JSON strings.
         /// </remarks>
         /// <returns>
-        ///   <see langword="true" /> if the string can be represented as a <see cref="T:System.Guid" />,
+        ///   <see langword="true" /> if the string can be represented as a <see cref="System.Guid" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public bool TryGetGuid(out Guid value)
         {
@@ -3775,20 +3778,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the value of the element as a <see cref="T:System.Guid" />.
+        ///   Gets the value of the element as a <see cref="System.Guid" />.
         /// </summary>
         /// <remarks>
         ///   This method does not create a Guid representation of values other than JSON strings.
         /// </remarks>
-        /// <returns>The value of the element as a <see cref="T:System.Guid" />.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <returns>The value of the element as a <see cref="System.Guid" />.</returns>
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
-        /// <exception cref="T:System.FormatException">
-        ///   The value cannot be represented as a <see cref="T:System.Guid" />.
+        /// <exception cref="System.FormatException">
+        ///   The value cannot be represented as a <see cref="System.Guid" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         /// <seealso cref="M:System.Text.Json.JsonElement.ToString" />
         public Guid GetGuid()
@@ -3807,13 +3810,13 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Gets the original input data backing this value, returning it as a <see cref="T:System.String" />.
+        ///   Gets the original input data backing this value, returning it as a <see cref="System.String" />.
         /// </summary>
         /// <returns>
-        ///   The original input data backing this value, returning it as a <see cref="T:System.String" />.
+        ///   The original input data backing this value, returning it as a <see cref="System.String" />.
         /// </returns>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public string GetRawText()
         {
@@ -3841,7 +3844,7 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the string value of this element matches <paramref name="text" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
         /// <remarks>
@@ -3865,7 +3868,7 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the string value of this element has the same UTF-8 encoding as
         ///   <paramref name="utf8Text" />, <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
         /// <remarks>
@@ -3890,7 +3893,7 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the string value of this element matches <paramref name="text" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.String" />.
         /// </exception>
         /// <remarks>
@@ -3922,14 +3925,14 @@ namespace System.Text.Json
         ///   Write the element into the provided writer as a JSON value.
         /// </summary>
         /// <param name="writer">The writer.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   The <paramref name="writer" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is <see cref="F:System.Text.Json.JsonValueKind.Undefined" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public void WriteTo(Utf8JsonWriter writer)
         {
@@ -3947,11 +3950,11 @@ namespace System.Text.Json
         /// <returns>
         ///   An enumerator to enumerate the values in the JSON array represented by this JsonElement.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Array" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public ArrayEnumerator EnumerateArray()
         {
@@ -3970,11 +3973,11 @@ namespace System.Text.Json
         /// <returns>
         ///   An enumerator to enumerate the properties in the JSON object represented by this JsonElement.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This value's <see cref="P:System.Text.Json.JsonElement.ValueKind" /> is not <see cref="F:System.Text.Json.JsonValueKind.Object" />.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public ObjectEnumerator EnumerateObject()
         {
@@ -3992,7 +3995,7 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     For JsonElement built from <see cref="T:System.Text.Json.JsonDocument" />:
+        ///     For JsonElement built from <see cref="System.Text.Json.JsonDocument" />:
         ///   </para>
         ///
         ///   <para>
@@ -4018,8 +4021,8 @@ namespace System.Text.Json
         /// <returns>
         ///   A string representation for the current value appropriate to the value type.
         /// </returns>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>
         public override string ToString()
         {
@@ -4045,11 +4048,11 @@ namespace System.Text.Json
 
         /// <summary>
         ///   Get a JsonElement which can be safely stored beyond the lifetime of the
-        ///   original <see cref="T:System.Text.Json.JsonDocument" />.
+        ///   original <see cref="System.Text.Json.JsonDocument" />.
         /// </summary>
         /// <returns>
         ///   A JsonElement which can be safely stored beyond the lifetime of the
-        ///   original <see cref="T:System.Text.Json.JsonDocument" />.
+        ///   original <see cref="System.Text.Json.JsonDocument" />.
         /// </returns>
         /// <remarks>
         ///   <para>
@@ -4102,13 +4105,13 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   The current <paramref name="reader" /> token does not start or represent a value.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   A value could not be read from the reader.
         /// </exception>
         public static JsonElement ParseValue(ref Utf8JsonReader reader)
@@ -4165,13 +4168,13 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   The current <paramref name="reader" /> token does not start or represent a value.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         ///   A value could not be read from the reader.
         /// </exception>
         public static bool TryParseValue(ref Utf8JsonReader reader, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out JsonElement? element)
@@ -4211,10 +4214,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="value">The value to be transformed as JSON encoded text.</param>
         /// <param name="encoder">The encoder to use when escaping the string, or <see langword="null" /> to use the default encoder.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// Thrown if value is null.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large or if it contains invalid UTF-16 characters.
         /// </exception>
         public static JsonEncodedText Encode(string value, JavaScriptEncoder? encoder = null)
@@ -4231,7 +4234,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="value">The value to be transformed as JSON encoded text.</param>
         /// <param name="encoder">The encoder to use when escaping the string, or <see langword="null" /> to use the default encoder.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large or if it contains invalid UTF-16 characters.
         /// </exception>
         public static JsonEncodedText Encode(ReadOnlySpan<char> value, JavaScriptEncoder? encoder = null)
@@ -4260,7 +4263,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8Value">The UTF-8 encoded value to be transformed as JSON encoded text.</param>
         /// <param name="encoder">The encoder to use when escaping the string, or <see langword="null" /> to use the default encoder.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large or if it contains invalid UTF-8 bytes.
         /// </exception>
         public static JsonEncodedText Encode(ReadOnlySpan<byte> utf8Value, JavaScriptEncoder? encoder = null)
@@ -4284,10 +4287,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Determines whether this instance and another specified <see cref="T:System.Text.Json.JsonEncodedText" /> instance have the same value.
+        /// Determines whether this instance and another specified <see cref="System.Text.Json.JsonEncodedText" /> instance have the same value.
         /// </summary>
         /// <remarks>
-        /// Default instances of <see cref="T:System.Text.Json.JsonEncodedText" /> are treated as equal.
+        /// Default instances of <see cref="System.Text.Json.JsonEncodedText" /> are treated as equal.
         /// </remarks>
         public bool Equals(JsonEncodedText other)
         {
@@ -4299,7 +4302,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Determines whether this instance and a specified object, which must also be a <see cref="T:System.Text.Json.JsonEncodedText" /> instance, have the same value.
+        /// Determines whether this instance and a specified object, which must also be a <see cref="System.Text.Json.JsonEncodedText" /> instance, have the same value.
         /// </summary>
         /// <remarks>
         /// If <paramref name="obj" /> is null, the method returns false.
@@ -4314,10 +4317,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the value of this instance to a <see cref="T:System.String" />.
+        /// Converts the value of this instance to a <see cref="System.String" />.
         /// </summary>
         /// <remarks>
-        /// Returns an empty string on a default instance of <see cref="T:System.Text.Json.JsonEncodedText" />.
+        /// Returns an empty string on a default instance of <see cref="System.Text.Json.JsonEncodedText" />.
         /// </remarks>
         /// <returns>
         /// Returns the underlying UTF-16 encoded string.
@@ -4328,10 +4331,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Returns the hash code for this <see cref="T:System.Text.Json.JsonEncodedText" />.
+        /// Returns the hash code for this <see cref="System.Text.Json.JsonEncodedText" />.
         /// </summary>
         /// <remarks>
-        /// Returns 0 on a default instance of <see cref="T:System.Text.Json.JsonEncodedText" />.
+        /// Returns 0 on a default instance of <see cref="System.Text.Json.JsonEncodedText" />.
         /// </remarks>
         public override int GetHashCode()
         {
@@ -4447,9 +4450,9 @@ namespace System.Text.Json
         /// <summary>
         /// Creates a new exception object with serialized data.
         /// </summary>
-        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+        /// <exception cref="System.ArgumentNullException">
         /// Thrown when <paramref name="info" /> is <see langword="null" />.
         /// </exception>
         protected JsonException(SerializationInfo info, StreamingContext context)
@@ -4462,10 +4465,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///  Sets the <see cref="T:System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
+        ///  Sets the <see cref="System.Runtime.Serialization.SerializationInfo" /> with information about the exception.
         /// </summary>
-        /// <param name="info">The <see cref="T:System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
-        /// <param name="context">The <see cref="T:System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
+        /// <param name="info">The <see cref="System.Runtime.Serialization.SerializationInfo" /> that holds the serialized object data about the exception being thrown.</param>
+        /// <param name="context">The <see cref="System.Runtime.Serialization.StreamingContext" /> that contains contextual information about the source or destination.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             base.GetObjectData(info, context);
@@ -4705,7 +4708,7 @@ namespace System.Text.Json
         /// Parse the given UTF-8 <paramref name="source" /> as extended ISO 8601 format.
         /// </summary>
         /// <param name="source">UTF-8 source to parse.</param>
-        /// <param name="value">The parsed <see cref="T:System.DateTime" /> if successful.</param>
+        /// <param name="value">The parsed <see cref="System.DateTime" /> if successful.</param>
         /// <returns>"true" if successfully parsed.</returns>
         public static bool TryParseAsISO(ReadOnlySpan<byte> source, out DateTime value)
         {
@@ -4735,7 +4738,7 @@ namespace System.Text.Json
         /// Parse the given UTF-8 <paramref name="source" /> as extended ISO 8601 format.
         /// </summary>
         /// <param name="source">UTF-8 source to parse.</param>
-        /// <param name="value">The parsed <see cref="T:System.DateTimeOffset" /> if successful.</param>
+        /// <param name="value">The parsed <see cref="System.DateTimeOffset" /> if successful.</param>
         /// <returns>"true" if successfully parsed.</returns>
         public static bool TryParseAsISO(ReadOnlySpan<byte> source, out DateTimeOffset value)
         {
@@ -4755,7 +4758,7 @@ namespace System.Text.Json
         /// ISO 8601 date time parser (ISO 8601-1:2019).
         /// </summary>
         /// <param name="source">The date/time to parse in UTF-8 format.</param>
-        /// <param name="parseData">The parsed <see cref="T:System.Text.Json.JsonHelpers.DateTimeParseData" /> for the given <paramref name="source" />.</param>
+        /// <param name="parseData">The parsed <see cref="System.Text.Json.JsonHelpers.DateTimeParseData" /> for the given <paramref name="source" />.</param>
         /// <remarks>
         /// Supports extended calendar date (5.2.2.1) and complete (5.4.2.1) calendar date/time of day
         /// representations with optional specification of seconds and fractional seconds.
@@ -5113,7 +5116,7 @@ namespace System.Text.Json
 
 
         /// <summary>
-        /// Initializes a new instance of <see cref="T:System.Text.Json.JsonNamingPolicy" />.
+        /// Initializes a new instance of <see cref="System.Text.Json.JsonNamingPolicy" />.
         /// </summary>
         protected JsonNamingPolicy()
         {
@@ -5171,8 +5174,8 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the name of this property matches <paramref name="text" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
-        ///   This value's <see cref="T:System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
+        /// <exception cref="System.InvalidOperationException">
+        ///   This value's <see cref="System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
         /// </exception>
         /// <remarks>
         ///   This method is functionally equal to doing an ordinal comparison of <paramref name="text" /> and
@@ -5191,8 +5194,8 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the name of this property has the same UTF-8 encoding as
         ///   <paramref name="utf8Text" />, <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
-        ///   This value's <see cref="T:System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
+        /// <exception cref="System.InvalidOperationException">
+        ///   This value's <see cref="System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
         /// </exception>
         /// <remarks>
         ///   This method is functionally equal to doing an ordinal comparison of <paramref name="utf8Text" /> and
@@ -5211,8 +5214,8 @@ namespace System.Text.Json
         ///   <see langword="true" /> if the name of this property matches <paramref name="text" />,
         ///   <see langword="false" /> otherwise.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
-        ///   This value's <see cref="T:System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
+        /// <exception cref="System.InvalidOperationException">
+        ///   This value's <see cref="System.Type" /> is not <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />.
         /// </exception>
         /// <remarks>
         ///   This method is functionally equal to doing an ordinal comparison of <paramref name="text" /> and
@@ -5232,17 +5235,17 @@ namespace System.Text.Json
         ///   Write the property into the provided writer as a named JSON object property.
         /// </summary>
         /// <param name="writer">The writer.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   The <paramref name="writer" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   This <see cref="P:System.Text.Json.JsonProperty.Name" />'s length is too large to be a JSON object property.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         ///   This <see cref="P:System.Text.Json.JsonProperty.Value" />'s <see cref="P:System.Text.Json.JsonElement.ValueKind" /> would result in an invalid JSON.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The parent <see cref="T:System.Text.Json.JsonDocument" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The parent <see cref="System.Text.Json.JsonDocument" /> has been disposed.
         /// </exception>&gt;
         public void WriteTo(Utf8JsonWriter writer)
         {
@@ -5255,7 +5258,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Provides a <see cref="T:System.String" /> representation of the property for
+        ///   Provides a <see cref="System.String" /> representation of the property for
         ///   debugging purposes.
         /// </summary>
         /// <returns>
@@ -6557,7 +6560,7 @@ namespace System.Text.Json
 
         /// <summary>
         /// Copies the UTF-8 code unit representation of this scalar to an output buffer.
-        /// The buffer must be large enough to hold the required number of <see cref="T:System.Byte" />s.
+        /// The buffer must be large enough to hold the required number of <see cref="System.Byte" />s.
         /// </summary>
         private static bool TryEncodeToUtf8Bytes(uint scalar, Span<byte> utf8Destination, out int bytesWritten)
         {
@@ -6623,13 +6626,13 @@ namespace System.Text.Json
         private JsonCommentHandling _commentHandling;
 
         /// <summary>
-        /// Defines how the <see cref="T:System.Text.Json.Utf8JsonReader" /> should handle comments when reading through the JSON.
+        /// Defines how the <see cref="System.Text.Json.Utf8JsonReader" /> should handle comments when reading through the JSON.
         /// </summary>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// Thrown when the comment handling enum is set to a value that is not supported (i.e. not within the <see cref="T:System.Text.Json.JsonCommentHandling" /> enum range).
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the comment handling enum is set to a value that is not supported (i.e. not within the <see cref="System.Text.Json.JsonCommentHandling" /> enum range).
         /// </exception>
         /// <remarks>
-        /// By default <exception cref="T:System.Text.Json.JsonException" /> is thrown if a comment is encountered.
+        /// By default <exception cref="System.Text.Json.JsonException" /> is thrown if a comment is encountered.
         /// </remarks>
         public JsonCommentHandling CommentHandling
         {
@@ -6650,11 +6653,11 @@ namespace System.Text.Json
         /// <summary>
         /// Gets or sets the maximum depth allowed when reading JSON, with the default (i.e. 0) indicating a max depth of 64.
         /// </summary>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// <exception cref="System.ArgumentOutOfRangeException">
         /// Thrown when the max depth is set to a negative value.
         /// </exception>
         /// <remarks>
-        /// Reading past this depth will throw a <exception cref="T:System.Text.Json.JsonException" />.
+        /// Reading past this depth will throw a <exception cref="System.Text.Json.JsonException" />.
         /// </remarks>
         public int MaxDepth
         {
@@ -6677,7 +6680,7 @@ namespace System.Text.Json
         /// is allowed (and ignored) within the JSON payload being read.
         /// </summary>
         /// <remarks>
-        /// By default, it's set to false, and <exception cref="T:System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
+        /// By default, it's set to false, and <exception cref="System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
         /// </remarks>
         public bool AllowTrailingCommas { get; set; }
     }
@@ -6688,7 +6691,7 @@ namespace System.Text.Json
 	/// This type is required to support reentrancy when reading incomplete data, and to continue
 	/// reading once more data is available. Unlike the <see cref="Utf8JsonReader" />, which is a ref struct,
 	/// this type can survive across async/await boundaries and hence this type is required to provide
-	/// support for reading in more data asynchronously before continuing with a new instance of the <see cref="T:System.Text.Json.Utf8JsonReader" />.
+	/// support for reading in more data asynchronously before continuing with a new instance of the <see cref="System.Text.Json.Utf8JsonReader" />.
 	/// </summary>
 	public struct JsonReaderState
     {
@@ -6714,22 +6717,22 @@ namespace System.Text.Json
 
         /// <summary>
         /// Gets the custom behavior when reading JSON using
-        /// the <see cref="T:System.Text.Json.Utf8JsonReader" /> that may deviate from strict adherence
+        /// the <see cref="System.Text.Json.Utf8JsonReader" /> that may deviate from strict adherence
         /// to the JSON specification, which is the default behavior.
         /// </summary>
         public JsonReaderOptions Options => _readerOptions;
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.JsonReaderState" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.JsonReaderState" /> instance.
         /// </summary>
-        /// <param name="options">Defines the customized behavior of the <see cref="T:System.Text.Json.Utf8JsonReader" />
+        /// <param name="options">Defines the customized behavior of the <see cref="System.Text.Json.Utf8JsonReader" />
         /// that is different from the JSON RFC (for example how to handle comments or maximum depth allowed when reading).
-        /// By default, the <see cref="T:System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
+        /// By default, the <see cref="System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
         /// <remarks>
-        /// An instance of this state must be passed to the <see cref="T:System.Text.Json.Utf8JsonReader" /> ctor with the JSON data.
-        /// Unlike the <see cref="T:System.Text.Json.Utf8JsonReader" />, which is a ref struct, the state can survive
+        /// An instance of this state must be passed to the <see cref="System.Text.Json.Utf8JsonReader" /> ctor with the JSON data.
+        /// Unlike the <see cref="System.Text.Json.Utf8JsonReader" />, which is a ref struct, the state can survive
         /// across async/await boundaries and hence this type is required to provide support for reading
-        /// in more data asynchronously before continuing with a new instance of the <see cref="T:System.Text.Json.Utf8JsonReader" />.
+        /// in more data asynchronously before continuing with a new instance of the <see cref="System.Text.Json.Utf8JsonReader" />.
         /// </remarks>
         public JsonReaderState(JsonReaderOptions options = default(JsonReaderOptions))
         {
@@ -6783,20 +6786,20 @@ namespace System.Text.Json
         private const float FlushThreshold = 0.9f;
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonDocument" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="System.Text.Json.JsonDocument" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="document">The <see cref="T:System.Text.Json.JsonDocument" /> to convert.</param>
+        /// <param name="document">The <see cref="System.Text.Json.JsonDocument" /> to convert.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="document" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -6812,20 +6815,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonDocument" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="System.Text.Json.JsonDocument" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="document">The <see cref="T:System.Text.Json.JsonDocument" /> to convert.</param>
+        /// <param name="document">The <see cref="System.Text.Json.JsonDocument" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="document" /> or <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <paramref name="returnType" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -6845,27 +6848,27 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonDocument" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="System.Text.Json.JsonDocument" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="document">The <see cref="T:System.Text.Json.JsonDocument" /> to convert.</param>
+        /// <param name="document">The <see cref="System.Text.Json.JsonDocument" /> to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="document" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static TValue? Deserialize<TValue>(this JsonDocument document, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>(this JsonDocument document, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (document == null)
             {
@@ -6880,13 +6883,13 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonDocument" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="System.Text.Json.JsonDocument" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="document">The <see cref="T:System.Text.Json.JsonDocument" /> to convert.</param>
+        /// <param name="document">The <see cref="System.Text.Json.JsonDocument" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="document" /> is <see langword="null" />.
         ///
         /// -or-
@@ -6897,7 +6900,7 @@ namespace System.Text.Json
         ///
         /// <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -6907,12 +6910,12 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
         public static object? Deserialize(this JsonDocument document, Type returnType, JsonSerializerContext context)
@@ -6940,17 +6943,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonElement" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="System.Text.Json.JsonElement" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" /> to convert.</param>
+        /// <param name="element">The <see cref="System.Text.Json.JsonElement" /> to convert.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -6962,20 +6965,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonElement" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="System.Text.Json.JsonElement" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" /> to convert.</param>
+        /// <param name="element">The <see cref="System.Text.Json.JsonElement" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <paramref name="returnType" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -6991,23 +6994,23 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonElement" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="System.Text.Json.JsonElement" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" /> to convert.</param>
+        /// <param name="element">The <see cref="System.Text.Json.JsonElement" /> to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static TValue? Deserialize<TValue>(this JsonElement element, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>(this JsonElement element, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -7018,20 +7021,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.JsonElement" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="System.Text.Json.JsonElement" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" /> to convert.</param>
+        /// <param name="element">The <see cref="System.Text.Json.JsonElement" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -7041,12 +7044,12 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
         public static object? Deserialize(this JsonElement element, Type returnType, JsonSerializerContext context)
@@ -7070,17 +7073,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.Nodes.JsonNode" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="JsonNode" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="node">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to convert.</param>
+        /// <param name="node">The <see cref="JsonNode" /> to convert.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7092,17 +7095,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.Nodes.JsonNode" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="JsonNode" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="node">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to convert.</param>
+        /// <param name="node">The <see cref="JsonNode" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <paramref name="returnType" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7113,28 +7116,28 @@ namespace System.Text.Json
             {
                 ThrowHelper.ThrowArgumentNullException("returnType");
             }
-            JsonTypeInfo typeInfo = GetTypeInfo(options, returnType);
+            Serialization.Metadata.JsonTypeInfo typeInfo = GetTypeInfo(options, returnType);
             return ReadNode<object>(node, typeInfo);
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.Nodes.JsonNode" /> representing a single JSON value into a <typeparamref name="TValue" />.
+        /// Converts the <see cref="JsonNode" /> representing a single JSON value into a <typeparamref name="TValue" />.
         /// </summary>
         /// <typeparam name="TValue">The type to deserialize the JSON value into.</typeparam>
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <param name="node">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to convert.</param>
+        /// <param name="node">The <see cref="JsonNode" /> to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// <typeparamref name="TValue" /> is not compatible with the JSON.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static TValue? Deserialize<TValue>(this JsonNode? node, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>(this JsonNode? node, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -7145,20 +7148,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the <see cref="T:System.Text.Json.Nodes.JsonNode" /> representing a single JSON value into a <paramref name="returnType" />.
+        /// Converts the <see cref="JsonNode" /> representing a single JSON value into a <paramref name="returnType" />.
         /// </summary>
         /// <returns>A <paramref name="returnType" /> representation of the JSON value.</returns>
-        /// <param name="node">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to convert.</param>
+        /// <param name="node">The <see cref="JsonNode" /> to convert.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -7168,12 +7171,12 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
         public static object? Deserialize(this JsonNode? node, Type returnType, JsonSerializerContext context)
@@ -7186,7 +7189,7 @@ namespace System.Text.Json
             {
                 ThrowHelper.ThrowArgumentNullException("context");
             }
-            JsonTypeInfo typeInfo = GetTypeInfo(context, returnType);
+            Serialization.Metadata.JsonTypeInfo typeInfo = GetTypeInfo(context, returnType);
             return ReadNode<object>(node, typeInfo);
         }
 
@@ -7209,14 +7212,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonDocument" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonDocument" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.JsonDocument" /> representation of the JSON value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonDocument" /> representation of the JSON value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7228,20 +7231,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonDocument" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonDocument" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.JsonDocument" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonDocument" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.NotSupportedException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7254,20 +7257,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonDocument" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonDocument" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.JsonDocument" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonDocument" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        public static JsonDocument SerializeToDocument<TValue>(TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static JsonDocument SerializeToDocument<TValue>(TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -7278,21 +7281,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonDocument" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonDocument" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.JsonDocument" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonDocument" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
         public static JsonDocument SerializeToDocument(object? value, Type inputType, JsonSerializerContext context)
@@ -7305,7 +7308,7 @@ namespace System.Text.Json
             return WriteDocumentAsObject(value, GetTypeInfo(context, inputType));
         }
 
-        private static JsonDocument WriteDocument<TValue>(in TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        private static JsonDocument WriteDocument<TValue>(in TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             PooledByteBufferWriter pooledByteBufferWriter = new PooledByteBufferWriter(options.DefaultBufferSize);
@@ -7321,7 +7324,7 @@ namespace System.Text.Json
             }
         }
 
-        private static JsonDocument WriteDocumentAsObject(object value, JsonTypeInfo jsonTypeInfo)
+        private static JsonDocument WriteDocumentAsObject(object value, Serialization.Metadata.JsonTypeInfo jsonTypeInfo)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             PooledByteBufferWriter pooledByteBufferWriter = new PooledByteBufferWriter(options.DefaultBufferSize);
@@ -7338,39 +7341,39 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonElement" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonElement" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.JsonElement" /> representation of the JSON value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonElement" /> representation of the JSON value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
         public static JsonElement SerializeToElement<TValue>(TValue value, JsonSerializerOptions? options = null)
         {
-            JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
+            Serialization.Metadata.JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
             return WriteElement<TValue>(in value, typeInfo);
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonElement" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonElement" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.JsonElement" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonElement" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.NotSupportedException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7383,17 +7386,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonElement" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonElement" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.JsonElement" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonElement" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
         public static JsonElement SerializeToElement<TValue>(TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
@@ -7407,21 +7410,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.JsonElement" />.
+        /// Converts the provided value into a <see cref="System.Text.Json.JsonElement" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.JsonElement" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.Text.Json.JsonElement" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
         public static JsonElement SerializeToElement(object? value, Type inputType, JsonSerializerContext context)
@@ -7435,7 +7438,7 @@ namespace System.Text.Json
             return WriteElementAsObject(value, typeInfo);
         }
 
-        private static JsonElement WriteElement<TValue>(in TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        private static JsonElement WriteElement<TValue>(in TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             PooledByteBufferWriter bufferWriter;
@@ -7468,39 +7471,39 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+        /// Converts the provided value into a <see cref="JsonNode" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the JSON value.</returns>
+        /// <returns>A <see cref="JsonNode" /> representation of the JSON value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
         public static JsonNode? SerializeToNode<TValue>(TValue value, JsonSerializerOptions? options = null)
         {
-            JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
+            Serialization.Metadata.JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
             return WriteNode<TValue>(in value, typeInfo);
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+        /// Converts the provided value into a <see cref="JsonNode" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the value.</returns>
+        /// <returns>A <see cref="JsonNode" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.NotSupportedException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -7513,20 +7516,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+        /// Converts the provided value into a <see cref="JsonNode" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the value.</returns>
+        /// <returns>A <see cref="JsonNode" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        public static JsonNode? SerializeToNode<TValue>(TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static JsonNode? SerializeToNode<TValue>(TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -7537,21 +7540,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+        /// Converts the provided value into a <see cref="JsonNode" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the value.</returns>
+        /// <returns>A <see cref="JsonNode" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
         public static JsonNode? SerializeToNode(object? value, Type inputType, JsonSerializerContext context)
@@ -7565,7 +7568,7 @@ namespace System.Text.Json
             return WriteNodeAsObject(value, typeInfo);
         }
 
-        private static JsonNode WriteNode<TValue>(in TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        private static JsonNode WriteNode<TValue>(in TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             PooledByteBufferWriter bufferWriter;
@@ -7618,14 +7621,14 @@ namespace System.Text.Json
 
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
-        private static JsonTypeInfo<T> GetTypeInfo<T>(JsonSerializerOptions options)
+        private static Serialization.Metadata.JsonTypeInfo<T> GetTypeInfo<T>(JsonSerializerOptions options)
         {
-            return (JsonTypeInfo<T>)GetTypeInfo(options, typeof(T));
+            return (Serialization.Metadata.JsonTypeInfo<T>)GetTypeInfo(options, typeof(T));
         }
 
-        private static JsonTypeInfo GetTypeInfo(JsonSerializerContext context, Type inputType)
+        private static Serialization.Metadata.JsonTypeInfo GetTypeInfo(JsonSerializerContext context, Type inputType)
         {
-            JsonTypeInfo typeInfo = context.GetTypeInfo(inputType);
+            Serialization.Metadata.JsonTypeInfo typeInfo = context.GetTypeInfo(inputType);
             if (typeInfo == null)
             {
                 ThrowHelper.ThrowInvalidOperationException_NoMetadataForType(inputType, context);
@@ -7779,7 +7782,7 @@ namespace System.Text.Json
             return false;
         }
 
-        internal static bool IsMetadataPropertyName(ReadOnlySpan<byte> propertyName, PolymorphicTypeResolver resolver)
+        internal static bool IsMetadataPropertyName(ReadOnlySpan<byte> propertyName, Serialization.Metadata.PolymorphicTypeResolver resolver)
         {
             if (propertyName.Length <= 0 || propertyName[0] != 36)
             {
@@ -7792,7 +7795,7 @@ namespace System.Text.Json
             return true;
         }
 
-        internal static MetadataPropertyName GetMetadataPropertyName(ReadOnlySpan<byte> propertyName, PolymorphicTypeResolver resolver)
+        internal static MetadataPropertyName GetMetadataPropertyName(ReadOnlySpan<byte> propertyName, Serialization.Metadata.PolymorphicTypeResolver resolver)
         {
             if (propertyName.Length > 0 && propertyName[0] == 36)
             {
@@ -7990,12 +7993,12 @@ namespace System.Text.Json
         {
             useExtensionProperty = false;
             byte[] utf8PropertyName;
-            JsonPropertyInfo jsonPropertyInfo = state.Current.JsonTypeInfo.GetProperty(unescapedPropertyName, ref state.Current, out utf8PropertyName);
+            Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo = state.Current.JsonTypeInfo.GetProperty(unescapedPropertyName, ref state.Current, out utf8PropertyName);
             state.Current.PropertyIndex++;
             state.Current.JsonPropertyName = utf8PropertyName;
-            if (jsonPropertyInfo == JsonPropertyInfo.s_missingProperty)
+            if (jsonPropertyInfo == Serialization.Metadata.JsonPropertyInfo.s_missingProperty)
             {
-                JsonPropertyInfo extensionDataProperty = state.Current.JsonTypeInfo.ExtensionDataProperty;
+                Serialization.Metadata.JsonPropertyInfo extensionDataProperty = state.Current.JsonTypeInfo.ExtensionDataProperty;
                 if (extensionDataProperty != null && extensionDataProperty.HasGetter && extensionDataProperty.HasSetter)
                 {
                     state.Current.JsonPropertyNameAsString = JsonHelpers.Utf8GetString(unescapedPropertyName);
@@ -8024,7 +8027,7 @@ namespace System.Text.Json
             return result;
         }
 
-        internal static void CreateExtensionDataProperty(object obj, JsonPropertyInfo jsonPropertyInfo, JsonSerializerOptions options)
+        internal static void CreateExtensionDataProperty(object obj, Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo, JsonSerializerOptions options)
         {
             object valueAsObject = jsonPropertyInfo.GetValueAsObject(obj);
             if (valueAsObject != null)
@@ -8034,7 +8037,7 @@ namespace System.Text.Json
             Func<object> func = jsonPropertyInfo.JsonTypeInfo.CreateObject ?? jsonPropertyInfo.JsonTypeInfo.CreateObjectForExtensionDataProperty;
             if (func == null)
             {
-                if (jsonPropertyInfo.PropertyType.FullName == "System.Text.Json.Nodes.JsonObject")
+                if (jsonPropertyInfo.PropertyType.FullName == "JsonObject")
                 {
                     ThrowHelper.ThrowInvalidOperationException_NodeJsonObjectCustomConverterNotAllowedOnExtensionProperty();
                 }
@@ -8057,7 +8060,7 @@ namespace System.Text.Json
             return (TValue)obj;
         }
 
-        private static TValue ReadFromSpan<TValue>(ReadOnlySpan<byte> utf8Json, JsonTypeInfo jsonTypeInfo, int? actualByteCount = null)
+        private static TValue ReadFromSpan<TValue>(ReadOnlySpan<byte> utf8Json, Serialization.Metadata.JsonTypeInfo jsonTypeInfo, int? actualByteCount = null)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             JsonReaderState state = new JsonReaderState(options.GetReaderOptions());
@@ -8079,13 +8082,13 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="utf8Json">JSON text to parse.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8103,16 +8106,16 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8134,13 +8137,13 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="utf8Json">JSON text to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         public static TValue? Deserialize<TValue>(ReadOnlySpan<byte> utf8Json, JsonTypeInfo<TValue> jsonTypeInfo)
@@ -8160,21 +8163,21 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
-        /// did not return a compatible <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
+        /// did not return a compatible <see cref="Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
         /// </exception>
         public static object? Deserialize(ReadOnlySpan<byte> utf8Json, Type returnType, JsonSerializerContext context)
         {
@@ -8198,18 +8201,18 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
         /// <param name="cancellationToken">
-        /// The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.
+        /// The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.
         /// </param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8232,16 +8235,16 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8265,18 +8268,18 @@ namespace System.Text.Json
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
         /// <param name="cancellationToken">
-        /// The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.
+        /// The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.
         /// </param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// the <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8303,16 +8306,16 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// the <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8340,21 +8343,21 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
         /// <param name="cancellationToken">
-        /// The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.
+        /// The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.
         /// </param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static ValueTask<TValue?> DeserializeAsync<TValue>(Stream utf8Json, JsonTypeInfo<TValue> jsonTypeInfo, CancellationToken cancellationToken = default(CancellationToken))
+        public static ValueTask<TValue?> DeserializeAsync<TValue>(Stream utf8Json, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo, CancellationToken cancellationToken = default(CancellationToken))
         {
             if (utf8Json == null)
             {
@@ -8376,19 +8379,19 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static TValue? Deserialize<TValue>(Stream utf8Json, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>(Stream utf8Json, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (utf8Json == null)
             {
@@ -8411,23 +8414,23 @@ namespace System.Text.Json
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
         /// <param name="cancellationToken">
-        /// The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.
+        /// The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.
         /// </param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" />, <paramref name="returnType" />, or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// the <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
-        /// did not return a compatible <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
+        /// did not return a compatible <see cref="Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
         /// </exception>
         public static ValueTask<object?> DeserializeAsync(Stream utf8Json, Type returnType, JsonSerializerContext context, CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -8455,21 +8458,21 @@ namespace System.Text.Json
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" />, <paramref name="returnType" />, or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// the <paramref name="returnType" /> is not compatible with the JSON,
         /// or when there is remaining data in the Stream.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
-        /// did not return a compatible <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
+        /// did not return a compatible <see cref="Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
         /// </exception>
         public static object? Deserialize(Stream utf8Json, Type returnType, JsonSerializerContext context)
         {
@@ -8490,16 +8493,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Wraps the UTF-8 encoded text into an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" />
+        /// Wraps the UTF-8 encoded text into an <see cref="System.Collections.Generic.IAsyncEnumerable{T}" />
         /// that can be used to deserialize root-level JSON arrays in a streaming manner.
         /// </summary>
         /// <typeparam name="TValue">The element type to deserialize asynchronously.</typeparam>
-        /// <returns>An <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" /> representation of the provided JSON array.</returns>
+        /// <returns>An <see cref="System.Collections.Generic.IAsyncEnumerable{T}" /> representation of the provided JSON array.</returns>
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="options">Options to control the behavior during reading.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.</param>
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.</param>
         /// <returns>An <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8510,21 +8513,21 @@ namespace System.Text.Json
             {
                 ThrowHelper.ThrowArgumentNullException("utf8Json");
             }
-            JsonTypeInfo typeInfo = GetTypeInfo(options, typeof(TValue));
+            Serialization.Metadata.JsonTypeInfo typeInfo = GetTypeInfo(options, typeof(TValue));
             return CreateAsyncEnumerableDeserializer(utf8Json, CreateQueueTypeInfo<TValue>(typeInfo), cancellationToken);
         }
 
         /// <summary>
-        /// Wraps the UTF-8 encoded text into an <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" />
+        /// Wraps the UTF-8 encoded text into an <see cref="System.Collections.Generic.IAsyncEnumerable{T}" />
         /// that can be used to deserialize root-level JSON arrays in a streaming manner.
         /// </summary>
         /// <typeparam name="TValue">The element type to deserialize asynchronously.</typeparam>
-        /// <returns>An <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" /> representation of the provided JSON array.</returns>
+        /// <returns>An <see cref="System.Collections.Generic.IAsyncEnumerable{T}" /> representation of the provided JSON array.</returns>
         /// <param name="utf8Json">JSON data to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the element type to convert.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the read operation.</param>
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the read operation.</param>
         /// <returns>An <typeparamref name="TValue" /> representation of the JSON value.</returns>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
         public static IAsyncEnumerable<TValue?> DeserializeAsyncEnumerable<TValue>(Stream utf8Json, JsonTypeInfo<TValue> jsonTypeInfo, CancellationToken cancellationToken = default(CancellationToken))
@@ -8540,9 +8543,9 @@ namespace System.Text.Json
             return CreateAsyncEnumerableDeserializer(utf8Json, CreateQueueTypeInfo<TValue>(jsonTypeInfo), cancellationToken);
         }
 
-        private static JsonTypeInfo<Queue<TValue>> CreateQueueTypeInfo<TValue>(JsonTypeInfo jsonTypeInfo)
+        private static Serialization.Metadata.JsonTypeInfo<Queue<TValue>> CreateQueueTypeInfo<TValue>(Serialization.Metadata.JsonTypeInfo jsonTypeInfo)
         {
-            JsonTypeInfo<Queue<TValue>> jsonTypeInfo2 = JsonMetadataServices.CreateQueueInfo<Queue<TValue>, TValue>(jsonTypeInfo.Options, new JsonCollectionInfoValues<Queue<TValue>>
+            Serialization.Metadata.JsonTypeInfo<Queue<TValue>> jsonTypeInfo2 = Serialization.Metadata.JsonMetadataServices.CreateQueueInfo<Queue<TValue>, TValue>(jsonTypeInfo.Options, new JsonCollectionInfoValues<Queue<TValue>>
             {
                 ObjectCreator = () => new Queue<TValue>(),
                 ElementInfo = jsonTypeInfo,
@@ -8552,7 +8555,7 @@ namespace System.Text.Json
             return jsonTypeInfo2;
         }
 
-        private static async IAsyncEnumerable<TValue> CreateAsyncEnumerableDeserializer<TValue>(Stream utf8Json, JsonTypeInfo<Queue<TValue>> queueTypeInfo, [EnumeratorCancellation] CancellationToken cancellationToken)
+        private static async IAsyncEnumerable<TValue> CreateAsyncEnumerableDeserializer<TValue>(Stream utf8Json, Serialization.Metadata.JsonTypeInfo<Queue<TValue>> queueTypeInfo, [EnumeratorCancellation] CancellationToken cancellationToken)
         {
             JsonSerializerOptions options = queueTypeInfo.Options;
             ReadBufferState bufferState = new ReadBufferState(options.DefaultBufferSize);
@@ -8648,10 +8651,10 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="json">JSON text to parse.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8661,11 +8664,11 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8687,7 +8690,7 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="json">The JSON text to parse.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8697,8 +8700,8 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the span beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         /// <remarks>Using a UTF-16 span is not as efficient as using the
@@ -8719,10 +8722,10 @@ namespace System.Text.Json
         /// <param name="json">JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> or <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8732,11 +8735,11 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -8762,10 +8765,10 @@ namespace System.Text.Json
         /// <param name="json">The JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the behavior during parsing.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8775,8 +8778,8 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the span beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         /// <remarks>Using a UTF-16 span is not as efficient as using the
@@ -8801,14 +8804,14 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="json">JSON text to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8818,11 +8821,11 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
         public static TValue? Deserialize<TValue>([StringSyntax("Json")] string json, JsonTypeInfo<TValue> jsonTypeInfo)
@@ -8846,14 +8849,14 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="json">JSON text to parse.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8863,14 +8866,14 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
-        public static TValue? Deserialize<TValue>([StringSyntax("Json")] ReadOnlySpan<char> json, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>([StringSyntax("Json")] ReadOnlySpan<char> json, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -8887,14 +8890,14 @@ namespace System.Text.Json
         /// <param name="json">JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> or <paramref name="returnType" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8904,15 +8907,15 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
         public static object? Deserialize([StringSyntax("Json")] string json, Type returnType, JsonSerializerContext context)
@@ -8940,14 +8943,14 @@ namespace System.Text.Json
         /// <param name="json">JSON text to parse.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="json" /> or <paramref name="returnType" /> is <see langword="null" />.
         ///
         /// -or-
         ///
         /// <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid.
         ///
         /// -or-
@@ -8957,15 +8960,15 @@ namespace System.Text.Json
         /// -or-
         ///
         /// There is remaining data in the string beyond a single JSON value.</exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using the
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using the
         /// UTF-8 methods since the implementation natively uses UTF-8.
         /// </remarks>
         public static object? Deserialize([StringSyntax("Json")] ReadOnlySpan<char> json, Type returnType, JsonSerializerContext context)
@@ -9009,16 +9012,16 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="reader">The reader to read.</param>
         /// <param name="options">Options to control the serializer behavior during reading.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or a value could not be read from the reader.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         /// <remarks>
@@ -9041,7 +9044,7 @@ namespace System.Text.Json
         ///   </para>
         ///
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="T:System.Text.Json.JsonSerializerOptions" /> when they conflict.
+        ///     The <see cref="System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="System.Text.Json.JsonSerializerOptions" /> when they conflict.
         ///     Hence, <see cref="P:System.Text.Json.JsonReaderOptions.AllowTrailingCommas" />, <see cref="P:System.Text.Json.JsonReaderOptions.MaxDepth" />, and <see cref="P:System.Text.Json.JsonReaderOptions.CommentHandling" /> are used while reading.
         ///   </para>
         /// </remarks>
@@ -9060,19 +9063,19 @@ namespace System.Text.Json
         /// <param name="reader">The reader to read.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="options">Options to control the serializer behavior during reading.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <paramref name="returnType" /> is not compatible with the JSON,
         /// or a value could not be read from the reader.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
         /// <remarks>
@@ -9094,7 +9097,7 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="T:System.Text.Json.JsonSerializerOptions" /> when they conflict.
+        ///     The <see cref="System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="System.Text.Json.JsonSerializerOptions" /> when they conflict.
         ///     Hence, <see cref="P:System.Text.Json.JsonReaderOptions.AllowTrailingCommas" />, <see cref="P:System.Text.Json.JsonReaderOptions.MaxDepth" />, and <see cref="P:System.Text.Json.JsonReaderOptions.CommentHandling" /> are used while reading.
         ///   </para>
         /// </remarks>
@@ -9117,16 +9120,16 @@ namespace System.Text.Json
         /// <returns>A <typeparamref name="TValue" /> representation of the JSON value.</returns>
         /// <param name="reader">The reader to read.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <typeparamref name="TValue" /> is not compatible with the JSON,
         /// or a value could not be read from the reader.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         /// <remarks>
@@ -9149,11 +9152,11 @@ namespace System.Text.Json
         ///   </para>
         ///
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="T:System.Text.Json.JsonSerializerOptions" /> when they conflict.
+        ///     The <see cref="System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="System.Text.Json.JsonSerializerOptions" /> when they conflict.
         ///     Hence, <see cref="P:System.Text.Json.JsonReaderOptions.AllowTrailingCommas" />, <see cref="P:System.Text.Json.JsonReaderOptions.MaxDepth" />, and <see cref="P:System.Text.Json.JsonReaderOptions.CommentHandling" /> are used while reading.
         ///   </para>
         /// </remarks>
-        public static TValue? Deserialize<TValue>(ref Utf8JsonReader reader, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static TValue? Deserialize<TValue>(ref Utf8JsonReader reader, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo == null)
             {
@@ -9170,24 +9173,24 @@ namespace System.Text.Json
         /// <param name="reader">The reader to read.</param>
         /// <param name="returnType">The type of the object to convert to and return.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="returnType" /> or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// The JSON is invalid,
         /// <paramref name="returnType" /> is not compatible with the JSON,
         /// or a value could not be read from the reader.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         ///   <paramref name="reader" /> is using unsupported options.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="returnType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
-        /// did not return a compatible <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method on the provided <paramref name="context" />
+        /// did not return a compatible <see cref="Serialization.Metadata.JsonTypeInfo" /> for <paramref name="returnType" />.
         /// </exception>
         /// <remarks>
         ///   <para>
@@ -9208,7 +9211,7 @@ namespace System.Text.Json
         ///     requirement to maintain data integrity beyond the return of this method.
         ///   </para>
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="T:System.Text.Json.JsonSerializerOptions" /> when they conflict.
+        ///     The <see cref="System.Text.Json.JsonReaderOptions" /> used to create the instance of the <see cref="System.Text.Json.Utf8JsonReader" /> take precedence over the <see cref="System.Text.Json.JsonSerializerOptions" /> when they conflict.
         ///     Hence, <see cref="P:System.Text.Json.JsonReaderOptions.AllowTrailingCommas" />, <see cref="P:System.Text.Json.JsonReaderOptions.MaxDepth" />, and <see cref="P:System.Text.Json.JsonReaderOptions.CommentHandling" /> are used while reading.
         ///   </para>
         /// </remarks>
@@ -9352,38 +9355,38 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Byte" /> array.
+        /// Converts the provided value into a <see cref="System.Byte" /> array.
         /// </summary>
         /// <returns>A UTF-8 representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
         [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
         public static byte[] SerializeToUtf8Bytes<TValue>(TValue value, JsonSerializerOptions? options = null)
         {
-            JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
+            Serialization.Metadata.JsonTypeInfo<TValue> typeInfo = GetTypeInfo<TValue>(options);
             return WriteBytes<TValue>(in value, typeInfo);
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Byte" /> array.
+        /// Converts the provided value into a <see cref="System.Byte" /> array.
         /// </summary>
         /// <returns>A UTF-8 representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -9396,16 +9399,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Byte" /> array.
+        /// Converts the provided value into a <see cref="System.Byte" /> array.
         /// </summary>
         /// <returns>A UTF-8 representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
         public static byte[] SerializeToUtf8Bytes<TValue>(TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
@@ -9419,24 +9422,24 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.Byte" /> array.
+        /// Converts the provided value into a <see cref="System.Byte" /> array.
         /// </summary>
         /// <returns>A UTF-8 representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
         public static byte[] SerializeToUtf8Bytes(object? value, Type inputType, JsonSerializerContext context)
@@ -9450,7 +9453,7 @@ namespace System.Text.Json
             return WriteBytesAsObject(value, typeInfo);
         }
 
-        private static byte[] WriteBytes<TValue>(in TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        private static byte[] WriteBytes<TValue>(in TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             PooledByteBufferWriter bufferWriter;
             Utf8JsonWriter writer = Utf8JsonWriterCache.RentWriterAndBuffer(jsonTypeInfo.Options, out bufferWriter);
@@ -9465,7 +9468,7 @@ namespace System.Text.Json
             }
         }
 
-        private static byte[] WriteBytesAsObject(object value, JsonTypeInfo jsonTypeInfo)
+        private static byte[] WriteBytesAsObject(object value, Serialization.Metadata.JsonTypeInfo jsonTypeInfo)
         {
             PooledByteBufferWriter bufferWriter;
             Utf8JsonWriter writer = Utf8JsonWriterCache.RentWriterAndBuffer(jsonTypeInfo.Options, out bufferWriter);
@@ -9550,7 +9553,7 @@ namespace System.Text.Json
         /// <summary>
         /// Sync, strongly typed root value serialization helper.
         /// </summary>
-        private static void WriteCore<TValue>(Utf8JsonWriter writer, in TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        private static void WriteCore<TValue>(Utf8JsonWriter writer, in TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (jsonTypeInfo.CanUseSerializeHandler)
             {
@@ -9559,7 +9562,7 @@ namespace System.Text.Json
             else
             {
                 WriteStack state = default(WriteStack);
-                JsonTypeInfo jsonTypeInfo2 = ResolvePolymorphicTypeInfo(in value, jsonTypeInfo, out state.IsPolymorphicRootValue);
+                Serialization.Metadata.JsonTypeInfo jsonTypeInfo2 = ResolvePolymorphicTypeInfo(in value, jsonTypeInfo, out state.IsPolymorphicRootValue);
                 state.Initialize(jsonTypeInfo2);
                 bool flag = (state.IsPolymorphicRootValue ? jsonTypeInfo2.Converter.WriteCoreAsObject(writer, value, jsonTypeInfo.Options, ref state) : jsonTypeInfo.EffectiveConverter.WriteCore(writer, in value, jsonTypeInfo.Options, ref state));
             }
@@ -9621,19 +9624,19 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
         /// <returns>A task that represents the asynchronous write operation.</returns>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -9644,22 +9647,22 @@ namespace System.Text.Json
             {
                 ThrowHelper.ThrowArgumentNullException("utf8Json");
             }
-            JsonTypeInfo typeInfo = GetTypeInfo(options, typeof(TValue));
+            Serialization.Metadata.JsonTypeInfo typeInfo = GetTypeInfo(options, typeof(TValue));
             return WriteStreamAsync(utf8Json, value, typeInfo, cancellationToken);
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -9675,22 +9678,22 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <returns>A task that represents the asynchronous write operation.</returns>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -9707,20 +9710,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> or <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -9737,19 +9740,19 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
         /// <returns>A task that represents the asynchronous write operation.</returns>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         public static Task SerializeAsync<TValue>(Stream utf8Json, TValue value, JsonTypeInfo<TValue> jsonTypeInfo, CancellationToken cancellationToken = default(CancellationToken))
@@ -9766,20 +9769,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static void Serialize<TValue>(Stream utf8Json, TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static void Serialize<TValue>(Stream utf8Json, TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (utf8Json == null)
             {
@@ -9793,22 +9796,22 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
         /// <returns>A task that represents the asynchronous write operation.</returns>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <param name="cancellationToken">The <see cref="T:System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <param name="cancellationToken">The <see cref="System.Threading.CancellationToken" /> that can be used to cancel the write operation.</param>
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" />, <paramref name="inputType" />, or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         public static Task SerializeAsync(Stream utf8Json, object? value, Type inputType, JsonSerializerContext context, CancellationToken cancellationToken = default(CancellationToken))
@@ -9826,20 +9829,20 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="T:System.IO.Stream" />.
+        /// Converts the provided value to UTF-8 encoded JSON text and write it to the <see cref="System.IO.Stream" />.
         /// </summary>
-        /// <param name="utf8Json">The UTF-8 <see cref="T:System.IO.Stream" /> to write to.</param>
+        /// <param name="utf8Json">The UTF-8 <see cref="System.IO.Stream" /> to write to.</param>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="utf8Json" />, <paramref name="inputType" />, or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
         public static void Serialize(Stream utf8Json, object? value, Type inputType, JsonSerializerContext context)
@@ -9856,7 +9859,7 @@ namespace System.Text.Json
             WriteStream(utf8Json, in value, GetTypeInfo(context, inputType));
         }
 
-        private static async Task WriteStreamAsync<TValue>(Stream utf8Json, TValue value, JsonTypeInfo jsonTypeInfo, CancellationToken cancellationToken)
+        private static async Task WriteStreamAsync<TValue>(Stream utf8Json, TValue value, Serialization.Metadata.JsonTypeInfo jsonTypeInfo, CancellationToken cancellationToken)
         {
             jsonTypeInfo.EnsureConfigured();
             JsonSerializerOptions options = jsonTypeInfo.Options;
@@ -9912,7 +9915,7 @@ namespace System.Text.Json
             }
         }
 
-        private static void WriteStream<TValue>(Stream utf8Json, in TValue value, JsonTypeInfo jsonTypeInfo)
+        private static void WriteStream<TValue>(Stream utf8Json, in TValue value, Serialization.Metadata.JsonTypeInfo jsonTypeInfo)
         {
             jsonTypeInfo.EnsureConfigured();
             JsonSerializerOptions options = jsonTypeInfo.Options;
@@ -9934,17 +9937,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.String" />.
+        /// Converts the provided value into a <see cref="System.String" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.String" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.String" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using UTF-8
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using UTF-8
         /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes``1(``0,System.Text.Json.JsonSerializerOptions)" />
         /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync``1(System.IO.Stream,``0,System.Text.Json.JsonSerializerOptions,System.Threading.CancellationToken)" />.
         /// </remarks>
@@ -9957,23 +9960,23 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.String" />.
+        /// Converts the provided value into a <see cref="System.String" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.String" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.String" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the conversion behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" />  or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using UTF-8
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using UTF-8
         /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(System.Object,System.Type,System.Text.Json.JsonSerializerOptions)" />
         /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync(System.IO.Stream,System.Object,System.Type,System.Text.Json.JsonSerializerOptions,System.Threading.CancellationToken)" />.
         /// </remarks>
@@ -9987,22 +9990,22 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.String" />.
+        /// Converts the provided value into a <see cref="System.String" />.
         /// </summary>
         /// <typeparam name="TValue">The type of the value to serialize.</typeparam>
-        /// <returns>A <see cref="T:System.String" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.String" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using UTF-8
-        /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes``1(``0,System.Text.Json.Serialization.Metadata.JsonTypeInfo{``0})" />
-        /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync``1(System.IO.Stream,``0,System.Text.Json.Serialization.Metadata.JsonTypeInfo{``0},System.Threading.CancellationToken)" />.
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using UTF-8
+        /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes``1(``0,Metadata.JsonTypeInfo{``0})" />
+        /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync``1(System.IO.Stream,``0,Metadata.JsonTypeInfo{``0},System.Threading.CancellationToken)" />.
         /// </remarks>
         public static string Serialize<TValue>(TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
         {
@@ -10015,26 +10018,26 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converts the provided value into a <see cref="T:System.String" />.
+        /// Converts the provided value into a <see cref="System.String" />.
         /// </summary>
-        /// <returns>A <see cref="T:System.String" /> representation of the value.</returns>
+        /// <returns>A <see cref="System.String" /> representation of the value.</returns>
         /// <param name="value">The value to convert.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="inputType" /> or <paramref name="context" /> is <see langword="null" />.
         /// </exception>
-        /// <remarks>Using a <see cref="T:System.String" /> is not as efficient as using UTF-8
-        /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(System.Object,System.Type,System.Text.Json.Serialization.JsonSerializerContext)" />
-        /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync(System.IO.Stream,System.Object,System.Type,System.Text.Json.Serialization.JsonSerializerContext,System.Threading.CancellationToken)" />.
+        /// <remarks>Using a <see cref="System.String" /> is not as efficient as using UTF-8
+        /// encoding since the implementation internally uses UTF-8. See also <see cref="M:System.Text.Json.JsonSerializer.SerializeToUtf8Bytes(System.Object,System.Type,JsonSerializerContext)" />
+        /// and <see cref="M:System.Text.Json.JsonSerializer.SerializeAsync(System.IO.Stream,System.Object,System.Type,JsonSerializerContext,System.Threading.CancellationToken)" />.
         /// </remarks>
         public static string Serialize(object? value, Type inputType, JsonSerializerContext context)
         {
@@ -10084,11 +10087,11 @@ namespace System.Text.Json
         /// <param name="writer">The writer to write.</param>
         /// <param name="value">The value to convert and write.</param>
         /// <param name="options">Options to control the behavior.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   <paramref name="writer" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -10110,14 +10113,14 @@ namespace System.Text.Json
         /// <param name="value">The value to convert and write.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="options">Options to control the behavior.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="writer" /> or <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
@@ -10140,14 +10143,14 @@ namespace System.Text.Json
         /// <param name="writer">The writer to write.</param>
         /// <param name="value">The value to convert and write.</param>
         /// <param name="jsonTypeInfo">Metadata about the type to convert.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         ///   <paramref name="writer" /> or <paramref name="jsonTypeInfo" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <typeparamref name="TValue" /> or its serializable members.
         /// </exception>
-        public static void Serialize<TValue>(Utf8JsonWriter writer, TValue value, JsonTypeInfo<TValue> jsonTypeInfo)
+        public static void Serialize<TValue>(Utf8JsonWriter writer, TValue value, Serialization.Metadata.JsonTypeInfo<TValue> jsonTypeInfo)
         {
             if (writer == null)
             {
@@ -10168,18 +10171,18 @@ namespace System.Text.Json
         /// <param name="value">The value to convert and write.</param>
         /// <param name="inputType">The type of the <paramref name="value" /> to convert.</param>
         /// <param name="context">A metadata provider for serializable types.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// <paramref name="inputType" /> is not compatible with <paramref name="value" />.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="writer" /> or <paramref name="inputType" /> is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="inputType" /> or its serializable members.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The <see cref="M:System.Text.Json.Serialization.JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
+        /// <exception cref="System.InvalidOperationException">
+        /// The <see cref="M:JsonSerializerContext.GetTypeInfo(System.Type)" /> method of the provided
         /// <paramref name="context" /> returns <see langword="null" /> for the type to convert.
         /// </exception>
         public static void Serialize(Utf8JsonWriter writer, object? value, Type inputType, JsonSerializerContext context)
@@ -10204,7 +10207,7 @@ namespace System.Text.Json
 	public enum JsonSerializerDefaults
     {
         /// <summary>
-        /// Specifies that general-purpose values should be used. These are the same settings applied if a <see cref="T:System.Text.Json.JsonSerializerDefaults" /> isn't specified.
+        /// Specifies that general-purpose values should be used. These are the same settings applied if a <see cref="System.Text.Json.JsonSerializerDefaults" /> isn't specified.
         /// </summary>
         /// <remarks>
         /// This option implies that property names are treated as case-sensitive and that "PascalCase" name formatting should be employed.
@@ -10220,25 +10223,25 @@ namespace System.Text.Json
     }
 
     /// <summary>
-	/// Provides options to be used with <see cref="T:System.Text.Json.JsonSerializer" />.
+	/// Provides options to be used with <see cref="System.Text.Json.JsonSerializer" />.
 	/// </summary>
 	/// <summary>
-	/// Provides options to be used with <see cref="T:System.Text.Json.JsonSerializer" />.
+	/// Provides options to be used with <see cref="System.Text.Json.JsonSerializer" />.
 	/// </summary>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
     public sealed class JsonSerializerOptions
     {
         /// <summary>
-        /// Stores and manages all reflection caches for one or more <see cref="T:System.Text.Json.JsonSerializerOptions" /> instances.
+        /// Stores and manages all reflection caches for one or more <see cref="System.Text.Json.JsonSerializerOptions" /> instances.
         /// NB the type encapsulates the original options instance and only consults that one when building new types;
         /// this is to prevent multiple options instances from leaking into the object graphs of converters which
         /// could break user invariants.
         /// </summary>
         internal sealed class CachingContext
         {
-            private readonly ConcurrentDictionary<Type, JsonTypeInfo> _jsonTypeInfoCache = new ConcurrentDictionary<Type, JsonTypeInfo>();
+            private readonly ConcurrentDictionary<Type, Serialization.Metadata.JsonTypeInfo> _jsonTypeInfoCache = new ConcurrentDictionary<Type, Serialization.Metadata.JsonTypeInfo>();
 
-            private readonly Func<Type, JsonTypeInfo> _jsonTypeInfoFactory;
+            private readonly Func<Type, Serialization.Metadata.JsonTypeInfo> _jsonTypeInfoFactory;
 
             public JsonSerializerOptions Options { get; }
 
@@ -10253,12 +10256,12 @@ namespace System.Text.Json
                 _jsonTypeInfoFactory = Options.GetTypeInfoNoCaching;
             }
 
-            public JsonTypeInfo GetOrAddJsonTypeInfo(Type type)
+            public Serialization.Metadata.JsonTypeInfo GetOrAddJsonTypeInfo(Type type)
             {
                 return _jsonTypeInfoCache.GetOrAdd(type, _jsonTypeInfoFactory);
             }
 
-            public bool TryGetJsonTypeInfo(Type type, [System.Diagnostics.CodeAnalysis.NotNullWhen(true)] out JsonTypeInfo typeInfo)
+            public bool TryGetJsonTypeInfo(Type type, [NotNullWhen(true)] out Serialization.Metadata.JsonTypeInfo typeInfo)
             {
                 return _jsonTypeInfoCache.TryGetValue(type, out typeInfo);
             }
@@ -10271,8 +10274,8 @@ namespace System.Text.Json
 
         /// <summary>
         /// Defines a cache of CachingContexts; instead of using a ConditionalWeakTable which can be slow to traverse
-        /// this approach uses a fixed-size array of weak references of <see cref="T:System.Text.Json.JsonSerializerOptions.CachingContext" /> that can be looked up lock-free.
-        /// Relevant caching contexts are looked up by linear traversal using the equality comparison defined by <see cref="T:System.Text.Json.JsonSerializerOptions.EqualityComparer" />.
+        /// this approach uses a fixed-size array of weak references of <see cref="System.Text.Json.JsonSerializerOptions.CachingContext" /> that can be looked up lock-free.
+        /// Relevant caching contexts are looked up by linear traversal using the equality comparison defined by <see cref="System.Text.Json.JsonSerializerOptions.EqualityComparer" />.
         /// </summary>
         internal static class TrackedCachingContexts
         {
@@ -10411,7 +10414,7 @@ namespace System.Text.Json
                 AddHashCode<bool>(ref hc2, options._includeFields);
                 AddHashCode<bool>(ref hc2, options._propertyNameCaseInsensitive);
                 AddHashCode<bool>(ref hc2, options._writeIndented);
-                AddHashCode<IJsonTypeInfoResolver>(ref hc2, options._typeInfoResolver);
+                AddHashCode<Serialization.Metadata.IJsonTypeInfoResolver>(ref hc2, options._typeInfoResolver);
                 AddListHashCode<JsonConverter>(ref hc2, options._converters);
                 return hc2.ToHashCode();
                 static void AddHashCode<TValue>(ref HashCode hc, TValue value)
@@ -10462,14 +10465,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Encapsulates all cached metadata referenced by the current <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance.
+        /// Encapsulates all cached metadata referenced by the current <see cref="System.Text.Json.JsonSerializerOptions" /> instance.
         /// Context can be shared across multiple equivalent options instances.
         /// </summary>
         private CachingContext _cachingContext;
 
-        private volatile JsonTypeInfo _lastTypeInfo;
+        private volatile Serialization.Metadata.JsonTypeInfo _lastTypeInfo;
 
-        private JsonTypeInfo _objectTypeInfo;
+        private Serialization.Metadata.JsonTypeInfo _objectTypeInfo;
 
         internal const int BufferSizeDefault = 16384;
 
@@ -10477,9 +10480,9 @@ namespace System.Text.Json
 
         private static JsonSerializerOptions s_defaultOptions;
 
-        private IJsonTypeInfoResolver _typeInfoResolver;
+        private Serialization.Metadata.IJsonTypeInfoResolver _typeInfoResolver;
 
-        private MemberAccessor _memberAccessorStrategy;
+        private Serialization.Metadata.MemberAccessor _memberAccessorStrategy;
 
         private JsonNamingPolicy _dictionaryKeyPolicy;
 
@@ -10523,9 +10526,9 @@ namespace System.Text.Json
 
         private volatile bool _isInitializedForReflectionSerializer;
 
-        private IJsonTypeInfoResolver _effectiveJsonTypeInfoResolver;
+        private Serialization.Metadata.IJsonTypeInfoResolver _effectiveJsonTypeInfoResolver;
 
-        internal JsonTypeInfo ObjectTypeInfo => _objectTypeInfo ?? (_objectTypeInfo = GetTypeInfoInternal(JsonTypeInfo.ObjectType));
+        internal Serialization.Metadata.JsonTypeInfo ObjectTypeInfo => _objectTypeInfo ?? (_objectTypeInfo = GetTypeInfoInternal(JsonTypeInfo.ObjectType));
 
         /// <summary>
         /// The list of custom converters.
@@ -10536,10 +10539,10 @@ namespace System.Text.Json
         public IList<JsonConverter> Converters => _converters;
 
         /// <summary>
-        /// Gets a read-only, singleton instance of <see cref="T:System.Text.Json.JsonSerializerOptions" /> that uses the default configuration.
+        /// Gets a read-only, singleton instance of <see cref="System.Text.Json.JsonSerializerOptions" /> that uses the default configuration.
         /// </summary>
         /// <remarks>
-        /// Each <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance encapsulates its own serialization metadata caches,
+        /// Each <see cref="System.Text.Json.JsonSerializerOptions" /> instance encapsulates its own serialization metadata caches,
         /// so using fresh default instances every time one is needed can result in redundant recomputation of converters.
         /// This property provides a shared instance that can be consumed by any number of components without necessitating any converter recomputation.
         /// </remarks>
@@ -10559,16 +10562,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Gets or sets the <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> contract resolver used by this instance.
+        /// Gets or sets the <see cref="Serialization.Metadata.JsonTypeInfo" /> contract resolver used by this instance.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         /// <remarks>
-        /// A <see langword="null" /> setting is equivalent to using the reflection-based <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" />.
-        /// The property will be populated automatically once used with one of the <see cref="T:System.Text.Json.JsonSerializer" /> methods.
+        /// A <see langword="null" /> setting is equivalent to using the reflection-based <see cref="Serialization.Metadata.DefaultJsonTypeInfoResolver" />.
+        /// The property will be populated automatically once used with one of the <see cref="JsonSerializer" /> methods.
         /// </remarks>
-        public IJsonTypeInfoResolver? TypeInfoResolver
+        public Serialization.Metadata.IJsonTypeInfoResolver? TypeInfoResolver
         {
             get
             {
@@ -10585,11 +10588,11 @@ namespace System.Text.Json
         /// Defines whether an extra comma at the end of a list of JSON values in an object or array
         /// is allowed (and ignored) within the JSON payload being deserialized.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         /// <remarks>
-        /// By default, it's set to false, and <exception cref="T:System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
+        /// By default, it's set to false, and <exception cref="System.Text.Json.JsonException" /> is thrown if a trailing comma is encountered.
         /// </remarks>
         public bool AllowTrailingCommas
         {
@@ -10608,8 +10611,8 @@ namespace System.Text.Json
         /// The default buffer size in bytes used when creating temporary buffers.
         /// </summary>
         /// <remarks>The default size is 16K.</remarks>
-        /// <exception cref="T:System.ArgumentException">Thrown when the buffer size is less than 1.</exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.ArgumentException">Thrown when the buffer size is less than 1.</exception>
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public int DefaultBufferSize
@@ -10646,7 +10649,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Specifies the policy used to convert a <see cref="T:System.Collections.IDictionary" /> key's name to another format, such as camel-casing.
+        /// Specifies the policy used to convert a <see cref="System.Collections.IDictionary" /> key's name to another format, such as camel-casing.
         /// </summary>
         /// <remarks>
         /// This property can be set to <see cref="P:System.Text.Json.JsonNamingPolicy.CamelCase" /> to specify a camel-casing policy.
@@ -10669,7 +10672,7 @@ namespace System.Text.Json
         /// Determines whether null values are ignored during serialization and deserialization.
         /// The default value is false.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// or <see cref="P:System.Text.Json.JsonSerializerOptions.DefaultIgnoreCondition" /> has been set to a non-default value. These properties cannot be used together.
         /// </exception>
@@ -10694,12 +10697,12 @@ namespace System.Text.Json
 
         /// <summary>
         /// Specifies a condition to determine when properties with default values are ignored during serialization or deserialization.
-        /// The default value is <see cref="F:System.Text.Json.Serialization.JsonIgnoreCondition.Never" />.
+        /// The default value is <see cref="F:JsonIgnoreCondition.Never" />.
         /// </summary>
-        /// <exception cref="T:System.ArgumentException">
-        /// Thrown if this property is set to <see cref="F:System.Text.Json.Serialization.JsonIgnoreCondition.Always" />.
+        /// <exception cref="System.ArgumentException">
+        /// Thrown if this property is set to <see cref="F:JsonIgnoreCondition.Always" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred,
         /// or <see cref="P:System.Text.Json.JsonSerializerOptions.IgnoreNullValues" /> has been set to <see langword="true" />. These properties cannot be used together.
         /// </exception>
@@ -10732,7 +10735,7 @@ namespace System.Text.Json
         /// <summary>
         /// Specifies how number types should be handled when serializing or deserializing.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public JsonNumberHandling NumberHandling
@@ -10760,7 +10763,7 @@ namespace System.Text.Json
         /// <remarks>
         /// Read-only properties are not deserialized regardless of this setting.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public bool IgnoreReadOnlyProperties
@@ -10784,7 +10787,7 @@ namespace System.Text.Json
         /// <remarks>
         /// Read-only fields are not deserialized regardless of this setting.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public bool IgnoreReadOnlyFields
@@ -10804,7 +10807,7 @@ namespace System.Text.Json
         /// Determines whether fields are handled on serialization and deserialization.
         /// The default value is false.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public bool IncludeFields
@@ -10823,14 +10826,14 @@ namespace System.Text.Json
         /// <summary>
         /// Gets or sets the maximum depth allowed when serializing or deserializing JSON, with the default (i.e. 0) indicating a max depth of 64.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// <exception cref="System.ArgumentOutOfRangeException">
         /// Thrown when the max depth is set to a negative value.
         /// </exception>
         /// <remarks>
-        /// Going past this depth will throw a <exception cref="T:System.Text.Json.JsonException" />.
+        /// Going past this depth will throw a <exception cref="System.Text.Json.JsonException" />.
         /// </remarks>
         public int MaxDepth
         {
@@ -10859,7 +10862,7 @@ namespace System.Text.Json
         /// will be used when writing the property name during serialization.
         /// </summary>
         /// <remarks>
-        /// The policy is not used for properties that have a <see cref="T:System.Text.Json.Serialization.JsonPropertyNameAttribute" /> applied.
+        /// The policy is not used for properties that have a <see cref="JsonPropertyNameAttribute" /> applied.
         /// This property can be set to <see cref="P:System.Text.Json.JsonNamingPolicy.CamelCase" /> to specify a camel-casing policy.
         /// </remarks>
         public JsonNamingPolicy? PropertyNamingPolicy
@@ -10896,14 +10899,14 @@ namespace System.Text.Json
         /// <summary>
         /// Defines how the comments are handled during deserialization.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
-        /// Thrown when the comment handling enum is set to a value that is not supported (or not within the <see cref="T:System.Text.Json.JsonCommentHandling" /> enum range).
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the comment handling enum is set to a value that is not supported (or not within the <see cref="System.Text.Json.JsonCommentHandling" /> enum range).
         /// </exception>
         /// <remarks>
-        /// By default <exception cref="T:System.Text.Json.JsonException" /> is thrown if a comment is encountered.
+        /// By default <exception cref="System.Text.Json.JsonException" /> is thrown if a comment is encountered.
         /// </remarks>
         public JsonCommentHandling ReadCommentHandling
         {
@@ -10923,7 +10926,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Defines how deserializing a type declared as an <see cref="T:System.Object" /> is handled during deserialization.
+        /// Defines how deserializing a type declared as an <see cref="System.Object" /> is handled during deserialization.
         /// </summary>
         public JsonUnknownTypeHandling UnknownTypeHandling
         {
@@ -10943,7 +10946,7 @@ namespace System.Text.Json
         /// indenting nested JSON tokens, adding new lines, and adding white space between property names and values.
         /// By default, the JSON is serialized without any extra white space.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this property is set after serialization or deserialization has occurred.
         /// </exception>
         public bool WriteIndented
@@ -10998,16 +11001,16 @@ namespace System.Text.Json
         private string DebuggerDisplay => $"TypeInfoResolver = {TypeInfoResolver?.GetType()?.Name}, IsImmutable = {IsImmutable}";
 
         /// <summary>
-        /// Gets the <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> contract metadata resolved by the current <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance.
+        /// Gets the <see cref="JsonTypeInfo" /> contract metadata resolved by the current <see cref="System.Text.Json.JsonSerializerOptions" /> instance.
         /// </summary>
         /// <param name="type">The type to resolve contract metadata for.</param>
         /// <returns>The contract metadata resolved for <paramref name="type" />.</returns>
-        /// <exception cref="T:System.ArgumentNullException"><paramref name="type" /> is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException"><paramref name="type" /> is not valid for serialization.</exception>
+        /// <exception cref="System.ArgumentNullException"><paramref name="type" /> is <see langword="null" />.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="type" /> is not valid for serialization.</exception>
         /// <remarks>
-        /// Returned metadata can be downcast to <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> and used with the relevant <see cref="T:System.Text.Json.JsonSerializer" /> overloads.
+        /// Returned metadata can be downcast to <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> and used with the relevant <see cref="System.Text.Json.JsonSerializer" /> overloads.
         ///
-        /// If the <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance is locked for modification, the method will return a cached instance for the metadata.
+        /// If the <see cref="System.Text.Json.JsonSerializerOptions" /> instance is locked for modification, the method will return a cached instance for the metadata.
         /// </remarks>
         public JsonTypeInfo GetTypeInfo(Type type)
         {
@@ -11062,9 +11065,9 @@ namespace System.Text.Json
         /// This has an LRU cache that is intended only for public API calls that specify the root type.
         /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal JsonTypeInfo GetTypeInfoForRootType(Type type)
+        internal Serialization.Metadata.JsonTypeInfo GetTypeInfoForRootType(Type type)
         {
-            JsonTypeInfo jsonTypeInfo = _lastTypeInfo;
+            Serialization.Metadata.JsonTypeInfo jsonTypeInfo = _lastTypeInfo;
             if (jsonTypeInfo?.Type != type)
             {
                 jsonTypeInfo = (_lastTypeInfo = GetTypeInfoInternal(type));
@@ -11091,11 +11094,11 @@ namespace System.Text.Json
         /// <returns>
         /// The converter for the given type.
         /// </returns>
-        /// <exception cref="T:System.InvalidOperationException">
-        /// The configured <see cref="T:System.Text.Json.Serialization.JsonConverter" /> for <paramref name="typeToConvert" /> returned an invalid converter.
+        /// <exception cref="System.InvalidOperationException">
+        /// The configured <see cref="JsonConverter" /> for <paramref name="typeToConvert" /> returned an invalid converter.
         /// </exception>
-        /// <exception cref="T:System.NotSupportedException">
-        /// There is no compatible <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+        /// <exception cref="System.NotSupportedException">
+        /// There is no compatible <see cref="JsonConverter" />
         /// for <paramref name="typeToConvert" /> or its serializable members.
         /// </exception>
         [RequiresUnreferencedCode("Getting a converter for a type may require reflection which depends on unreferenced code.")]
@@ -11153,7 +11156,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.JsonSerializerOptions" /> instance.
         /// </summary>
         public JsonSerializerOptions()
         {
@@ -11162,10 +11165,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Copies the options from a <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance to a new instance.
+        /// Copies the options from a <see cref="System.Text.Json.JsonSerializerOptions" /> instance to a new instance.
         /// </summary>
-        /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance to copy options from.</param>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> instance to copy options from.</param>
+        /// <exception cref="System.ArgumentNullException">
         /// <paramref name="options" /> is <see langword="null" />.
         /// </exception>
         public JsonSerializerOptions(JsonSerializerOptions options)
@@ -11206,9 +11209,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance with a predefined set of options determined by the specified <see cref="T:System.Text.Json.JsonSerializerDefaults" />.
+        /// Constructs a new <see cref="System.Text.Json.JsonSerializerOptions" /> instance with a predefined set of options determined by the specified <see cref="System.Text.Json.JsonSerializerDefaults" />.
         /// </summary>
-        /// <param name="defaults"> The <see cref="T:System.Text.Json.JsonSerializerDefaults" /> to reason about.</param>
+        /// <param name="defaults"> The <see cref="System.Text.Json.JsonSerializerDefaults" /> to reason about.</param>
         public JsonSerializerOptions(JsonSerializerDefaults defaults)
             : this()
         {
@@ -11227,7 +11230,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Binds current <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance with a new instance of the specified <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> type.
+        /// Binds current <see cref="System.Text.Json.JsonSerializerOptions" /> instance with a new instance of the specified <see cref="JsonSerializerContext" /> type.
         /// </summary>
         /// <typeparam name="TContext">The generic definition of the specified context type.</typeparam>
         /// <remarks>
@@ -11276,9 +11279,9 @@ namespace System.Text.Json
             IsImmutable = true;
         }
 
-        private JsonTypeInfo GetTypeInfoNoCaching(Type type)
+        private Serialization.Metadata.JsonTypeInfo GetTypeInfoNoCaching(Type type)
         {
-            JsonTypeInfo jsonTypeInfo = (_effectiveJsonTypeInfoResolver ?? _typeInfoResolver)?.GetTypeInfo(type, this);
+            Serialization.Metadata.JsonTypeInfo jsonTypeInfo = (_effectiveJsonTypeInfoResolver ?? _typeInfoResolver)?.GetTypeInfo(type, this);
             if (jsonTypeInfo != null)
             {
                 if (jsonTypeInfo.Type != type)
@@ -11342,7 +11345,7 @@ namespace System.Text.Json
         {
             JsonSerializerOptions jsonSerializerOptions = new JsonSerializerOptions
             {
-                TypeInfoResolver = DefaultJsonTypeInfoResolver.RootDefaultInstance(),
+                TypeInfoResolver = Serialization.Metadata.DefaultJsonTypeInfoResolver.RootDefaultInstance(),
                 IsImmutable = true
             };
             return Interlocked.CompareExchange(ref s_defaultOptions, jsonSerializerOptions, null) ?? jsonSerializerOptions;
@@ -11351,9 +11354,9 @@ namespace System.Text.Json
 
     /// <summary>
 	/// This enum defines the various JSON tokens that make up a JSON text and is used by
-	/// the <see cref="T:System.Text.Json.Utf8JsonReader" /> when moving from one token to the next.
-	/// The <see cref="T:System.Text.Json.Utf8JsonReader" /> starts at 'None' by default. The 'Comment' enum value
-	/// is only ever reached in a specific <see cref="T:System.Text.Json.Utf8JsonReader" /> mode and is not
+	/// the <see cref="System.Text.Json.Utf8JsonReader" /> when moving from one token to the next.
+	/// The <see cref="System.Text.Json.Utf8JsonReader" /> starts at 'None' by default. The 'Comment' enum value
+	/// is only ever reached in a specific <see cref="System.Text.Json.Utf8JsonReader" /> mode and is not
 	/// reachable by default.
 	/// </summary>
 	public enum JsonTokenType : byte
@@ -11362,7 +11365,7 @@ namespace System.Text.Json
         ///   Indicates that there is no value (as distinct from <see cref="F:System.Text.Json.JsonTokenType.Null" />).
         /// </summary>
         /// <remarks>
-        ///   This is the default token type if no data has been read by the <see cref="T:System.Text.Json.Utf8JsonReader" />.
+        ///   This is the default token type if no data has been read by the <see cref="System.Text.Json.Utf8JsonReader" />.
         /// </remarks>
         None,
         /// <summary>
@@ -11952,7 +11955,7 @@ namespace System.Text.Json
         /// <param name="utf8Destination">A span to write the UTF-8 bytes into.</param>
         /// <param name="bytesConsumed">On exit, contains the number of bytes that were consumed from the <paramref name="utf16Source" />.</param>
         /// <param name="bytesWritten">On exit, contains the number of bytes written to <paramref name="utf8Destination" /></param>
-        /// <returns>A <see cref="T:System.Buffers.OperationStatus" /> value representing the state of the conversion.</returns>
+        /// <returns>A <see cref="System.Buffers.OperationStatus" /> value representing the state of the conversion.</returns>
         public unsafe static OperationStatus ToUtf8(ReadOnlySpan<byte> utf16Source, Span<byte> utf8Destination, out int bytesConsumed, out int bytesWritten)
         {
             fixed (byte* ptr = &MemoryMarshal.GetReference(utf16Source))
@@ -12179,8 +12182,8 @@ namespace System.Text.Json
 
     /// <summary>
 	/// Provides the ability for the user to define custom behavior when writing JSON
-	/// using the <see cref="T:System.Text.Json.Utf8JsonWriter" />. By default, the JSON is written without
-	/// any indentation or extra white space. Also, the <see cref="T:System.Text.Json.Utf8JsonWriter" /> will
+	/// using the <see cref="System.Text.Json.Utf8JsonWriter" />. By default, the JSON is written without
+	/// any indentation or extra white space. Also, the <see cref="System.Text.Json.Utf8JsonWriter" /> will
 	/// throw an exception if the user attempts to write structurally invalid JSON.
 	/// </summary>
 	public struct JsonWriterOptions
@@ -12201,7 +12204,7 @@ namespace System.Text.Json
         public JavaScriptEncoder? Encoder { get; set; }
 
         /// <summary>
-        /// Defines whether the <see cref="T:System.Text.Json.Utf8JsonWriter" /> should pretty print the JSON which includes:
+        /// Defines whether the <see cref="System.Text.Json.Utf8JsonWriter" /> should pretty print the JSON which includes:
         /// indenting nested JSON tokens, adding new lines, and adding white space between property names and values.
         /// By default, the JSON is written without any extra white space.
         /// </summary>
@@ -12227,11 +12230,11 @@ namespace System.Text.Json
         /// <summary>
         /// Gets or sets the maximum depth allowed when writing JSON, with the default (i.e. 0) indicating a max depth of 1000.
         /// </summary>
-        /// <exception cref="T:System.ArgumentOutOfRangeException">
+        /// <exception cref="System.ArgumentOutOfRangeException">
         /// Thrown when the max depth is set to a negative value.
         /// </exception>
         /// <remarks>
-        /// Reading past this depth will throw a <exception cref="T:System.Text.Json.JsonException" />.
+        /// Reading past this depth will throw a <exception cref="System.Text.Json.JsonException" />.
         /// </remarks>
         public int MaxDepth
         {
@@ -12250,9 +12253,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Defines whether the <see cref="T:System.Text.Json.Utf8JsonWriter" /> should skip structural validation and allow
+        /// Defines whether the <see cref="System.Text.Json.Utf8JsonWriter" /> should skip structural validation and allow
         /// the user to write invalid JSON, when set to true. If set to false, any attempts to write invalid JSON will result in
-        /// a <exception cref="T:System.InvalidOperationException" /> to be thrown.
+        /// a <exception cref="System.InvalidOperationException" /> to be thrown.
         /// </summary>
         /// <remarks>
         /// If the JSON being written is known to be correct,
@@ -12538,7 +12541,7 @@ namespace System.Text.Json
             }
         }
 
-        internal void Initialize(JsonTypeInfo jsonTypeInfo, bool supportContinuation = false)
+        internal void Initialize(Serialization.Metadata.JsonTypeInfo jsonTypeInfo, bool supportContinuation = false)
         {
             JsonSerializerOptions options = jsonTypeInfo.Options;
             if (options.ReferenceHandlingStrategy == ReferenceHandlingStrategy.Preserve)
@@ -12622,7 +12625,7 @@ namespace System.Text.Json
         /// <summary>
         /// Configures the current stack frame for a polymorphic converter.
         /// </summary>
-        public JsonConverter InitializePolymorphicReEntry(JsonTypeInfo derivedJsonTypeInfo)
+        public JsonConverter InitializePolymorphicReEntry(Serialization.Metadata.JsonTypeInfo derivedJsonTypeInfo)
         {
             Current.PolymorphicJsonTypeInfo = Current.JsonTypeInfo;
             Current.JsonTypeInfo = derivedJsonTypeInfo.PropertyInfoForTypeInfo.JsonTypeInfo;
@@ -12824,10 +12827,10 @@ namespace System.Text.Json
 
         public PolymorphicSerializationState PolymorphicSerializationState;
 
-        public JsonTypeInfo PolymorphicJsonTypeInfo;
+        public Serialization.Metadata.JsonTypeInfo PolymorphicJsonTypeInfo;
         public int PropertyIndex;
 
-        public List<PropertyRef> PropertyRefCache;
+        public List<Serialization.Metadata.PropertyRef> PropertyRefCache;
 
         public int CtorArgumentStateIndex;
 
@@ -12837,7 +12840,7 @@ namespace System.Text.Json
 
         public BitArray RequiredPropertiesSet;
 
-        public JsonTypeInfo BaseJsonTypeInfo
+        public Serialization.Metadata.JsonTypeInfo BaseJsonTypeInfo
         {
             get
             {
@@ -12890,7 +12893,7 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void MarkRequiredPropertyAsRead(JsonPropertyInfo propertyInfo)
+        public void MarkRequiredPropertyAsRead(Serialization.Metadata.JsonPropertyInfo propertyInfo)
         {
             if (propertyInfo.IsRequired)
             {
@@ -12899,7 +12902,7 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void InitializeRequiredPropertiesValidationState(JsonTypeInfo typeInfo)
+        internal void InitializeRequiredPropertiesValidationState(Serialization.Metadata.JsonTypeInfo typeInfo)
         {
             if (typeInfo.NumberOfRequiredProperties > 0)
             {
@@ -12908,7 +12911,7 @@ namespace System.Text.Json
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        internal void ValidateAllRequiredPropertiesAreRead(JsonTypeInfo typeInfo)
+        internal void ValidateAllRequiredPropertiesAreRead(Serialization.Metadata.JsonTypeInfo typeInfo)
         {
             if (typeInfo.NumberOfRequiredProperties > 0 && !RequiredPropertiesSet.AllBitsEqual(value: true))
             {
@@ -13827,31 +13830,31 @@ namespace System.Text.Json
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_SerializerPropertyNameNull(JsonPropertyInfo jsonPropertyInfo)
+        public static void ThrowInvalidOperationException_SerializerPropertyNameNull(Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.SerializerPropertyNameNull, jsonPropertyInfo.DeclaringType, jsonPropertyInfo.MemberName));
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_JsonPropertyRequiredAndNotDeserializable(JsonPropertyInfo jsonPropertyInfo)
+        public static void ThrowInvalidOperationException_JsonPropertyRequiredAndNotDeserializable(Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.JsonPropertyRequiredAndNotDeserializable, jsonPropertyInfo.Name, jsonPropertyInfo.DeclaringType));
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_JsonPropertyRequiredAndExtensionData(JsonPropertyInfo jsonPropertyInfo)
+        public static void ThrowInvalidOperationException_JsonPropertyRequiredAndExtensionData(Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.JsonPropertyRequiredAndExtensionData, jsonPropertyInfo.Name, jsonPropertyInfo.DeclaringType));
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowJsonException_JsonRequiredPropertyMissing(JsonTypeInfo parent, BitArray requiredPropertiesSet)
+        public static void ThrowJsonException_JsonRequiredPropertyMissing(Serialization.Metadata.JsonTypeInfo parent, BitArray requiredPropertiesSet)
         {
             StringBuilder stringBuilder = new StringBuilder();
             bool flag = true;
             for (int i = 0; i < parent.PropertyCache.List.Count; i++)
             {
-                JsonPropertyInfo value = parent.PropertyCache.List[i].Value;
+                Serialization.Metadata.JsonPropertyInfo value = parent.PropertyCache.List[i].Value;
                 if (value.IsRequired && !requiredPropertiesSet[value.RequiredPropertyIndex])
                 {
                     if (!flag)
@@ -13919,33 +13922,33 @@ namespace System.Text.Json
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_NumberHandlingOnPropertyInvalid(JsonPropertyInfo jsonPropertyInfo)
+        public static void ThrowInvalidOperationException_NumberHandlingOnPropertyInvalid(Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.NumberHandlingOnPropertyInvalid, jsonPropertyInfo.MemberName, jsonPropertyInfo.DeclaringType));
         }
 
-        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        [DoesNotReturn]
         public static void ThrowInvalidOperationException_ConverterCanConvertMultipleTypes(Type runtimePropertyType, JsonConverter jsonConverter)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.ConverterCanConvertMultipleTypes, jsonConverter.GetType(), jsonConverter.TypeToConvert, runtimePropertyType));
         }
 
-        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        [DoesNotReturn]
         public static void ThrowNotSupportedException_ObjectWithParameterizedCtorRefMetadataNotSupported(ReadOnlySpan<byte> propertyName, ref Utf8JsonReader reader, scoped ref ReadStack state)
         {
-            JsonTypeInfo topJsonTypeInfoWithParameterizedConstructor = state.GetTopJsonTypeInfoWithParameterizedConstructor();
+            Serialization.Metadata.JsonTypeInfo topJsonTypeInfoWithParameterizedConstructor = state.GetTopJsonTypeInfoWithParameterizedConstructor();
             state.Current.JsonPropertyName = propertyName.ToArray();
             NotSupportedException ex = new NotSupportedException(System.SR.Format(MDCFR.Properties.Resources.ObjectWithParameterizedCtorRefMetadataNotSupported, topJsonTypeInfoWithParameterizedConstructor.Type));
             ThrowNotSupportedException(ref state, in reader, ex);
         }
 
-        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_JsonTypeInfoOperationNotPossibleForKind(JsonTypeInfoKind kind)
+        [DoesNotReturn]
+        public static void ThrowInvalidOperationException_JsonTypeInfoOperationNotPossibleForKind(Serialization.Metadata.JsonTypeInfoKind kind)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.InvalidJsonTypeInfoOperationForKind, kind));
         }
 
-        [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+        [DoesNotReturn]
         public static void ThrowInvalidOperationException_CreateObjectConverterNotCompatible(Type type)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.CreateObjectConverterNotCompatible, type));
@@ -14034,7 +14037,7 @@ namespace System.Text.Json
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_SerializationDataExtensionPropertyInvalid(JsonPropertyInfo jsonPropertyInfo)
+        public static void ThrowInvalidOperationException_SerializationDataExtensionPropertyInvalid(Serialization.Metadata.JsonPropertyInfo jsonPropertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.SerializationDataExtensionPropertyInvalid, jsonPropertyInfo.PropertyType, jsonPropertyInfo.MemberName));
         }
@@ -14223,7 +14226,7 @@ namespace System.Text.Json
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_JsonPropertyInfoIsBoundToDifferentJsonTypeInfo(JsonPropertyInfo propertyInfo)
+        public static void ThrowInvalidOperationException_JsonPropertyInfoIsBoundToDifferentJsonTypeInfo(Serialization.Metadata.JsonPropertyInfo propertyInfo)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.JsonPropertyInfoBoundToDifferentParent, propertyInfo.Name, propertyInfo.ParentTypeInfo.Type.FullName));
         }
@@ -14254,24 +14257,24 @@ namespace System.Text.Json
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_NoMetadataForType(Type type, IJsonTypeInfoResolver resolver)
+        public static void ThrowInvalidOperationException_NoMetadataForType(Type type, System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver resolver)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.NoMetadataForType, type, resolver?.GetType().FullName ?? "<null>"));
         }
 
-        public static Exception GetInvalidOperationException_NoMetadataForTypeProperties(IJsonTypeInfoResolver resolver, Type type)
+        public static Exception GetInvalidOperationException_NoMetadataForTypeProperties(System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver resolver, Type type)
         {
             return new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.NoMetadataForTypeProperties, resolver?.GetType().FullName ?? "<null>", type));
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_NoMetadataForTypeProperties(IJsonTypeInfoResolver resolver, Type type)
+        public static void ThrowInvalidOperationException_NoMetadataForTypeProperties(Serialization.Metadata.IJsonTypeInfoResolver resolver, Type type)
         {
             throw GetInvalidOperationException_NoMetadataForTypeProperties(resolver, type);
         }
 
         [System.Diagnostics.CodeAnalysis.DoesNotReturn]
-        public static void ThrowInvalidOperationException_NoMetadataForTypeCtorParams(IJsonTypeInfoResolver resolver, Type type)
+        public static void ThrowInvalidOperationException_NoMetadataForTypeCtorParams(System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver resolver, Type type)
         {
             throw new InvalidOperationException(System.SR.Format(MDCFR.Properties.Resources.NoMetadataForTypeCtorParams, resolver?.GetType().FullName ?? "<null>", type));
         }
@@ -14363,7 +14366,7 @@ namespace System.Text.Json
 	/// Since this type is a ref struct, it does not directly support async. However, it does provide
 	/// support for reentrancy to read incomplete data, and continue reading once more data is presented.
 	/// To be able to set max depth while reading OR allow skipping comments, create an instance of
-	/// <see cref="T:System.Text.Json.JsonReaderState" /> and pass that in to the reader.
+	/// <see cref="System.Text.Json.JsonReaderState" /> and pass that in to the reader.
 	/// </summary>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
     public ref struct Utf8JsonReader
@@ -14487,8 +14490,8 @@ namespace System.Text.Json
         public ReadOnlySpan<byte> ValueSpan { get; private set; }
 
         /// <summary>
-        /// Returns the total amount of bytes consumed by the <see cref="T:System.Text.Json.Utf8JsonReader" /> so far
-        /// for the current instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> with the given UTF-8 encoded input text.
+        /// Returns the total amount of bytes consumed by the <see cref="System.Text.Json.Utf8JsonReader" /> so far
+        /// for the current instance of the <see cref="System.Text.Json.Utf8JsonReader" /> with the given UTF-8 encoded input text.
         /// </summary>
         public readonly long BytesConsumed => _totalConsumed + _consumed;
 
@@ -14542,7 +14545,7 @@ namespace System.Text.Json
         public bool ValueIsEscaped { get; private set; }
 
         /// <summary>
-        /// Returns the mode of this instance of the <see cref="T:System.Text.Json.Utf8JsonReader" />.
+        /// Returns the mode of this instance of the <see cref="System.Text.Json.Utf8JsonReader" />.
         /// True when the reader was constructed with the input span containing the entire data to process.
         /// False when the reader was constructed knowing that the input span may contain partial data with more data to follow.
         /// </summary>
@@ -14563,9 +14566,9 @@ namespace System.Text.Json
         public ReadOnlySequence<byte> ValueSequence { get; private set; }
 
         /// <summary>
-        /// Returns the current <see cref="T:System.SequencePosition" /> within the provided UTF-8 encoded
-        /// input ReadOnlySequence&lt;byte&gt;. If the <see cref="T:System.Text.Json.Utf8JsonReader" /> was constructed
-        /// with a ReadOnlySpan&lt;byte&gt; instead, this will always return a default <see cref="T:System.SequencePosition" />.
+        /// Returns the current <see cref="System.SequencePosition" /> within the provided UTF-8 encoded
+        /// input ReadOnlySequence&lt;byte&gt;. If the <see cref="System.Text.Json.Utf8JsonReader" /> was constructed
+        /// with a ReadOnlySpan&lt;byte&gt; instead, this will always return a default <see cref="System.SequencePosition" />.
         /// </summary>
         public readonly SequencePosition Position
         {
@@ -14580,11 +14583,11 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Returns the current snapshot of the <see cref="T:System.Text.Json.Utf8JsonReader" /> state which must
-        /// be captured by the caller and passed back in to the <see cref="T:System.Text.Json.Utf8JsonReader" /> ctor with more data.
-        /// Unlike the <see cref="T:System.Text.Json.Utf8JsonReader" />, which is a ref struct, the state can survive
+        /// Returns the current snapshot of the <see cref="System.Text.Json.Utf8JsonReader" /> state which must
+        /// be captured by the caller and passed back in to the <see cref="System.Text.Json.Utf8JsonReader" /> ctor with more data.
+        /// Unlike the <see cref="System.Text.Json.Utf8JsonReader" />, which is a ref struct, the state can survive
         /// across async/await boundaries and hence this type is required to provide support for reading
-        /// in more data asynchronously before continuing with a new instance of the <see cref="T:System.Text.Json.Utf8JsonReader" />.
+        /// in more data asynchronously before continuing with a new instance of the <see cref="System.Text.Json.Utf8JsonReader" />.
         /// </summary>
         public readonly JsonReaderState CurrentState
         {
@@ -14626,16 +14629,16 @@ namespace System.Text.Json
         };
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonReader" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonReader" /> instance.
         /// </summary>
         /// <param name="jsonData">The ReadOnlySpan&lt;byte&gt; containing the UTF-8 encoded JSON text to process.</param>
         /// <param name="isFinalBlock">True when the input span contains the entire data to process.
         /// Set to false only if it is known that the input span contains partial data with more data to follow.</param>
         /// <param name="state">If this is the first call to the ctor, pass in a default state. Otherwise,
-        /// capture the state from the previous instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> and pass that back.</param>
+        /// capture the state from the previous instance of the <see cref="System.Text.Json.Utf8JsonReader" /> and pass that back.</param>
         /// <remarks>
         /// Since this type is a ref struct, it is a stack-only type and all the limitations of ref structs apply to it.
-        /// This is the reason why the ctor accepts a <see cref="T:System.Text.Json.JsonReaderState" />.
+        /// This is the reason why the ctor accepts a <see cref="System.Text.Json.JsonReaderState" />.
         /// </remarks>
         public Utf8JsonReader(ReadOnlySpan<byte> jsonData, bool isFinalBlock, JsonReaderState state)
         {
@@ -14670,12 +14673,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonReader" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonReader" /> instance.
         /// </summary>
         /// <param name="jsonData">The ReadOnlySpan&lt;byte&gt; containing the UTF-8 encoded JSON text to process.</param>
-        /// <param name="options">Defines the customized behavior of the <see cref="T:System.Text.Json.Utf8JsonReader" />
+        /// <param name="options">Defines the customized behavior of the <see cref="System.Text.Json.Utf8JsonReader" />
         /// that is different from the JSON RFC (for example how to handle comments or maximum depth allowed when reading).
-        /// By default, the <see cref="T:System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
+        /// By default, the <see cref="System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
         /// <remarks>
         ///   <para>
         ///     Since this type is a ref struct, it is a stack-only type and all the limitations of ref structs apply to it.
@@ -14693,7 +14696,7 @@ namespace System.Text.Json
         /// Read the next JSON token from input source.
         /// </summary>
         /// <returns>True if the token was read successfully, else false.</returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown when an invalid JSON token is encountered according to the JSON RFC
         /// or if the current depth exceeds the recursive limit set by the max depth.
         /// </exception>
@@ -14710,10 +14713,10 @@ namespace System.Text.Json
         /// <summary>
         /// Skips the children of the current JSON token.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the reader was given partial data with more data to follow (i.e. <see cref="P:System.Text.Json.Utf8JsonReader.IsFinalBlock" /> is false).
         /// </exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown when an invalid JSON token is encountered while skipping, according to the JSON RFC,
         /// or if the current depth exceeds the recursive limit set by the max depth.
         /// </exception>
@@ -14757,7 +14760,7 @@ namespace System.Text.Json
         /// Tries to skip the children of the current JSON token.
         /// </summary>
         /// <returns>True if there was enough data for the children to be skipped successfully, else false.</returns>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown when an invalid JSON token is encountered while skipping, according to the JSON RFC,
         /// or if the current depth exceeds the recursive limit set by the max depth.
         /// </exception>
@@ -14816,7 +14819,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8Text">The UTF-8 encoded text to compare against.</param>
         /// <returns>True if the JSON token value in the source matches the UTF-8 encoded look up text.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to find a text match on a JSON token that is not a string
         /// (i.e. other than <see cref="F:System.Text.Json.JsonTokenType.String" /> or <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />).
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
@@ -14845,7 +14848,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="text">The text to compare against.</param>
         /// <returns>True if the JSON token value in the source matches the look up text.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to find a text match on a JSON token that is not a string
         /// (i.e. other than <see cref="F:System.Text.Json.JsonTokenType.String" /> or <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />).
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
@@ -14884,7 +14887,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="text">The text to compare against.</param>
         /// <returns>True if the JSON token value in the source matches the look up text.</returns>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to find a text match on a JSON token that is not a string
         /// (i.e. other than <see cref="F:System.Text.Json.JsonTokenType.String" /> or <see cref="F:System.Text.Json.JsonTokenType.PropertyName" />).
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
@@ -16554,16 +16557,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonReader" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonReader" /> instance.
         /// </summary>
         /// <param name="jsonData">The ReadOnlySequence&lt;byte&gt; containing the UTF-8 encoded JSON text to process.</param>
         /// <param name="isFinalBlock">True when the input span contains the entire data to process.
         /// Set to false only if it is known that the input span contains partial data with more data to follow.</param>
         /// <param name="state">If this is the first call to the ctor, pass in a default state. Otherwise,
-        /// capture the state from the previous instance of the <see cref="T:System.Text.Json.Utf8JsonReader" /> and pass that back.</param>
+        /// capture the state from the previous instance of the <see cref="System.Text.Json.Utf8JsonReader" /> and pass that back.</param>
         /// <remarks>
         /// Since this type is a ref struct, it is a stack-only type and all the limitations of ref structs apply to it.
-        /// This is the reason why the ctor accepts a <see cref="T:System.Text.Json.JsonReaderState" />.
+        /// This is the reason why the ctor accepts a <see cref="System.Text.Json.JsonReaderState" />.
         /// </remarks>
         public Utf8JsonReader(ReadOnlySequence<byte> jsonData, bool isFinalBlock, JsonReaderState state)
         {
@@ -16623,12 +16626,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonReader" /> instance.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonReader" /> instance.
         /// </summary>
         /// <param name="jsonData">The ReadOnlySequence&lt;byte&gt; containing the UTF-8 encoded JSON text to process.</param>
-        /// <param name="options">Defines the customized behavior of the <see cref="T:System.Text.Json.Utf8JsonReader" />
+        /// <param name="options">Defines the customized behavior of the <see cref="System.Text.Json.Utf8JsonReader" />
         /// that is different from the JSON RFC (for example how to handle comments or maximum depth allowed when reading).
-        /// By default, the <see cref="T:System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
+        /// By default, the <see cref="System.Text.Json.Utf8JsonReader" /> follows the JSON RFC strictly (i.e. comments within the JSON are invalid) and reads up to a maximum depth of 64.</param>
         /// <remarks>
         ///   <para>
         ///     Since this type is a ref struct, it is a stack-only type and all the limitations of ref structs apply to it.
@@ -18662,12 +18665,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source, unescaped, and transcoded as a <see cref="T:System.String" />.
+        /// Parses the current JSON token value from the source, unescaped, and transcoded as a <see cref="System.String" />.
         /// </summary>
         /// <remarks>
         /// Returns <see langword="null" /> when <see cref="P:System.Text.Json.Utf8JsonReader.TokenType" /> is <see cref="F:System.Text.Json.JsonTokenType.Null" />.
         /// </remarks>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of the JSON token that is not a string
         /// (i.e. other than <see cref="F:System.Text.Json.JsonTokenType.String" />, <see cref="F:System.Text.Json.JsonTokenType.PropertyName" /> or
         /// <see cref="F:System.Text.Json.JsonTokenType.Null" />).
@@ -18761,7 +18764,7 @@ namespace System.Text.Json
         /// <remarks>
         /// Unlike <see cref="M:System.Text.Json.Utf8JsonReader.GetString" />, this method does not support <see cref="F:System.Text.Json.JsonTokenType.Null" />.
         ///
-        /// This method will throw <see cref="T:System.ArgumentException" /> if the destination buffer is too small to hold the unescaped value.
+        /// This method will throw <see cref="System.ArgumentException" /> if the destination buffer is too small to hold the unescaped value.
         /// An appropriately sized buffer can be determined by consulting the length of either <see cref="P:System.Text.Json.Utf8JsonReader.ValueSpan" /> or <see cref="P:System.Text.Json.Utf8JsonReader.ValueSequence" />,
         /// since the unescaped result is always less than or equal to the length of the encoded strings.
         /// </remarks>
@@ -18864,9 +18867,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a comment, transcoded as a <see cref="T:System.String" />.
+        /// Parses the current JSON token value from the source as a comment, transcoded as a <see cref="System.String" />.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of the JSON token that is not a comment.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -18891,10 +18894,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Boolean" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Boolean" />.
         /// Returns <see langword="true" /> if the TokenType is JsonTokenType.True and <see langword="false" /> if the TokenType is JsonTokenType.False.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a boolean (i.e. <see cref="F:System.Text.Json.JsonTokenType.True" /> or <see cref="F:System.Text.Json.JsonTokenType.False" />).
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -18916,11 +18919,11 @@ namespace System.Text.Json
         /// <summary>
         /// Parses the current JSON token value from the source and decodes the Base64 encoded JSON string as bytes.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// The JSON string contains data outside of the expected Base64 range, or if it contains invalid/more than two padding characters,
         /// or is incomplete (i.e. the JSON string length is not a multiple of 4).
         /// </exception>
@@ -18934,16 +18937,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Byte" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Byte" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Byte" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Byte" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.Byte.MinValue" /> or greater
         /// than <see cref="F:System.Byte.MaxValue" />.
@@ -18968,16 +18971,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as an <see cref="T:System.SByte" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to an <see cref="T:System.SByte" />
+        /// Parses the current JSON token value from the source as an <see cref="System.SByte" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to an <see cref="System.SByte" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.SByte.MinValue" /> or greater
         /// than <see cref="F:System.SByte.MaxValue" />.
@@ -19003,16 +19006,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Int16" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Int16" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Int16" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Int16" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.Int16.MinValue" /> or greater
         /// than <see cref="F:System.Int16.MaxValue" />.
@@ -19037,16 +19040,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as an <see cref="T:System.Int32" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to an <see cref="T:System.Int32" />
+        /// Parses the current JSON token value from the source as an <see cref="System.Int32" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to an <see cref="System.Int32" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.Int32.MinValue" /> or greater
         /// than <see cref="F:System.Int32.MaxValue" />.
@@ -19071,16 +19074,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Int64" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Int64" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Int64" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Int64" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.Int64.MinValue" /> or greater
         /// than <see cref="F:System.Int64.MaxValue" />.
@@ -19105,16 +19108,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt16" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.UInt16" />
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt16" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.UInt16" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.UInt16.MinValue" /> or greater
         /// than <see cref="F:System.UInt16.MaxValue" />.
@@ -19140,16 +19143,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt32" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.UInt32" />
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt32" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.UInt32" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.UInt32.MinValue" /> or greater
         /// than <see cref="F:System.UInt32.MaxValue" />.
@@ -19175,16 +19178,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt64" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.UInt64" />
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt64" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.UInt64" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is either of incorrect numeric format (for example if it contains a decimal or
         /// is written in scientific notation) or, it represents a number less than <see cref="F:System.UInt64.MinValue" /> or greater
         /// than <see cref="F:System.UInt64.MaxValue" />.
@@ -19210,16 +19213,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Single" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Single" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Single" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Single" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// On any framework that is not .NET Core 3.0 or higher, thrown if the JSON token value represents a number less than <see cref="F:System.Single.MinValue" /> or greater
         /// than <see cref="F:System.Single.MaxValue" />.
         /// </exception>
@@ -19257,16 +19260,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Double" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Double" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Double" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Double" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// On any framework that is not .NET Core 3.0 or higher, thrown if the JSON token value represents a number less than <see cref="F:System.Double.MinValue" /> or greater
         /// than <see cref="F:System.Double.MaxValue" />.
         /// </exception>
@@ -19304,16 +19307,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Decimal" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Decimal" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Decimal" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Decimal" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value represents a number less than <see cref="F:System.Decimal.MinValue" /> or greater
         /// than <see cref="F:System.Decimal.MaxValue" />.
         /// </exception>
@@ -19337,16 +19340,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.DateTime" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.DateTime" />
+        /// Parses the current JSON token value from the source as a <see cref="System.DateTime" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.DateTime" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is of an unsupported format. Only a subset of ISO 8601 formats are supported.
         /// </exception>
         public DateTime GetDateTime()
@@ -19368,16 +19371,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.DateTimeOffset" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.DateTimeOffset" />
+        /// Parses the current JSON token value from the source as a <see cref="System.DateTimeOffset" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.DateTimeOffset" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is of an unsupported format. Only a subset of ISO 8601 formats are supported.
         /// </exception>
         public DateTimeOffset GetDateTimeOffset()
@@ -19399,16 +19402,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Guid" />.
-        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="T:System.Guid" />
+        /// Parses the current JSON token value from the source as a <see cref="System.Guid" />.
+        /// Returns the value if the entire UTF-8 encoded token value can be successfully parsed to a <see cref="System.Guid" />
         /// value.
         /// Throws exceptions otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
-        /// <exception cref="T:System.FormatException">
+        /// <exception cref="System.FormatException">
         /// Thrown if the JSON token value is of an unsupported format for a Guid.
         /// </exception>
         public Guid GetGuid()
@@ -19435,7 +19438,7 @@ namespace System.Text.Json
         /// decoded to bytes.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19464,12 +19467,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Byte" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Byte" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Byte" /> value.
+        /// parsed to a <see cref="System.Byte" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19506,12 +19509,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as an <see cref="T:System.SByte" />.
+        /// Parses the current JSON token value from the source as an <see cref="System.SByte" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to an <see cref="T:System.SByte" /> value.
+        /// parsed to an <see cref="System.SByte" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19549,12 +19552,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Int16" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Int16" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Int16" /> value.
+        /// parsed to a <see cref="System.Int16" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19591,12 +19594,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as an <see cref="T:System.Int32" />.
+        /// Parses the current JSON token value from the source as an <see cref="System.Int32" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to an <see cref="T:System.Int32" /> value.
+        /// parsed to an <see cref="System.Int32" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19633,12 +19636,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Int64" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Int64" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Int64" /> value.
+        /// parsed to a <see cref="System.Int64" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19675,12 +19678,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt16" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt16" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.UInt16" /> value.
+        /// parsed to a <see cref="System.UInt16" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19718,12 +19721,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt32" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt32" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.UInt32" /> value.
+        /// parsed to a <see cref="System.UInt32" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19761,12 +19764,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.UInt64" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.UInt64" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.UInt64" /> value.
+        /// parsed to a <see cref="System.UInt64" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19804,12 +19807,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Single" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Single" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Single" /> value.
+        /// parsed to a <see cref="System.Single" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19840,12 +19843,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Double" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Double" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Double" /> value.
+        /// parsed to a <see cref="System.Double" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19876,12 +19879,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Decimal" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Decimal" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Decimal" /> value.
+        /// parsed to a <see cref="System.Decimal" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.Number" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -19918,12 +19921,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.DateTime" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.DateTime" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.DateTime" /> value.
+        /// parsed to a <see cref="System.DateTime" /> value.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -20039,13 +20042,13 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Parses the current JSON token value from the source as a <see cref="T:System.Guid" />.
+        /// Parses the current JSON token value from the source as a <see cref="System.Guid" />.
         /// Returns <see langword="true" /> if the entire UTF-8 encoded token value can be successfully
-        /// parsed to a <see cref="T:System.Guid" /> value. Only supports <see cref="T:System.Guid" /> values with hyphens
+        /// parsed to a <see cref="System.Guid" /> value. Only supports <see cref="System.Guid" /> values with hyphens
         /// and without any surrounding decorations.
         /// Returns <see langword="false" /> otherwise.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if trying to get the value of a JSON token that is not a <see cref="F:System.Text.Json.JsonTokenType.String" />.
         /// <seealso cref="P:System.Text.Json.Utf8JsonReader.TokenType" />
         /// </exception>
@@ -20107,11 +20110,11 @@ namespace System.Text.Json
 	///   </para>
 	///   <para>
 	///     When the user attempts to write invalid JSON and validation is enabled, it throws
-	///     an <see cref="T:System.InvalidOperationException" /> with a context specific error message.
+	///     an <see cref="System.InvalidOperationException" /> with a context specific error message.
 	///   </para>
 	///   <para>
 	///     To be able to format the output with indentation and whitespace OR to skip validation, create an instance of
-	///     <see cref="T:System.Text.Json.JsonWriterOptions" /> and pass that in to the writer.
+	///     <see cref="System.Text.Json.JsonWriterOptions" /> and pass that in to the writer.
 	///   </para>
 	/// </remarks>
 	[DebuggerDisplay("{DebuggerDisplay,nq}")]
@@ -20144,13 +20147,13 @@ namespace System.Text.Json
         private static readonly char[] s_singleLineCommentDelimiter = new char[2] { '*', '/' };
 
         /// <summary>
-        /// Returns the amount of bytes written by the <see cref="T:System.Text.Json.Utf8JsonWriter" /> so far
+        /// Returns the amount of bytes written by the <see cref="System.Text.Json.Utf8JsonWriter" /> so far
         /// that have not yet been flushed to the output and committed.
         /// </summary>
         public int BytesPending { get; private set; }
 
         /// <summary>
-        /// Returns the amount of bytes committed to the output by the <see cref="T:System.Text.Json.Utf8JsonWriter" /> so far.
+        /// Returns the amount of bytes committed to the output by the <see cref="System.Text.Json.Utf8JsonWriter" /> so far.
         /// </summary>
         /// <remarks>
         /// In the case of IBufferwriter, this is how much the IBufferWriter has advanced.
@@ -20160,7 +20163,7 @@ namespace System.Text.Json
 
         /// <summary>
         /// Gets the custom behavior when writing JSON using
-        /// the <see cref="T:System.Text.Json.Utf8JsonWriter" /> which indicates whether to format the output
+        /// the <see cref="System.Text.Json.Utf8JsonWriter" /> which indicates whether to format the output
         /// while writing and whether to skip structural JSON validation or not.
         /// </summary>
         public JsonWriterOptions Options => _options;
@@ -20185,14 +20188,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonWriter" /> instance with a specified <paramref name="bufferWriter" />.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonWriter" /> instance with a specified <paramref name="bufferWriter" />.
         /// </summary>
-        /// <param name="bufferWriter">An instance of <see cref="T:System.Buffers.IBufferWriter`1" /> used as a destination for writing JSON text into.</param>
-        /// <param name="options">Defines the customized behavior of the <see cref="T:System.Text.Json.Utf8JsonWriter" />
-        /// By default, the <see cref="T:System.Text.Json.Utf8JsonWriter" /> writes JSON minimized (that is, with no extra whitespace)
+        /// <param name="bufferWriter">An instance of <see cref="Buffers.IBufferWriter{T}" /> used as a destination for writing JSON text into.</param>
+        /// <param name="options">Defines the customized behavior of the <see cref="System.Text.Json.Utf8JsonWriter" />
+        /// By default, the <see cref="System.Text.Json.Utf8JsonWriter" /> writes JSON minimized (that is, with no extra whitespace)
         /// and validates that the JSON being written is structurally valid according to JSON RFC.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// Thrown when the instance of <see cref="T:System.Buffers.IBufferWriter`1" /> that is passed in is null.
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when the instance of <see cref="Buffers.IBufferWriter{T}" /> that is passed in is null.
         /// </exception>
         public Utf8JsonWriter(IBufferWriter<byte> bufferWriter, JsonWriterOptions options = default(JsonWriterOptions))
         {
@@ -20209,14 +20212,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Constructs a new <see cref="T:System.Text.Json.Utf8JsonWriter" /> instance with a specified <paramref name="utf8Json" />.
+        /// Constructs a new <see cref="System.Text.Json.Utf8JsonWriter" /> instance with a specified <paramref name="utf8Json" />.
         /// </summary>
-        /// <param name="utf8Json">An instance of <see cref="T:System.IO.Stream" /> used as a destination for writing JSON text into.</param>
-        /// <param name="options">Defines the customized behavior of the <see cref="T:System.Text.Json.Utf8JsonWriter" />
-        /// By default, the <see cref="T:System.Text.Json.Utf8JsonWriter" /> writes JSON minimized (that is, with no extra whitespace)
+        /// <param name="utf8Json">An instance of <see cref="System.IO.Stream" /> used as a destination for writing JSON text into.</param>
+        /// <param name="options">Defines the customized behavior of the <see cref="System.Text.Json.Utf8JsonWriter" />
+        /// By default, the <see cref="System.Text.Json.Utf8JsonWriter" /> writes JSON minimized (that is, with no extra whitespace)
         /// and validates that the JSON being written is structurally valid according to JSON RFC.</param>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// Thrown when the instance of <see cref="T:System.IO.Stream" /> that is passed in is null.
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when the instance of <see cref="System.IO.Stream" /> that is passed in is null.
         /// </exception>
         public Utf8JsonWriter(Stream utf8Json, JsonWriterOptions options = default(JsonWriterOptions))
         {
@@ -20238,14 +20241,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Resets the <see cref="T:System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used.
+        /// Resets the <see cref="System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used.
         /// </summary>
         /// <remarks>
-        /// The <see cref="T:System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
-        /// and the original output as the destination (either <see cref="T:System.Buffers.IBufferWriter`1" /> or <see cref="T:System.IO.Stream" />).
+        /// The <see cref="System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
+        /// and the original output as the destination (either <see cref="Buffers.IBufferWriter{T}" /> or <see cref="System.IO.Stream" />).
         /// </remarks>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The instance of <see cref="T:System.Text.Json.Utf8JsonWriter" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The instance of <see cref="System.Text.Json.Utf8JsonWriter" /> has been disposed.
         /// </exception>
         public void Reset()
         {
@@ -20255,18 +20258,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Resets the <see cref="T:System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used with the new instance of <see cref="T:System.IO.Stream" />.
+        /// Resets the <see cref="System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used with the new instance of <see cref="System.IO.Stream" />.
         /// </summary>
-        /// <param name="utf8Json">An instance of <see cref="T:System.IO.Stream" /> used as a destination for writing JSON text into.</param>
+        /// <param name="utf8Json">An instance of <see cref="System.IO.Stream" /> used as a destination for writing JSON text into.</param>
         /// <remarks>
-        /// The <see cref="T:System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
-        /// but now write to the passed in <see cref="T:System.IO.Stream" /> as the new destination.
+        /// The <see cref="System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
+        /// but now write to the passed in <see cref="System.IO.Stream" /> as the new destination.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// Thrown when the instance of <see cref="T:System.IO.Stream" /> that is passed in is null.
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when the instance of <see cref="System.IO.Stream" /> that is passed in is null.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The instance of <see cref="T:System.Text.Json.Utf8JsonWriter" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The instance of <see cref="System.Text.Json.Utf8JsonWriter" /> has been disposed.
         /// </exception>
         public void Reset(Stream utf8Json)
         {
@@ -20293,18 +20296,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Resets the <see cref="T:System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used with the new instance of <see cref="T:System.Buffers.IBufferWriter`1" />.
+        /// Resets the <see cref="System.Text.Json.Utf8JsonWriter" /> internal state so that it can be re-used with the new instance of <see cref="Buffers.IBufferWriter{T}" />.
         /// </summary>
-        /// <param name="bufferWriter">An instance of <see cref="T:System.Buffers.IBufferWriter`1" /> used as a destination for writing JSON text into.</param>
+        /// <param name="bufferWriter">An instance of <see cref="Buffers.IBufferWriter{T}" /> used as a destination for writing JSON text into.</param>
         /// <remarks>
-        /// The <see cref="T:System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
-        /// but now write to the passed in <see cref="T:System.Buffers.IBufferWriter`1" /> as the new destination.
+        /// The <see cref="System.Text.Json.Utf8JsonWriter" /> will continue to use the original writer options
+        /// but now write to the passed in <see cref="Buffers.IBufferWriter{T}" /> as the new destination.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentNullException">
-        /// Thrown when the instance of <see cref="T:System.Buffers.IBufferWriter`1" /> that is passed in is null.
+        /// <exception cref="System.ArgumentNullException">
+        /// Thrown when the instance of <see cref="Buffers.IBufferWriter{T}" /> that is passed in is null.
         /// </exception>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The instance of <see cref="T:System.Text.Json.Utf8JsonWriter" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The instance of <see cref="System.Text.Json.Utf8JsonWriter" /> has been disposed.
         /// </exception>
         public void Reset(IBufferWriter<byte> bufferWriter)
         {
@@ -20361,11 +20364,11 @@ namespace System.Text.Json
         /// Commits the JSON text written so far which makes it visible to the output destination.
         /// </summary>
         /// <remarks>
-        /// In the case of IBufferWriter, this advances the underlying <see cref="T:System.Buffers.IBufferWriter`1" /> based on what has been written so far.
+        /// In the case of IBufferWriter, this advances the underlying <see cref="Buffers.IBufferWriter{T}" /> based on what has been written so far.
         /// In the case of Stream, this writes the data to the stream and flushes it.
         /// </remarks>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The instance of <see cref="T:System.Text.Json.Utf8JsonWriter" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The instance of <see cref="System.Text.Json.Utf8JsonWriter" /> has been disposed.
         /// </exception>
         public void Flush()
         {
@@ -20377,8 +20380,7 @@ namespace System.Text.Json
                 {
                     _arrayBufferWriter.Advance(BytesPending);
                     BytesPending = 0;
-                    ArraySegment<byte> segment;
-                    bool flag = MemoryMarshal.TryGetArray(_arrayBufferWriter.WrittenMemory, out segment);
+                    MemoryMarshal.TryGetArray(_arrayBufferWriter.WrittenMemory, out ArraySegment<byte> segment);
                     _stream.Write(segment.Array, segment.Offset, segment.Count);
                     BytesCommitted += _arrayBufferWriter.WrittenCount;
                     _arrayBufferWriter.Clear();
@@ -20398,11 +20400,11 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     In the case of IBufferWriter, this advances the underlying <see cref="T:System.Buffers.IBufferWriter`1" /> based on what has been written so far.
+        ///     In the case of IBufferWriter, this advances the underlying <see cref="Buffers.IBufferWriter{T}" /> based on what has been written so far.
         ///     In the case of Stream, this writes the data to the stream and flushes it.
         ///   </para>
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.Utf8JsonWriter" /> instance cannot be re-used after disposing.
+        ///     The <see cref="System.Text.Json.Utf8JsonWriter" /> instance cannot be re-used after disposing.
         ///   </para>
         /// </remarks>
         public void Dispose()
@@ -20422,11 +20424,11 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         ///   <para>
-        ///     In the case of IBufferWriter, this advances the underlying <see cref="T:System.Buffers.IBufferWriter`1" /> based on what has been written so far.
+        ///     In the case of IBufferWriter, this advances the underlying <see cref="Buffers.IBufferWriter{T}" /> based on what has been written so far.
         ///     In the case of Stream, this writes the data to the stream and flushes it.
         ///   </para>
         ///   <para>
-        ///     The <see cref="T:System.Text.Json.Utf8JsonWriter" /> instance cannot be re-used after disposing.
+        ///     The <see cref="System.Text.Json.Utf8JsonWriter" /> instance cannot be re-used after disposing.
         ///   </para>
         /// </remarks>
         public async ValueTask DisposeAsync()
@@ -20445,11 +20447,11 @@ namespace System.Text.Json
         /// Asynchronously commits the JSON text written so far which makes it visible to the output destination.
         /// </summary>
         /// <remarks>
-        /// In the case of IBufferWriter, this advances the underlying <see cref="T:System.Buffers.IBufferWriter`1" /> based on what has been written so far.
+        /// In the case of IBufferWriter, this advances the underlying <see cref="Buffers.IBufferWriter{T}" /> based on what has been written so far.
         /// In the case of Stream, this writes the data to the stream and flushes it asynchronously, while monitoring cancellation requests.
         /// </remarks>
-        /// <exception cref="T:System.ObjectDisposedException">
-        ///   The instance of <see cref="T:System.Text.Json.Utf8JsonWriter" /> has been disposed.
+        /// <exception cref="System.ObjectDisposedException">
+        ///   The instance of <see cref="System.Text.Json.Utf8JsonWriter" /> has been disposed.
         /// </exception>
         public async Task FlushAsync(CancellationToken cancellationToken = default(CancellationToken))
         {
@@ -20479,7 +20481,7 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the beginning of a JSON array.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20492,7 +20494,7 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the beginning of a JSON object.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20598,7 +20600,7 @@ namespace System.Text.Json
         /// Writes the beginning of a JSON array with a pre-encoded property name as the key.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20612,7 +20614,7 @@ namespace System.Text.Json
         /// Writes the beginning of a JSON object with a pre-encoded property name as the key.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20637,10 +20639,10 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20660,10 +20662,10 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20723,13 +20725,13 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20749,13 +20751,13 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20775,10 +20777,10 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20798,10 +20800,10 @@ namespace System.Text.Json
         /// <remarks>
         /// The property name is escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown when the depth of the JSON has exceeded the maximum depth of 1000
         /// OR if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
@@ -20857,7 +20859,7 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the end of a JSON array.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteEndArray()
@@ -20869,7 +20871,7 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the end of a JSON object.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteEndObject()
@@ -21040,7 +21042,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="bytes">The binary data to write as Base64 encoded text.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteBase64String(JsonEncodedText propertyName, ReadOnlySpan<byte> bytes)
@@ -21057,13 +21059,13 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="bytes">The binary data to write as Base64 encoded text.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -21083,10 +21085,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="bytes">The binary data to write as Base64 encoded text.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -21105,10 +21107,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="bytes">The binary data to write as Base64 encoded text.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -21309,16 +21311,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTime" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
-        /// The property name should already be escaped when the instance of <see cref="T:System.Text.Json.JsonEncodedText" /> was created.
+        /// Writes the <see cref="System.DateTime" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
+        /// The property name should already be escaped when the instance of <see cref="System.Text.Json.JsonEncodedText" /> was created.
         /// </remarks>
         public void WriteString(JsonEncodedText propertyName, DateTime value)
         {
@@ -21329,21 +21331,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTime" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
+        /// Writes the <see cref="System.DateTime" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(string propertyName, DateTime value)
@@ -21356,18 +21358,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTime" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
+        /// Writes the <see cref="System.DateTime" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<char> propertyName, DateTime value)
@@ -21379,18 +21381,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTime" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTime" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
+        /// Writes the <see cref="System.DateTime" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, DateTime value)
@@ -21597,15 +21599,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
+        /// Writes the <see cref="System.DateTimeOffset" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
         /// </remarks>
         public void WriteString(JsonEncodedText propertyName, DateTimeOffset value)
         {
@@ -21616,21 +21618,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
+        /// Writes the <see cref="System.DateTimeOffset" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(string propertyName, DateTimeOffset value)
@@ -21643,18 +21645,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
+        /// Writes the <see cref="System.DateTimeOffset" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<char> propertyName, DateTimeOffset value)
@@ -21666,18 +21668,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.DateTimeOffset" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded property name of the JSON object to be written.</param>
         /// <param name="value">The value to to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
+        /// Writes the <see cref="System.DateTimeOffset" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, DateTimeOffset value)
@@ -21884,15 +21886,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Decimal" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Decimal" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// </remarks>
         public void WriteNumber(JsonEncodedText propertyName, decimal value)
         {
@@ -21903,21 +21905,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Decimal" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Decimal" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(string propertyName, decimal value)
@@ -21930,18 +21932,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Decimal" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Decimal" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, decimal value)
@@ -21953,18 +21955,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Decimal" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Decimal" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Decimal" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, decimal value)
@@ -22168,15 +22170,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Double" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Double" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// </remarks>
         public void WriteNumber(JsonEncodedText propertyName, double value)
         {
@@ -22188,21 +22190,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Double" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Double" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(string propertyName, double value)
@@ -22215,18 +22217,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Double" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Double" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, double value)
@@ -22239,18 +22241,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Double" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Double" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Double" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, double value)
@@ -22456,15 +22458,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write..</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Single" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Single" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// </remarks>
         public void WriteNumber(JsonEncodedText propertyName, float value)
         {
@@ -22476,21 +22478,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write..</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Single" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Single" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(string propertyName, float value)
@@ -22503,18 +22505,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write..</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Single" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Single" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, float value)
@@ -22527,18 +22529,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Single" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Single" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Single" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, float value)
@@ -22747,17 +22749,17 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="utf8FormattedNumber">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when <paramref name="utf8FormattedNumber" /> does not represent a valid JSON number.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         internal void WriteNumber(ReadOnlySpan<char> propertyName, ReadOnlySpan<byte> utf8FormattedNumber)
@@ -22775,17 +22777,17 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write..</param>
         /// <param name="utf8FormattedNumber">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when <paramref name="utf8FormattedNumber" /> does not represent a valid JSON number.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         internal void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, ReadOnlySpan<byte> utf8FormattedNumber)
@@ -22888,15 +22890,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Guid" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
+        /// Writes the <see cref="System.Guid" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
         /// </remarks>
         public void WriteString(JsonEncodedText propertyName, Guid value)
         {
@@ -22907,21 +22909,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Guid" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
+        /// Writes the <see cref="System.Guid" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(string propertyName, Guid value)
@@ -22934,18 +22936,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Guid" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
+        /// Writes the <see cref="System.Guid" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<char> propertyName, Guid value)
@@ -22957,18 +22959,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Guid" /> value (as a JSON string) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Guid" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
+        /// Writes the <see cref="System.Guid" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteString(ReadOnlySpan<byte> utf8PropertyName, Guid value)
@@ -23338,7 +23340,7 @@ namespace System.Text.Json
         /// Writes the pre-encoded property name and the JSON literal "null" as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteNull(JsonEncodedText propertyName)
@@ -23374,13 +23376,13 @@ namespace System.Text.Json
         /// Writes the property name and the JSON literal "null" as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23399,10 +23401,10 @@ namespace System.Text.Json
         /// Writes the property name and the JSON literal "null" as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23421,10 +23423,10 @@ namespace System.Text.Json
         /// Writes the property name and the JSON literal "null" as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23440,11 +23442,11 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteBoolean(JsonEncodedText propertyName, bool value)
@@ -23462,17 +23464,17 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23488,14 +23490,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23511,14 +23513,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Boolean" /> value (as a JSON literal "true" or "false") as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -23742,15 +23744,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         public void WriteNumber(JsonEncodedText propertyName, long value)
         {
@@ -23761,21 +23763,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(string propertyName, long value)
@@ -23788,18 +23790,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, long value)
@@ -23811,18 +23813,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, long value)
@@ -23834,15 +23836,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         public void WriteNumber(JsonEncodedText propertyName, int value)
         {
@@ -23850,21 +23852,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(string propertyName, int value)
@@ -23877,18 +23879,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<char> propertyName, int value)
         {
@@ -23896,18 +23898,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.Int32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         public void WriteNumber(ReadOnlySpan<byte> utf8PropertyName, int value)
@@ -24116,7 +24118,7 @@ namespace System.Text.Json
         /// Writes the pre-encoded property name (as a JSON string) as the first part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WritePropertyName(JsonEncodedText propertyName)
@@ -24150,13 +24152,13 @@ namespace System.Text.Json
         /// Writes the property name (as a JSON string) as the first part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24175,10 +24177,10 @@ namespace System.Text.Json
         /// Writes the property name (as a JSON string) as the first part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24294,10 +24296,10 @@ namespace System.Text.Json
         /// Writes the UTF-8 property name (as a JSON string) as the first part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24445,7 +24447,7 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The JSON-encoded value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteString(JsonEncodedText propertyName, JsonEncodedText value)
@@ -24465,13 +24467,13 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The JSON-encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24491,13 +24493,13 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24530,10 +24532,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24552,10 +24554,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="utf8Value">The UTF-8 encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24574,10 +24576,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24606,10 +24608,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24641,13 +24643,13 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24667,10 +24669,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24689,10 +24691,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="utf8Value">The UTF-8 encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24724,13 +24726,13 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="utf8Value">The UTF-8 encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24750,10 +24752,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="utf8Value">The UTF-8 encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24772,10 +24774,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The JSON-encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24807,10 +24809,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24839,10 +24841,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The JSON-encoded value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -24874,10 +24876,10 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name or value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -25516,15 +25518,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         [CLSCompliant(false)]
         public void WriteNumber(JsonEncodedText propertyName, ulong value)
@@ -25536,21 +25538,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25564,18 +25566,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25588,18 +25590,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt64" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25612,15 +25614,15 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the pre-encoded property name and <see cref="T:System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the pre-encoded property name and <see cref="System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The JSON-encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         [CLSCompliant(false)]
         public void WriteNumber(JsonEncodedText propertyName, uint value)
@@ -25629,21 +25631,21 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="propertyName" /> parameter is <see langword="null" />.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25657,18 +25659,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="propertyName">The name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25678,18 +25680,18 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the property name and <see cref="T:System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
+        /// Writes the property name and <see cref="System.UInt32" /> value (as a JSON number) as part of a name/value pair of a JSON object.
         /// </summary>
         /// <param name="utf8PropertyName">The UTF-8 encoded name of the property to write.</param>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified property name is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// The property name is escaped before writing.
         /// </remarks>
         [CLSCompliant(false)]
@@ -25899,10 +25901,10 @@ namespace System.Text.Json
         /// Writes the raw bytes value as a Base64 encoded JSON string as an element of a JSON array.
         /// </summary>
         /// <param name="bytes">The binary data to write as Base64 encoded text.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -25982,10 +25984,10 @@ namespace System.Text.Json
         /// Writes the string text value (as a JSON comment).
         /// </summary>
         /// <param name="value">The value to write as a JSON comment within /*..*/.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large OR if the given string text value contains a comment delimiter (that is, */).
         /// </exception>
-        /// <exception cref="T:System.ArgumentNullException">
+        /// <exception cref="System.ArgumentNullException">
         /// The <paramref name="value" /> parameter is <see langword="null" />.
         /// </exception>
         /// <remarks>
@@ -26004,7 +26006,7 @@ namespace System.Text.Json
         /// Writes the text value (as a JSON comment).
         /// </summary>
         /// <param name="value">The value to write as a JSON comment within /*..*/.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large OR if the given text value contains a comment delimiter (that is, */).
         /// </exception>
         /// <remarks>
@@ -26084,7 +26086,7 @@ namespace System.Text.Json
         /// <remarks>
         /// The comment value is not escaped before writing.
         /// </remarks>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large OR if the given UTF-8 text value contains a comment delimiter (that is, */).
         /// </exception>
         public void WriteCommentValue(ReadOnlySpan<byte> utf8Value)
@@ -26153,14 +26155,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.DateTime" /> value (as a JSON string) as an element of a JSON array.
+        /// Writes the <see cref="System.DateTime" /> value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTime" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
+        /// Writes the <see cref="System.DateTime" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000.
         /// </remarks>
         public void WriteStringValue(DateTime value)
         {
@@ -26227,14 +26229,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> value (as a JSON string) as an element of a JSON array.
+        /// Writes the <see cref="System.DateTimeOffset" /> value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.DateTimeOffset" /> using the round-trippable ('O') <see cref="T:System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
+        /// Writes the <see cref="System.DateTimeOffset" /> using the round-trippable ('O') <see cref="System.Buffers.StandardFormat" /> , for example: 2017-06-12T05:30:45.7680000-07:00.
         /// </remarks>
         public void WriteStringValue(DateTimeOffset value)
         {
@@ -26301,14 +26303,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Decimal" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.Decimal" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Decimal" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G').
+        /// Writes the <see cref="System.Decimal" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G').
         /// </remarks>
         public void WriteNumberValue(decimal value)
         {
@@ -26381,14 +26383,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Double" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.Double" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Double" /> using the default <see cref="T:System.Buffers.StandardFormat" /> on .NET Core 3 or higher
+        /// Writes the <see cref="System.Double" /> using the default <see cref="System.Buffers.StandardFormat" /> on .NET Core 3 or higher
         /// and 'G17' on any other framework.
         /// </remarks>
         public void WriteNumberValue(double value)
@@ -26510,14 +26512,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Single" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.Single" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Single" /> using the default <see cref="T:System.Buffers.StandardFormat" /> on .NET Core 3 or higher
+        /// Writes the <see cref="System.Single" /> using the default <see cref="System.Buffers.StandardFormat" /> on .NET Core 3 or higher
         /// and 'G9' on any other framework.
         /// </remarks>
         public void WriteNumberValue(float value)
@@ -26642,14 +26644,14 @@ namespace System.Text.Json
         /// Writes the value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="utf8FormattedNumber">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when <paramref name="utf8FormattedNumber" /> does not represent a valid JSON number.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         internal void WriteNumberValue(ReadOnlySpan<byte> utf8FormattedNumber)
         {
@@ -26714,14 +26716,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Guid" /> value (as a JSON string) as an element of a JSON array.
+        /// Writes the <see cref="System.Guid" /> value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Guid" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
+        /// Writes the <see cref="System.Guid" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'D'), as the form: nnnnnnnn-nnnn-nnnn-nnnn-nnnnnnnnnnnn.
         /// </remarks>
         public void WriteStringValue(Guid value)
         {
@@ -26826,7 +26828,7 @@ namespace System.Text.Json
         /// <summary>
         /// Writes the JSON literal "null" as an element of a JSON array.
         /// </summary>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteNullValue()
@@ -26837,10 +26839,10 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Boolean" /> value (as a JSON literal "true" or "false") as an element of a JSON array.
+        /// Writes the <see cref="System.Boolean" /> value (as a JSON literal "true" or "false") as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteBooleanValue(bool value)
@@ -26921,9 +26923,9 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="json">The raw JSON content to write.</param>
         /// <param name="skipInputValidation">Whether to validate if the input is an RFC 8259-compliant JSON payload.</param>
-        /// <exception cref="T:System.ArgumentNullException">Thrown if <paramref name="json" /> is <see langword="null" />.</exception>
-        /// <exception cref="T:System.ArgumentException">Thrown if the length of the input is zero or greater than 715,827,882 (<see cref="F:System.Int32.MaxValue" /> / 3).</exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.ArgumentNullException">Thrown if <paramref name="json" /> is <see langword="null" />.</exception>
+        /// <exception cref="System.ArgumentException">Thrown if the length of the input is zero or greater than 715,827,882 (<see cref="F:System.Int32.MaxValue" /> / 3).</exception>
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown if <paramref name="skipInputValidation" /> is <see langword="false" />, and the input
         /// is not a valid, complete, single JSON value according to the JSON RFC (https://tools.ietf.org/html/rfc8259)
         /// or the input JSON exceeds a recursive depth of 64.
@@ -26956,8 +26958,8 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="json">The raw JSON content to write.</param>
         /// <param name="skipInputValidation">Whether to validate if the input is an RFC 8259-compliant JSON payload.</param>
-        /// <exception cref="T:System.ArgumentException">Thrown if the length of the input is zero or greater than 715,827,882 (<see cref="F:System.Int32.MaxValue" /> / 3).</exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.ArgumentException">Thrown if the length of the input is zero or greater than 715,827,882 (<see cref="F:System.Int32.MaxValue" /> / 3).</exception>
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown if <paramref name="skipInputValidation" /> is <see langword="false" />, and the input
         /// is not a valid, complete, single JSON value according to the JSON RFC (https://tools.ietf.org/html/rfc8259)
         /// or the input JSON exceeds a recursive depth of 64.
@@ -26986,8 +26988,8 @@ namespace System.Text.Json
         /// </summary>
         /// <param name="utf8Json">The raw JSON content to write.</param>
         /// <param name="skipInputValidation">Whether to validate if the input is an RFC 8259-compliant JSON payload.</param>
-        /// <exception cref="T:System.ArgumentException">Thrown if the length of the input is zero or equal to <see cref="F:System.Int32.MaxValue" />.</exception>
-        /// <exception cref="T:System.Text.Json.JsonException">
+        /// <exception cref="System.ArgumentException">Thrown if the length of the input is zero or equal to <see cref="F:System.Int32.MaxValue" />.</exception>
+        /// <exception cref="System.Text.Json.JsonException">
         /// Thrown if <paramref name="skipInputValidation" /> is <see langword="false" />, and the input
         /// is not a valid, complete, single JSON value according to the JSON RFC (https://tools.ietf.org/html/rfc8259)
         /// or the input JSON exceeds a recursive depth of 64.
@@ -27074,14 +27076,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Int32" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.Int32" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         public void WriteNumberValue(int value)
         {
@@ -27089,14 +27091,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.Int64" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.Int64" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.Int64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.Int64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         public void WriteNumberValue(long value)
         {
@@ -27172,7 +27174,7 @@ namespace System.Text.Json
         /// Writes the pre-encoded text value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The JSON-encoded value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         public void WriteStringValue(JsonEncodedText value)
@@ -27187,10 +27189,10 @@ namespace System.Text.Json
         /// Writes the string text value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -27217,10 +27219,10 @@ namespace System.Text.Json
         /// Writes the text value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -27325,10 +27327,10 @@ namespace System.Text.Json
         /// Writes the UTF-8 text value (as a JSON string) as an element of a JSON array.
         /// </summary>
         /// <param name="utf8Value">The UTF-8 encoded value to be written as a JSON string element of a JSON array.</param>
-        /// <exception cref="T:System.ArgumentException">
+        /// <exception cref="System.ArgumentException">
         /// Thrown when the specified value is too large.
         /// </exception>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
@@ -27445,14 +27447,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.UInt32" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.UInt32" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt32" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt32" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         [CLSCompliant(false)]
         public void WriteNumberValue(uint value)
@@ -27461,14 +27463,14 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Writes the <see cref="T:System.UInt64" /> value (as a JSON number) as an element of a JSON array.
+        /// Writes the <see cref="System.UInt64" /> value (as a JSON number) as an element of a JSON array.
         /// </summary>
         /// <param name="value">The value to write.</param>
-        /// <exception cref="T:System.InvalidOperationException">
+        /// <exception cref="System.InvalidOperationException">
         /// Thrown if this would result in invalid JSON being written (while validation is enabled).
         /// </exception>
         /// <remarks>
-        /// Writes the <see cref="T:System.UInt64" /> using the default <see cref="T:System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
+        /// Writes the <see cref="System.UInt64" /> using the default <see cref="System.Buffers.StandardFormat" /> (that is, 'G'), for example: 32767.
         /// </remarks>
         [CLSCompliant(false)]
         public void WriteNumberValue(ulong value)
@@ -27763,7 +27765,7 @@ namespace System.Text.Json
         /// <summary>
         /// Gets the nested JsonTypeInfo before resolving any polymorphic converters
         /// </summary>
-        public JsonTypeInfo PeekNestedJsonTypeInfo()
+        public Serialization.Metadata.JsonTypeInfo PeekNestedJsonTypeInfo()
         {
             if (_count != 0)
             {
@@ -28001,8 +28003,8 @@ namespace System.Text.Json
         /// The original JsonPropertyInfo that is not changed. It contains all properties.
         /// </summary>
         /// <remarks>
-        /// For objects, it is either the actual (real) JsonPropertyInfo or the <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" /> for the class.
-        /// For collections, it is the <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" /> for the class and current element.
+        /// For objects, it is either the actual (real) JsonPropertyInfo or the <see cref="P:Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" /> for the class.
+        /// For collections, it is the <see cref="P:Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" /> for the class and current element.
         /// </remarks>
         public JsonPropertyInfo JsonPropertyInfo;
 
@@ -28014,7 +28016,7 @@ namespace System.Text.Json
         /// <summary>
         /// The class (POCO or IEnumerable) that is being populated.
         /// </summary>
-        public JsonTypeInfo JsonTypeInfo;
+        public Serialization.Metadata.JsonTypeInfo JsonTypeInfo;
 
         /// <summary>
         /// Validation state for a class.
@@ -28095,7 +28097,7 @@ namespace System.Text.Json
         /// <summary>
         /// Configures the next stack frame for a polymorphic converter.
         /// </summary>
-        public JsonConverter InitializePolymorphicReEntry(JsonTypeInfo derivedJsonTypeInfo)
+        public JsonConverter InitializePolymorphicReEntry(Serialization.Metadata.JsonTypeInfo derivedJsonTypeInfo)
         {
             PolymorphicJsonTypeInfo = derivedJsonTypeInfo.PropertyInfoForTypeInfo;
             PolymorphicSerializationState = PolymorphicSerializationState.PolymorphicReEntryStarted;
@@ -28129,7 +28131,7 @@ namespace System.Text.Json
         ///   Represents a mutable JSON array.
         /// </summary>
         /// <remarks>
-        /// It is safe to perform multiple concurrent read operations on a <see cref="T:System.Text.Json.Nodes.JsonArray" />,
+        /// It is safe to perform multiple concurrent read operations on a <see cref="JsonArray" />,
         /// but issues can occur if the collection is modified while it's being read.
         /// </remarks>
         [DebuggerDisplay("JsonArray[{List.Count}]")]
@@ -28209,7 +28211,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Gets the number of elements contained in the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Gets the number of elements contained in the <see cref="JsonArray" />.
             /// </summary>
             public int Count => List.Count;
 
@@ -28219,7 +28221,7 @@ namespace System.Text.Json
             bool ICollection<JsonNode>.IsReadOnly => false;
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonArray" /> class that is empty.
+            ///   Initializes a new instance of the <see cref="JsonArray" /> class that is empty.
             /// </summary>
             /// <param name="options">Options to control the behavior.</param>
             public JsonArray(JsonNodeOptions? options = null)
@@ -28228,10 +28230,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonArray" /> class that contains items from the specified params array.
+            ///   Initializes a new instance of the <see cref="JsonArray" /> class that contains items from the specified params array.
             /// </summary>
             /// <param name="options">Options to control the behavior.</param>
-            /// <param name="items">The items to add to the new <see cref="T:System.Text.Json.Nodes.JsonArray" />.</param>
+            /// <param name="items">The items to add to the new <see cref="JsonArray" />.</param>
             public JsonArray(JsonNodeOptions options, params JsonNode?[] items)
                 : base(options)
             {
@@ -28239,9 +28241,9 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonArray" /> class that contains items from the specified array.
+            ///   Initializes a new instance of the <see cref="JsonArray" /> class that contains items from the specified array.
             /// </summary>
-            /// <param name="items">The items to add to the new <see cref="T:System.Text.Json.Nodes.JsonArray" />.</param>
+            /// <param name="items">The items to add to the new <see cref="JsonArray" />.</param>
             public JsonArray(params JsonNode?[] items)
             {
                 InitializeFromArray(items);
@@ -28258,14 +28260,14 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonArray" /> class that contains items from the specified <see cref="T:System.Text.Json.JsonElement" />.
+            ///   Initializes a new instance of the <see cref="JsonArray" /> class that contains items from the specified <see cref="System.Text.Json.JsonElement" />.
             /// </summary>
             /// <returns>
-            ///   The new instance of the <see cref="T:System.Text.Json.Nodes.JsonArray" /> class that contains items from the specified <see cref="T:System.Text.Json.JsonElement" />.
+            ///   The new instance of the <see cref="JsonArray" /> class that contains items from the specified <see cref="System.Text.Json.JsonElement" />.
             /// </returns>
-            /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" />.</param>
+            /// <param name="element">The <see cref="System.Text.Json.JsonElement" />.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <exception cref="T:System.InvalidOperationException">
+            /// <exception cref="System.InvalidOperationException">
             ///   The <paramref name="element" /> is not a <see cref="F:System.Text.Json.JsonValueKind.Array" />.
             /// </exception>
             public static JsonArray? Create(JsonElement element, JsonNodeOptions? options = null)
@@ -28288,11 +28290,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Adds an object to the end of the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Adds an object to the end of the <see cref="JsonArray" />.
             /// </summary>
             /// <typeparam name="T">The type of object to be added.</typeparam>
             /// <param name="value">
-            ///   The object to be added to the end of the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   The object to be added to the end of the <see cref="JsonArray" />.
             /// </param>
             [RequiresUnreferencedCode("Creating JsonValue instances with non-primitive types is not compatible with trimming. It can result in non-primitive types being serialized, which may have their members trimmed.")]
             [RequiresDynamicCode("Creating JsonValue instances with non-primitive types requires generating code at runtime.")]
@@ -28381,10 +28383,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Adds a <see cref="T:System.Text.Json.Nodes.JsonNode" /> to the end of the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Adds a <see cref="JsonNode" /> to the end of the <see cref="JsonArray" />.
             /// </summary>
             /// <param name="item">
-            ///   The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to be added to the end of the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   The <see cref="JsonNode" /> to be added to the end of the <see cref="JsonArray" />.
             /// </param>
             public void Add(JsonNode? item)
             {
@@ -28393,7 +28395,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes all elements from the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Removes all elements from the <see cref="JsonArray" />.
             /// </summary>
             public void Clear()
             {
@@ -28405,11 +28407,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Determines whether an element is in the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Determines whether an element is in the <see cref="JsonArray" />.
             /// </summary>
-            /// <param name="item">The object to locate in the <see cref="T:System.Text.Json.Nodes.JsonArray" />.</param>
+            /// <param name="item">The object to locate in the <see cref="JsonArray" />.</param>
             /// <returns>
-            ///   <see langword="true" /> if <paramref name="item" /> is found in the <see cref="T:System.Text.Json.Nodes.JsonArray" />; otherwise, <see langword="false" />.
+            ///   <see langword="true" /> if <paramref name="item" /> is found in the <see cref="JsonArray" />; otherwise, <see langword="false" />.
             /// </returns>
             public bool Contains(JsonNode? item)
             {
@@ -28417,9 +28419,9 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   The object to locate in the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   The object to locate in the <see cref="JsonArray" />.
             /// </summary>
-            /// <param name="item">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to locate in the <see cref="T:System.Text.Json.Nodes.JsonArray" />.</param>
+            /// <param name="item">The <see cref="JsonNode" /> to locate in the <see cref="JsonArray" />.</param>
             /// <returns>
             ///  The index of item if found in the list; otherwise, -1.
             /// </returns>
@@ -28429,12 +28431,12 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Inserts an element into the <see cref="T:System.Text.Json.Nodes.JsonArray" /> at the specified index.
+            ///   Inserts an element into the <see cref="JsonArray" /> at the specified index.
             /// </summary>
             /// <param name="index">The zero-based index at which <paramref name="item" /> should be inserted.</param>
-            /// <param name="item">The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to insert.</param>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
-            ///   <paramref name="index" /> is less than 0 or <paramref name="index" /> is greater than <see cref="P:System.Text.Json.Nodes.JsonArray.Count" />.
+            /// <param name="item">The <see cref="JsonNode" /> to insert.</param>
+            /// <exception cref="System.ArgumentOutOfRangeException">
+            ///   <paramref name="index" /> is less than 0 or <paramref name="index" /> is greater than <see cref="P:JsonArray.Count" />.
             /// </exception>
             public void Insert(int index, JsonNode? item)
             {
@@ -28443,10 +28445,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes the first occurrence of a specific <see cref="T:System.Text.Json.Nodes.JsonNode" /> from the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Removes the first occurrence of a specific <see cref="JsonNode" /> from the <see cref="JsonArray" />.
             /// </summary>
             /// <param name="item">
-            ///   The <see cref="T:System.Text.Json.Nodes.JsonNode" /> to remove from the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   The <see cref="JsonNode" /> to remove from the <see cref="JsonArray" />.
             /// </param>
             /// <returns>
             ///   <see langword="true" /> if <paramref name="item" /> is successfully removed; otherwise, <see langword="false" />.
@@ -28462,11 +28464,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes the element at the specified index of the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Removes the element at the specified index of the <see cref="JsonArray" />.
             /// </summary>
             /// <param name="index">The zero-based index of the element to remove.</param>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
-            ///   <paramref name="index" /> is less than 0 or <paramref name="index" /> is greater than <see cref="P:System.Text.Json.Nodes.JsonArray.Count" />.
+            /// <exception cref="System.ArgumentOutOfRangeException">
+            ///   <paramref name="index" /> is less than 0 or <paramref name="index" /> is greater than <see cref="P:JsonArray.Count" />.
             /// </exception>
             public void RemoveAt(int index)
             {
@@ -28476,22 +28478,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Copies the entire <see cref="T:System.Array" /> to a compatible one-dimensional array,
+            ///   Copies the entire <see cref="System.Array" /> to a compatible one-dimensional array,
             ///   starting at the specified index of the target array.
             /// </summary>
             /// <param name="array">
-            ///   The one-dimensional <see cref="T:System.Array" /> that is the destination of the elements copied
-            ///   from <see cref="T:System.Text.Json.Nodes.JsonArray" />. The Array must have zero-based indexing.</param>
+            ///   The one-dimensional <see cref="System.Array" /> that is the destination of the elements copied
+            ///   from <see cref="JsonArray" />. The Array must have zero-based indexing.</param>
             /// <param name="index">
             ///   The zero-based index in <paramref name="array" /> at which copying begins.
             /// </param>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="array" /> is <see langword="null" />.
             /// </exception>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
+            /// <exception cref="System.ArgumentOutOfRangeException">
             ///   <paramref name="index" /> is less than 0.
             /// </exception>
-            /// <exception cref="T:System.ArgumentException">
+            /// <exception cref="System.ArgumentException">
             ///   The number of elements in the source ICollection is greater than the available space from <paramref name="index" />
             ///   to the end of the destination <paramref name="array" />.
             /// </exception>
@@ -28501,19 +28503,19 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Returns an enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Returns an enumerator that iterates through the <see cref="JsonArray" />.
             /// </summary>
-            /// <returns>A <see cref="T:System.Collections.Generic.IEnumerator`1" /> for the <see cref="T:System.Text.Json.Nodes.JsonNode" />.</returns>
+            /// <returns>A <see cref="IEnumerator{T}" /> for the <see cref="JsonNode" />.</returns>
             public IEnumerator<JsonNode?> GetEnumerator()
             {
                 return List.GetEnumerator();
             }
 
             /// <summary>
-            ///   Returns an enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   Returns an enumerator that iterates through the <see cref="JsonArray" />.
             /// </summary>
             /// <returns>
-            ///   A <see cref="T:System.Collections.IEnumerator" /> for the <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   A <see cref="IEnumerator" /> for the <see cref="JsonArray" />.
             /// </returns>
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -28533,7 +28535,7 @@ namespace System.Text.Json
         ///   The base class that represents a single node within a mutable JSON document.
         /// </summary>
         /// <seealso cref="P:System.Text.Json.JsonSerializerOptions.UnknownTypeHandling" /> to specify that a type
-        /// declared as an <see cref="T:System.Object" /> should be deserialized as a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+        /// declared as an <see cref="System.Object" /> should be deserialized as a <see cref="JsonNode" />.
         public abstract class JsonNode
         {
             private JsonNode _parent;
@@ -28558,9 +28560,9 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Gets the parent <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Gets the parent <see cref="JsonNode" />.
             ///   If there is no parent, <see langword="null" /> is returned.
-            ///   A parent can either be a <see cref="T:System.Text.Json.Nodes.JsonObject" /> or a <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   A parent can either be a <see cref="JsonObject" /> or a <see cref="JsonArray" />.
             /// </summary>
             public JsonNode? Parent
             {
@@ -28575,7 +28577,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Gets the root <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Gets the root <see cref="JsonNode" />.
             /// </summary>
             /// <remarks>
             ///   The current node is returned if it is a root.
@@ -28601,11 +28603,11 @@ namespace System.Text.Json
             ///   Gets or sets the element at the specified index.
             /// </summary>
             /// <param name="index">The zero-based index of the element to get or set.</param>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
+            /// <exception cref="System.ArgumentOutOfRangeException">
             ///   <paramref name="index" /> is less than 0 or <paramref name="index" /> is greater than the number of properties.
             /// </exception>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The current <see cref="T:System.Text.Json.Nodes.JsonNode" /> is not a <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            /// <exception cref="System.InvalidOperationException">
+            ///   The current <see cref="JsonNode" /> is not a <see cref="JsonArray" />.
             /// </exception>
             public JsonNode? this[int index]
             {
@@ -28624,11 +28626,11 @@ namespace System.Text.Json
             ///   If the property is not found, <see langword="null" /> is returned.
             /// </summary>
             /// <param name="propertyName">The name of the property to return.</param>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="propertyName" /> is <see langword="null" />.
             /// </exception>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The current <see cref="T:System.Text.Json.Nodes.JsonNode" /> is not a <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            /// <exception cref="System.InvalidOperationException">
+            ///   The current <see cref="JsonNode" /> is not a <see cref="JsonObject" />.
             /// </exception>
             public JsonNode? this[string propertyName]
             {
@@ -28648,13 +28650,13 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Casts to the derived <see cref="T:System.Text.Json.Nodes.JsonArray" /> type.
+            ///   Casts to the derived <see cref="JsonArray" /> type.
             /// </summary>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            ///   A <see cref="JsonArray" />.
             /// </returns>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The node is not a <see cref="T:System.Text.Json.Nodes.JsonArray" />.
+            /// <exception cref="System.InvalidOperationException">
+            ///   The node is not a <see cref="JsonArray" />.
             /// </exception>
             public JsonArray AsArray()
             {
@@ -28666,13 +28668,13 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Casts to the derived <see cref="T:System.Text.Json.Nodes.JsonObject" /> type.
+            ///   Casts to the derived <see cref="JsonObject" /> type.
             /// </summary>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   A <see cref="JsonObject" />.
             /// </returns>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The node is not a <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            /// <exception cref="System.InvalidOperationException">
+            ///   The node is not a <see cref="JsonObject" />.
             /// </exception>
             public JsonObject AsObject()
             {
@@ -28684,13 +28686,13 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Casts to the derived <see cref="T:System.Text.Json.Nodes.JsonValue" /> type.
+            ///   Casts to the derived <see cref="JsonValue" /> type.
             /// </summary>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonValue" />.
+            ///   A <see cref="JsonValue" />.
             /// </returns>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The node is not a <see cref="T:System.Text.Json.Nodes.JsonValue" />.
+            /// <exception cref="System.InvalidOperationException">
+            ///   The node is not a <see cref="JsonValue" />.
             /// </exception>
             public JsonValue AsValue()
             {
@@ -28724,24 +28726,24 @@ namespace System.Text.Json
             internal abstract void GetPath(List<string> path, JsonNode child);
 
             /// <summary>
-            ///   Gets the value for the current <see cref="T:System.Text.Json.Nodes.JsonValue" />.
+            ///   Gets the value for the current <see cref="JsonValue" />.
             /// </summary>
-            /// <typeparam name="T">The type of the value to obtain from the <see cref="T:System.Text.Json.Nodes.JsonValue" />.</typeparam>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</returns>
+            /// <typeparam name="T">The type of the value to obtain from the <see cref="JsonValue" />.</typeparam>
+            /// <returns>A value converted from the <see cref="JsonValue" /> instance.</returns>
             /// <remarks>
             ///   {T} can be the type or base type of the underlying value.
-            ///   If the underlying value is a <see cref="T:System.Text.Json.JsonElement" /> then {T} can also be the type of any primitive
-            ///   value supported by current <see cref="T:System.Text.Json.JsonElement" />.
-            ///   Specifying the <see cref="T:System.Object" /> type for {T} will always succeed and return the underlying value as <see cref="T:System.Object" />.<br />
-            ///   The underlying value of a <see cref="T:System.Text.Json.Nodes.JsonValue" /> after deserialization is an instance of <see cref="T:System.Text.Json.JsonElement" />,
-            ///   otherwise it's the value specified when the <see cref="T:System.Text.Json.Nodes.JsonValue" /> was created.
+            ///   If the underlying value is a <see cref="System.Text.Json.JsonElement" /> then {T} can also be the type of any primitive
+            ///   value supported by current <see cref="System.Text.Json.JsonElement" />.
+            ///   Specifying the <see cref="System.Object" /> type for {T} will always succeed and return the underlying value as <see cref="System.Object" />.<br />
+            ///   The underlying value of a <see cref="JsonValue" /> after deserialization is an instance of <see cref="System.Text.Json.JsonElement" />,
+            ///   otherwise it's the value specified when the <see cref="JsonValue" /> was created.
             /// </remarks>
-            /// <seealso cref="M:System.Text.Json.Nodes.JsonValue.TryGetValue``1(``0@)"></seealso>
-            /// <exception cref="T:System.FormatException">
-            ///   The current <see cref="T:System.Text.Json.Nodes.JsonNode" /> cannot be represented as a {T}.
+            /// <seealso cref="M:JsonValue.TryGetValue``1(``0@)"></seealso>
+            /// <exception cref="System.FormatException">
+            ///   The current <see cref="JsonNode" /> cannot be represented as a {T}.
             /// </exception>
-            /// <exception cref="T:System.InvalidOperationException">
-            ///   The current <see cref="T:System.Text.Json.Nodes.JsonNode" /> is not a <see cref="T:System.Text.Json.Nodes.JsonValue" /> or
+            /// <exception cref="System.InvalidOperationException">
+            ///   The current <see cref="JsonNode" /> is not a <see cref="JsonValue" /> or
             ///   is not compatible with {T}.
             /// </exception>
             public virtual T GetValue<T>()
@@ -28766,230 +28768,230 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Boolean" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Boolean" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Boolean" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Boolean" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(bool value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Boolean" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Boolean" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Boolean" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Boolean" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(bool? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Byte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Byte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Byte" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Byte" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(byte value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Byte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Byte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Byte" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Byte" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(byte? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Char" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Char" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Char" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Char" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(char value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Char" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Char" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Char" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Char" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(char? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.DateTime" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.DateTime" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTime" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.DateTime" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(DateTime value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.DateTime" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.DateTime" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTime" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.DateTime" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(DateTime? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.DateTimeOffset" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.DateTimeOffset" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTimeOffset" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.DateTimeOffset" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(DateTimeOffset value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.DateTimeOffset" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.DateTimeOffset" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTimeOffset" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.DateTimeOffset" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(DateTimeOffset? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Decimal" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Decimal" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Decimal" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Decimal" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(decimal value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Decimal" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Decimal" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Decimal" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Decimal" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(decimal? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Double" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Double" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Double" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Double" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(double value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Double" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Double" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Double" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Double" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(double? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Guid" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Guid" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Guid" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Guid" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(Guid value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Guid" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Guid" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Guid" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Guid" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(Guid? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int16" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int16" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(short value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int16" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int16" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(short? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int32" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int32" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(int value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int32" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int32" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(int? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int64" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int64" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(long value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Int64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Int64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int64" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Int64" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(long? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.SByte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.SByte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.SByte" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.SByte" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode(sbyte value)
             {
@@ -28997,10 +28999,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.SByte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.SByte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.SByte" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.SByte" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode?(sbyte? value)
             {
@@ -29008,40 +29010,40 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Single" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Single" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Single" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Single" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode(float value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.Single" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.Single" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Single" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.Single" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(float? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.String" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.String" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.String" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.String" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             public static implicit operator JsonNode?(string? value)
             {
                 return JsonValue.Create(value);
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt16" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt16" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode(ushort value)
             {
@@ -29049,10 +29051,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt16" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt16" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode?(ushort? value)
             {
@@ -29060,10 +29062,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt32" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt32" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode(uint value)
             {
@@ -29071,10 +29073,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt32" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt32" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode?(uint? value)
             {
@@ -29082,10 +29084,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt64" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt64" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode(ulong value)
             {
@@ -29093,10 +29095,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an implicit conversion of a given <see cref="T:System.UInt64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an implicit conversion of a given <see cref="System.UInt64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt64" /> to implicitly convert.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
+            /// <param name="value">A <see cref="System.UInt64" /> to implicitly convert.</param>
+            /// <returns>A <see cref="JsonNode" /> instance converted from the <paramref name="value" /> parameter.</returns>
             [CLSCompliant(false)]
             public static implicit operator JsonNode?(ulong? value)
             {
@@ -29104,230 +29106,230 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Boolean" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Boolean" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Boolean" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Boolean" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator bool(JsonNode value)
             {
                 return value.GetValue<bool>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Boolean" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Boolean" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Boolean" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Boolean" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator bool?(JsonNode? value)
             {
                 return value?.GetValue<bool>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Byte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Byte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Byte" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Byte" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator byte(JsonNode value)
             {
                 return value.GetValue<byte>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Byte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Byte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Byte" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Byte" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator byte?(JsonNode? value)
             {
                 return value?.GetValue<byte>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Char" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Char" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Char" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Char" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator char(JsonNode value)
             {
                 return value.GetValue<char>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Char" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Char" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Char" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Char" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator char?(JsonNode? value)
             {
                 return value?.GetValue<char>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.DateTime" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.DateTime" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTime" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.DateTime" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator DateTime(JsonNode value)
             {
                 return value.GetValue<DateTime>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.DateTime" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.DateTime" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTime" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.DateTime" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator DateTime?(JsonNode? value)
             {
                 return value?.GetValue<DateTime>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.DateTimeOffset" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.DateTimeOffset" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTimeOffset" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.DateTimeOffset" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator DateTimeOffset(JsonNode value)
             {
                 return value.GetValue<DateTimeOffset>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.DateTimeOffset" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.DateTimeOffset" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.DateTimeOffset" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.DateTimeOffset" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator DateTimeOffset?(JsonNode? value)
             {
                 return value?.GetValue<DateTimeOffset>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Decimal" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Decimal" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Decimal" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Decimal" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator decimal(JsonNode value)
             {
                 return value.GetValue<decimal>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Decimal" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Decimal" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Decimal" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Decimal" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator decimal?(JsonNode? value)
             {
                 return value?.GetValue<decimal>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Double" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Double" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Double" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Double" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator double(JsonNode value)
             {
                 return value.GetValue<double>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Double" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Double" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Double" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Double" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator double?(JsonNode? value)
             {
                 return value?.GetValue<double>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Guid" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Guid" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Guid" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Guid" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator Guid(JsonNode value)
             {
                 return value.GetValue<Guid>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Guid" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Guid" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Guid" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Guid" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator Guid?(JsonNode? value)
             {
                 return value?.GetValue<Guid>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int16" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int16" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator short(JsonNode value)
             {
                 return value.GetValue<short>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int16" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int16" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator short?(JsonNode? value)
             {
                 return value?.GetValue<short>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int32" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int32" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator int(JsonNode value)
             {
                 return value.GetValue<int>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int32" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int32" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator int?(JsonNode? value)
             {
                 return value?.GetValue<int>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int64" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int64" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator long(JsonNode value)
             {
                 return value.GetValue<long>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Int64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Int64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Int64" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Int64" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator long?(JsonNode? value)
             {
                 return value?.GetValue<long>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.SByte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.SByte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.SByte" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.SByte" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator sbyte(JsonNode value)
             {
@@ -29335,10 +29337,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.SByte" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.SByte" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.SByte" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.SByte" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator sbyte?(JsonNode? value)
             {
@@ -29346,40 +29348,40 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Single" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Single" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Single" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Single" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator float(JsonNode value)
             {
                 return value.GetValue<float>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.Single" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.Single" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.Single" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.Single" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator float?(JsonNode? value)
             {
                 return value?.GetValue<float>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.String" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.String" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.String" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.String" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             public static explicit operator string?(JsonNode? value)
             {
                 return value?.GetValue<string>();
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt16" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt16" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator ushort(JsonNode value)
             {
@@ -29387,10 +29389,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt16" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt16" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt16" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt16" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator ushort?(JsonNode? value)
             {
@@ -29398,10 +29400,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt32" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt32" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator uint(JsonNode value)
             {
@@ -29409,10 +29411,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt32" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt32" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt32" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt32" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator uint?(JsonNode? value)
             {
@@ -29420,10 +29422,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt64" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt64" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator ulong(JsonNode value)
             {
@@ -29431,10 +29433,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Defines an explicit conversion of a given <see cref="T:System.UInt64" /> to a <see cref="T:System.Text.Json.Nodes.JsonNode" />.
+            ///   Defines an explicit conversion of a given <see cref="System.UInt64" /> to a <see cref="JsonNode" />.
             /// </summary>
-            /// <param name="value">A <see cref="T:System.UInt64" /> to explicitly convert.</param>
-            /// <returns>A value converted from the <see cref="T:System.Text.Json.Nodes.JsonNode" /> instance.</returns>
+            /// <param name="value">A <see cref="System.UInt64" /> to explicitly convert.</param>
+            /// <returns>A value converted from the <see cref="JsonNode" /> instance.</returns>
             [CLSCompliant(false)]
             public static explicit operator ulong?(JsonNode? value)
             {
@@ -29447,7 +29449,7 @@ namespace System.Text.Json
             /// <param name="reader">The reader to read.</param>
             /// <param name="nodeOptions">Options to control the behavior.</param>
             /// <returns>
-            ///   The <see cref="T:System.Text.Json.Nodes.JsonNode" /> from the reader.
+            ///   The <see cref="JsonNode" /> from the reader.
             /// </returns>
             /// <remarks>
             ///   <para>
@@ -29465,13 +29467,13 @@ namespace System.Text.Json
             ///     requirement to maintain data integrity beyond the return of this method.
             ///   </para>
             /// </remarks>
-            /// <exception cref="T:System.ArgumentException">
+            /// <exception cref="System.ArgumentException">
             ///   <paramref name="reader" /> is using unsupported options.
             /// </exception>
-            /// <exception cref="T:System.ArgumentException">
+            /// <exception cref="System.ArgumentException">
             ///   The current <paramref name="reader" /> token does not start or represent a value.
             /// </exception>
-            /// <exception cref="T:System.Text.Json.JsonException">
+            /// <exception cref="System.Text.Json.JsonException">
             ///   A value could not be read from the reader.
             /// </exception>
             public static JsonNode? Parse(ref Utf8JsonReader reader, JsonNodeOptions? nodeOptions = null)
@@ -29487,12 +29489,12 @@ namespace System.Text.Json
             /// <param name="nodeOptions">Options to control the node behavior after parsing.</param>
             /// <param name="documentOptions">Options to control the document behavior during parsing.</param>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the JSON value.
+            ///   A <see cref="JsonNode" /> representation of the JSON value.
             /// </returns>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="json" /> is <see langword="null" />.
             /// </exception>
-            /// <exception cref="T:System.Text.Json.JsonException">
+            /// <exception cref="System.Text.Json.JsonException">
             ///   <paramref name="json" /> does not represent a valid single JSON value.
             /// </exception>
             public static JsonNode? Parse([StringSyntax("Json")] string json, JsonNodeOptions? nodeOptions = null, JsonDocumentOptions documentOptions = default(JsonDocumentOptions))
@@ -29512,9 +29514,9 @@ namespace System.Text.Json
             /// <param name="nodeOptions">Options to control the node behavior after parsing.</param>
             /// <param name="documentOptions">Options to control the document behavior during parsing.</param>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the JSON value.
+            ///   A <see cref="JsonNode" /> representation of the JSON value.
             /// </returns>
-            /// <exception cref="T:System.Text.Json.JsonException">
+            /// <exception cref="System.Text.Json.JsonException">
             ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
             /// </exception>
             public static JsonNode? Parse(ReadOnlySpan<byte> utf8Json, JsonNodeOptions? nodeOptions = null, JsonDocumentOptions documentOptions = default(JsonDocumentOptions))
@@ -29524,16 +29526,16 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Parse a <see cref="T:System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
-            ///   <see cref="T:System.Text.Json.Nodes.JsonNode" />.  The Stream will be read to completion.
+            ///   Parse a <see cref="System.IO.Stream" /> as UTF-8-encoded data representing a single JSON value into a
+            ///   <see cref="JsonNode" />.  The Stream will be read to completion.
             /// </summary>
             /// <param name="utf8Json">JSON text to parse.</param>
             /// <param name="nodeOptions">Options to control the node behavior after parsing.</param>
             /// <param name="documentOptions">Options to control the document behavior during parsing.</param>
             /// <returns>
-            ///   A <see cref="T:System.Text.Json.Nodes.JsonNode" /> representation of the JSON value.
+            ///   A <see cref="JsonNode" /> representation of the JSON value.
             /// </returns>
-            /// <exception cref="T:System.Text.Json.JsonException">
+            /// <exception cref="System.Text.Json.JsonException">
             ///   <paramref name="utf8Json" /> does not represent a valid single JSON value.
             /// </exception>
             public static JsonNode? Parse(Stream utf8Json, JsonNodeOptions? nodeOptions = null, JsonDocumentOptions documentOptions = default(JsonDocumentOptions))
@@ -29590,10 +29592,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Write the <see cref="T:System.Text.Json.Nodes.JsonNode" /> into the provided <see cref="T:System.Text.Json.Utf8JsonWriter" /> as JSON.
+            ///   Write the <see cref="JsonNode" /> into the provided <see cref="System.Text.Json.Utf8JsonWriter" /> as JSON.
             /// </summary>
-            /// <param name="writer">The <see cref="T:System.Text.Json.Utf8JsonWriter" />.</param>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" />.</param>
+            /// <exception cref="System.ArgumentNullException">
             ///   The <paramref name="writer" /> parameter is <see langword="null" />.
             /// </exception>
             /// <param name="options">Options to control the serialization behavior.</param>
@@ -29601,12 +29603,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        ///   Options to control <see cref="T:System.Text.Json.Nodes.JsonNode" /> behavior.
+        ///   Options to control <see cref="JsonNode" /> behavior.
         /// </summary>
         public struct JsonNodeOptions
         {
             /// <summary>
-            ///   Specifies whether property names on <see cref="T:System.Text.Json.Nodes.JsonObject" /> are case insensitive.
+            ///   Specifies whether property names on <see cref="JsonObject" /> are case insensitive.
             /// </summary>
             public bool PropertyNameCaseInsensitive { get; set; }
         }
@@ -29615,7 +29617,7 @@ namespace System.Text.Json
         ///   Represents a mutable JSON object.
         /// </summary>
         /// <remarks>
-        /// It's safe to perform multiple concurrent read operations on a <see cref="T:System.Text.Json.Nodes.JsonObject" />,
+        /// It's safe to perform multiple concurrent read operations on a <see cref="JsonObject" />,
         /// but issues can occur if the collection is modified while it's being read.
         /// </remarks>
         [DebuggerDisplay("JsonObject[{Count}]")]
@@ -29692,7 +29694,7 @@ namespace System.Text.Json
             private JsonPropertyDictionary<JsonNode> _dictionary;
 
             /// <summary>
-            ///   Gets the number of elements contained in <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Gets the number of elements contained in <see cref="JsonObject" />.
             /// </summary>
             public int Count
             {
@@ -29704,7 +29706,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Gets a collection containing the property names in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Gets a collection containing the property names in the <see cref="JsonObject" />.
             /// </summary>
             ICollection<string> IDictionary<string, JsonNode>.Keys
             {
@@ -29716,7 +29718,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Gets a collection containing the property values in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Gets a collection containing the property values in the <see cref="JsonObject" />.
             /// </summary>
             ICollection<JsonNode?> IDictionary<string, JsonNode>.Values
             {
@@ -29733,7 +29735,7 @@ namespace System.Text.Json
             bool ICollection<KeyValuePair<string, JsonNode>>.IsReadOnly => false;
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonObject" /> class that is empty.
+            ///   Initializes a new instance of the <see cref="JsonObject" /> class that is empty.
             /// </summary>
             /// <param name="options">Options to control the behavior.</param>
             public JsonObject(JsonNodeOptions? options = null)
@@ -29742,7 +29744,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonObject" /> class that contains the specified <paramref name="properties" />.
+            ///   Initializes a new instance of the <see cref="JsonObject" /> class that contains the specified <paramref name="properties" />.
             /// </summary>
             /// <param name="properties">The properties to be added.</param>
             /// <param name="options">Options to control the behavior.</param>
@@ -29756,14 +29758,14 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonObject" /> class that contains properties from the specified <see cref="T:System.Text.Json.JsonElement" />.
+            ///   Initializes a new instance of the <see cref="JsonObject" /> class that contains properties from the specified <see cref="System.Text.Json.JsonElement" />.
             /// </summary>
             /// <returns>
-            ///   The new instance of the <see cref="T:System.Text.Json.Nodes.JsonObject" /> class that contains properties from the specified <see cref="T:System.Text.Json.JsonElement" />.
+            ///   The new instance of the <see cref="JsonObject" /> class that contains properties from the specified <see cref="System.Text.Json.JsonElement" />.
             /// </returns>
-            /// <param name="element">The <see cref="T:System.Text.Json.JsonElement" />.</param>
+            /// <param name="element">The <see cref="System.Text.Json.JsonElement" />.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>A <see cref="T:System.Text.Json.Nodes.JsonObject" />.</returns>
+            /// <returns>A <see cref="JsonObject" />.</returns>
             public static JsonObject? Create(JsonElement element, JsonNodeOptions? options = null)
             {
                 if (element.ValueKind == JsonValueKind.Null)
@@ -29872,15 +29874,15 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Adds an element with the provided property name and value to the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Adds an element with the provided property name and value to the <see cref="JsonObject" />.
             /// </summary>
             /// <param name="propertyName">The property name of the element to add.</param>
             /// <param name="value">The value of the element to add.</param>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="propertyName" />is <see langword="null" />.
             /// </exception>
-            /// <exception cref="T:System.ArgumentException">
-            ///   An element with the same property name already exists in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            /// <exception cref="System.ArgumentException">
+            ///   An element with the same property name already exists in the <see cref="JsonObject" />.
             /// </exception>
             public void Add(string propertyName, JsonNode? value)
             {
@@ -29890,15 +29892,15 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Adds the specified property to the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Adds the specified property to the <see cref="JsonObject" />.
             /// </summary>
             /// <param name="property">
-            ///   The KeyValuePair structure representing the property name and value to add to the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   The KeyValuePair structure representing the property name and value to add to the <see cref="JsonObject" />.
             /// </param>
-            /// <exception cref="T:System.ArgumentException">
-            ///   An element with the same property name already exists in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            /// <exception cref="System.ArgumentException">
+            ///   An element with the same property name already exists in the <see cref="JsonObject" />.
             /// </exception>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   The property name of <paramref name="property" /> is <see langword="null" />.
             /// </exception>
             public void Add(KeyValuePair<string, JsonNode?> property)
@@ -29907,7 +29909,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes all elements from the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Removes all elements from the <see cref="JsonObject" />.
             /// </summary>
             public void Clear()
             {
@@ -29930,13 +29932,13 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Determines whether the <see cref="T:System.Text.Json.Nodes.JsonObject" /> contains an element with the specified property name.
+            ///   Determines whether the <see cref="JsonObject" /> contains an element with the specified property name.
             /// </summary>
-            /// <param name="propertyName">The property name to locate in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.</param>
+            /// <param name="propertyName">The property name to locate in the <see cref="JsonObject" />.</param>
             /// <returns>
-            ///   <see langword="true" /> if the <see cref="T:System.Text.Json.Nodes.JsonObject" /> contains an element with the specified property name; otherwise, <see langword="false" />.
+            ///   <see langword="true" /> if the <see cref="JsonObject" /> contains an element with the specified property name; otherwise, <see langword="false" />.
             /// </returns>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="propertyName" /> is <see langword="null" />.
             /// </exception>
             public bool ContainsKey(string propertyName)
@@ -29946,13 +29948,13 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes the element with the specified property name from the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Removes the element with the specified property name from the <see cref="JsonObject" />.
             /// </summary>
             /// <param name="propertyName">The property name of the element to remove.</param>
             /// <returns>
             ///   <see langword="true" /> if the element is successfully removed; otherwise, <see langword="false" />.
             /// </returns>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="propertyName" /> is <see langword="null" />.
             /// </exception>
             public bool Remove(string propertyName)
@@ -29972,11 +29974,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Determines whether the <see cref="T:System.Text.Json.Nodes.JsonObject" /> contains a specific property name and <see cref="T:System.Text.Json.Nodes.JsonNode" /> reference.
+            ///   Determines whether the <see cref="JsonObject" /> contains a specific property name and <see cref="JsonNode" /> reference.
             /// </summary>
-            /// <param name="item">The element to locate in the <see cref="T:System.Text.Json.Nodes.JsonObject" />.</param>
+            /// <param name="item">The element to locate in the <see cref="JsonObject" />.</param>
             /// <returns>
-            ///   <see langword="true" /> if the <see cref="T:System.Text.Json.Nodes.JsonObject" /> contains an element with the property name; otherwise, <see langword="false" />.
+            ///   <see langword="true" /> if the <see cref="JsonObject" /> contains an element with the property name; otherwise, <see langword="false" />.
             /// </returns>
             bool ICollection<KeyValuePair<string, JsonNode>>.Contains(KeyValuePair<string, JsonNode> item)
             {
@@ -29985,19 +29987,19 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Copies the elements of the <see cref="T:System.Text.Json.Nodes.JsonObject" /> to an array of type KeyValuePair starting at the specified array index.
+            ///   Copies the elements of the <see cref="JsonObject" /> to an array of type KeyValuePair starting at the specified array index.
             /// </summary>
             /// <param name="array">
-            ///   The one-dimensional Array that is the destination of the elements copied from <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   The one-dimensional Array that is the destination of the elements copied from <see cref="JsonObject" />.
             /// </param>
             /// <param name="index">The zero-based index in <paramref name="array" /> at which copying begins.</param>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="array" /> is <see langword="null" />.
             /// </exception>
-            /// <exception cref="T:System.ArgumentOutOfRangeException">
+            /// <exception cref="System.ArgumentOutOfRangeException">
             ///   <paramref name="index" /> is less than 0.
             /// </exception>
-            /// <exception cref="T:System.ArgumentException">
+            /// <exception cref="System.ArgumentException">
             ///   The number of elements in the source ICollection is greater than the available space from <paramref name="index" />
             ///   to the end of the destination <paramref name="array" />.
             /// </exception>
@@ -30008,10 +30010,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Returns an enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Returns an enumerator that iterates through the <see cref="JsonObject" />.
             /// </summary>
             /// <returns>
-            ///   An enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   An enumerator that iterates through the <see cref="JsonObject" />.
             /// </returns>
             public IEnumerator<KeyValuePair<string, JsonNode?>> GetEnumerator()
             {
@@ -30020,10 +30022,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Removes a key and value from the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Removes a key and value from the <see cref="JsonObject" />.
             /// </summary>
             /// <param name="item">
-            ///   The KeyValuePair structure representing the property name and value to remove from the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   The KeyValuePair structure representing the property name and value to remove from the <see cref="JsonObject" />.
             /// </param>
             /// <returns>
             ///   <see langword="true" /> if the element is successfully removed; otherwise, <see langword="false" />.
@@ -30042,9 +30044,9 @@ namespace System.Text.Json
             ///   otherwise, <see langword="null" />.
             /// </param>
             /// <returns>
-            ///   <see langword="true" /> if the <see cref="T:System.Text.Json.Nodes.JsonObject" /> contains an element with the specified property name; otherwise, <see langword="false" />.
+            ///   <see langword="true" /> if the <see cref="JsonObject" /> contains an element with the specified property name; otherwise, <see langword="false" />.
             /// </returns>
-            /// <exception cref="T:System.ArgumentNullException">
+            /// <exception cref="System.ArgumentNullException">
             ///   <paramref name="propertyName" /> is <see langword="null" />.
             /// </exception>
             bool IDictionary<string, JsonNode>.TryGetValue(string propertyName, out JsonNode jsonNode)
@@ -30054,10 +30056,10 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Returns an enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   Returns an enumerator that iterates through the <see cref="JsonObject" />.
             /// </summary>
             /// <returns>
-            ///   An enumerator that iterates through the <see cref="T:System.Text.Json.Nodes.JsonObject" />.
+            ///   An enumerator that iterates through the <see cref="JsonObject" />.
             /// </returns>
             IEnumerator IEnumerable.GetEnumerator()
             {
@@ -30100,22 +30102,22 @@ namespace System.Text.Json
             internal const string CreateDynamicCodeMessage = "Creating JsonValue instances with non-primitive types requires generating code at runtime.";
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(bool value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<bool>(value, JsonMetadataServices.BooleanConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(bool? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30126,22 +30128,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(byte value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<byte>(value, JsonMetadataServices.ByteConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(byte? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30152,22 +30154,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(char value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<char>(value, JsonMetadataServices.CharConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(char? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30178,22 +30180,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(DateTime value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<DateTime>(value, JsonMetadataServices.DateTimeConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(DateTime? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30204,22 +30206,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(DateTimeOffset value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<DateTimeOffset>(value, JsonMetadataServices.DateTimeOffsetConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(DateTimeOffset? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30230,22 +30232,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(decimal value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<decimal>(value, JsonMetadataServices.DecimalConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(decimal? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30256,22 +30258,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(double value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<double>(value, JsonMetadataServices.DoubleConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(double? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30282,22 +30284,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(Guid value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<Guid>(value, JsonMetadataServices.GuidConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(Guid? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30308,22 +30310,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(short value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<short>(value, JsonMetadataServices.Int16Converter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(short? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30334,22 +30336,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(int value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<int>(value, JsonMetadataServices.Int32Converter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(int? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30360,22 +30362,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(long value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<long>(value, JsonMetadataServices.Int64Converter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(long? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30386,11 +30388,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue Create(sbyte value, JsonNodeOptions? options = null)
             {
@@ -30398,11 +30400,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue? Create(sbyte? value, JsonNodeOptions? options = null)
             {
@@ -30414,22 +30416,22 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue Create(float value, JsonNodeOptions? options = null)
             {
                 return new JsonValueTrimmable<float>(value, JsonMetadataServices.SingleConverter);
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(float? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30440,11 +30442,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(string? value, JsonNodeOptions? options = null)
             {
                 if (value == null)
@@ -30455,11 +30457,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue Create(ushort value, JsonNodeOptions? options = null)
             {
@@ -30467,11 +30469,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue? Create(ushort? value, JsonNodeOptions? options = null)
             {
@@ -30483,11 +30485,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue Create(uint value, JsonNodeOptions? options = null)
             {
@@ -30495,11 +30497,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue? Create(uint? value, JsonNodeOptions? options = null)
             {
@@ -30511,11 +30513,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue Create(ulong value, JsonNodeOptions? options = null)
             {
@@ -30523,11 +30525,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [CLSCompliant(false)]
             public static JsonValue? Create(ulong? value, JsonNodeOptions? options = null)
             {
@@ -30539,11 +30541,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(JsonElement value, JsonNodeOptions? options = null)
             {
                 if (value.ValueKind == JsonValueKind.Null)
@@ -30555,11 +30557,11 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
-            /// <param name="value">The underlying value of the new <see cref="T:System.Text.Json.Nodes.JsonValue" /> instance.</param>
+            /// <param name="value">The underlying value of the new <see cref="JsonValue" /> instance.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create(JsonElement? value, JsonNodeOptions? options = null)
             {
                 if (!value.HasValue)
@@ -30581,15 +30583,15 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
             /// <returns>
-            ///   The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   The new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </returns>
             /// <typeparam name="T">The type of value to create.</typeparam>
             /// <param name="value">The value to create.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             [RequiresUnreferencedCode("Creating JsonValue instances with non-primitive types is not compatible with trimming. It can result in non-primitive types being serialized, which may have their members trimmed. Use the overload that takes a JsonTypeInfo, or make sure all of the required types are preserved.")]
             [RequiresDynamicCode("Creating JsonValue instances with non-primitive types requires generating code at runtime.")]
             public static JsonValue? Create<T>(T? value, JsonNodeOptions? options = null)
@@ -30613,16 +30615,16 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            ///   Initializes a new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   Initializes a new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </summary>
             /// <returns>
-            ///   The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.
+            ///   The new instance of the <see cref="JsonValue" /> class that contains the specified value.
             /// </returns>
             /// <typeparam name="T">The type of value to create.</typeparam>
             /// <param name="value">The value to create.</param>
-            /// <param name="jsonTypeInfo">The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> that will be used to serialize the value.</param>
+            /// <param name="jsonTypeInfo">The <see cref="Serialization.Metadata.JsonTypeInfo" /> that will be used to serialize the value.</param>
             /// <param name="options">Options to control the behavior.</param>
-            /// <returns>The new instance of the <see cref="T:System.Text.Json.Nodes.JsonValue" /> class that contains the specified value.</returns>
+            /// <returns>The new instance of the <see cref="JsonValue" /> class that contains the specified value.</returns>
             public static JsonValue? Create<T>(T? value, JsonTypeInfo<T> jsonTypeInfo, JsonNodeOptions? options = null)
             {
                 if (jsonTypeInfo == null)
@@ -30656,13 +30658,13 @@ namespace System.Text.Json
             /// </summary>
             /// <remarks>
             ///   {T} can be the type or base type of the underlying value.
-            ///   If the underlying value is a <see cref="T:System.Text.Json.JsonElement" /> then {T} can also be the type of any primitive
-            ///   value supported by current <see cref="T:System.Text.Json.JsonElement" />.
-            ///   Specifying the <see cref="T:System.Object" /> type for {T} will always succeed and return the underlying value as <see cref="T:System.Object" />.<br />
-            ///   The underlying value of a <see cref="T:System.Text.Json.Nodes.JsonValue" /> after deserialization is an instance of <see cref="T:System.Text.Json.JsonElement" />,
-            ///   otherwise it's the value specified when the <see cref="T:System.Text.Json.Nodes.JsonValue" /> was created.
+            ///   If the underlying value is a <see cref="System.Text.Json.JsonElement" /> then {T} can also be the type of any primitive
+            ///   value supported by current <see cref="System.Text.Json.JsonElement" />.
+            ///   Specifying the <see cref="System.Object" /> type for {T} will always succeed and return the underlying value as <see cref="System.Object" />.<br />
+            ///   The underlying value of a <see cref="JsonValue" /> after deserialization is an instance of <see cref="System.Text.Json.JsonElement" />,
+            ///   otherwise it's the value specified when the <see cref="JsonValue" /> was created.
             /// </remarks>
-            /// <seealso cref="M:System.Text.Json.Nodes.JsonNode.GetValue``1"></seealso>
+            /// <seealso cref="M:JsonNode.GetValue``1"></seealso>
             /// <typeparam name="T">The type of value to obtain.</typeparam>
             /// <param name="value">When this method returns, contains the parsed value.</param>
             /// <returns><see langword="true" /> if the value can be successfully obtained; otherwise, <see langword="false" />.</returns>
@@ -31341,7 +31343,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// Returns <see langword="true" /> when the given type is of type <see cref="T:System.Nullable`1" />.
+            /// Returns <see langword="true" /> when the given type is of type <see cref="System.Nullable{T}" />.
             /// </summary>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public static bool IsNullableOfT(this Type type)
@@ -31355,7 +31357,7 @@ namespace System.Text.Json
 
             /// <summary>
             /// Returns <see langword="true" /> when the given type is assignable from <paramref name="from" /> including support
-            /// when <paramref name="from" /> is <see cref="T:System.Nullable`1" /> by using the {T} generic parameter for <paramref name="from" />.
+            /// when <paramref name="from" /> is <see cref="System.Nullable{T}" /> by using the {T} generic parameter for <paramref name="from" />.
             /// </summary>
             public static bool IsAssignableFromInternal(this Type type, Type from)
             {
@@ -31444,8 +31446,8 @@ namespace System.Text.Json
     namespace Serialization
     {
         using System.Text.Json.Reflection;
-        using System.Text.Json.Serialization.Converters;
-        using System.Text.Json.Serialization.Metadata;
+        using Converters;
+        using Metadata;
 
 
         /// <summary>
@@ -31557,7 +31559,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Converter for streaming <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" /> values.
+        /// Converter for streaming <see cref="System.Collections.Generic.IAsyncEnumerable{T}" /> values.
         /// </summary>
         [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
         internal sealed class IAsyncEnumerableConverterFactory : JsonConverterFactory
@@ -31733,7 +31735,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Specifies that the JSON type should have its <see cref="M:System.Text.Json.Serialization.IJsonOnDeserialized.OnDeserialized" /> method called after deserialization occurs.
+        /// Specifies that the JSON type should have its <see cref="M:IJsonOnDeserialized.OnDeserialized" /> method called after deserialization occurs.
         /// </summary>
         /// <remarks>
         /// This behavior is only supported on types representing JSON objects.
@@ -31748,7 +31750,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Specifies that the type should have its <see cref="M:System.Text.Json.Serialization.IJsonOnDeserializing.OnDeserializing" /> method called before deserialization occurs.
+        /// Specifies that the type should have its <see cref="M:IJsonOnDeserializing.OnDeserializing" /> method called before deserialization occurs.
         /// </summary>
         /// <remarks>
         /// This behavior is only supported on types representing JSON objects.
@@ -31763,7 +31765,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Specifies that the type should have its <see cref="M:System.Text.Json.Serialization.IJsonOnSerialized.OnSerialized" /> method called after serialization occurs.
+        /// Specifies that the type should have its <see cref="M:IJsonOnSerialized.OnSerialized" /> method called after serialization occurs.
         /// </summary>
         /// <remarks>
         /// This behavior is only supported on types representing JSON objects.
@@ -31778,7 +31780,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Specifies that the type should have its <see cref="M:System.Text.Json.Serialization.IJsonOnSerializing.OnSerializing" /> method called before serialization occurs.
+        /// Specifies that the type should have its <see cref="M:IJsonOnSerializing.OnSerializing" /> method called before serialization occurs.
         /// </summary>
         /// <remarks>
         /// This behavior is only supported on types representing JSON objects.
@@ -31798,8 +31800,8 @@ namespace System.Text.Json
         public abstract class JsonAttribute : Attribute { }
 
         /// <summary>
-        /// Base class for all collections. Collections are assumed to implement <see cref="T:System.Collections.Generic.IEnumerable`1" />
-        /// or a variant thereof e.g. <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" />.
+        /// Base class for all collections. Collections are assumed to implement <see cref="Collections.Generic.IEnumerable{T}" />
+        /// or a variant thereof e.g. <see cref="System.Collections.Generic.IAsyncEnumerable{T}" />.
         /// </summary>
         internal abstract class JsonCollectionConverter<TCollection, TElement> : JsonResumableConverter<TCollection>
         {
@@ -32046,7 +32048,7 @@ namespace System.Text.Json
         public sealed class JsonConstructorAttribute : JsonAttribute
         {
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonConstructorAttribute" />.
+            /// Initializes a new instance of <see cref="JsonConstructorAttribute" />.
             /// </summary>
             public JsonConstructorAttribute() { }
         }
@@ -32067,7 +32069,7 @@ namespace System.Text.Json
             internal abstract ConverterStrategy ConverterStrategy { get; }
 
             /// <summary>
-            /// Indicates that the converter can consume the <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.CreateObject" /> delegate.
+            /// Indicates that the converter can consume the <see cref="P:Metadata.JsonTypeInfo.CreateObject" /> delegate.
             /// Needed because certain collection converters cannot support arbitrary delegates.
             /// TODO remove once https://github.com/dotnet/runtime/pull/73395/ and
             /// https://github.com/dotnet/runtime/issues/71944 have been addressed.
@@ -32346,7 +32348,7 @@ namespace System.Text.Json
         /// <summary>
         /// Converts an object or value to or from JSON.
         /// </summary>
-        /// <typeparam name="T">The <see cref="T:System.Type" /> to convert.</typeparam>
+        /// <typeparam name="T">The <see cref="System.Type" /> to convert.</typeparam>
         public abstract class JsonConverter<T> : JsonConverter
         {
             internal override ConverterStrategy ConverterStrategy => ConverterStrategy.Value;
@@ -32504,7 +32506,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// When overridden, constructs a new <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance.
+            /// When overridden, constructs a new <see cref="JsonConverter{T}" /> instance.
             /// </summary>
             protected internal JsonConverter()
                 : this(initialize: true)
@@ -32596,11 +32598,11 @@ namespace System.Text.Json
             /// <remarks>
             /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON is invalid.
             /// </remarks>
-            /// <param name="reader">The <see cref="T:System.Text.Json.Utf8JsonReader" /> to read from.</param>
-            /// <param name="typeToConvert">The <see cref="T:System.Type" /> being converted.</param>
-            /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> being used.</param>
+            /// <param name="reader">The <see cref="System.Text.Json.Utf8JsonReader" /> to read from.</param>
+            /// <param name="typeToConvert">The <see cref="Type" /> being converted.</param>
+            /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> being used.</param>
             /// <returns>The value that was converted.</returns>
-            /// <remarks>Note that the value of <seealso cref="P:System.Text.Json.Serialization.JsonConverter`1.HandleNull" /> determines if the converter handles null JSON tokens.</remarks>
+            /// <remarks>Note that the value of <seealso cref="JsonConverter{T}.HandleNull" /> determines if the converter handles null JSON tokens.</remarks>
             public abstract T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options);
 
             internal bool TryRead(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options, scoped ref ReadStack state, out T value)
@@ -32826,17 +32828,17 @@ namespace System.Text.Json
             /// A converter may throw any Exception, but should throw <cref>JsonException</cref> when the JSON
             /// cannot be created.
             /// </remarks>
-            /// <param name="writer">The <see cref="T:System.Text.Json.Utf8JsonWriter" /> to write to.</param>
-            /// <param name="value">The value to convert. Note that the value of <seealso cref="P:System.Text.Json.Serialization.JsonConverter`1.HandleNull" /> determines if the converter handles <see langword="null" /> values.</param>
-            /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> being used.</param>
+            /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" /> to write to.</param>
+            /// <param name="value">The value to convert. Note that the value of <seealso cref="P:JsonConverter{T}.HandleNull" /> determines if the converter handles <see langword="null" /> values.</param>
+            /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> being used.</param>
             public abstract void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options);
 
             /// <summary>
             /// Reads a dictionary key from a JSON property name.
             /// </summary>
-            /// <param name="reader">The <see cref="T:System.Text.Json.Utf8JsonReader" /> to read from.</param>
-            /// <param name="typeToConvert">The <see cref="T:System.Type" /> being converted.</param>
-            /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> being used.</param>
+            /// <param name="reader">The <see cref="System.Text.Json.Utf8JsonReader" /> to read from.</param>
+            /// <param name="typeToConvert">The <see cref="System.Type" /> being converted.</param>
+            /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> being used.</param>
             /// <returns>The value that was converted.</returns>
             /// <remarks>Method should be overridden in custom converters of types used in deserialized dictionary keys.</remarks>
             public virtual T ReadAsPropertyName(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -32863,9 +32865,9 @@ namespace System.Text.Json
             /// <summary>
             /// Writes a dictionary key as a JSON property name.
             /// </summary>
-            /// <param name="writer">The <see cref="T:System.Text.Json.Utf8JsonWriter" /> to write to.</param>
-            /// <param name="value">The value to convert. Note that the value of <seealso cref="P:System.Text.Json.Serialization.JsonConverter`1.HandleNull" /> determines if the converter handles <see langword="null" /> values.</param>
-            /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> being used.</param>
+            /// <param name="writer">The <see cref="System.Text.Json.Utf8JsonWriter" /> to write to.</param>
+            /// <param name="value">The value to convert. Note that the value of <seealso cref="P:JsonConverter{T}.HandleNull" /> determines if the converter handles <see langword="null" /> values.</param>
+            /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> being used.</param>
             /// <remarks>Method should be overridden in custom converters of types used in serialized dictionary keys.</remarks>
             public virtual void WriteAsPropertyName(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
             {
@@ -32914,23 +32916,23 @@ namespace System.Text.Json
         /// When placed on a property, field, or type, specifies the converter type to use.
         /// </summary>
         /// <remarks>
-        /// The specified converter type must derive from <see cref="T:System.Text.Json.Serialization.JsonConverter" />.
+        /// The specified converter type must derive from <see cref="JsonConverter" />.
         /// When placed on a property or field, the specified converter will always be used.
         /// When placed on a type, the specified converter will be used unless a compatible converter is added to
-        /// <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" /> or there is another <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> on a property or field
+        /// <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" /> or there is another <see cref="JsonConverterAttribute" /> on a property or field
         /// of the same type.
         /// </remarks>
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Interface, AllowMultiple = false)]
         public class JsonConverterAttribute : JsonAttribute
         {
             /// <summary>
-            /// The type of the converter to create, or null if <see cref="M:System.Text.Json.Serialization.JsonConverterAttribute.CreateConverter(System.Type)" /> should be used to obtain the converter.
+            /// The type of the converter to create, or null if <see cref="M:JsonConverterAttribute.CreateConverter(System.Type)" /> should be used to obtain the converter.
             /// </summary>
             [DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)]
             public Type? ConverterType { get; private set; }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> with the specified converter type.
+            /// Initializes a new instance of <see cref="JsonConverterAttribute" /> with the specified converter type.
             /// </summary>
             /// <param name="converterType">The type of the converter.</param>
             public JsonConverterAttribute([DynamicallyAccessedMembers(DynamicallyAccessedMemberTypes.PublicParameterlessConstructor)] Type converterType)
@@ -32939,14 +32941,14 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" />.
+            /// Initializes a new instance of <see cref="JsonConverterAttribute" />.
             /// </summary>
             protected JsonConverterAttribute()
             {
             }
 
             /// <summary>
-            /// If overridden and <see cref="P:System.Text.Json.Serialization.JsonConverterAttribute.ConverterType" /> is null, allows a custom attribute to create the converter in order to pass additional state.
+            /// If overridden and <see cref="P:JsonConverterAttribute.ConverterType" /> is null, allows a custom attribute to create the converter in order to pass additional state.
             /// </summary>
             /// <returns>
             /// The custom converter.
@@ -32961,7 +32963,7 @@ namespace System.Text.Json
         /// Supports converting several types by using a factory pattern.
         /// </summary>
         /// <remarks>
-        /// This is useful for converters supporting generics, such as a converter for <see cref="T:System.Collections.Generic.List`1" />.
+        /// This is useful for converters supporting generics, such as a converter for <see cref="List{T}" />.
         /// </remarks>
         public abstract class JsonConverterFactory : JsonConverter
         {
@@ -32974,20 +32976,20 @@ namespace System.Text.Json
             internal sealed override Type TypeToConvert => null;
 
             /// <summary>
-            /// When overridden, constructs a new <see cref="T:System.Text.Json.Serialization.JsonConverterFactory" /> instance.
+            /// When overridden, constructs a new <see cref="JsonConverterFactory" /> instance.
             /// </summary>
             protected JsonConverterFactory()
             {
             }
 
             /// <summary>
-            /// Create a converter for the provided <see cref="T:System.Type" />.
+            /// Create a converter for the provided <see cref="System.Type" />.
             /// </summary>
-            /// <param name="typeToConvert">The <see cref="T:System.Type" /> being converted.</param>
-            /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> being used.</param>
+            /// <param name="typeToConvert">The <see cref="System.Type" /> being converted.</param>
+            /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> being used.</param>
             /// <returns>
-            /// An instance of a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> where T is compatible with <paramref name="typeToConvert" />.
-            /// If <see langword="null" /> is returned, a <see cref="T:System.NotSupportedException" /> will be thrown.
+            /// An instance of a <see cref="JsonConverter{T}" /> where T is compatible with <paramref name="typeToConvert" />.
+            /// If <see langword="null" /> is returned, a <see cref="System.NotSupportedException" /> will be thrown.
             /// </returns>
             public abstract JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options);
 
@@ -33375,26 +33377,26 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// When placed on a property or field of type <see cref="T:System.Text.Json.Nodes.JsonObject" /> or
-        /// <see cref="T:System.Collections.Generic.IDictionary`2" />, any properties that do not have a
+        /// When placed on a property or field of type <see cref="JsonObject" /> or
+        /// <see cref="IDictionary{T1 , T2}" />, any properties that do not have a
         /// matching property or field are added during deserialization and written during serialization.
         /// </summary>
         /// <remarks>
-        /// When using <see cref="T:System.Collections.Generic.IDictionary`2" />, the TKey value must be <see cref="T:System.String" />
-        /// and TValue must be <see cref="T:System.Text.Json.JsonElement" /> or <see cref="T:System.Object" />.
+        /// When using <see cref="IDictionary{T1 , T2}" />, the TKey value must be <see cref="System.String" />
+        /// and TValue must be <see cref="System.Text.Json.JsonElement" /> or <see cref="System.Object" />.
         ///
-        /// During deserializing with a <see cref="T:System.Collections.Generic.IDictionary`2" /> extension property with TValue as
-        /// <see cref="T:System.Object" />, the type of object created will either be a <see cref="T:System.Text.Json.Nodes.JsonNode" /> or a
-        /// <see cref="T:System.Text.Json.JsonElement" /> depending on the value of <see cref="P:System.Text.Json.JsonSerializerOptions.UnknownTypeHandling" />.
+        /// During deserializing with a <see cref="IDictionary{T1 , T2}" /> extension property with TValue as
+        /// <see cref="System.Object" />, the type of object created will either be a <see cref="JsonNode" /> or a
+        /// <see cref="System.Text.Json.JsonElement" /> depending on the value of <see cref="P:System.Text.Json.JsonSerializerOptions.UnknownTypeHandling" />.
         ///
-        /// If a <see cref="T:System.Text.Json.JsonElement" /> is created, a "null" JSON value is treated as a JsonElement with <see cref="P:System.Text.Json.JsonElement.ValueKind" />
+        /// If a <see cref="System.Text.Json.JsonElement" /> is created, a "null" JSON value is treated as a JsonElement with <see cref="P:System.Text.Json.JsonElement.ValueKind" />
         /// set to <see cref="F:System.Text.Json.JsonValueKind.Null" />, otherwise a "null" JSON value is treated as a <c>null</c> object reference.
         ///
         /// During serializing, the name of the extension data member is not included in the JSON;
         /// the data contained within the extension data is serialized as properties of the JSON object.
         ///
         /// If there is more than one extension member on a type, or the member is not of the correct type,
-        /// an <see cref="T:System.InvalidOperationException" /> is thrown during the first serialization or deserialization of that type.
+        /// an <see cref="System.InvalidOperationException" /> is thrown during the first serialization or deserialization of that type.
         /// </remarks>
         [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
         public sealed class JsonExtensionDataAttribute : JsonAttribute { }
@@ -33408,12 +33410,12 @@ namespace System.Text.Json
             /// <summary>
             /// Specifies the condition that must be met before a property or field will be ignored.
             /// </summary>
-            /// <remarks>The default value is <see cref="F:System.Text.Json.Serialization.JsonIgnoreCondition.Always" />.</remarks>
+            /// <remarks>The default value is <see cref="F:JsonIgnoreCondition.Always" />.</remarks>
             public JsonIgnoreCondition Condition { get; set; } = JsonIgnoreCondition.Always;
 
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonIgnoreAttribute" />.
+            /// Initializes a new instance of <see cref="JsonIgnoreAttribute" />.
             /// </summary>
             public JsonIgnoreAttribute()
             {
@@ -33483,9 +33485,9 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Determines how <see cref="T:System.Text.Json.JsonSerializer" /> handles numbers when serializing and deserializing.
+        /// Determines how <see cref="System.Text.Json.JsonSerializer" /> handles numbers when serializing and deserializing.
         /// <remarks>
-        /// The behavior of <see cref="F:System.Text.Json.Serialization.JsonNumberHandling.WriteAsString" /> and <see cref="F:System.Text.Json.Serialization.JsonNumberHandling.AllowNamedFloatingPointLiterals" /> is not defined by the JSON specification. Altering the default number handling can potentially produce JSON that cannot be parsed by other JSON implementations.
+        /// The behavior of <see cref="F:JsonNumberHandling.WriteAsString" /> and <see cref="F:JsonNumberHandling.AllowNamedFloatingPointLiterals" /> is not defined by the JSON specification. Altering the default number handling can potentially produce JSON that cannot be parsed by other JSON implementations.
         /// </remarks>
         /// </summary>
         [Flags]
@@ -33511,7 +33513,7 @@ namespace System.Text.Json
             WriteAsString = 2,
             /// <summary>
             /// The "NaN", "Infinity", and "-Infinity" <see cref="F:System.Text.Json.JsonTokenType.String" /> tokens can be read as
-            /// floating-point constants, and the <see cref="T:System.Single" /> and <see cref="T:System.Double" /> values for these
+            /// floating-point constants, and the <see cref="System.Single" /> and <see cref="System.Double" /> values for these
             /// constants (such as <see cref="F:System.Single.PositiveInfinity" /> and <see cref="F:System.Double.NaN" />)
             /// will be written as their corresponding JSON string representations.
             /// Strings that have escaped characters will be unescaped before reading.
@@ -33524,7 +33526,7 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// When placed on a type, property, or field, indicates what <see cref="T:System.Text.Json.Serialization.JsonNumberHandling" />
+        /// When placed on a type, property, or field, indicates what <see cref="JsonNumberHandling" />
         /// settings should be used when serializing or deserializing numbers.
         /// </summary>
         [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
@@ -33536,7 +33538,7 @@ namespace System.Text.Json
             public JsonNumberHandling Handling { get; }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonNumberHandlingAttribute" />.
+            /// Initializes a new instance of <see cref="JsonNumberHandlingAttribute" />.
             /// </summary>
             public JsonNumberHandlingAttribute(JsonNumberHandling handling)
             {
@@ -33586,7 +33588,7 @@ namespace System.Text.Json
 
         /// <summary>
         /// Specifies the property name that is present in the JSON when serializing and deserializing.
-        /// This overrides any naming policy specified by <see cref="T:System.Text.Json.JsonNamingPolicy" />.
+        /// This overrides any naming policy specified by <see cref="System.Text.Json.JsonNamingPolicy" />.
         /// </summary>
         [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
         public sealed class JsonPropertyNameAttribute : JsonAttribute
@@ -33597,7 +33599,7 @@ namespace System.Text.Json
             public string Name { get; }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonPropertyNameAttribute" /> with the specified property name.
+            /// Initializes a new instance of <see cref="JsonPropertyNameAttribute" /> with the specified property name.
             /// </summary>
             /// <param name="name">The name of the property.</param>
             public JsonPropertyNameAttribute(string name)
@@ -33620,7 +33622,7 @@ namespace System.Text.Json
             public int Order { get; }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonPropertyOrderAttribute" /> with the specified order.
+            /// Initializes a new instance of <see cref="JsonPropertyOrderAttribute" /> with the specified order.
             /// </summary>
             /// <param name="order">The order of the property.</param>
             public JsonPropertyOrderAttribute(int order)
@@ -33634,14 +33636,14 @@ namespace System.Text.Json
         /// </summary>
         /// <remarks>
         /// <see langword="null" /> token in JSON will not trigger a validation error.
-        /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-        /// this attribute will be mapped to <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.IsRequired" />.
+        /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+        /// this attribute will be mapped to <see cref="P:Metadata.JsonPropertyInfo.IsRequired" />.
         /// </remarks>
         [AttributeUsage(AttributeTargets.Property | AttributeTargets.Field, AllowMultiple = false)]
         public sealed class JsonRequiredAttribute : JsonAttribute
         {
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonRequiredAttribute" />.
+            /// Initializes a new instance of <see cref="JsonRequiredAttribute" />.
             /// </summary>
             public JsonRequiredAttribute() { }
         }
@@ -33697,8 +33699,8 @@ namespace System.Text.Json
         public sealed class JsonSerializableAttribute : JsonAttribute
         {
             /// <summary>
-            /// The name of the property for the generated <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> for
-            /// the type on the generated, derived <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> type.
+            /// The name of the property for the generated <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> for
+            /// the type on the generated, derived <see cref="JsonSerializerContext" /> type.
             /// </summary>
             /// <remarks>
             /// Useful to resolve a name collision with another type in the compilation closure.
@@ -33706,13 +33708,13 @@ namespace System.Text.Json
             public string? TypeInfoPropertyName { get; set; }
 
             /// <summary>
-            /// Determines what the source generator should generate for the type. If the value is <see cref="F:System.Text.Json.Serialization.JsonSourceGenerationMode.Default" />,
-            /// then the setting specified on <see cref="P:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute.GenerationMode" /> will be used.
+            /// Determines what the source generator should generate for the type. If the value is <see cref="F:JsonSourceGenerationMode.Default" />,
+            /// then the setting specified on <see cref="P:JsonSourceGenerationOptionsAttribute.GenerationMode" /> will be used.
             /// </summary>
             public JsonSourceGenerationMode GenerationMode { get; set; }
 
             /// <summary>
-            /// Initializes a new instance of <see cref="T:System.Text.Json.Serialization.JsonSerializableAttribute" /> with the specified type.
+            /// Initializes a new instance of <see cref="JsonSerializableAttribute" /> with the specified type.
             /// </summary>
             /// <param name="type">The type to generate source code for.</param>
             public JsonSerializableAttribute(Type type)
@@ -33764,7 +33766,7 @@ namespace System.Text.Json
 
             /// <summary>
             /// Indicates whether pre-generated serialization logic for types in the context
-            /// is compatible with the run time specified <see cref="T:System.Text.Json.JsonSerializerOptions" />.
+            /// is compatible with the run time specified <see cref="System.Text.Json.JsonSerializerOptions" />.
             /// </summary>
             internal bool CanUseSerializationLogic
             {
@@ -33786,17 +33788,17 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// The default run time options for the context. Its values are defined at design-time via <see cref="T:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute" />.
+            /// The default run time options for the context. Its values are defined at design-time via <see cref="JsonSourceGenerationOptionsAttribute" />.
             /// </summary>
             protected abstract JsonSerializerOptions? GeneratedSerializerOptions { get; }
 
             /// <summary>
-            /// Creates an instance of <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> and binds it with the indicated <see cref="T:System.Text.Json.JsonSerializerOptions" />.
+            /// Creates an instance of <see cref="JsonSerializerContext" /> and binds it with the indicated <see cref="System.Text.Json.JsonSerializerOptions" />.
             /// </summary>
             /// <param name="options">The run time provided options for the context instance.</param>
             /// <remarks>
             /// If no instance options are passed, then no options are set until the context is bound using <see cref="M:System.Text.Json.JsonSerializerOptions.AddContext``1" />,
-            /// or until <see cref="P:System.Text.Json.Serialization.JsonSerializerContext.Options" /> is called, where a new options instance is created and bound.
+            /// or until <see cref="P:JsonSerializerContext.Options" /> is called, where a new options instance is created and bound.
             /// </remarks>
             protected JsonSerializerContext(JsonSerializerOptions? options)
             {
@@ -33808,7 +33810,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// Returns a <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance representing the given type.
+            /// Returns a <see cref="Metadata.JsonTypeInfo" /> instance representing the given type.
             /// </summary>
             /// <param name="type">The type to fetch metadata about.</param>
             /// <returns>The metadata for the specified type, or <see langword="null" /> if the context has no metadata for the type.</returns>
@@ -33831,30 +33833,30 @@ namespace System.Text.Json
         public enum JsonSourceGenerationMode
         {
             /// <summary>
-            /// When specified on <see cref="P:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute.GenerationMode" />, indicates that both type-metadata initialization logic
-            /// and optimized serialization logic should be generated for all types. When specified on <see cref="P:System.Text.Json.Serialization.JsonSerializableAttribute.GenerationMode" />,
-            /// indicates that the setting on <see cref="P:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute.GenerationMode" /> should be used.
+            /// When specified on <see cref="P:JsonSourceGenerationOptionsAttribute.GenerationMode" />, indicates that both type-metadata initialization logic
+            /// and optimized serialization logic should be generated for all types. When specified on <see cref="P:JsonSerializableAttribute.GenerationMode" />,
+            /// indicates that the setting on <see cref="P:JsonSourceGenerationOptionsAttribute.GenerationMode" /> should be used.
             /// </summary>
             Default = 0,
             /// <summary>
             /// Instructs the JSON source generator to generate type-metadata initialization logic.
             /// </summary>
             /// <remarks>
-            /// This mode supports all <see cref="T:System.Text.Json.JsonSerializer" /> features.
+            /// This mode supports all <see cref="System.Text.Json.JsonSerializer" /> features.
             /// </remarks>
             Metadata = 1,
             /// <summary>
             /// Instructs the JSON source generator to generate optimized serialization logic.
             /// </summary>
             /// <remarks>
-            /// This mode supports only a subset of <see cref="T:System.Text.Json.JsonSerializer" /> features.
+            /// This mode supports only a subset of <see cref="System.Text.Json.JsonSerializer" /> features.
             /// </remarks>
             Serialization = 2
         }
 
         /// <summary>
         /// Instructs the System.Text.Json source generator to assume the specified
-        /// options will be used at run time via <see cref="T:System.Text.Json.JsonSerializerOptions" />.
+        /// options will be used at run time via <see cref="System.Text.Json.JsonSerializerOptions" />.
         /// </summary>
         [AttributeUsage(AttributeTargets.Class, AllowMultiple = false)]
         public sealed class JsonSourceGenerationOptionsAttribute : JsonAttribute
@@ -33890,7 +33892,7 @@ namespace System.Text.Json
             public bool WriteIndented { get; set; }
 
             /// <summary>
-            /// Specifies the source generation mode for types that don't explicitly set the mode with <see cref="P:System.Text.Json.Serialization.JsonSerializableAttribute.GenerationMode" />.
+            /// Specifies the source generation mode for types that don't explicitly set the mode with <see cref="P:JsonSerializableAttribute.GenerationMode" />.
             /// </summary>
             public JsonSourceGenerationMode GenerationMode { get; set; }
         }
@@ -33899,7 +33901,7 @@ namespace System.Text.Json
         /// Converter to convert enums to and from strings.
         /// </summary>
         /// <remarks>
-        /// Reading is case insensitive, writing can be customized via a <see cref="T:System.Text.Json.JsonNamingPolicy" />.
+        /// Reading is case insensitive, writing can be customized via a <see cref="System.Text.Json.JsonNamingPolicy" />.
         /// </remarks>
         [RequiresDynamicCode("JsonStringEnumConverter cannot be statically analyzed and requires runtime code generation. Consider authoring a custom converter that is not a factory to work around the issue. See https://github.com/dotnet/runtime/issues/73124.")]
         public class JsonStringEnumConverter : JsonConverterFactory
@@ -33909,7 +33911,7 @@ namespace System.Text.Json
             private readonly EnumConverterOptions _converterOptions;
 
             /// <summary>
-            /// Constructor. Creates the <see cref="T:System.Text.Json.Serialization.JsonStringEnumConverter" /> with the
+            /// Constructor. Creates the <see cref="JsonStringEnumConverter" /> with the
             /// default naming policy and allows integer values.
             /// </summary>
             public JsonStringEnumConverter()
@@ -33967,16 +33969,16 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// Defines how deserializing a type declared as an <see cref="T:System.Object" /> is handled during deserialization.
+        /// Defines how deserializing a type declared as an <see cref="System.Object" /> is handled during deserialization.
         /// </summary>
         public enum JsonUnknownTypeHandling
         {
             /// <summary>
-            /// A type declared as <see cref="T:System.Object" /> is deserialized as a <see cref="F:System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonElement" />.
+            /// A type declared as <see cref="System.Object" /> is deserialized as a <see cref="F:JsonUnknownTypeHandling.JsonElement" />.
             /// </summary>
             JsonElement,
             /// <summary>
-            /// A type declared as <see cref="T:System.Object" /> is deserialized as a <see cref="F:System.Text.Json.Serialization.JsonUnknownTypeHandling.JsonNode" />.
+            /// A type declared as <see cref="System.Object" /> is deserialized as a <see cref="F:JsonUnknownTypeHandling.JsonNode" />.
             /// </summary>
             JsonNode
         }
@@ -34205,12 +34207,12 @@ namespace System.Text.Json
         }
 
         /// <summary>
-        /// This class defines how the <see cref="T:System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
+        /// This class defines how the <see cref="System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
         /// </summary>
         public abstract class ReferenceHandler
         {
             /// <summary>
-            /// Indicates whether this ReferenceHandler implementation should use <see cref="F:System.Text.Json.Serialization.ReferenceHandlingStrategy.Preserve" /> semantics or <see cref="F:System.Text.Json.Serialization.ReferenceHandlingStrategy.IgnoreCycles" /> semantics.
+            /// Indicates whether this ReferenceHandler implementation should use <see cref="F:ReferenceHandlingStrategy.Preserve" /> semantics or <see cref="F:ReferenceHandlingStrategy.IgnoreCycles" /> semantics.
             /// The defualt is Preserve.
             /// </summary>
             internal ReferenceHandlingStrategy HandlingStrategy = ReferenceHandlingStrategy.Preserve;
@@ -34230,17 +34232,17 @@ namespace System.Text.Json
             /// For JSON objects that don't contain any metadata properties, the deserialization behavior is identical to <see langword="null" />.
             /// For value types:
             ///   * The `$id` metadata property is ignored.
-            ///   * A <see cref="T:System.Text.Json.JsonException" /> is thrown if a `$ref` metadata property is found within the JSON object.
+            ///   * A <see cref="System.Text.Json.JsonException" /> is thrown if a `$ref` metadata property is found within the JSON object.
             ///   * For enumerable value types, the `$values` metadata property is ignored.
             /// ** For the metadata properties within the JSON to be considered well-formed, they must follow these rules:
             ///   1) The `$id` metadata property must be the first property in the JSON object.
             ///   2) A JSON object that contains a `$ref` metadata property must not contain any other properties.
             ///   3) The value of the `$ref` metadata property must refer to an `$id` that has appeared earlier in the JSON.
             ///   4) The value of the `$id` and `$ref` metadata properties must be a JSON string.
-            ///   5) For enumerable types, such as <see cref="T:System.Collections.Generic.List`1" />, the JSON array must be nested within a JSON object containing an `$id` and `$values` metadata property, in that order.
+            ///   5) For enumerable types, such as <see cref="List{T}" />, the JSON array must be nested within a JSON object containing an `$id` and `$values` metadata property, in that order.
             ///   6) For enumerable types, the `$values` metadata property must be a JSON array.
             ///   7) The `$values` metadata property is only valid when referring to enumerable types.
-            /// If the JSON is not well-formed, a <see cref="T:System.Text.Json.JsonException" /> is thrown.
+            /// If the JSON is not well-formed, a <see cref="System.Text.Json.JsonException" /> is thrown.
             /// </remarks>
             public static ReferenceHandler Preserve { get; } = new PreserveReferenceHandler();
 
@@ -34252,13 +34254,13 @@ namespace System.Text.Json
 
 
             /// <summary>
-            /// Returns the <see cref="T:System.Text.Json.Serialization.ReferenceResolver" /> used for each serialization call.
+            /// Returns the <see cref="ReferenceResolver" /> used for each serialization call.
             /// </summary>
             /// <returns>The resolver to use for serialization and deserialization.</returns>
             public abstract ReferenceResolver CreateResolver();
 
             /// <summary>
-            /// Optimization for the resolver used when <see cref="P:System.Text.Json.Serialization.ReferenceHandler.Preserve" /> is set in <see cref="P:System.Text.Json.JsonSerializerOptions.ReferenceHandler" />;
+            /// Optimization for the resolver used when <see cref="P:ReferenceHandler.Preserve" /> is set in <see cref="P:System.Text.Json.JsonSerializerOptions.ReferenceHandler" />;
             /// we pass a flag signaling whether this is called from serialization or deserialization to save one dictionary instantiation.
             /// </summary>
             internal virtual ReferenceResolver CreateResolver(bool writing)
@@ -34268,13 +34270,13 @@ namespace System.Text.Json
         }
        
         /// <summary>
-        /// This class defines how the <see cref="T:System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
+        /// This class defines how the <see cref="System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
         /// </summary>
-        /// <typeparam name="T">The type of the <see cref="T:System.Text.Json.Serialization.ReferenceResolver" /> to create on each serialization or deserialization call.</typeparam>
+        /// <typeparam name="T">The type of the <see cref="ReferenceResolver" /> to create on each serialization or deserialization call.</typeparam>
         public sealed class ReferenceHandler<T> : ReferenceHandler where T : ReferenceResolver, new()
         {
             /// <summary>
-            /// Creates a new <see cref="T:System.Text.Json.Serialization.ReferenceResolver" /> of type <typeparamref name="T" /> used for each serialization call.
+            /// Creates a new <see cref="ReferenceResolver" /> of type <typeparamref name="T" /> used for each serialization call.
             /// </summary>
             /// <returns>The new resolver to use for serialization and deserialization.</returns>
             public override ReferenceResolver CreateResolver()
@@ -34286,7 +34288,7 @@ namespace System.Text.Json
         internal enum ReferenceHandlingStrategy { None, Preserve, IgnoreCycles }
 
         /// <summary>
-        /// This class defines how the <see cref="T:System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
+        /// This class defines how the <see cref="System.Text.Json.JsonSerializer" /> deals with references on serialization and deserialization.
         /// Defines the core behavior of preserving references on serialization and deserialization.
         /// </summary>
         public abstract class ReferenceResolver
@@ -34335,7 +34337,7 @@ namespace System.Text.Json
         namespace Converters
         {
             using System.Text.Json.Nodes;
-            using System.Text.Json.Serialization.Metadata;
+            using Metadata;
 
             /// <summary>
             /// Converter for <cref>System.Array</cref>.
@@ -34967,14 +34969,14 @@ namespace System.Text.Json
                 private readonly JsonNamingPolicy _namingPolicy;
 
                 /// <summary>
-                /// Holds a mapping from enum value to text that might be formatted with <see cref="F:System.Text.Json.Serialization.Converters.EnumConverter`1._namingPolicy" />.
-                /// <see cref="T:System.UInt64" /> is as the key used rather than <typeparamref name="T" /> given measurements that
+                /// Holds a mapping from enum value to text that might be formatted with <see cref="F:Converters.EnumConverter`1._namingPolicy" />.
+                /// <see cref="System.UInt64" /> is as the key used rather than <typeparamref name="T" /> given measurements that
                 /// show private memory savings when a single type is used https://github.com/dotnet/runtime/pull/36726#discussion_r428868336.
                 /// </summary>
                 private readonly ConcurrentDictionary<ulong, JsonEncodedText> _nameCacheForWriting;
 
                 /// <summary>
-                /// Holds a mapping from text that might be formatted with <see cref="F:System.Text.Json.Serialization.Converters.EnumConverter`1._namingPolicy" /> to enum value.
+                /// Holds a mapping from text that might be formatted with <see cref="F:Converters.EnumConverter`1._namingPolicy" /> to enum value.
                 /// </summary>
                 private readonly ConcurrentDictionary<string, T> _nameCacheForReading;
 
@@ -36710,8 +36712,8 @@ namespace System.Text.Json
 
             /// <summary>
             /// Provides a mechanism to invoke "fast-path" serialization logic via
-            /// <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1.SerializeHandler" />. This type holds an optional
-            /// reference to an actual <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> for the type
+            /// <see cref="P:Serialization.Metadata.JsonTypeInfo{T}.SerializeHandler" />. This type holds an optional
+            /// reference to an actual <see cref="JsonConverter{T}" /> for the type
             /// <typeparamref name="T" />, to provide a fallback when the fast path cannot be used.
             /// </summary>
             /// <typeparam name="T">The type to converter</typeparam>
@@ -38669,7 +38671,8 @@ namespace System.Text.Json
             using System.Reflection.Emit;
             using System.Runtime.ExceptionServices;
             using System.Text.Json.Reflection;
-            using System.Text.Json.Serialization.Converters;
+            using Converters;
+            using NAudio.Wave;
 
             /// <summary>
             /// Creates and initializes serialization metadata for a type.
@@ -38734,7 +38737,7 @@ namespace System.Text.Json
                 /// Gets a list of user-defined callbacks that can be used to modify the initial contract.
                 /// </summary>
                 /// <remarks>
-                /// The modifier list will be rendered immutable after the first <see cref="M:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver.GetTypeInfo(System.Type,System.Text.Json.JsonSerializerOptions)" /> invocation.
+                /// The modifier list will be rendered immutable after the first <see cref="M:Metadata.DefaultJsonTypeInfoResolver.GetTypeInfo(System.Type,System.Text.Json.JsonSerializerOptions)" /> invocation.
                 ///
                 /// Modifier callbacks are called consecutively in the order in which they are specified in the list.
                 /// </remarks>
@@ -38900,7 +38903,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a mutable <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> instance.
+                /// Creates a mutable <see cref="Metadata.DefaultJsonTypeInfoResolver" /> instance.
                 /// </summary>
                 [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed. Use the overload that takes a JsonTypeInfo or JsonSerializerContext, or make sure all of the required types are preserved.")]
                 [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
@@ -38928,12 +38931,12 @@ namespace System.Text.Json
                 /// Resolves a JSON contract for a given <paramref name="type" /> and <paramref name="options" /> configuration.
                 /// </summary>
                 /// <param name="type">The type for which to resolve a JSON contract.</param>
-                /// <param name="options">A <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance used to determine contract configuration.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> defining a reflection-derived JSON contract for <paramref name="type" />.</returns>
-                /// <exception cref="T:System.ArgumentNullException"><paramref name="type" /> or <paramref name="options" /> is <see langword="null" />.</exception>
+                /// <param name="options">A <see cref="System.Text.Json.JsonSerializerOptions" /> instance used to determine contract configuration.</param>
+                /// <returns>A <see cref="Metadata.JsonTypeInfo" /> defining a reflection-derived JSON contract for <paramref name="type" />.</returns>
+                /// <exception cref="System.ArgumentNullException"><paramref name="type" /> or <paramref name="options" /> is <see langword="null" />.</exception>
                 /// <remarks>
                 /// The base implementation of this method will produce a reflection-derived contract
-                /// and apply any callbacks from the <see cref="P:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver.Modifiers" /> list.
+                /// and apply any callbacks from the <see cref="P:Metadata.DefaultJsonTypeInfoResolver.Modifiers" /> list.
                 /// </remarks>
                 [UnconditionalSuppressMessage("ReflectionAnalysis", "IL2026:RequiresUnreferencedCode", Justification = "The ctor is marked RequiresUnreferencedCode.")]
                 [UnconditionalSuppressMessage("AotAnalysis", "IL3050:RequiresDynamicCode", Justification = "The ctor is marked RequiresDynamicCode.")]
@@ -39286,12 +39289,12 @@ namespace System.Text.Json
             public interface IJsonTypeInfoResolver
             {
                 /// <summary>
-                /// Resolves a <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> contract for the requested type and options.
+                /// Resolves a <see cref="Metadata.JsonTypeInfo" /> contract for the requested type and options.
                 /// </summary>
                 /// <param name="type">Type to be resolved.</param>
                 /// <param name="options">Configuration used when resolving the metadata.</param>
                 /// <returns>
-                /// A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance matching the requested type,
+                /// A <see cref="Metadata.JsonTypeInfo" /> instance matching the requested type,
                 /// or <see langword="null" /> if no contract could be resolved.
                 /// </returns>
                 JsonTypeInfo? GetTypeInfo(Type type, JsonSerializerOptions options);
@@ -39306,31 +39309,31 @@ namespace System.Text.Json
             public sealed class JsonCollectionInfoValues<TCollection>
             {
                 /// <summary>
-                /// A <see cref="T:System.Func`1" /> to create an instance of the collection when deserializing.
+                /// A <see cref="System.Func{T}" /> to create an instance of the collection when deserializing.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public Func<TCollection>? ObjectCreator { get; init; }
 
                 /// <summary>
-                /// If a dictionary type, the <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance representing the key type.
+                /// If a dictionary type, the <see cref="Metadata.JsonTypeInfo" /> instance representing the key type.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public JsonTypeInfo? KeyInfo { get; init; }
 
                 /// <summary>
-                /// A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance representing the element type.
+                /// A <see cref="Metadata.JsonTypeInfo" /> instance representing the element type.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public JsonTypeInfo ElementInfo { get; init; }
 
                 /// <summary>
-                /// The <see cref="T:System.Text.Json.Serialization.JsonNumberHandling" /> option to apply to number collection elements.
+                /// The <see cref="JsonNumberHandling" /> option to apply to number collection elements.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public JsonNumberHandling NumberHandling { get; init; }
 
                 /// <summary>
-                /// An optimized serialization implementation assuming pre-determined <see cref="T:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute" /> defaults.
+                /// An optimized serialization implementation assuming pre-determined <see cref="JsonSourceGenerationOptionsAttribute" /> defaults.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public Action<Utf8JsonWriter, TCollection>? SerializeHandler { get; init; }
@@ -39460,173 +39463,173 @@ namespace System.Text.Json
                 private static JsonConverter<Version> s_versionConverter;
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Boolean" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Boolean" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<bool> BooleanConverter => s_booleanConverter ?? (s_booleanConverter = new System.Text.Json.Serialization.Converters.BooleanConverter());
+                public static JsonConverter<bool> BooleanConverter => s_booleanConverter ?? (s_booleanConverter = new Converters.BooleanConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts byte array values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts byte array values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<byte[]> ByteArrayConverter => s_byteArrayConverter ?? (s_byteArrayConverter = new ByteArrayConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Byte" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Byte" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<byte> ByteConverter => s_byteConverter ?? (s_byteConverter = new System.Text.Json.Serialization.Converters.ByteConverter());
+                public static JsonConverter<byte> ByteConverter => s_byteConverter ?? (s_byteConverter = new Converters.ByteConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Char" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Char" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<char> CharConverter => s_charConverter ?? (s_charConverter = new System.Text.Json.Serialization.Converters.CharConverter());
+                public static JsonConverter<char> CharConverter => s_charConverter ?? (s_charConverter = new Converters.CharConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.DateTime" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.DateTime" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<DateTime> DateTimeConverter => s_dateTimeConverter ?? (s_dateTimeConverter = new System.Text.Json.Serialization.Converters.DateTimeConverter());
+                public static JsonConverter<DateTime> DateTimeConverter => s_dateTimeConverter ?? (s_dateTimeConverter = new Converters.DateTimeConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.DateTimeOffset" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.DateTimeOffset" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<DateTimeOffset> DateTimeOffsetConverter => s_dateTimeOffsetConverter ?? (s_dateTimeOffsetConverter = new System.Text.Json.Serialization.Converters.DateTimeOffsetConverter());
+                public static JsonConverter<DateTimeOffset> DateTimeOffsetConverter => s_dateTimeOffsetConverter ?? (s_dateTimeOffsetConverter = new Converters.DateTimeOffsetConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Decimal" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Decimal" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<decimal> DecimalConverter => s_decimalConverter ?? (s_decimalConverter = new System.Text.Json.Serialization.Converters.DecimalConverter());
+                public static JsonConverter<decimal> DecimalConverter => s_decimalConverter ?? (s_decimalConverter = new Converters.DecimalConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Double" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Double" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<double> DoubleConverter => s_doubleConverter ?? (s_doubleConverter = new System.Text.Json.Serialization.Converters.DoubleConverter());
+                public static JsonConverter<double> DoubleConverter => s_doubleConverter ?? (s_doubleConverter = new Converters.DoubleConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Guid" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Guid" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<Guid> GuidConverter => s_guidConverter ?? (s_guidConverter = new System.Text.Json.Serialization.Converters.GuidConverter());
+                public static JsonConverter<Guid> GuidConverter => s_guidConverter ?? (s_guidConverter = new Converters.GuidConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Int16" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Int16" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<short> Int16Converter => s_int16Converter ?? (s_int16Converter = new System.Text.Json.Serialization.Converters.Int16Converter());
+                public static JsonConverter<short> Int16Converter => s_int16Converter ?? (s_int16Converter = new Converters.Int16Converter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Int32" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Int32" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<int> Int32Converter => s_int32Converter ?? (s_int32Converter = new System.Text.Json.Serialization.Converters.Int32Converter());
+                public static JsonConverter<int> Int32Converter => s_int32Converter ?? (s_int32Converter = new Converters.Int32Converter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Int64" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Int64" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<long> Int64Converter => s_int64Converter ?? (s_int64Converter = new System.Text.Json.Serialization.Converters.Int64Converter());
+                public static JsonConverter<long> Int64Converter => s_int64Converter ?? (s_int64Converter = new Converters.Int64Converter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.Nodes.JsonArray" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="JsonArray" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonArray> JsonArrayConverter => s_jsonArrayConverter ?? (s_jsonArrayConverter = new JsonArrayConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.JsonElement" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Text.Json.JsonElement" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonElement> JsonElementConverter => s_jsonElementConverter ?? (s_jsonElementConverter = new JsonElementConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.Nodes.JsonNode" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="JsonNode" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonNode> JsonNodeConverter => s_jsonNodeConverter ?? (s_jsonNodeConverter = new JsonNodeConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.Nodes.JsonObject" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="JsonObject" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonObject> JsonObjectConverter => s_jsonObjectConverter ?? (s_jsonObjectConverter = new JsonObjectConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.Nodes.JsonArray" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="JsonArray" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonValue> JsonValueConverter => s_jsonValueConverter ?? (s_jsonValueConverter = new JsonValueConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Text.Json.JsonDocument" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Text.Json.JsonDocument" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<JsonDocument> JsonDocumentConverter => s_jsonDocumentConverter ?? (s_jsonDocumentConverter = new JsonDocumentConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Object" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Object" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<object?> ObjectConverter => s_objectConverter ?? (s_objectConverter = new ObjectConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Single" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Single" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<float> SingleConverter => s_singleConverter ?? (s_singleConverter = new System.Text.Json.Serialization.Converters.SingleConverter());
+                public static JsonConverter<float> SingleConverter => s_singleConverter ?? (s_singleConverter = new Converters.SingleConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.SByte" /> values.
-                /// </summary>
-                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                [CLSCompliant(false)]
-                public static JsonConverter<sbyte> SByteConverter => s_sbyteConverter ?? (s_sbyteConverter = new System.Text.Json.Serialization.Converters.SByteConverter());
-
-                /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.String" /> values.
-                /// </summary>
-                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<string> StringConverter => s_stringConverter ?? (s_stringConverter = new System.Text.Json.Serialization.Converters.StringConverter());
-
-                /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.TimeSpan" /> values.
-                /// </summary>
-                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
-                public static JsonConverter<TimeSpan> TimeSpanConverter => s_timeSpanConverter ?? (s_timeSpanConverter = new System.Text.Json.Serialization.Converters.TimeSpanConverter());
-
-                /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.UInt16" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.SByte" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 [CLSCompliant(false)]
-                public static JsonConverter<ushort> UInt16Converter => s_uint16Converter ?? (s_uint16Converter = new System.Text.Json.Serialization.Converters.UInt16Converter());
+                public static JsonConverter<sbyte> SByteConverter => s_sbyteConverter ?? (s_sbyteConverter = new Converters.SByteConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.UInt32" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.String" /> values.
+                /// </summary>
+                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
+                public static JsonConverter<string> StringConverter => s_stringConverter ?? (s_stringConverter = new Converters.StringConverter());
+
+                /// <summary>
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.TimeSpan" /> values.
+                /// </summary>
+                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
+                public static JsonConverter<TimeSpan> TimeSpanConverter => s_timeSpanConverter ?? (s_timeSpanConverter = new Converters.TimeSpanConverter());
+
+                /// <summary>
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.UInt16" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 [CLSCompliant(false)]
-                public static JsonConverter<uint> UInt32Converter => s_uint32Converter ?? (s_uint32Converter = new System.Text.Json.Serialization.Converters.UInt32Converter());
+                public static JsonConverter<ushort> UInt16Converter => s_uint16Converter ?? (s_uint16Converter = new Converters.UInt16Converter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.UInt64" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.UInt32" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 [CLSCompliant(false)]
-                public static JsonConverter<ulong> UInt64Converter => s_uint64Converter ?? (s_uint64Converter = new System.Text.Json.Serialization.Converters.UInt64Converter());
+                public static JsonConverter<uint> UInt32Converter => s_uint32Converter ?? (s_uint32Converter = new Converters.UInt32Converter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Uri" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.UInt64" /> values.
+                /// </summary>
+                /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
+                [CLSCompliant(false)]
+                public static JsonConverter<ulong> UInt64Converter => s_uint64Converter ?? (s_uint64Converter = new Converters.UInt64Converter());
+
+                /// <summary>
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Uri" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<Uri> UriConverter => s_uriConverter ?? (s_uriConverter = new UriConverter());
 
                 /// <summary>
-                /// Returns a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <see cref="T:System.Version" /> values.
+                /// Returns a <see cref="JsonConverter{T}" /> instance that converts <see cref="System.Version" /> values.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<Version> VersionConverter => s_versionConverter ?? (s_versionConverter = new VersionConverter());
@@ -39635,7 +39638,7 @@ namespace System.Text.Json
                 /// Creates serialization metadata for an array.
                 /// </summary>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to use.</param>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use.</param>
                 /// <param name="collectionInfo">Provides serialization metadata about the collection type.</param>
                 /// <returns>Serialization metadata for the given type.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
@@ -39645,11 +39648,11 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.List`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="List{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to use.</param>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use.</param>
                 /// <param name="collectionInfo">Provides serialization metadata about the collection type.</param>
                 /// <returns>Serialization metadata for the given type.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
@@ -39659,7 +39662,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.Dictionary`2" />.
+                /// Creates serialization metadata for types assignable to <see cref="Dictionary{TKey , TValue}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TKey">The generic definition of the key type.</typeparam>
@@ -39674,8 +39677,8 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for <see cref="!:System.Collections.Immutable.ImmutableDictionary&lt;TKey, TValue&gt;" /> and
-                /// types assignable to <see cref="!:System.Collections.Immutable.IImmutableDictionary&lt;TKey, TValue&gt;" />.
+                /// Creates serialization metadata for <see cref="Collections.Immutable.ImmutableDictionary{TKey, TValue}" /> and
+                /// types assignable to <see cref="Collections.Immutable.IImmutableDictionary{TKey, TValue}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TKey">The generic definition of the key type.</typeparam>
@@ -39695,7 +39698,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.IDictionary`2" />.
+                /// Creates serialization metadata for types assignable to <see cref="IDictionary{T1 , T2}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TKey">The generic definition of the key type.</typeparam>
@@ -39710,7 +39713,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.IReadOnlyDictionary`2" />.
+                /// Creates serialization metadata for types assignable to <see cref="IReadOnlyDictionary{TKey , TValue}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TKey">The generic definition of the key type.</typeparam>
@@ -39744,7 +39747,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.IList" />.
+                /// Creates serialization metadata for types assignable to <see cref="System.Collections.IList" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <param name="options"></param>
@@ -39757,7 +39760,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.IList`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="IList{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39771,7 +39774,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.ISet`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="ISet{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39785,7 +39788,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.ICollection`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="ICollection{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39799,7 +39802,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.Stack`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="Stack{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39813,7 +39816,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.Queue`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="Queue{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39827,7 +39830,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Concurrent.ConcurrentStack`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="System.Collections.Concurrent.ConcurrentStack{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39841,7 +39844,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.Queue`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="Queue{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39855,7 +39858,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.IEnumerable`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="Collections.Generic.IEnumerable{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39869,7 +39872,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.Generic.IAsyncEnumerable`1" />.
+                /// Creates serialization metadata for types assignable to <see cref="System.Collections.Generic.IAsyncEnumerable{T}" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <typeparam name="TElement">The generic definition of the element type.</typeparam>
@@ -39883,7 +39886,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.IDictionary" />.
+                /// Creates serialization metadata for types assignable to <see cref="System.Collections.IDictionary" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <param name="options"></param>
@@ -39896,7 +39899,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for <see cref="T:System.Collections.Stack" /> types.
+                /// Creates serialization metadata for <see cref="System.Collections.Stack" /> types.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <param name="options"></param>
@@ -39910,7 +39913,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for <see cref="T:System.Collections.Queue" /> types.
+                /// Creates serialization metadata for <see cref="System.Collections.Queue" /> types.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <param name="options"></param>
@@ -39933,7 +39936,7 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates serialization metadata for types assignable to <see cref="T:System.Collections.IList" />.
+                /// Creates serialization metadata for types assignable to <see cref="System.Collections.IList" />.
                 /// </summary>
                 /// <typeparam name="TCollection">The generic definition of the type.</typeparam>
                 /// <param name="options"></param>
@@ -39946,10 +39949,10 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that throws <see cref="T:System.NotSupportedException" />.
+                /// Creates a <see cref="JsonConverter{T}" /> instance that throws <see cref="System.NotSupportedException" />.
                 /// </summary>
                 /// <typeparam name="T">The generic definition for the type.</typeparam>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that throws <see cref="T:System.NotSupportedException" /></returns>
+                /// <returns>A <see cref="JsonConverter{T}" /> instance that throws <see cref="System.NotSupportedException" /></returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<T> GetUnsupportedTypeConverter<T>()
                 {
@@ -39957,11 +39960,11 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T" /> values.
+                /// Creates a <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T" /> values.
                 /// </summary>
                 /// <typeparam name="T">The generic definition for the enum type.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to use for serialization and deserialization.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T" /> values.</returns>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use for serialization and deserialization.</param>
+                /// <returns>A <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T" /> values.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<T> GetEnumConverter<T>(JsonSerializerOptions options) where T : struct, Enum
                 {
@@ -39973,11 +39976,11 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T??" /> values.
+                /// Creates a <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T??" /> values.
                 /// </summary>
                 /// <typeparam name="T">The generic definition for the underlying nullable type.</typeparam>
                 /// <param name="underlyingTypeInfo">Serialization metadata for the underlying nullable type.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T??" /> values</returns>
+                /// <returns>A <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T??" /> values</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<T?> GetNullableConverter<T>(JsonTypeInfo<T> underlyingTypeInfo) where T : struct
                 {
@@ -39990,11 +39993,11 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T??" /> values.
+                /// Creates a <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T??" /> values.
                 /// </summary>
                 /// <typeparam name="T">The generic definition for the underlying nullable type.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to use for serialization and deserialization.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> instance that converts <typeparamref name="T??" /> values</returns>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to use for serialization and deserialization.</param>
+                /// <returns>A <see cref="JsonConverter{T}" /> instance that converts <typeparamref name="T??" /> values</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonConverter<T?> GetNullableConverter<T>(JsonSerializerOptions options) where T : struct
                 {
@@ -40020,9 +40023,9 @@ namespace System.Text.Json
                 /// Creates metadata for a property or field.
                 /// </summary>
                 /// <typeparam name="T">The type that the converter for the property returns or accepts when converting JSON data.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to initialize the metadata with.</param>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to initialize the metadata with.</param>
                 /// <param name="propertyInfo">Provides serialization metadata about the property or field.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance initialized with the provided metadata.</returns>
+                /// <returns>A <see cref="Metadata.JsonPropertyInfo" /> instance initialized with the provided metadata.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonPropertyInfo CreatePropertyInfo<T>(JsonSerializerOptions options, JsonPropertyInfoValues<T> propertyInfo)
                 {
@@ -40054,11 +40057,11 @@ namespace System.Text.Json
                 /// <summary>
                 /// Creates metadata for a complex class or struct.
                 /// </summary>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> to initialize the metadata with.</param>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> to initialize the metadata with.</param>
                 /// <param name="objectInfo">Provides serialization metadata about an object type with constructors, properties, and fields.</param>
                 /// <typeparam name="T">The type of the class or struct.</typeparam>
-                /// <exception cref="T:System.ArgumentNullException">Thrown when <paramref name="options" /> or <paramref name="objectInfo" /> is null.</exception>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> instance representing the class or struct.</returns>
+                /// <exception cref="System.ArgumentNullException">Thrown when <paramref name="options" /> or <paramref name="objectInfo" /> is null.</exception>
+                /// <returns>A <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> instance representing the class or struct.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonTypeInfo<T> CreateObjectInfo<T>(JsonSerializerOptions options, JsonObjectInfoValues<T> objectInfo) where T : notnull
                 {
@@ -40077,7 +40080,7 @@ namespace System.Text.Json
                 /// Creates metadata for a primitive or a type with a custom converter.
                 /// </summary>
                 /// <typeparam name="T">The generic type definition.</typeparam>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> instance representing the type.</returns>
+                /// <returns>A <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> instance representing the type.</returns>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public static JsonTypeInfo<T> CreateValueInfo<T>(JsonSerializerOptions options, JsonConverter converter)
                 {
@@ -40132,7 +40135,7 @@ namespace System.Text.Json
                 public JsonNumberHandling NumberHandling { get; init; }
 
                 /// <summary>
-                /// Provides a serialization implementation for instances of the class or struct which assumes options specified by <see cref="T:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute" />.
+                /// Provides a serialization implementation for instances of the class or struct which assumes options specified by <see cref="JsonSourceGenerationOptionsAttribute" />.
                 /// </summary>
                 /// <remarks>This API is for use by the output of the System.Text.Json source generator and should not be called directly.</remarks>
                 public Action<Utf8JsonWriter, T>? SerializeHandler { get; init; }
@@ -40332,8 +40335,8 @@ namespace System.Text.Json
                 /// unrecognized type discriminator id's and reverts to the contract of the base type.
                 /// Otherwise, it will fail the deserialization.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The parent <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The parent <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 /// </exception>
                 public bool IgnoreUnrecognizedTypeDiscriminators
                 {
@@ -40351,8 +40354,8 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets the behavior when serializing an undeclared derived runtime type.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The parent <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The parent <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 /// </exception>
                 public JsonUnknownDerivedTypeHandling UnknownDerivedTypeHandling
                 {
@@ -40371,8 +40374,8 @@ namespace System.Text.Json
                 /// Gets or sets a custom type discriminator property name for the polymorhic type.
                 /// Uses the default '$type' property name if left unset.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The parent <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The parent <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 /// </exception>
                 public string TypeDiscriminatorPropertyName
                 {
@@ -40470,14 +40473,14 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a custom converter override for the current property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// It is possible to use <see cref="T:System.Text.Json.Serialization.JsonConverterFactory" /> instances with this property.
+                /// It is possible to use <see cref="JsonConverterFactory" /> instances with this property.
                 ///
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" />, the value of
-                /// <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.CustomConverter" /> will be mapped from <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" />, the value of
+                /// <see cref="P:Metadata.JsonPropertyInfo.CustomConverter" /> will be mapped from <see cref="JsonConverterAttribute" /> annotations.
                 /// </remarks>
                 public JsonConverter? CustomConverter
                 {
@@ -40495,8 +40498,8 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a getter delegate for the property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
                 /// Setting to <see langword="null" /> will result in the property being skipped on serialization.
@@ -40517,8 +40520,8 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a setter delegate for the property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
                 /// Setting to <see langword="null" /> will result in the property being skipped on deserialization.
@@ -40540,16 +40543,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a predicate deciding whether the current property value should be serialized.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
                 /// The first parameter denotes the parent object, the second parameter denotes the property value.
                 ///
                 /// Setting the predicate to <see langword="null" /> is equivalent to always serializing the property value.
                 ///
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" />,
-                /// the value of <see cref="P:System.Text.Json.Serialization.JsonIgnoreAttribute.Condition" /> will map to this predicate.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" />,
+                /// the value of <see cref="P:JsonIgnoreAttribute.Condition" /> will map to this predicate.
                 /// </remarks>
                 public Func<object, object?, bool>? ShouldSerialize
                 {
@@ -40582,12 +40585,12 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a custom attribute provider for the current property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// When resolving metadata via <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> this
-                /// will be populated with the underlying <see cref="T:System.Reflection.MemberInfo" /> of the serialized property or field.
+                /// When resolving metadata via <see cref="Metadata.DefaultJsonTypeInfoResolver" /> this
+                /// will be populated with the underlying <see cref="System.Reflection.MemberInfo" /> of the serialized property or field.
                 ///
                 /// Setting a custom attribute provider will have no impact on the contract model,
                 /// but serves as metadata for downstream contract modifiers.
@@ -40614,16 +40617,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Specifies whether the current property is a special extension data property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// The current <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.PropertyType" /> is not valid for use with extension data.
+                /// The current <see cref="P:Metadata.JsonPropertyInfo.PropertyType" /> is not valid for use with extension data.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this property will be mapped from <see cref="T:System.Text.Json.Serialization.JsonExtensionDataAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this property will be mapped from <see cref="JsonExtensionDataAttribute" /> annotations.
                 /// </remarks>
                 public bool IsExtensionData
                 {
@@ -40634,7 +40637,7 @@ namespace System.Text.Json
                     set
                     {
                         VerifyMutable();
-                        if (value && !System.Text.Json.Serialization.Metadata.JsonTypeInfo.IsValidExtensionDataProperty(PropertyType))
+                        if (value && !Metadata.JsonTypeInfo.IsValidExtensionDataProperty(PropertyType))
                         {
                             ThrowHelper.ThrowInvalidOperationException_SerializationDataExtensionPropertyInvalid(this);
                         }
@@ -40645,16 +40648,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Specifies whether the current property is required for deserialization to be successful.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this property will be mapped from <see cref="T:System.Text.Json.Serialization.JsonRequiredAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this property will be mapped from <see cref="JsonRequiredAttribute" /> annotations.
                 ///
-                /// For contracts using <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" />, properties using the <see langword="required" /> keyword
+                /// For contracts using <see cref="Metadata.DefaultJsonTypeInfoResolver" />, properties using the <see langword="required" /> keyword
                 /// will also map to this setting, unless deserialization uses a SetsRequiredMembersAttribute on a constructor that populates all required properties.
-                /// <see langword="required" /> keyword is currently not supported in <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> contracts.
+                /// <see langword="required" /> keyword is currently not supported in <see cref="JsonSerializerContext" /> contracts.
                 /// </remarks>
                 public bool IsRequired
                 {
@@ -40699,16 +40702,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets the JSON property name used when serializing the property.
                 /// </summary>
-                /// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// The value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.Name" /> cannot conflict with that of other <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> defined in the declaring <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.JsonTypeInfo" />.
+                /// The value of <see cref="P:Metadata.JsonPropertyInfo.Name" /> cannot conflict with that of other <see cref="Metadata.JsonPropertyInfo" /> defined in the declaring <see cref="P:Metadata.JsonPropertyInfo.JsonTypeInfo" />.
                 ///
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
                 /// the value typically reflects the underlying .NET member name, the name derived from <see cref="P:System.Text.Json.JsonSerializerOptions.PropertyNamingPolicy" />,
-                /// or the value specified in <see cref="T:System.Text.Json.Serialization.JsonPropertyNameAttribute" />.
+                /// or the value specified in <see cref="JsonPropertyNameAttribute" />.
                 /// </remarks>
                 public string Name
                 {
@@ -40738,19 +40741,19 @@ namespace System.Text.Json
                 internal byte[] EscapedNameSection { get; set; }
 
                 /// <summary>
-                /// Gets the <see cref="T:System.Text.Json.JsonSerializerOptions" /> value associated with the current contract instance.
+                /// Gets the <see cref="System.Text.Json.JsonSerializerOptions" /> value associated with the current contract instance.
                 /// </summary>
                 public JsonSerializerOptions Options { get; }
 
                 /// <summary>
                 /// Gets or sets the serialization order for the current property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this property will be mapped from <see cref="T:System.Text.Json.Serialization.JsonPropertyOrderAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this property will be mapped from <see cref="JsonPropertyOrderAttribute" /> annotations.
                 /// </remarks>
                 public int Order
                 {
@@ -40785,17 +40788,17 @@ namespace System.Text.Json
                 internal bool IsIgnored => _ignoreCondition == JsonIgnoreCondition.Always;
 
                 /// <summary>
-                /// Reflects the value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.HasGetter" /> combined with any additional global ignore policies.
+                /// Reflects the value of <see cref="P:Metadata.JsonPropertyInfo.HasGetter" /> combined with any additional global ignore policies.
                 /// </summary>
                 internal bool CanSerialize { get; private set; }
 
                 /// <summary>
-                /// Reflects the value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.HasSetter" /> combined with any additional global ignore policies.
+                /// Reflects the value of <see cref="P:Metadata.JsonPropertyInfo.HasSetter" /> combined with any additional global ignore policies.
                 /// </summary>
                 internal bool CanDeserialize { get; private set; }
 
                 /// <summary>
-                /// Relevant to source generated metadata: did the property have the <see cref="T:System.Text.Json.Serialization.JsonIncludeAttribute" />?
+                /// Relevant to source generated metadata: did the property have the <see cref="JsonIncludeAttribute" />?
                 /// </summary>
                 internal bool SrcGen_HasJsonInclude { get; set; }
 
@@ -40810,14 +40813,14 @@ namespace System.Text.Json
                 internal JsonNumberHandling? DeclaringTypeNumberHandling { get; set; }
 
                 /// <summary>
-                /// Gets or sets the <see cref="T:System.Text.Json.Serialization.JsonNumberHandling" /> applied to the current property.
+                /// Gets or sets the <see cref="JsonNumberHandling" /> applied to the current property.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonPropertyInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this property will be mapped from <see cref="T:System.Text.Json.Serialization.JsonNumberHandlingAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this property will be mapped from <see cref="JsonNumberHandlingAttribute" /> annotations.
                 /// </remarks>
                 public JsonNumberHandling? NumberHandling
                 {
@@ -41059,7 +41062,7 @@ namespace System.Text.Json
                     type = Nullable.GetUnderlyingType(type) ?? type;
                     if (!(type == typeof(byte)) && !(type == typeof(decimal)) && !(type == typeof(double)) && !(type == typeof(short)) && !(type == typeof(int)) && !(type == typeof(long)) && !(type == typeof(sbyte)) && !(type == typeof(float)) && !(type == typeof(ushort)) && !(type == typeof(uint)) && !(type == typeof(ulong)))
                     {
-                        return type == System.Text.Json.Serialization.Metadata.JsonTypeInfo.ObjectType;
+                        return type == Metadata.JsonTypeInfo.ObjectType;
                     }
                     return true;
                 }
@@ -41117,7 +41120,7 @@ namespace System.Text.Json
                         else
                         {
                             JsonConverter<object> jsonConverter = GetDictionaryValueConverter<object>();
-                            object value = jsonConverter.Read(ref reader, System.Text.Json.Serialization.Metadata.JsonTypeInfo.ObjectType, Options);
+                            object value = jsonConverter.Read(ref reader, Metadata.JsonTypeInfo.ObjectType, Options);
                             dictionary[state.Current.JsonPropertyNameAsString] = value;
                         }
                     }
@@ -41145,7 +41148,7 @@ namespace System.Text.Json
 
                 internal bool ReadJsonExtensionDataValue(scoped ref ReadStack state, ref Utf8JsonReader reader, out object value)
                 {
-                    if (JsonTypeInfo.ElementType == System.Text.Json.Serialization.Metadata.JsonTypeInfo.ObjectType && reader.TokenType == JsonTokenType.Null)
+                    if (JsonTypeInfo.ElementType == Metadata.JsonTypeInfo.ObjectType && reader.TokenType == JsonTokenType.Null)
                     {
                         value = null;
                         return true;
@@ -41176,8 +41179,8 @@ namespace System.Text.Json
             /// <summary>
             /// Represents a strongly-typed property to prevent boxing and to create a direct delegate to the getter\setter.
             /// </summary>
-            /// <typeparamref name="T" /> is the <see cref="P:System.Text.Json.Serialization.JsonConverter`1.TypeToConvert" /> for either the property's converter,
-            /// or a type's converter, if the current instance is a <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" />.
+            /// <typeparamref name="T" /> is the <see cref="P:JsonConverter{T}.TypeToConvert" /> for either the property's converter,
+            /// or a type's converter, if the current instance is a <see cref="P:Metadata.JsonTypeInfo.PropertyInfoForTypeInfo" />.
             internal sealed class JsonPropertyInfo<T> : JsonPropertyInfo
             {
                 private Func<object, T> _typedGet;
@@ -41563,7 +41566,7 @@ namespace System.Text.Json
             /// <summary>
             /// Provides serialization metadata about a property or field.
             /// </summary>
-            /// <typeparam name="T">The type to convert of the <see cref="T:System.Text.Json.Serialization.JsonConverter`1" /> for the property.</typeparam>
+            /// <typeparam name="T">The type to convert of the <see cref="JsonConverter{T}" /> for the property.</typeparam>
             [EditorBrowsable(EditorBrowsableState.Never)]
             public sealed class JsonPropertyInfoValues<T>
             {
@@ -41588,12 +41591,12 @@ namespace System.Text.Json
                 public Type DeclaringType { get; init; }
 
                 /// <summary>
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> info for the property or field's type.
+                /// The <see cref="Metadata.JsonTypeInfo" /> info for the property or field's type.
                 /// </summary>
                 public JsonTypeInfo PropertyTypeInfo { get; init; }
 
                 /// <summary>
-                /// A <see cref="T:System.Text.Json.Serialization.JsonConverter" /> for the property or field, specified by <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" />.
+                /// A <see cref="JsonConverter" /> for the property or field, specified by <see cref="JsonConverterAttribute" />.
                 /// </summary>
                 public JsonConverter<T>? Converter { get; init; }
 
@@ -41613,12 +41616,12 @@ namespace System.Text.Json
                 public JsonIgnoreCondition? IgnoreCondition { get; init; }
 
                 /// <summary>
-                /// Whether the property was annotated with <see cref="T:System.Text.Json.Serialization.JsonIncludeAttribute" />.
+                /// Whether the property was annotated with <see cref="JsonIncludeAttribute" />.
                 /// </summary>
                 public bool HasJsonInclude { get; init; }
 
                 /// <summary>
-                /// Whether the property was annotated with <see cref="T:System.Text.Json.Serialization.JsonExtensionDataAttribute" />.
+                /// Whether the property was annotated with <see cref="JsonExtensionDataAttribute" />.
                 /// </summary>
                 public bool IsExtensionData { get; init; }
 
@@ -41633,7 +41636,7 @@ namespace System.Text.Json
                 public string PropertyName { get; init; }
 
                 /// <summary>
-                /// The name to be used when processing the property or field, specified by <see cref="T:System.Text.Json.Serialization.JsonPropertyNameAttribute" />.
+                /// The name to be used when processing the property or field, specified by <see cref="JsonPropertyNameAttribute" />.
                 /// </summary>
                 public string? JsonPropertyName { get; init; }
             }
@@ -41658,18 +41661,18 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a parameterless factory to be used on deserialization.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// A parameterless factory is not supported for the current metadata <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />.
+                /// A parameterless factory is not supported for the current metadata <see cref="P:Metadata.JsonTypeInfo.Kind" />.
                 /// </exception>
                 /// <remarks>
                 /// If set to <see langword="null" />, any attempt to deserialize instances of the given type will fail at runtime.
                 ///
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// types with a single default constructor or default constructors annotated with <see cref="T:System.Text.Json.Serialization.JsonConstructorAttribute" />
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// types with a single default constructor or default constructors annotated with <see cref="JsonConstructorAttribute" />
                 /// will be mapped to this delegate.
                 /// </remarks>
                 public new Func<T>? CreateObject
@@ -41686,7 +41689,7 @@ namespace System.Text.Json
 
                 /// <summary>
                 /// Serializes an instance of <typeparamref name="T" /> using
-                /// <see cref="T:System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute" /> values specified at design time.
+                /// <see cref="JsonSourceGenerationOptionsAttribute" /> values specified at design time.
                 /// </summary>
                 /// <remarks>The writer is not flushed after writing.</remarks>
                 [EditorBrowsable(EditorBrowsableState.Never)]
@@ -41927,7 +41930,7 @@ namespace System.Text.Json
 
                 internal const string MetadataFactoryRequiresUnreferencedCode = "JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.";
 
-                internal const string JsonObjectTypeName = "System.Text.Json.Nodes.JsonObject";
+                internal const string JsonObjectTypeName = "JsonObject";
 
                 private JsonPropertyInfoList _properties;
 
@@ -41971,18 +41974,18 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a parameterless factory to be used on deserialization.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// A parameterless factory is not supported for the current metadata <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />.
+                /// A parameterless factory is not supported for the current metadata <see cref="P:Metadata.JsonTypeInfo.Kind" />.
                 /// </exception>
                 /// <remarks>
                 /// If set to <see langword="null" />, any attempt to deserialize instances of the given type will result in an exception.
                 ///
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// types with a single default constructor or default constructors annotated with <see cref="T:System.Text.Json.Serialization.JsonConstructorAttribute" />
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// types with a single default constructor or default constructors annotated with <see cref="JsonConstructorAttribute" />
                 /// will be mapped to this delegate.
                 /// </remarks>
                 public Func<object>? CreateObject
@@ -42002,16 +42005,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a callback to be invoked before serialization occurs.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// Serialization callbacks are only supported for <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" /> metadata.
+                /// Serialization callbacks are only supported for <see cref="F:Metadata.JsonTypeInfoKind.Object" /> metadata.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this callback will be mapped from any <see cref="T:System.Text.Json.Serialization.IJsonOnSerializing" /> implementation on the type.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this callback will be mapped from any <see cref="IJsonOnSerializing" /> implementation on the type.
                 /// </remarks>
                 public Action<object>? OnSerializing
                 {
@@ -42033,16 +42036,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a callback to be invoked after serialization occurs.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// Serialization callbacks are only supported for <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" /> metadata.
+                /// Serialization callbacks are only supported for <see cref="F:Metadata.JsonTypeInfoKind.Object" /> metadata.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this callback will be mapped from any <see cref="T:System.Text.Json.Serialization.IJsonOnSerialized" /> implementation on the type.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this callback will be mapped from any <see cref="IJsonOnSerialized" /> implementation on the type.
                 /// </remarks>
                 public Action<object>? OnSerialized
                 {
@@ -42064,16 +42067,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a callback to be invoked before deserialization occurs.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// Serialization callbacks are only supported for <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" /> metadata.
+                /// Serialization callbacks are only supported for <see cref="F:Metadata.JsonTypeInfoKind.Object" /> metadata.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this callback will be mapped from any <see cref="T:System.Text.Json.Serialization.IJsonOnDeserializing" /> implementation on the type.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this callback will be mapped from any <see cref="IJsonOnDeserializing" /> implementation on the type.
                 /// </remarks>
                 public Action<object>? OnDeserializing
                 {
@@ -42095,16 +42098,16 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a callback to be invoked after deserialization occurs.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// Serialization callbacks are only supported for <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" /> metadata.
+                /// Serialization callbacks are only supported for <see cref="F:Metadata.JsonTypeInfoKind.Object" /> metadata.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this callback will be mapped from any <see cref="T:System.Text.Json.Serialization.IJsonOnDeserialized" /> implementation on the type.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this callback will be mapped from any <see cref="IJsonOnDeserialized" /> implementation on the type.
                 /// </remarks>
                 public Action<object>? OnDeserialized
                 {
@@ -42124,17 +42127,17 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Gets the list of <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> metadata corresponding to the current type.
+                /// Gets the list of <see cref="Metadata.JsonPropertyInfo" /> metadata corresponding to the current type.
                 /// </summary>
                 /// <remarks>
-                /// Property is only applicable to metadata of kind <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" />.
+                /// Property is only applicable to metadata of kind <see cref="F:Metadata.JsonTypeInfoKind.Object" />.
                 /// For other kinds an empty, read-only list will be returned.
                 ///
-                /// The order of <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> entries in the list determines the serialization order,
-                /// unless either of the entries specifies a non-zero <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.Order" /> value,
-                /// in which case the properties will be stable sorted by <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.Order" />.
+                /// The order of <see cref="Metadata.JsonPropertyInfo" /> entries in the list determines the serialization order,
+                /// unless either of the entries specifies a non-zero <see cref="P:Metadata.JsonPropertyInfo.Order" /> value,
+                /// in which case the properties will be stable sorted by <see cref="P:Metadata.JsonPropertyInfo.Order" />.
                 ///
-                /// It is required that added <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> entries are unique up to <see cref="P:System.Text.Json.Serialization.Metadata.JsonPropertyInfo.Name" />,
+                /// It is required that added <see cref="Metadata.JsonPropertyInfo" /> entries are unique up to <see cref="P:Metadata.JsonPropertyInfo.Name" />,
                 /// however this will only be validated on serialization, once the metadata instance gets locked for further modification.
                 /// </remarks>
                 public IList<JsonPropertyInfo> Properties
@@ -42152,19 +42155,19 @@ namespace System.Text.Json
                 /// <summary>
                 /// Gets or sets a configuration object specifying polymorphism metadata.
                 /// </summary>
-                /// <exception cref="T:System.ArgumentException">
-                /// <paramref name="value" /> has been associated with a different <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.
+                /// <exception cref="System.ArgumentException">
+                /// <paramref name="value" /> has been associated with a different <see cref="Metadata.JsonTypeInfo" /> instance.
                 /// </exception>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 ///
                 /// -or-
                 ///
-                /// Polymorphic serialization is not supported for the current metadata <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />.
+                /// Polymorphic serialization is not supported for the current metadata <see cref="P:Metadata.JsonTypeInfo.Kind" />.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the configuration of this setting will be mapped from any <see cref="T:System.Text.Json.Serialization.JsonDerivedTypeAttribute" /> or <see cref="T:System.Text.Json.Serialization.JsonPolymorphicAttribute" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the configuration of this setting will be mapped from any <see cref="JsonDerivedTypeAttribute" /> or <see cref="JsonPolymorphicAttribute" /> annotations.
                 /// </remarks>
                 public JsonPolymorphismOptions? PolymorphismOptions
                 {
@@ -42195,10 +42198,10 @@ namespace System.Text.Json
                 /// Specifies whether the current instance has been locked for modification.
                 /// </summary>
                 /// <remarks>
-                /// A <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance can be locked either if
-                /// it has been passed to one of the <see cref="T:System.Text.Json.JsonSerializer" /> methods,
-                /// has been associated with a <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> instance,
-                /// or a user explicitly called the <see cref="M:System.Text.Json.Serialization.Metadata.JsonTypeInfo.MakeReadOnly" /> method on the instance.
+                /// A <see cref="Metadata.JsonTypeInfo" /> instance can be locked either if
+                /// it has been passed to one of the <see cref="System.Text.Json.JsonSerializer" /> methods,
+                /// has been associated with a <see cref="JsonSerializerContext" /> instance,
+                /// or a user explicitly called the <see cref="M:Metadata.JsonTypeInfo.MakeReadOnly" /> method on the instance.
                 /// </remarks>
                 public bool IsReadOnly { get; private set; }
 
@@ -42279,22 +42282,22 @@ namespace System.Text.Json
                 internal Type? KeyType { get; }
 
                 /// <summary>
-                /// Gets the <see cref="T:System.Text.Json.JsonSerializerOptions" /> value associated with the current <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.
+                /// Gets the <see cref="System.Text.Json.JsonSerializerOptions" /> value associated with the current <see cref="Metadata.JsonTypeInfo" /> instance.
                 /// </summary>
                 public JsonSerializerOptions Options { get; }
 
                 /// <summary>
-                /// Gets the <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Type" /> for which the JSON serialization contract is being defined.
+                /// Gets the <see cref="P:Metadata.JsonTypeInfo.Type" /> for which the JSON serialization contract is being defined.
                 /// </summary>
                 public Type Type { get; }
 
                 /// <summary>
-                /// Gets the <see cref="T:System.Text.Json.Serialization.JsonConverter" /> associated with the current type.
+                /// Gets the <see cref="JsonConverter" /> associated with the current type.
                 /// </summary>
                 /// <remarks>
-                /// The <see cref="T:System.Text.Json.Serialization.JsonConverter" /> associated with the type determines the value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />,
+                /// The <see cref="JsonConverter" /> associated with the type determines the value of <see cref="P:Metadata.JsonTypeInfo.Kind" />,
                 /// and by extension the types of metadata that are configurable in the current JSON contract.
-                /// As such, the value of the converter cannot be changed once a <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been created.
+                /// As such, the value of the converter cannot be changed once a <see cref="Metadata.JsonTypeInfo" /> instance has been created.
                 /// </remarks>
                 public JsonConverter Converter { get; }
 
@@ -42302,14 +42305,14 @@ namespace System.Text.Json
                 /// Determines the kind of contract metadata that the current instance is specifying.
                 /// </summary>
                 /// <remarks>
-                /// The value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" /> determines what aspects of the JSON contract are configurable.
-                /// For example, it is only possible to configure the <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Properties" /> list for metadata
-                /// of kind <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.Object" />.
+                /// The value of <see cref="P:Metadata.JsonTypeInfo.Kind" /> determines what aspects of the JSON contract are configurable.
+                /// For example, it is only possible to configure the <see cref="P:Metadata.JsonTypeInfo.Properties" /> list for metadata
+                /// of kind <see cref="F:Metadata.JsonTypeInfoKind.Object" />.
                 ///
-                /// The value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" /> is determined exclusively by the <see cref="T:System.Text.Json.Serialization.JsonConverter" />
+                /// The value of <see cref="P:Metadata.JsonTypeInfo.Kind" /> is determined exclusively by the <see cref="JsonConverter" />
                 /// resolved for the current type, and cannot be changed once resolution has happened.
-                /// User-defined custom converters (specified either via <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> or <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" />)
-                /// are metadata-agnostic and thus always resolve to <see cref="F:System.Text.Json.Serialization.Metadata.JsonTypeInfoKind.None" />.
+                /// User-defined custom converters (specified either via <see cref="JsonConverterAttribute" /> or <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" />)
+                /// are metadata-agnostic and thus always resolve to <see cref="F:Metadata.JsonTypeInfoKind.None" />.
                 /// </remarks>
                 public JsonTypeInfoKind Kind { get; private set; }
 
@@ -42322,7 +42325,7 @@ namespace System.Text.Json
                 /// a generic type parameter,
                 /// a property type (if pushed to a new stack frame),
                 /// or the root type passed into the root serialization APIs.
-                /// For example, for a property returning <see cref="T:System.Collections.Generic.List`1" /> where T is a string,
+                /// For example, for a property returning <see cref="List{T}" /> where T is a string,
                 /// a JsonTypeInfo will be created with .Type=typeof(string) and .PropertyInfoForTypeInfo=JsonPropertyInfo{string}.
                 /// Without this property, a "Converter" property would need to be added to JsonTypeInfo and there would be several more
                 /// `if` statements to obtain the converter from either the actual JsonPropertyInfo (for a real property) or from the
@@ -42334,17 +42337,17 @@ namespace System.Text.Json
                 /// <summary>
                 /// Returns a helper class used for computing the default value.
                 /// </summary>
-                internal DefaultValueHolder DefaultValueHolder => _defaultValueHolder ?? (_defaultValueHolder = System.Text.Json.Serialization.Metadata.DefaultValueHolder.CreateHolder(Type));
+                internal DefaultValueHolder DefaultValueHolder => _defaultValueHolder ?? (_defaultValueHolder = Metadata.DefaultValueHolder.CreateHolder(Type));
 
                 /// <summary>
                 /// Gets or sets the type-level <see cref="P:System.Text.Json.JsonSerializerOptions.NumberHandling" /> override.
                 /// </summary>
-                /// <exception cref="T:System.InvalidOperationException">
-                /// The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.
+                /// <exception cref="System.InvalidOperationException">
+                /// The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.
                 /// </exception>
                 /// <remarks>
-                /// For contracts originating from <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" />,
-                /// the value of this callback will be mapped from any <see cref="T:System.Text.Json.Serialization.JsonNumberHandling" /> annotations.
+                /// For contracts originating from <see cref="Metadata.DefaultJsonTypeInfoResolver" /> or <see cref="JsonSerializerContext" />,
+                /// the value of this callback will be mapped from any <see cref="JsonNumberHandling" /> annotations.
                 /// </remarks>
                 public JsonNumberHandling? NumberHandling
                 {
@@ -42789,21 +42792,21 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> instance.
+                /// Creates a blank <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> instance.
                 /// </summary>
                 /// <typeparam name="T">The type for which contract metadata is specified.</typeparam>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance the metadata is associated with.</param>
-                /// <returns>A blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> instance.</returns>
-                /// <exception cref="T:System.ArgumentNullException"><paramref name="options" /> is null.</exception>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> instance the metadata is associated with.</param>
+                /// <returns>A blank <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> instance.</returns>
+                /// <exception cref="System.ArgumentNullException"><paramref name="options" /> is null.</exception>
                 /// <remarks>
-                /// The returned <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo`1" /> will be blank, with the exception of the
-                /// <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Converter" /> property which will be resolved either from
+                /// The returned <see cref="Serialization.Metadata.JsonTypeInfo{T}" /> will be blank, with the exception of the
+                /// <see cref="P:Metadata.JsonTypeInfo.Converter" /> property which will be resolved either from
                 /// <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" /> or the built-in converters for the type.
-                /// Any converters specified via <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> on the type declaration
+                /// Any converters specified via <see cref="JsonConverterAttribute" /> on the type declaration
                 /// will not be resolved by this method.
                 ///
-                /// What converter does get resolved influences the value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />,
-                /// which constrains the type of metadata that can be modified in the <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.
+                /// What converter does get resolved influences the value of <see cref="P:Metadata.JsonTypeInfo.Kind" />,
+                /// which constrains the type of metadata that can be modified in the <see cref="Metadata.JsonTypeInfo" /> instance.
                 /// </remarks>
                 [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
                 [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
@@ -42818,22 +42821,22 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.
+                /// Creates a blank <see cref="Metadata.JsonTypeInfo" /> instance.
                 /// </summary>
                 /// <param name="type">The type for which contract metadata is specified.</param>
-                /// <param name="options">The <see cref="T:System.Text.Json.JsonSerializerOptions" /> instance the metadata is associated with.</param>
-                /// <returns>A blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.</returns>
-                /// <exception cref="T:System.ArgumentNullException"><paramref name="type" /> or <paramref name="options" /> is null.</exception>
-                /// <exception cref="T:System.ArgumentException"><paramref name="type" /> cannot be used for serialization.</exception>
+                /// <param name="options">The <see cref="System.Text.Json.JsonSerializerOptions" /> instance the metadata is associated with.</param>
+                /// <returns>A blank <see cref="Metadata.JsonTypeInfo" /> instance.</returns>
+                /// <exception cref="System.ArgumentNullException"><paramref name="type" /> or <paramref name="options" /> is null.</exception>
+                /// <exception cref="System.ArgumentException"><paramref name="type" /> cannot be used for serialization.</exception>
                 /// <remarks>
-                /// The returned <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> will be blank, with the exception of the
-                /// <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Converter" /> property which will be resolved either from
+                /// The returned <see cref="Metadata.JsonTypeInfo" /> will be blank, with the exception of the
+                /// <see cref="P:Metadata.JsonTypeInfo.Converter" /> property which will be resolved either from
                 /// <see cref="P:System.Text.Json.JsonSerializerOptions.Converters" /> or the built-in converters for the type.
-                /// Any converters specified via <see cref="T:System.Text.Json.Serialization.JsonConverterAttribute" /> on the type declaration
+                /// Any converters specified via <see cref="JsonConverterAttribute" /> on the type declaration
                 /// will not be resolved by this method.
                 ///
-                /// What converter does get resolved influences the value of <see cref="P:System.Text.Json.Serialization.Metadata.JsonTypeInfo.Kind" />,
-                /// which constrains the type of metadata that can be modified in the <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance.
+                /// What converter does get resolved influences the value of <see cref="P:Metadata.JsonTypeInfo.Kind" />,
+                /// which constrains the type of metadata that can be modified in the <see cref="Metadata.JsonTypeInfo" /> instance.
                 /// </remarks>
                 [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
                 [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
@@ -42865,14 +42868,14 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Creates a blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance for the current <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" />.
+                /// Creates a blank <see cref="Metadata.JsonPropertyInfo" /> instance for the current <see cref="Metadata.JsonTypeInfo" />.
                 /// </summary>
                 /// <param name="propertyType">The declared type for the property.</param>
                 /// <param name="name">The property name used in JSON serialization and deserialization.</param>
-                /// <returns>A blank <see cref="T:System.Text.Json.Serialization.Metadata.JsonPropertyInfo" /> instance.</returns>
-                /// <exception cref="T:System.ArgumentNullException"><paramref name="propertyType" /> or <paramref name="name" /> is null.</exception>
-                /// <exception cref="T:System.ArgumentException"><paramref name="propertyType" /> cannot be used for serialization.</exception>
-                /// <exception cref="T:System.InvalidOperationException">The <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> instance has been locked for further modification.</exception>
+                /// <returns>A blank <see cref="Metadata.JsonPropertyInfo" /> instance.</returns>
+                /// <exception cref="System.ArgumentNullException"><paramref name="propertyType" /> or <paramref name="name" /> is null.</exception>
+                /// <exception cref="System.ArgumentException"><paramref name="propertyType" /> cannot be used for serialization.</exception>
+                /// <exception cref="System.InvalidOperationException">The <see cref="Metadata.JsonTypeInfo" /> instance has been locked for further modification.</exception>
                 [RequiresUnreferencedCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
                 [RequiresDynamicCode("JSON serialization and deserialization might require types that cannot be statically analyzed and might need runtime code generation. Use System.Text.Json source generation for native AOT applications.")]
                 public JsonPropertyInfo CreateJsonPropertyInfo(Type propertyType, string name)
@@ -43091,7 +43094,7 @@ namespace System.Text.Json
                 {
                     if (!typeof(IDictionary<string, object>).IsAssignableFrom(propertyType) && !typeof(IDictionary<string, JsonElement>).IsAssignableFrom(propertyType))
                     {
-                        if (propertyType.FullName == "System.Text.Json.Nodes.JsonObject")
+                        if (propertyType.FullName == "JsonObject")
                         {
                             return (object)propertyType.Assembly == typeof(JsonTypeInfo).Assembly;
                         }
@@ -43134,7 +43137,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// Determines the kind of contract metadata a given <see cref="T:System.Text.Json.Serialization.Metadata.JsonTypeInfo" /> is specifying.
+            /// Determines the kind of contract metadata a given <see cref="Metadata.JsonTypeInfo" /> is specifying.
             /// </summary>
             public enum JsonTypeInfoKind
             {
@@ -43157,7 +43160,7 @@ namespace System.Text.Json
             }
 
             /// <summary>
-            /// Contains utilities and combinators acting on <see cref="T:System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver" />.
+            /// Contains utilities and combinators acting on <see cref="Metadata.IJsonTypeInfoResolver" />.
             /// </summary>
             public static class JsonTypeInfoResolver
             {
@@ -43186,19 +43189,19 @@ namespace System.Text.Json
                 }
 
                 /// <summary>
-                /// Combines multiple <see cref="T:System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver" /> sources into one.
+                /// Combines multiple <see cref="Metadata.IJsonTypeInfoResolver" /> sources into one.
                 /// </summary>
                 /// <param name="resolvers">Sequence of contract resolvers to be queried for metadata.</param>
-                /// <returns>A <see cref="T:System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver" /> combining results from <paramref name="resolvers" />.</returns>
-                /// <exception cref="T:System.ArgumentException"><paramref name="resolvers" /> or any of its elements is null.</exception>
+                /// <returns>A <see cref="Metadata.IJsonTypeInfoResolver" /> combining results from <paramref name="resolvers" />.</returns>
+                /// <exception cref="System.ArgumentException"><paramref name="resolvers" /> or any of its elements is null.</exception>
                 /// <remarks>
                 /// The combined resolver will query each of <paramref name="resolvers" /> in the specified order,
                 /// returning the first result that is non-null. If all <paramref name="resolvers" /> return null,
                 /// then the combined resolver will also return <see langword="null" />.
                 ///
-                /// Can be used to combine multiple <see cref="T:System.Text.Json.Serialization.JsonSerializerContext" /> sources,
+                /// Can be used to combine multiple <see cref="JsonSerializerContext" /> sources,
                 /// which typically define contract metadata for small subsets of types.
-                /// It can also be used to fall back to <see cref="T:System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver" /> wherever necessary.
+                /// It can also be used to fall back to <see cref="Metadata.DefaultJsonTypeInfoResolver" /> wherever necessary.
                 /// </remarks>
                 public static IJsonTypeInfoResolver Combine(params IJsonTypeInfoResolver[] resolvers)
                 {

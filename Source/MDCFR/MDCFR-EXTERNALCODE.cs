@@ -1,6 +1,5 @@
-﻿
-/*
- * Some of the code used here is from .NET Foundation. A small license excerpt is here:
+﻿/*
+ * Most of the code used here is from .NET Foundation. A small license excerpt is here:
  * 
  * 
  * Licensed to the .NET Foundation under one or more agreements.
@@ -945,6 +944,10 @@ namespace System
                     _continueOnCapturedContext = continueOnCapturedContext;
                 }
 
+                /// <summary>
+                /// Performs application-defined tasks associated with freeing, releasing, or
+                /// resetting unmanaged resources asynchronously.
+                /// </summary>
                 public ConfiguredValueTaskAwaitable DisposeAsync()
                 {
                     return _source.DisposeAsync().ConfigureAwait(_continueOnCapturedContext);
@@ -4108,6 +4111,186 @@ namespace System
                 return count;
             }
         }
+
+        /// <summary>Provides a <see cref="T:System.IO.Stream" /> for the contents of a <see cref="T:System.ReadOnlyMemory`1" />.</summary>
+        internal sealed class ReadOnlyMemoryStream : Stream
+        {
+            private ReadOnlyMemory<byte> _content;
+
+            private int _position;
+
+            private bool _isOpen;
+
+            public override bool CanRead => _isOpen;
+
+            public override bool CanSeek => _isOpen;
+
+            public override bool CanWrite => false;
+
+            public override long Length
+            {
+                get
+                {
+                    EnsureNotClosed();
+                    return _content.Length;
+                }
+            }
+
+            public override long Position
+            {
+                get
+                {
+                    EnsureNotClosed();
+                    return _position;
+                }
+                set
+                {
+                    EnsureNotClosed();
+                    if (value < 0 || value > int.MaxValue)
+                    {
+                        throw new ArgumentOutOfRangeException("value");
+                    }
+                    _position = (int)value;
+                }
+            }
+
+            public ReadOnlyMemoryStream(ReadOnlyMemory<byte> content)
+            {
+                _content = content;
+                _isOpen = true;
+            }
+
+            private void EnsureNotClosed()
+            {
+                if (!_isOpen)
+                {
+                    throw new ObjectDisposedException(null, MDCFR.Properties.Resources.ObjectDisposed_StreamClosed);
+                }
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                EnsureNotClosed();
+                long num = origin switch
+                {
+                    SeekOrigin.End => _content.Length + offset,
+                    SeekOrigin.Current => _position + offset,
+                    SeekOrigin.Begin => offset,
+                    _ => throw new ArgumentOutOfRangeException("origin"),
+                };
+                if (num > int.MaxValue)
+                {
+                    throw new ArgumentOutOfRangeException("offset");
+                }
+                if (num < 0)
+                {
+                    throw new IOException(MDCFR.Properties.Resources.IO_SeekBeforeBegin);
+                }
+                _position = (int)num;
+                return _position;
+            }
+
+            public unsafe override int ReadByte()
+            {
+                EnsureNotClosed();
+                System.ReadOnlySpan<byte> span = _content.Span;
+                if (_position >= span.Length)
+                {
+                    return -1;
+                }
+                return span[_position++];
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                ValidateBufferArguments(buffer, offset, count);
+                return ReadBuffer(new System.Span<byte>(buffer, offset, count));
+            }
+
+            private int ReadBuffer(System.Span<byte> buffer)
+            {
+                EnsureNotClosed();
+                int num = _content.Length - _position;
+                if (num <= 0 || buffer.Length == 0)
+                {
+                    return 0;
+                }
+                if (num <= buffer.Length)
+                {
+                    _content.Span.Slice(_position).CopyTo(buffer);
+                    _position = _content.Length;
+                    return num;
+                }
+                _content.Span.Slice(_position, buffer.Length).CopyTo(buffer);
+                _position += buffer.Length;
+                return buffer.Length;
+            }
+
+            public override Threading.Tasks.Task<int> ReadAsync(byte[] buffer, int offset, int count, System.Threading.CancellationToken cancellationToken)
+            {
+                ValidateBufferArguments(buffer, offset, count);
+                EnsureNotClosed();
+                if (!cancellationToken.IsCancellationRequested)
+                {
+                    return Threading.Tasks.Task.FromResult(ReadBuffer(new System.Span<byte>(buffer, offset, count)));
+                }
+                return Threading.Tasks.Task.FromCanceled<int>(cancellationToken);
+            }
+
+            public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            {
+                return System.Threading.Tasks.TaskToApm.Begin(ReadAsync(buffer, offset, count), callback, state);
+            }
+
+            public override int EndRead(IAsyncResult asyncResult)
+            {
+                EnsureNotClosed();
+                return Threading.Tasks.TaskToApm.End<int>(asyncResult);
+            }
+
+            public override void Flush()
+            {
+            }
+
+            public override Threading.Tasks.Task FlushAsync(System.Threading.CancellationToken cancellationToken)
+            {
+                return Threading.Tasks.Task.CompletedTask;
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotSupportedException();
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                //IL_000d: Unknown result type (might be due to invalid IL or missing references)
+                _isOpen = false;
+                _content = default(ReadOnlyMemory<byte>);
+                base.Dispose(disposing);
+            }
+
+            private static void ValidateBufferArguments(byte[] buffer, int offset, int count)
+            {
+                if (buffer == null)
+                {
+                    throw new ArgumentNullException("buffer");
+                }
+                if (offset < 0)
+                {
+                    throw new ArgumentOutOfRangeException("offset", MDCFR.Properties.Resources.ArgumentOutOfRange_NeedNonNegNum);
+                }
+                if ((uint)count > buffer.Length - offset)
+                {
+                    throw new ArgumentOutOfRangeException("count", MDCFR.Properties.Resources.Argument_InvalidOffLen);
+                }
+            }
+        }
     }
 
 
@@ -4987,36 +5170,23 @@ namespace System
         public ObsoleteAttribute(string message, bool error) { Message = message; IsError = error; }
     }
 
-   
-        internal sealed class DefaultBinder : Binder
+    internal sealed class DefaultBinder : Binder
+    {
+        [Flags]
+        private enum Primitives
         {
+            Boolean = 8, Char = 0x10, SByte = 0x20, Byte = 0x40,
+            Int16 = 0x80, UInt16 = 0x100, Int32 = 0x200, UInt32 = 0x400,
+            Int64 = 0x800, UInt64 = 0x1000, Single = 0x2000, Double = 0x4000,
+            Decimal = 0x8000, DateTime = 0x10000, String = 0x40000
+        }
 
-            [Flags]
-            private enum Primitives
-            {
-                Boolean = 8,
-                Char = 0x10,
-                SByte = 0x20,
-                Byte = 0x40,
-                Int16 = 0x80,
-                UInt16 = 0x100,
-                Int32 = 0x200,
-                UInt32 = 0x400,
-                Int64 = 0x800,
-                UInt64 = 0x1000,
-                Single = 0x2000,
-                Double = 0x4000,
-                Decimal = 0x8000,
-                DateTime = 0x10000,
-                String = 0x40000
-            }
+        private readonly MetadataLoadContext _loader;
 
-            private readonly MetadataLoadContext _loader;
+        private readonly Type _objectType;
 
-            private readonly Type _objectType;
-
-            private static readonly Primitives[] s_primitiveConversions = new Primitives[19]
-            {
+        private static readonly Primitives[] s_primitiveConversions = new Primitives[19]
+        {
                 0, 0, 0, Primitives.Boolean,
                 Primitives.Char | Primitives.UInt16 | Primitives.Int32 | Primitives.UInt32 | Primitives.Int64 | Primitives.UInt64 | Primitives.Single | Primitives.Double,
                 Primitives.SByte | Primitives.Int16 | Primitives.Int32 | Primitives.Int64 | Primitives.Single | Primitives.Double,
@@ -5029,391 +5199,392 @@ namespace System
                 Primitives.UInt64 | Primitives.Single | Primitives.Double,
                 Primitives.Single | Primitives.Double,
                 Primitives.Double, Primitives.Decimal, Primitives.DateTime, 0, Primitives.String
-            };
+        };
 
-            internal DefaultBinder(MetadataLoadContext loader)
-            {
-                _loader = loader;
-                _objectType = loader.TryGetCoreType(CoreType.Object);
-            }
+        internal DefaultBinder(MetadataLoadContext loader)
+        {
+            _loader = loader;
+            _objectType = loader.TryGetCoreType(CoreType.Object);
+        }
 
-            private bool IsImplementedByMetadataLoadContext(Type type)
-            {
-                if (type is RoType roType) { return roType.Loader == _loader; }
-                return false;
-            }
+        private bool IsImplementedByMetadataLoadContext(Type type)
+        {
+            if (type is RoType roType) { return roType.Loader == _loader; }
+            return false;
+        }
 
-            public sealed override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args, ParameterModifier[] modifiers, System.Globalization.CultureInfo cultureInfo, string[] names, out object state)
-            {
-                throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
-            }
+        public sealed override MethodBase BindToMethod(BindingFlags bindingAttr, MethodBase[] match, ref object[] args, ParameterModifier[] modifiers, System.Globalization.CultureInfo cultureInfo, string[] names, out object state)
+        {
+            throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
+        }
 
-            public sealed override FieldInfo BindToField(BindingFlags bindingAttr, FieldInfo[] match, object value, System.Globalization.CultureInfo cultureInfo)
-            {
-                throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
-            }
+        public sealed override FieldInfo BindToField(BindingFlags bindingAttr, FieldInfo[] match, object value, System.Globalization.CultureInfo cultureInfo)
+        {
+            throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
+        }
 
-            public sealed override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+        public sealed override MethodBase SelectMethod(BindingFlags bindingAttr, MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+        {
+            Type[] array = new Type[types.Length];
+            for (int i = 0; i < types.Length; i++)
             {
-                Type[] array = new Type[types.Length];
-                for (int i = 0; i < types.Length; i++)
+                array[i] = types[i].UnderlyingSystemType;
+                if (!IsImplementedByMetadataLoadContext(array[i]) && !array[i].IsSignatureType())
                 {
-                    array[i] = types[i].UnderlyingSystemType;
-                    if (!IsImplementedByMetadataLoadContext(array[i]) && !array[i].IsSignatureType())
+                    throw new ArgumentException(MDCFR.Properties.Resources.Arg_MustBeType, "types");
+                }
+            }
+            types = array;
+            if (match == null || match.Length == 0)
+            {
+                throw new ArgumentException(MDCFR.Properties.Resources.Arg_EmptyArray, "match");
+            }
+            MethodBase[] array2 = (MethodBase[])match.Clone();
+            int num = 0;
+            for (int i = 0; i < array2.Length; i++)
+            {
+                ParameterInfo[] parametersNoCopy = array2[i].GetParametersNoCopy();
+                if (parametersNoCopy.Length != types.Length) { continue; }
+                int j;
+                for (j = 0; j < types.Length; j++)
+                {
+                    Type parameterType = parametersNoCopy[j].ParameterType;
+                    if (types[j].MatchesParameterTypeExactly(parametersNoCopy[j]) || parameterType == _objectType)
                     {
-                        throw new ArgumentException(MDCFR.Properties.Resources.Arg_MustBeType, "types");
+                        continue;
                     }
-                }
-                types = array;
-                if (match == null || match.Length == 0)
-                {
-                    throw new ArgumentException(MDCFR.Properties.Resources.Arg_EmptyArray, "match");
-                }
-                MethodBase[] array2 = (MethodBase[])match.Clone();
-                int num = 0;
-                for (int i = 0; i < array2.Length; i++)
-                {
-                    ParameterInfo[] parametersNoCopy = array2[i].GetParametersNoCopy();
-                    if (parametersNoCopy.Length != types.Length) { continue; }
-                    int j;
-                    for (j = 0; j < types.Length; j++)
+                    Type type = types[j];
+                    if (type.IsSignatureType())
                     {
-                        Type parameterType = parametersNoCopy[j].ParameterType;
-                        if (types[j].MatchesParameterTypeExactly(parametersNoCopy[j]) || parameterType == _objectType)
-                        {
-                            continue;
-                        }
-                        Type type = types[j];
-                        if (type.IsSignatureType())
-                        {
-                            if (!(array2[i] is MethodInfo genericMethod)) { break; }
-                            type = type.TryResolveAgainstGenericMethod(genericMethod);
-                            if (type == null) { break; }
-                        }
-                        if (parameterType.IsPrimitive)
-                        {
-                            if (!IsImplementedByMetadataLoadContext(type.UnderlyingSystemType) || !CanChangePrimitive(type.UnderlyingSystemType, parameterType.UnderlyingSystemType))
-                            {
-                                break;
-                            }
-                        }
-                        else if (!parameterType.IsAssignableFrom(type)) { break; }
+                        if (!(array2[i] is MethodInfo genericMethod)) { break; }
+                        type = type.TryResolveAgainstGenericMethod(genericMethod);
+                        if (type == null) { break; }
                     }
-                    if (j == types.Length) { array2[num++] = array2[i]; }
-                }
-                switch (num)
-                {
-                    case 0:
-                        return null;
-                    case 1:
-                        return array2[0];
-                    default:
+                    if (parameterType.IsPrimitive)
+                    {
+                        if (!IsImplementedByMetadataLoadContext(type.UnderlyingSystemType) || !CanChangePrimitive(type.UnderlyingSystemType, parameterType.UnderlyingSystemType))
                         {
-                            int num2 = 0;
-                            bool flag = false;
-                            int[] array3 = new int[types.Length];
-                            for (int i = 0; i < types.Length; i++)
-                            {
-                                array3[i] = i;
-                            }
-                            for (int i = 1; i < num; i++)
-                            {
-                                switch (FindMostSpecificMethod(array2[num2], array3, null, array2[i], array3, null, types, null))
-                                {
-                                    case 0:
-                                        flag = true;
-                                        break;
-                                    case 2:
-                                        num2 = i;
-                                        flag = false;
-                                        break;
-                                }
-                            }
-                            if (flag)
-                            {
-                                throw new AmbiguousMatchException();
-                            }
-                            return array2[num2];
+                            break;
                         }
+                    }
+                    else if (!parameterType.IsAssignableFrom(type)) { break; }
                 }
+                if (j == types.Length) { array2[num++] = array2[i]; }
             }
+            switch (num)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return array2[0];
+                default:
+                    {
+                        int num2 = 0;
+                        bool flag = false;
+                        int[] array3 = new int[types.Length];
+                        for (int i = 0; i < types.Length; i++)
+                        {
+                            array3[i] = i;
+                        }
+                        for (int i = 1; i < num; i++)
+                        {
+                            switch (FindMostSpecificMethod(array2[num2], array3, null, array2[i], array3, null, types, null))
+                            {
+                                case 0:
+                                    flag = true;
+                                    break;
+                                case 2:
+                                    num2 = i;
+                                    flag = false;
+                                    break;
+                            }
+                        }
+                        if (flag)
+                        {
+                            throw new AmbiguousMatchException();
+                        }
+                        return array2[num2];
+                    }
+            }
+        }
 
-            public sealed override PropertyInfo SelectProperty(BindingFlags bindingAttr, PropertyInfo[] match, Type returnType, Type[] indexes, ParameterModifier[] modifiers)
+        public sealed override PropertyInfo SelectProperty(BindingFlags bindingAttr, PropertyInfo[] match, Type returnType, Type[] indexes, ParameterModifier[] modifiers)
+        {
+            if (indexes != null)
+            {
+                foreach (Type type in indexes) { if (type == null) { throw new ArgumentNullException("indexes"); } }
+            }
+            if (match == null || match.Length == 0) { throw new ArgumentException(MDCFR.Properties.Resources.Arg_EmptyArray, "match"); }
+            PropertyInfo[] array = (PropertyInfo[])match.Clone();
+            int j = 0; int num = 0; int num2 = ((indexes != null) ? indexes.Length : 0);
+            for (int k = 0; k < array.Length; k++)
             {
                 if (indexes != null)
                 {
-                    foreach (Type type in indexes) { if (type == null) { throw new ArgumentNullException("indexes"); } }
-                }
-                if (match == null || match.Length == 0) { throw new ArgumentException(MDCFR.Properties.Resources.Arg_EmptyArray, "match"); }
-                PropertyInfo[] array = (PropertyInfo[])match.Clone();
-                int j = 0; int num = 0; int num2 = ((indexes != null) ? indexes.Length : 0);
-                for (int k = 0; k < array.Length; k++)
-                {
-                    if (indexes != null)
-                    {
-                        ParameterInfo[] indexParameters = array[k].GetIndexParameters();
-                        if (indexParameters.Length != num2) { continue; }
-                        for (j = 0; j < num2; j++)
-                        {
-                            Type parameterType = indexParameters[j].ParameterType;
-                            if (parameterType == indexes[j] || parameterType == _objectType) { continue; }
-                            if (parameterType.IsPrimitive)
-                            {
-                                if (!IsImplementedByMetadataLoadContext(indexes[j].UnderlyingSystemType) || !CanChangePrimitive(indexes[j].UnderlyingSystemType, parameterType.UnderlyingSystemType))
-                                {
-                                    break;
-                                }
-                            }
-                            else if (!parameterType.IsAssignableFrom(indexes[j])) { break; }
-                        }
-                    }
-                    if (j != num2) { continue; }
-                    if (returnType != null)
-                    {
-                        if (array[k].PropertyType.IsPrimitive)
-                        {
-                            if (!IsImplementedByMetadataLoadContext(returnType.UnderlyingSystemType) || !CanChangePrimitive(returnType.UnderlyingSystemType, array[k].PropertyType.UnderlyingSystemType))
-                            {
-                                continue;
-                            }
-                        }
-                        else if (!array[k].PropertyType.IsAssignableFrom(returnType)) { continue; }
-                    }
-                    array[num++] = array[k];
-                }
-                switch (num)
-                {
-                    case 0:
-                        return null;
-                    case 1:
-                        return array[0];
-                    default: {
-                            int num3 = 0;
-                            bool flag = false;
-                            int[] array2 = new int[num2];
-                            for (int k = 0; k < num2; k++) { array2[k] = k; }
-                            for (int k = 1; k < num; k++)
-                            {
-                                int num4 = FindMostSpecificType(array[num3].PropertyType, array[k].PropertyType, returnType);
-                                if (num4 == 0 && indexes != null)
-                                {
-                                    num4 = FindMostSpecific(array[num3].GetIndexParameters(), array2, null, array[k].GetIndexParameters(), array2, null, indexes, null);
-                                }
-                                if (num4 == 0)
-                                {
-                                    num4 = FindMostSpecificProperty(array[num3], array[k]);
-                                    if (num4 == 0) { flag = true; }
-                                }
-                                if (num4 == 2) { flag = false; num3 = k; }
-                            }
-                            if (flag) { throw new AmbiguousMatchException(); }
-                            return array[num3];
-                        }
-                }
-            }
-
-            public override object ChangeType(object value, Type type, System.Globalization.CultureInfo cultureInfo)
-            {
-                throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
-            }
-
-            public sealed override void ReorderArgumentArray(ref object[] args, object state)
-            {
-                throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
-            }
-
-            public static MethodBase ExactBinding(MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
-            {
-                if (match == null) { throw new ArgumentNullException("match"); }
-                MethodBase[] array = new MethodBase[match.Length];
-                int num = 0;
-                for (int i = 0; i < match.Length; i++)
-                {
-                    ParameterInfo[] parametersNoCopy = match[i].GetParametersNoCopy();
-                    if (parametersNoCopy.Length == 0) { continue; }
-                    int j;
-                    for (j = 0; j < types.Length; j++)
-                    {
-                        Type parameterType = parametersNoCopy[j].ParameterType;
-                        if (!parameterType.Equals(types[j])) { break; }
-                    }
-                    if (j >= types.Length) { array[num] = match[i]; num++; }
-                }
-                return num switch
-                {
-                    0 => null,
-                    1 => array[0],
-                    _ => FindMostDerivedNewSlotMeth(array, num),
-                };
-            }
-
-            public static PropertyInfo ExactPropertyBinding(PropertyInfo[] match, Type returnType, Type[] types, ParameterModifier[] modifiers)
-            {
-                if (match == null) { throw new ArgumentNullException("match"); }
-                PropertyInfo propertyInfo = null;
-                int num = ((types != null) ? types.Length : 0);
-                for (int i = 0; i < match.Length; i++)
-                {
-                    ParameterInfo[] indexParameters = match[i].GetIndexParameters();
-                    int j;
-                    for (j = 0; j < num; j++)
+                    ParameterInfo[] indexParameters = array[k].GetIndexParameters();
+                    if (indexParameters.Length != num2) { continue; }
+                    for (j = 0; j < num2; j++)
                     {
                         Type parameterType = indexParameters[j].ParameterType;
-                        if (parameterType != types[j]) { break; }
-                    }
-                    if (j >= num && (!(returnType != null) || !(returnType != match[i].PropertyType)))
-                    {
-                        if (propertyInfo != null) { throw new AmbiguousMatchException(); }
-                        propertyInfo = match[i];
+                        if (parameterType == indexes[j] || parameterType == _objectType) { continue; }
+                        if (parameterType.IsPrimitive)
+                        {
+                            if (!IsImplementedByMetadataLoadContext(indexes[j].UnderlyingSystemType) || !CanChangePrimitive(indexes[j].UnderlyingSystemType, parameterType.UnderlyingSystemType))
+                            {
+                                break;
+                            }
+                        }
+                        else if (!parameterType.IsAssignableFrom(indexes[j])) { break; }
                     }
                 }
-                return propertyInfo;
-            }
-
-            private static int FindMostSpecific(ParameterInfo[] p1, int[] paramOrder1, Type paramArrayType1, ParameterInfo[] p2, int[] paramOrder2, Type paramArrayType2, Type[] types, object[] args)
-            {
-                if (paramArrayType1 != null && paramArrayType2 == null) { return 2; }
-                if (paramArrayType2 != null && paramArrayType1 == null) { return 1; }
-                bool flag = false; bool flag2 = false;
-                for (int i = 0; i < types.Length; i++)
+                if (j != num2) { continue; }
+                if (returnType != null)
                 {
-                    if (args != null && args[i] == Type.Missing) { continue; }
-                    Type type = ((!(paramArrayType1 != null) || paramOrder1[i] < p1.Length - 1) ? p1[paramOrder1[i]].ParameterType : paramArrayType1);
-                    Type type2 = ((!(paramArrayType2 != null) || paramOrder2[i] < p2.Length - 1) ? p2[paramOrder2[i]].ParameterType : paramArrayType2);
-                    if (!(type == type2))
+                    if (array[k].PropertyType.IsPrimitive)
                     {
-                        switch (FindMostSpecificType(type, type2, types[i]))
+                        if (!IsImplementedByMetadataLoadContext(returnType.UnderlyingSystemType) || !CanChangePrimitive(returnType.UnderlyingSystemType, array[k].PropertyType.UnderlyingSystemType))
                         {
-                            case 0:
-                                return 0;
-                            case 1:
-                                flag = true;
-                                break;
-                            case 2:
-                                flag2 = true;
-                                break;
+                            continue;
                         }
                     }
+                    else if (!array[k].PropertyType.IsAssignableFrom(returnType)) { continue; }
                 }
-                if (flag == flag2)
-                {
-                    if (!flag && args != null)
+                array[num++] = array[k];
+            }
+            switch (num)
+            {
+                case 0:
+                    return null;
+                case 1:
+                    return array[0];
+                default:
                     {
-                        if (p1.Length > p2.Length) { return 1; }
-                        if (p2.Length > p1.Length) { return 2; }
+                        int num3 = 0;
+                        bool flag = false;
+                        int[] array2 = new int[num2];
+                        for (int k = 0; k < num2; k++) { array2[k] = k; }
+                        for (int k = 1; k < num; k++)
+                        {
+                            int num4 = FindMostSpecificType(array[num3].PropertyType, array[k].PropertyType, returnType);
+                            if (num4 == 0 && indexes != null)
+                            {
+                                num4 = FindMostSpecific(array[num3].GetIndexParameters(), array2, null, array[k].GetIndexParameters(), array2, null, indexes, null);
+                            }
+                            if (num4 == 0)
+                            {
+                                num4 = FindMostSpecificProperty(array[num3], array[k]);
+                                if (num4 == 0) { flag = true; }
+                            }
+                            if (num4 == 2) { flag = false; num3 = k; }
+                        }
+                        if (flag) { throw new AmbiguousMatchException(); }
+                        return array[num3];
                     }
-                    return 0;
-                }
-                if (!flag) { return 2; }
-                return 1;
-            }
-
-            private static int FindMostSpecificType(Type c1, Type c2, Type t)
-            {
-                if (c1 == c2) { return 0; }
-                if (t.IsSignatureType())
-                {
-                    if (t.MatchesExactly(c1)) { return 1; }
-                    if (t.MatchesExactly(c2)) { return 2; }
-                }
-                else { if (c1 == t) { return 1; } if (c2 == t) { return 2; } }
-
-                if (c1.IsByRef || c2.IsByRef)
-                {
-                    if (c1.IsByRef && c2.IsByRef) { c1 = c1.GetElementType(); c2 = c2.GetElementType(); }
-                    else if (c1.IsByRef)
-                    {
-                        if (c1.GetElementType() == c2) { return 2; }
-                        c1 = c1.GetElementType();
-                    }
-                    else
-                    {
-                        if (c2.GetElementType() == c1) { return 1; }
-                        c2 = c2.GetElementType();
-                    }
-                }
-                bool flag; bool flag2;
-                if (c1.IsPrimitive && c2.IsPrimitive) { flag = CanChangePrimitive(c2, c1); flag2 = CanChangePrimitive(c1, c2); }
-                else { flag = c1.IsAssignableFrom(c2); flag2 = c2.IsAssignableFrom(c1); }
-
-                if (flag == flag2) { return 0; }
-                if (flag) { return 2; }
-                return 1;
-            }
-
-            private static int FindMostSpecificMethod(MethodBase m1, int[] paramOrder1, Type paramArrayType1, MethodBase m2, int[] paramOrder2, Type paramArrayType2, Type[] types, object[] args)
-            {
-                int num = FindMostSpecific(m1.GetParametersNoCopy(), paramOrder1, paramArrayType1, m2.GetParametersNoCopy(), paramOrder2, paramArrayType2, types, args);
-                if (num != 0) { return num; }
-                if (CompareMethodSig(m1, m2))
-                {
-                    int hierarchyDepth = GetHierarchyDepth(m1.DeclaringType);
-                    int hierarchyDepth2 = GetHierarchyDepth(m2.DeclaringType);
-                    if (hierarchyDepth == hierarchyDepth2) { return 0; }
-                    if (hierarchyDepth < hierarchyDepth2) { return 2; }
-                    return 1;
-                }
-                return 0;
-            }
-
-            private static int FindMostSpecificProperty(PropertyInfo cur1, PropertyInfo cur2)
-            {
-                if (cur1.Name == cur2.Name)
-                {
-                    int hierarchyDepth = GetHierarchyDepth(cur1.DeclaringType);
-                    int hierarchyDepth2 = GetHierarchyDepth(cur2.DeclaringType);
-                    if (hierarchyDepth == hierarchyDepth2) { return 0; }
-                    if (hierarchyDepth < hierarchyDepth2) { return 2; }
-                    return 1;
-                }
-                return 0;
-            }
-
-            public static bool CompareMethodSig(MethodBase m1, MethodBase m2)
-            {
-                ParameterInfo[] parametersNoCopy = m1.GetParametersNoCopy();
-                ParameterInfo[] parametersNoCopy2 = m2.GetParametersNoCopy();
-                if (parametersNoCopy.Length != parametersNoCopy2.Length) { return false; }
-                for (int i = 0; i < parametersNoCopy.Length; i++)
-                {
-                    if (parametersNoCopy[i].ParameterType != parametersNoCopy2[i].ParameterType) { return false; }
-                }
-                return true;
-            }
-
-            private static int GetHierarchyDepth(Type t)
-            {
-                int num = 0;
-                Type type = t;
-                do { num++; type = type.BaseType; } while (type != null);
-                return num;
-            }
-
-            internal static MethodBase FindMostDerivedNewSlotMeth(MethodBase[] match, int cMatches)
-            {
-                int num = 0;
-                MethodBase result = null;
-                for (int i = 0; i < cMatches; i++)
-                {
-                    int hierarchyDepth = GetHierarchyDepth(match[i].DeclaringType);
-                    if (hierarchyDepth == num) { throw new AmbiguousMatchException(); }
-                    if (hierarchyDepth > num) { num = hierarchyDepth; result = match[i]; }
-                }
-                return result;
-            }
-
-            private static bool CanChangePrimitive(Type source, Type target)
-            {
-                return CanPrimitiveWiden(source, target);
-            }
-
-            private static bool CanPrimitiveWiden(Type source, Type target)
-            {
-                Primitives primitives = s_primitiveConversions[(int)Type.GetTypeCode(source)];
-                Primitives primitives2 = (Primitives)(1 << (int)Type.GetTypeCode(target));
-                return (primitives & primitives2) != 0;
             }
         }
+
+        public override object ChangeType(object value, Type type, System.Globalization.CultureInfo cultureInfo)
+        {
+            throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
+        }
+
+        public sealed override void ReorderArgumentArray(ref object[] args, object state)
+        {
+            throw new InvalidOperationException(MDCFR.Properties.Resources.Arg_InvalidOperation_Reflection);
+        }
+
+        public static MethodBase ExactBinding(MethodBase[] match, Type[] types, ParameterModifier[] modifiers)
+        {
+            if (match == null) { throw new ArgumentNullException("match"); }
+            MethodBase[] array = new MethodBase[match.Length];
+            int num = 0;
+            for (int i = 0; i < match.Length; i++)
+            {
+                ParameterInfo[] parametersNoCopy = match[i].GetParametersNoCopy();
+                if (parametersNoCopy.Length == 0) { continue; }
+                int j;
+                for (j = 0; j < types.Length; j++)
+                {
+                    Type parameterType = parametersNoCopy[j].ParameterType;
+                    if (!parameterType.Equals(types[j])) { break; }
+                }
+                if (j >= types.Length) { array[num] = match[i]; num++; }
+            }
+            return num switch
+            {
+                0 => null,
+                1 => array[0],
+                _ => FindMostDerivedNewSlotMeth(array, num),
+            };
+        }
+
+        public static PropertyInfo ExactPropertyBinding(PropertyInfo[] match, Type returnType, Type[] types, ParameterModifier[] modifiers)
+        {
+            if (match == null) { throw new ArgumentNullException("match"); }
+            PropertyInfo propertyInfo = null;
+            int num = ((types != null) ? types.Length : 0);
+            for (int i = 0; i < match.Length; i++)
+            {
+                ParameterInfo[] indexParameters = match[i].GetIndexParameters();
+                int j;
+                for (j = 0; j < num; j++)
+                {
+                    Type parameterType = indexParameters[j].ParameterType;
+                    if (parameterType != types[j]) { break; }
+                }
+                if (j >= num && (!(returnType != null) || !(returnType != match[i].PropertyType)))
+                {
+                    if (propertyInfo != null) { throw new AmbiguousMatchException(); }
+                    propertyInfo = match[i];
+                }
+            }
+            return propertyInfo;
+        }
+
+        private static int FindMostSpecific(ParameterInfo[] p1, int[] paramOrder1, Type paramArrayType1, ParameterInfo[] p2, int[] paramOrder2, Type paramArrayType2, Type[] types, object[] args)
+        {
+            if (paramArrayType1 != null && paramArrayType2 == null) { return 2; }
+            if (paramArrayType2 != null && paramArrayType1 == null) { return 1; }
+            bool flag = false; bool flag2 = false;
+            for (int i = 0; i < types.Length; i++)
+            {
+                if (args != null && args[i] == Type.Missing) { continue; }
+                Type type = ((!(paramArrayType1 != null) || paramOrder1[i] < p1.Length - 1) ? p1[paramOrder1[i]].ParameterType : paramArrayType1);
+                Type type2 = ((!(paramArrayType2 != null) || paramOrder2[i] < p2.Length - 1) ? p2[paramOrder2[i]].ParameterType : paramArrayType2);
+                if (!(type == type2))
+                {
+                    switch (FindMostSpecificType(type, type2, types[i]))
+                    {
+                        case 0:
+                            return 0;
+                        case 1:
+                            flag = true;
+                            break;
+                        case 2:
+                            flag2 = true;
+                            break;
+                    }
+                }
+            }
+            if (flag == flag2)
+            {
+                if (!flag && args != null)
+                {
+                    if (p1.Length > p2.Length) { return 1; }
+                    if (p2.Length > p1.Length) { return 2; }
+                }
+                return 0;
+            }
+            if (!flag) { return 2; }
+            return 1;
+        }
+
+        private static int FindMostSpecificType(Type c1, Type c2, Type t)
+        {
+            if (c1 == c2) { return 0; }
+            if (t.IsSignatureType())
+            {
+                if (t.MatchesExactly(c1)) { return 1; }
+                if (t.MatchesExactly(c2)) { return 2; }
+            }
+            else { if (c1 == t) { return 1; } if (c2 == t) { return 2; } }
+
+            if (c1.IsByRef || c2.IsByRef)
+            {
+                if (c1.IsByRef && c2.IsByRef) { c1 = c1.GetElementType(); c2 = c2.GetElementType(); }
+                else if (c1.IsByRef)
+                {
+                    if (c1.GetElementType() == c2) { return 2; }
+                    c1 = c1.GetElementType();
+                }
+                else
+                {
+                    if (c2.GetElementType() == c1) { return 1; }
+                    c2 = c2.GetElementType();
+                }
+            }
+            bool flag; bool flag2;
+            if (c1.IsPrimitive && c2.IsPrimitive) { flag = CanChangePrimitive(c2, c1); flag2 = CanChangePrimitive(c1, c2); }
+            else { flag = c1.IsAssignableFrom(c2); flag2 = c2.IsAssignableFrom(c1); }
+
+            if (flag == flag2) { return 0; }
+            if (flag) { return 2; }
+            return 1;
+        }
+
+        private static int FindMostSpecificMethod(MethodBase m1, int[] paramOrder1, Type paramArrayType1, MethodBase m2, int[] paramOrder2, Type paramArrayType2, Type[] types, object[] args)
+        {
+            int num = FindMostSpecific(m1.GetParametersNoCopy(), paramOrder1, paramArrayType1, m2.GetParametersNoCopy(), paramOrder2, paramArrayType2, types, args);
+            if (num != 0) { return num; }
+            if (CompareMethodSig(m1, m2))
+            {
+                int hierarchyDepth = GetHierarchyDepth(m1.DeclaringType);
+                int hierarchyDepth2 = GetHierarchyDepth(m2.DeclaringType);
+                if (hierarchyDepth == hierarchyDepth2) { return 0; }
+                if (hierarchyDepth < hierarchyDepth2) { return 2; }
+                return 1;
+            }
+            return 0;
+        }
+
+        private static int FindMostSpecificProperty(PropertyInfo cur1, PropertyInfo cur2)
+        {
+            if (cur1.Name == cur2.Name)
+            {
+                int hierarchyDepth = GetHierarchyDepth(cur1.DeclaringType);
+                int hierarchyDepth2 = GetHierarchyDepth(cur2.DeclaringType);
+                if (hierarchyDepth == hierarchyDepth2) { return 0; }
+                if (hierarchyDepth < hierarchyDepth2) { return 2; }
+                return 1;
+            }
+            return 0;
+        }
+
+        public static bool CompareMethodSig(MethodBase m1, MethodBase m2)
+        {
+            ParameterInfo[] parametersNoCopy = m1.GetParametersNoCopy();
+            ParameterInfo[] parametersNoCopy2 = m2.GetParametersNoCopy();
+            if (parametersNoCopy.Length != parametersNoCopy2.Length) { return false; }
+            for (int i = 0; i < parametersNoCopy.Length; i++)
+            {
+                if (parametersNoCopy[i].ParameterType != parametersNoCopy2[i].ParameterType) { return false; }
+            }
+            return true;
+        }
+
+        private static int GetHierarchyDepth(Type t)
+        {
+            int num = 0;
+            Type type = t;
+            do { num++; type = type.BaseType; } while (type != null);
+            return num;
+        }
+
+        internal static MethodBase FindMostDerivedNewSlotMeth(MethodBase[] match, int cMatches)
+        {
+            int num = 0;
+            MethodBase result = null;
+            for (int i = 0; i < cMatches; i++)
+            {
+                int hierarchyDepth = GetHierarchyDepth(match[i].DeclaringType);
+                if (hierarchyDepth == num) { throw new AmbiguousMatchException(); }
+                if (hierarchyDepth > num) { num = hierarchyDepth; result = match[i]; }
+            }
+            return result;
+        }
+
+        private static bool CanChangePrimitive(Type source, Type target)
+        {
+            return CanPrimitiveWiden(source, target);
+        }
+
+        private static bool CanPrimitiveWiden(Type source, Type target)
+        {
+            Primitives primitives = s_primitiveConversions[(int)Type.GetTypeCode(source)];
+            Primitives primitives2 = (Primitives)(1 << (int)Type.GetTypeCode(target));
+            return (primitives & primitives2) != 0;
+        }
+    }
 
 }
 #endif

@@ -466,6 +466,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Offset and length were out of bounds for the array or count is greater than the number of elements from index to the end of the source collection..
+        /// </summary>
+        internal static string Argument_InvalidOffLen {
+            get {
+                return ResourceManager.GetString("Argument_InvalidOffLen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Illegal characters in path &apos;{0}&apos;..
         /// </summary>
         internal static string Argument_InvalidPathChars {
@@ -714,6 +723,15 @@ namespace MDCFR.Properties {
         internal static string ArgumentOutOfRange_StreamLength {
             get {
                 return ResourceManager.GetString("ArgumentOutOfRange_StreamLength", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Stream length must be non-negative and less than or equal to Int32.MaxValue..
+        /// </summary>
+        internal static string ArgumentOutOfRange_StreamLengthMustBeNonNegativeInt32 {
+            get {
+                return ResourceManager.GetString("ArgumentOutOfRange_StreamLengthMustBeNonNegativeInt32", resourceCulture);
             }
         }
         
@@ -4043,6 +4061,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An attempt was made to move the position before the beginning of the stream..
+        /// </summary>
+        internal static string IO_SeekBeforeBegin {
+            get {
+                return ResourceManager.GetString("IO_SeekBeforeBegin", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The process cannot access the file &apos;{0}&apos; because it is being used by another process..
         /// </summary>
         internal static string IO_SharingViolation_File {
@@ -5291,6 +5318,15 @@ namespace MDCFR.Properties {
         internal static string ObjectDisposed_ResourceSet {
             get {
                 return ResourceManager.GetString("ObjectDisposed_ResourceSet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Cannot access a closed Stream..
+        /// </summary>
+        internal static string ObjectDisposed_StreamClosed {
+            get {
+                return ResourceManager.GetString("ObjectDisposed_StreamClosed", resourceCulture);
             }
         }
         

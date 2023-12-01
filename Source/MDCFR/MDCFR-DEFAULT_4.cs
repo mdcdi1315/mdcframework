@@ -7,8 +7,8 @@
 // Global namespaces
 using System;
 using System.Runtime.Versioning;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 #if WPFExists == false
 namespace System.Windows.Forms
@@ -984,10 +984,15 @@ namespace ROOT
     }
 
     /// <summary>
-    /// The exception that it is thrown when an unexpected result was found.
+    /// The exception that it is thrown when an unexpected result in an executing code block was found.
     /// </summary>
     public class ExecutionException : System.Exception
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="ExecutionException"/> class.
+        /// </summary>
+        public ExecutionException() : base() { }
+
         /// <summary>
         /// Creates a new instance of <see cref="ExecutionException"/> class with the specified error message.
         /// </summary>
@@ -1006,13 +1011,32 @@ namespace ROOT
     /// <summary>
     /// The exception that is thrown when a native P/Invoke call failed to give correct results.
     /// </summary>
-    public class NativeCallErrorException : ExecutionException
+    public sealed class NativeCallErrorException : ExecutionException
     {
+        /// <summary>
+        /// Creates a new instance of <see cref="NativeCallErrorException"/> class.
+        /// </summary>
+        public NativeCallErrorException() : base() { }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="NativeCallErrorException"/> 
+        /// class with the specified error code.
+        /// </summary>
+        public NativeCallErrorException(System.Int64 code) : base() { ErrorCode = code; }
+
         /// <summary>
         /// Creates a new instance of <see cref="NativeCallErrorException"/> class with the specified error message.
         /// </summary>
         /// <param name="message">The error message to show.</param>
         public NativeCallErrorException(System.String message) : base(message) { }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="NativeCallErrorException"/> class with the specified
+        /// native error code and error message.
+        /// </summary>
+        /// <param name="message">The error message to show.</param>
+        /// <param name="code">The error code that caused this exception.</param>
+        public NativeCallErrorException(System.Int64 code , System.String message) : base(message) { ErrorCode = code; }
 
         /// <summary>
         /// Creates a new instance of <see cref="NativeCallErrorException"/> class with the specified error message
@@ -1025,7 +1049,108 @@ namespace ROOT
         /// <summary>
         /// The error code of the native call , if it is available.
         /// </summary>
-        public System.Int64 ErrorCode { get; set; }
+        public System.Int64 ErrorCode { get; private set; }
     }
 
+    /// <summary>
+    /// Gets information on the last native Windows error code.
+    /// </summary>
+    [SupportedOSPlatform("windows")]
+    public static class WindowsErrorCodes
+    {
+        [Flags]
+        [Serializable]
+        private enum FormatMsg_Flags : System.UInt32
+        {
+            FORMAT_MESSAGE_NO_RESTRICTIONS = 0,
+            FORMAT_MESSAGE_ALLOCATE_BUFFER = 0x00000100,
+            FORMAT_MESSAGE_ARGUMENT_ARRAY = 0x00002000,
+            FORMAT_MESSAGE_FROM_HMODULE = 0x00000800,
+            FORMAT_MESSAGE_FROM_STRING = 0x00000400,
+            FORMAT_MESSAGE_FROM_SYSTEM = 0x00001000,
+            FORMAT_MESSAGE_IGNORE_INSERTS = 0x00000200,
+            FORMAT_MESSAGE_MAX_WIDTH_MASK = 0x000000FF
+        }
+
+        [Flags]
+        [Serializable]
+        private enum FormatMsg_SourceType : System.UInt32
+        {
+            None = 0,
+            FORMAT_MESSAGE_FROM_HMODULE = 0x00000800,
+            FORMAT_MESSAGE_FROM_STRING = 0x00000400
+        }
+
+        [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
+            CharSet = CharSet.Unicode, EntryPoint = "FormatMessageW")]
+        private static extern System.UInt32 GetString(
+            [In] FormatMsg_Flags Flags,
+            [In] [Optional] FormatMsg_SourceType Source,
+            [In] System.UInt32 MessageID,
+            [In] System.UInt32 LanguageID,
+            [Out] [MarshalAs(UnmanagedType.LPWStr)] System.String Buffer,
+            [In] System.UInt32 Input,
+            [In] [Optional] System.String Arguments);
+
+        [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi ,
+            CharSet = CharSet.Auto , EntryPoint = "GetLastError")]
+        private static extern System.UInt32 LastWinErrorCode();
+
+        /// <summary>
+        /// Gets the last Windows native error code.
+        /// </summary>
+        /// <remarks>
+        /// Note: This error code is only specific for the thread it was called on. <br />
+        /// To get the error code for another thread , use this property on that thread.
+        /// </remarks>
+        public static System.UInt32 LastErrorCode 
+        {
+            [System.Security.SecurityCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            get { return LastWinErrorCode(); } 
+        }
+
+        /// <summary>
+        /// Gets a string description from the last error code.
+        /// </summary>
+        /// <exception cref="System.InvalidOperationException">
+        /// No error was found , the property cannot return anything.
+        /// </exception>
+        public static System.String LastErrorString 
+        {
+            [System.Security.SecurityCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            get 
+            {
+                if (LastErrorCode == 0) { throw new System.InvalidOperationException("No Error was found , nothing to show"); }
+                System.Char[] D = new System.Char[700];
+                System.String retval = new(D);
+                GetString(FormatMsg_Flags.FORMAT_MESSAGE_ALLOCATE_BUFFER |
+                    FormatMsg_Flags.FORMAT_MESSAGE_FROM_SYSTEM |
+                    FormatMsg_Flags.FORMAT_MESSAGE_IGNORE_INSERTS,
+                    FormatMsg_SourceType.None, LastErrorCode, 1033, retval, (System.UInt32)retval.Length);
+                D = null;
+                return retval;
+            }
+        }
+    }
+        
+}
+
+internal enum ProcessInterop_Memory_Priority_Levels : System.UInt64
+{
+    None = 0,
+    MEMORY_PRIORITY_VERY_LOW,
+    MEMORY_PRIORITY_LOW,
+    MEMORY_PRIORITY_MEDIUM,
+    MEMORY_PRIORITY_BELOW_NORMAL,
+    MEMORY_PRIORITY_NORMAL
+}
+
+[StructLayout(LayoutKind.Explicit , CharSet = CharSet.Auto , Size = 64)]
+internal struct ProcessInterop_Memory_Priority_Info
+{
+    [FieldOffset(0)]
+    [MarshalAs(UnmanagedType.U8)]
+    public ProcessInterop_Memory_Priority_Levels MemoryPriority;
 }

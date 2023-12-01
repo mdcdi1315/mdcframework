@@ -1546,6 +1546,119 @@ namespace System.Threading
             }
         }
 
+        /// <summary>
+        /// Provides support for efficiently using Tasks to implement the APM (Begin/End) pattern.
+        /// </summary>
+        internal static class TaskToApm
+        {
+            /// <summary>Provides a simple IAsyncResult that wraps a Task.</summary>
+            /// <remarks>
+            /// We could use the Task as the IAsyncResult if the Task's AsyncState is the same as the object state,
+            /// but that's very rare, in particular in a situation where someone cares about allocation, and always
+            /// using TaskAsyncResult simplifies things and enables additional optimizations.
+            /// </remarks>
+            internal sealed class TaskAsyncResult : IAsyncResult
+            {
+                /// <summary>The wrapped Task.</summary>
+                internal readonly Task _task;
+
+                /// <summary>Callback to invoke when the wrapped task completes.</summary>
+                private readonly AsyncCallback _callback;
+
+                /// <summary>Gets a user-defined object that qualifies or contains information about an asynchronous operation.</summary>
+                public object AsyncState { get; }
+
+                /// <summary>Gets a value that indicates whether the asynchronous operation completed synchronously.</summary>
+                /// <remarks>This is set lazily based on whether the <see cref="F:System.Threading.Tasks.TaskToApm.TaskAsyncResult._task" /> has completed by the time this object is created.</remarks>
+                public bool CompletedSynchronously { get; }
+
+                /// <summary>Gets a value that indicates whether the asynchronous operation has completed.</summary>
+                public bool IsCompleted => _task.IsCompleted;
+
+                /// <summary>Gets a <see cref="T:System.Threading.WaitHandle" /> that is used to wait for an asynchronous operation to complete.</summary>
+                public WaitHandle AsyncWaitHandle => ((IAsyncResult)_task).AsyncWaitHandle;
+
+                /// <summary>Initializes the IAsyncResult with the Task to wrap and the associated object state.</summary>
+                /// <param name="task">The Task to wrap.</param>
+                /// <param name="state">The new AsyncState value.</param>
+                /// <param name="callback">Callback to invoke when the wrapped task completes.</param>
+                internal TaskAsyncResult(Task task, object state, AsyncCallback callback)
+                {
+                    _task = task;
+                    AsyncState = state;
+                    if (task.IsCompleted)
+                    {
+                        CompletedSynchronously = true;
+                        callback?.Invoke(this);
+                    }
+                    else if (callback != null)
+                    {
+                        _callback = callback;
+                        _task.ConfigureAwait(continueOnCapturedContext: false).GetAwaiter().OnCompleted(InvokeCallback);
+                    }
+                }
+
+                /// <summary>Invokes the callback.</summary>
+                private void InvokeCallback()
+                {
+                    _callback(this);
+                }
+            }
+
+            /// <summary>
+            /// Marshals the Task as an IAsyncResult, using the supplied callback and state
+            /// to implement the APM pattern.
+            /// </summary>
+            /// <param name="task">The Task to be marshaled.</param>
+            /// <param name="callback">The callback to be invoked upon completion.</param>
+            /// <param name="state">The state to be stored in the IAsyncResult.</param>
+            /// <returns>An IAsyncResult to represent the task's asynchronous operation.</returns>
+            public static IAsyncResult Begin(Task task, AsyncCallback callback, object state)
+            {
+                return new TaskAsyncResult(task, state, callback);
+            }
+
+            /// <summary>Processes an IAsyncResult returned by Begin.</summary>
+            /// <param name="asyncResult">The IAsyncResult to unwrap.</param>
+            public static void End(IAsyncResult asyncResult)
+            {
+                Task task = GetTask(asyncResult);
+                if (task != null)
+                {
+                    task.GetAwaiter().GetResult();
+                }
+                else
+                {
+                    ThrowArgumentException(asyncResult);
+                }
+            }
+
+            /// <summary>Processes an IAsyncResult returned by Begin.</summary>
+            /// <param name="asyncResult">The IAsyncResult to unwrap.</param>
+            public static TResult End<TResult>(IAsyncResult asyncResult)
+            {
+                if (GetTask(asyncResult) is Task<TResult> task)
+                {
+                    return task.GetAwaiter().GetResult();
+                }
+                ThrowArgumentException(asyncResult);
+                return default(TResult);
+            }
+
+            /// <summary>Gets the task represented by the IAsyncResult.</summary>
+            public static Task GetTask(IAsyncResult asyncResult)
+            {
+                return (asyncResult as TaskAsyncResult)?._task;
+            }
+
+            /// <summary>Throws an argument exception for the invalid <paramref name="asyncResult" />.</summary>
+            [System.Diagnostics.CodeAnalysis.DoesNotReturn]
+            private static void ThrowArgumentException(IAsyncResult asyncResult)
+            {
+                throw (asyncResult == null) ? new ArgumentNullException("asyncResult") : new ArgumentException(null, "asyncResult");
+            }
+        }
+
     }
     #nullable disable
 

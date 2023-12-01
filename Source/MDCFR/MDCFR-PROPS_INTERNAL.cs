@@ -1,5 +1,5 @@
 ﻿
-
+// Internal class embedded in MDCFR. This file defines generic assembly information.
 
 using System.Runtime.InteropServices;
 
@@ -49,7 +49,7 @@ internal static class mdcdi1315
     /// <summary>
     /// The current version of the MDCFR .
     /// </summary>
-    public const System.String VersionNumber = "1.5.5.071";
+    public const System.String VersionNumber = "1.5.5.080";
 
     /// <summary>
     /// This is the result of the bit-wise combination of <see cref="DllImportSearchPath.AssemblyDirectory"/> and <see cref="DllImportSearchPath.System32"/> enumeration values.

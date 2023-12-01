@@ -5,11 +5,15 @@
 [CreateDir:bin]
 [CreateDir:bin\NET48]
 [CreateDir:bin\NET70]
+[CreateDir:bin\NET70-NW]
 [CreateDir:bin\Release]
 [CreateDir:bin\Release\NET48]
 [CreateDir:bin\Release\NET70]
+[CreateDir:bin\Release\NET70-NW]
 # The Console action writes the specified text to the console.
 [Console:Starting Up Build...]
+# Reports the expected Build Output directory , will be used to clear artifacts when instructed to.
+[ReportBuildOutputDirectory:bin]
 # The Wait action freezes the build continuation for the specified amount of seconds.
 # If not supplied , it is supposed to be then one second.
 [Wait:2]

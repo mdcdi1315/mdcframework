@@ -65,6 +65,7 @@ Actions that are existent until now:
 | Execute | Yes | Yes | Yes | Yes | Executes the specified command in the build environment.
 | SetVariable | Yes | Yes | Yes | Yes | Creates a new environment variable with the specified value.
 | DeleteVariable | Yes | Yes | Yes | Yes | Deletes a previously-created environment variable.
+| ReportBuildOutputDirectory | No | Yes | No | No | Reports the build directory that is expected all build artifacts to be placed in.
 
 Note: All Action identifiers are case-sensitive.
 
@@ -227,3 +228,11 @@ out for the .NET SDK path.
 - <Code style="color:red">CUSTOM_DOTNT_RESTORE_ARGS</Code>  is an environment variable that adds to the .NET Restore
     Action positional arguments that might be needed during restoration actions.
 
+Some of the arguments that it uses are:
+
+- `-resetenv`: defaults the Build command prompt that called Build.cmd to the default environment.
+- `config <Configuration>`: Specifies the .NET Build configuration to use (The project configuration). Overrides the 
+<Code style="color:red">CUSTOM_DOTNT_BUILD_ARGS</Code> environment variable.
+- `-clear`: This argument effectively calls the `dotnet clean` command in the directory that the `Build.cmd` resides in 
+, plus clears the specified directory passed in the `Boss.script` file during startup (Uses the target ReportBuildOutputDirectory).
+- `-?`: Shows help about the `Build.cmd`.

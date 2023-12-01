@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current">
+
+	<Sdk Name="Microsoft.NET.Sdk.IL" Version="7.0.0" />
+	
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>net48</TargetFramework>
+		<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+		<ILAsmToolPath>$(MSBuildProjectDirectory)\ilasm</ILAsmToolPath>
+		<IlasmResourceFile>$(MSBuildProjectDirectory)\System.Runtime.CompilerServices.Unsafe.res</IlasmResourceFile>
+		<!-- Sign your assembly using an Strong Name Key. Use "False" to disable signing. -->
+		<SignAssembly>True</SignAssembly>  
+		<!-- The Strong Key .snk file to sign the assembly with. -->
+		<AssemblyOriginatorKeyFile>..\msft-dotnetcore.snk</AssemblyOriginatorKeyFile>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Include="$(MSBuildProjectDirectory)\System.Runtime.CompilerServices.Unsafe.il" />
+	</ItemGroup>
+	
+	<Target Name="Sys_Complete" AfterTargets="AfterBuild" Condition="'$(BuildingForMDCFR)' == 'True'">
+		<Message Importance="normal" Text="Completing task..." />
+		<Exec Command="1>nul Copy /y &quot;$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll&quot; &quot;..\MDCFR\Imports\NETFR48\System.Runtime.CompilerServices.Unsafe.dll&quot;" />
+		<Message Importance="normal" Text="Done!" />
+	</Target>
+</Project>

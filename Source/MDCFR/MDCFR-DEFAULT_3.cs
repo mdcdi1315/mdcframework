@@ -1963,7 +1963,8 @@ namespace ROOT
         /// </summary>
         NoConsoleWindow = ProcessInterop_ProcessFLAGS.CREATE_NO_WINDOW,
         /// <summary>
-        /// This will put the spawned process in a new process group containing this one.
+        /// This will put the spawned process in a new process group containing this one. <br />
+        /// Additionally , CTRL + C command is ignored if the spawned process is a console application.
         /// </summary>
         AsNewProcessGroup = ProcessInterop_ProcessFLAGS.CREATE_NEW_PROCESS_GROUP,
         /// <summary>
@@ -2003,23 +2004,78 @@ namespace ROOT
     }
 
     /// <summary>
-    /// Creates and launches a new process context.
+    /// Represents the opened process timing information. <br />
+    /// It contains time information related to when the process started , exited ,
+    /// current CPU execution time and User context execution time.
+    /// </summary>
+    [Serializable]
+    [RequiresPreviewFeatures]
+    public struct ProcessTimesInfo 
+    {
+        /// <summary>
+        /// Represents the CPU (kernel) execution time.
+        /// </summary>
+        public System.TimeSpan KernelTime;
+        /// <summary>
+        /// Represents the User context execution time.
+        /// </summary>
+        public System.TimeSpan UserTime;
+        /// <summary>
+        /// Represents the process time point that was started.
+        /// </summary>
+        public System.DateTime StartedTime;
+        /// <summary>
+        /// Represents the point when the process was exited. <br />
+        /// Will be <see cref="System.DateTime.MinValue"/> in case that the process
+        /// has not exited yet.
+        /// </summary>
+        public System.DateTime ExitedTime;
+        /// <summary>
+        /// Gets the current CPU clock execution cycles for the representing process.
+        /// </summary>
+        /// <remarks>In case that the cycles count have been larger than <see cref="System.UInt64.MaxValue"/> , then it returns zero.</remarks>
+        public System.UInt64 ExecutionTimeNow;
+    }
+
+    /// <summary>
+    /// Provides memory priority values for the opened process.
+    /// </summary>
+    [Serializable]
+    [RequiresPreviewFeatures]
+    public enum ProcessMemoryPriority : System.Int16
+    {
+        /// <summary>Reserved field value.</summary>
+        Error = 0,
+        /// <summary>Very low priority.</summary>
+        VeryLow = (System.Int16)ProcessInterop_Memory_Priority_Levels.MEMORY_PRIORITY_VERY_LOW,
+        /// <summary>Low priority.</summary>
+        Low = (System.Int16)ProcessInterop_Memory_Priority_Levels.MEMORY_PRIORITY_LOW,
+        /// <summary>Medium priority.</summary>
+        Medium = (System.Int16)ProcessInterop_Memory_Priority_Levels.MEMORY_PRIORITY_MEDIUM,
+        /// <summary>Normal priority. It is also and the default memory priority for all processes.</summary>
+        Normal = (System.Int16)ProcessInterop_Memory_Priority_Levels.MEMORY_PRIORITY_NORMAL,
+        /// <summary>Below Normal priority.</summary>
+        BelowNormal = (System.Int16)ProcessInterop_Memory_Priority_Levels.MEMORY_PRIORITY_BELOW_NORMAL
+    }
+
+    /// <summary>
+    /// Creates and launches a new process context. <br />
+    /// This class cannot be inherited.
     /// </summary>
     /// <remarks>Although that it is an alternative to 
     /// <see cref="System.Diagnostics.Process"/> class,
-    /// this only works for Windows platforms.
+    /// this only works for Windows platforms. 
     /// </remarks>
     [RequiresPreviewFeatures]
     [SupportedOSPlatform("windows")]
-    public class ProcessCreator : System.IDisposable
+    public sealed class ProcessCreator : System.IDisposable , System.IEquatable<ProcessCreator>
     {
+        private ProcessInterop_StartupInfo startupInfo = new();
         private ProcessInterop.ProcessResult result = null;
         private System.Boolean iscurrentprocess = false;
-        private ProcessInterop_StartupInfo startupInfo = new();
-        private ProcessInterop_App_Memory_Information memInf = new();
-        private System.IO.FileInfo fileinfo = null;
-        private System.Boolean isdisposed = false;
         private System.Boolean hasnotstartedyet = true;
+        private System.Boolean isdisposed = false;
+        private System.IO.FileInfo fileinfo = null;
 
         /// <summary>
         /// Initialises a new instance of <see cref="ProcessCreator"/> class.
@@ -2083,7 +2139,9 @@ namespace ROOT
             result.ProcessH.ThreadHandle = ProcessInterop.GetThisThread();
             result.ProcessH.ProcessPID = (System.Int32)ProcessInterop.GetProcessPID(result.ProcessH.ProcessHandle);
             result.ProcessH.ProcessTID = (System.Int32)ProcessInterop.GetThreadID(result.ProcessH.ThreadHandle);
-            memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+            result.MemPriorityInfo = ProcessInterop.GetMemPriorityInfo(result.ProcessH.ProcessHandle);
+            result.MemInfo = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+            result.Timing = ProcessInterop.GetProcessTimes(result.ProcessH.ProcessHandle);
             hasnotstartedyet = false;
             result.Success = true;
         }
@@ -2131,11 +2189,7 @@ namespace ROOT
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO , Dir , false);
             result = PR;
-            if (result.Success) 
-            { 
-                memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
-                hasnotstartedyet = false;
-            }
+            if (result.Success) { hasnotstartedyet = false; }
             return;
         }
 
@@ -2144,26 +2198,56 @@ namespace ROOT
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO, Dir, false , start);
             result = PR;
-            if (result.Success) 
-            { 
-                memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
-                hasnotstartedyet = false;
-            }
+            if (result.Success) { hasnotstartedyet = false; }
             return;
         }
 
-        private void EnsureNotDisposed() { if (isdisposed) { throw new ObjectDisposedException("This instance is disposed and cannot be reused."); } }
+        private void EnsureNotDisposed() { if (isdisposed) { throw new ObjectDisposedException(GetType().FullName ,"This instance is disposed and cannot be reused."); } }
 
         private void EnsureStarted() { if (hasnotstartedyet) { throw new InvalidOperationException("This instance has not been attached to a process yet."); } }
 
         private void EnsureNotStarted() { if (hasnotstartedyet == false && (result?.Success == true)) { throw new InvalidOperationException("This instance is already attached to a process."); } }
 
         /// <summary>
+        /// Determines whether two <see cref="ProcessCreator"/> instances are equal. <br />
+        /// This is done by testing if the <see cref="PID"/> property is equal in both instances.
+        /// </summary>
+        /// <param name="other">The other instance to compare.</param>
+        /// <returns><see langword="true"/> if both instances are equal; otherwise , <see langword="false"/>.</returns>
+        /// <exception cref="InvalidOperationException">One of the instances compared is not bound to a process.</exception>
+        /// <exception cref="ObjectDisposedException">One of the instances compared is disposed.</exception>
+        public System.Boolean Equals(ProcessCreator other) { return PID == other.PID; }
+
+        /// <summary>
+        /// Gets the opened process information.
+        /// </summary>
+        /// <returns>Some of the opened process information , if are available.</returns>
+        /// <exception cref="InvalidOperationException">This instance is not bound to a process.</exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their respective information.
+        /// </exception>
+        public override string ToString()
+        {
+            EnsureNotDisposed();
+            EnsureStarted();
+            return $"{GetType().FullName}: \n" +
+                $"ExecutedSucessfully={ExecutedSucessfully}\n" +
+                $"PID={PID}\n" +
+                $"TID={TID}\n";
+        }
+
+        /// <summary>
+        /// Ensures to dispose the instance properly if an instance of this class is left orphaned.
+        /// </summary>
+        ~ProcessCreator() { Dispose(); }
+
+        /// <summary>
         /// Gets a value whether the process was sucessfully launched.
         /// </summary>
         /// <exception cref="ObjectDisposedException">
         /// Thrown when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.Boolean ExecutedSucessfully 
         {
@@ -2178,12 +2262,10 @@ namespace ROOT
         /// <summary>
         /// Returns the native process handle of the spawned process.
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// This exception is thrown when this instance is not bound to a process.
-        /// </exception>
+        /// <exception cref="InvalidOperationException">This instance is not bound to a process.</exception>
         /// <exception cref="ObjectDisposedException">
         /// Thrown when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.IntPtr NativeProcessHandle 
         {
@@ -2195,18 +2277,59 @@ namespace ROOT
         /// <summary>
         /// Returns the native process thread handle of the spawned process.
         /// </summary>
-        /// <exception cref="InvalidOperationException">
-        /// This instance is not bound to a process.
-        /// </exception>
+        /// <exception cref="InvalidOperationException">This instance is not bound to a process.</exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.IntPtr NativeThreadHandle 
         {
             [System.Security.SecuritySafeCritical]
             [System.Security.SuppressUnmanagedCodeSecurity]
             get { EnsureNotDisposed(); EnsureStarted(); return result.ProcessH.ThreadHandle; } 
+        }
+
+        /// <summary>
+        /// Gets the attached process memory priority. <br />
+        /// You can also set a memory priority target for the attached process by setting a value to this property.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">This instance is not bound to a process.</exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their respective information.
+        /// </exception>
+        /// <exception cref="NativeCallErrorException">
+        /// Occurs while setting this property to an invalid value or when the native call fails.
+        /// </exception>
+        public ProcessMemoryPriority MemoryPriority
+        {
+            [System.Security.SecurityCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            get 
+            { 
+                EnsureNotDisposed(); EnsureStarted();
+                return (ProcessMemoryPriority)result.MemPriorityInfo.MemoryPriority;
+            }
+            [System.Security.SecurityCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            set 
+            {
+                EnsureNotDisposed();
+                EnsureStarted();
+                unsafe {
+                    ProcessInterop_Memory_Priority_Info temp = new()
+                    {
+                        MemoryPriority = (ProcessInterop_Memory_Priority_Levels)value
+                    };
+                    if (ProcessInterop.SetProcInfo(result.ProcessH.ProcessHandle,
+                        ProcessInterop_Process_Information_Class.ProcessMemoryPriority,
+                        &temp, (System.UInt32)Marshal.SizeOf(temp)) == 0)
+                    {
+                        throw new NativeCallErrorException($"Could not set new process memory priority value equal to {value}.");
+                    }
+                    result.MemPriorityInfo = temp;
+                }
+            }
         }
 
         /// <summary>
@@ -2217,7 +2340,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public ProcessMemoryInfo MemoryInfo 
         {
@@ -2229,12 +2352,41 @@ namespace ROOT
                 EnsureStarted();
                 return new ProcessMemoryInfo() 
                 {
-                    AvailableMemoryCommit = (System.Int64)memInf.AvailableCommit / 1024,
-                    PeakPrivateCommitUsage = (System.Int64)memInf.PeakPrivateCommitUsage / 1024,
-                    PrivateCommitUsage = (System.Int64)memInf.PrivateCommitUsage / 1024,
-                    TotalMemoryCommitUsage = (System.Int64)memInf.TotalCommitUsage / 1024,
+                    AvailableMemoryCommit = (System.Int64)result.MemInfo.AvailableCommit / 1024,
+                    PeakPrivateCommitUsage = (System.Int64)result.MemInfo.PeakPrivateCommitUsage / 1024,
+                    PrivateCommitUsage = (System.Int64)result.MemInfo.PrivateCommitUsage / 1024,
+                    TotalMemoryCommitUsage = (System.Int64)result.MemInfo.TotalCommitUsage / 1024,
                 }; 
-            } 
+            }
+        }
+
+        /// <summary>
+        /// Gets the timing information for this process.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">
+        /// This instance is not bound to a process.
+        /// </exception>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their repsective information.
+        /// </exception>
+        public ProcessTimesInfo TimingInfo
+        {
+            [System.Security.SecuritySafeCritical]
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            get 
+            {
+                EnsureNotDisposed();
+                EnsureStarted();
+                return new()
+                {
+                    ExitedTime = result.Timing.ExitedTime.ToDateTimeUtc(),
+                    StartedTime = result.Timing.CreatedTime.ToDateTimeUtc(),
+                    KernelTime = new TimeSpan(result.Timing.KernelTime.ToTicks()),
+                    UserTime = new TimeSpan(result.Timing.UserTime.ToTicks()),
+                    ExecutionTimeNow = result.Timing.ExecutionTime
+                };
+            }
         }
 
         /// <summary>
@@ -2261,7 +2413,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.Int32 PID 
         {
@@ -2277,7 +2429,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.Int32 TID 
         {
@@ -2288,7 +2440,7 @@ namespace ROOT
         /// <summary>
         /// Returns the <see cref="System.IO.FileInfo"/> object used to launch the process.
         /// </summary>
-        /// <exception cref="System.InvalidOperationException">
+        /// <exception cref="InvalidOperationException">
         /// This exception will be returned when the 
         /// <see cref="GetFromCurrentProcess"/> 
         /// method was called , instead of using the <br />
@@ -2322,7 +2474,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.Boolean IsCritical { get { EnsureNotDisposed(); EnsureStarted(); return Interop.Kernel32.IsCritical(result.ProcessH.ProcessHandle); } }
 
@@ -2331,10 +2483,10 @@ namespace ROOT
         /// </summary>
         /// <param name="ExitCode">The exit error code to be assigned.</param>
         /// <param name="DisposeAfterTerminate">Set a value whether to dispose this instance after exiting.</param>
-        /// <exception cref="System.InvalidOperationException">
+        /// <exception cref="InvalidOperationException">
         /// Attempting to terminate the current process handle is dangerous and therefore , prohibited. <br />
         /// Callers that want to terminate the current process can use instead the 
-        /// <see cref="System.Environment.Exit(int)"/> <br />
+        /// <see cref="Environment.Exit(int)"/> <br />
         /// method, which shuts down safely the CLR and then calls the native function to terminate the process.
         /// </exception>
         /// <exception cref="InvalidOperationException">
@@ -2342,7 +2494,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public void Terminate(System.Boolean DisposeAfterTerminate, System.Int32 ExitCode = 0)
         {
@@ -2363,7 +2515,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public void WaitForExit() { EnsureNotDisposed(); EnsureStarted(); while (ExitCode == 259) { System.Threading.Thread.Sleep(50); } }
 
@@ -2378,7 +2530,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         public System.UInt32 ExitCode 
         {
@@ -2391,7 +2543,7 @@ namespace ROOT
                 System.UInt32 Code = Interop.Kernel32.GetExitCode(result.ProcessH.ProcessHandle); 
                 if (Code == System.UInt32.MaxValue) 
                 {
-                    throw new NativeCallErrorException("Native method returned unexpected value.");
+                    throw new NativeCallErrorException(Code , "Native method returned unexpected value.");
                 } else { return Code; }
             }
         }
@@ -2405,15 +2557,14 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         [System.Security.SuppressUnmanagedCodeSecurity]
         public void Dispose() 
         {
             if (result != null)
             {
-                Interop.Kernel32.CloseHandle(result.ProcessH.ThreadHandle);
-                Interop.Kernel32.CloseHandle(result.ProcessH.ProcessHandle);
+                result.ProcessH.TerminateHandles();
                 result = null;
             }
             if (fileinfo != null) { fileinfo.Refresh(); fileinfo = null; }
@@ -2429,7 +2580,7 @@ namespace ROOT
         /// </exception>
         /// <exception cref="ObjectDisposedException">
         /// Occurs when this instance is disposed. Disposed instances cannot 
-        /// create or get processes or get their repsective information.
+        /// create or get processes or get their respective information.
         /// </exception>
         [System.Security.SuppressUnmanagedCodeSecurity]
         public void Refresh()
@@ -2437,7 +2588,9 @@ namespace ROOT
             EnsureNotDisposed();
             EnsureStarted();
             result.ProcessH.ProcessTID = (System.Int32)ProcessInterop.GetThreadID(result.ProcessH.ThreadHandle);
-            memInf = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+            result.MemPriorityInfo = ProcessInterop.GetMemPriorityInfo(result.ProcessH.ProcessHandle);
+            result.MemInfo = ProcessInterop.GetMemoryInfo(result.ProcessH.ProcessHandle);
+            result.Timing = ProcessInterop.GetProcessTimes(result.ProcessH.ProcessHandle);
             if (iscurrentprocess == false) { fileinfo.Refresh(); }
         }
     }
@@ -3173,8 +3326,8 @@ internal static class ProcessInterop
     private static extern System.Int32 NewProcess(
         [In][Optional][MarshalAs(UnmanagedType.LPWStr)] System.String ApplicationPath,
         [Optional][MarshalAs(UnmanagedType.LPWStr)] System.String CmdLine,
-        [In][Optional] FileInterop_SECURITY_ATTRIBUTES ExeAttrs,
-        [In][Optional] FileInterop_SECURITY_ATTRIBUTES ThreadAttrs,
+        [In][Optional] in FileInterop_SECURITY_ATTRIBUTES ExeAttrs,
+        [In][Optional] in FileInterop_SECURITY_ATTRIBUTES ThreadAttrs,
         [In][MarshalAs(UnmanagedType.Bool)] System.Boolean InheritHandles,
         [In] ProcessInterop_ProcessFLAGS CreationFlags,
         [In][Optional][MarshalAs(UnmanagedType.LPWStr)] System.String EnvironmentBlock,
@@ -3189,12 +3342,12 @@ internal static class ProcessInterop
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    private static extern unsafe System.Int32 GetProcInfo(
+    public static extern unsafe System.Int32 GetProcInfo(
         [In] System.IntPtr ProcessHandle,
         [In] ProcessInterop_Process_Information_Class Class,
         void* Info,
         [In] System.UInt32 InfoSize);
-    // Scheme for reading arbitrary data and translate them to structures (GetProcInfo method):
+    // Scheme for reading arbitrary data and translate them to structures (GetProcInfo or SetProcInfo methods):
     // 1. Pass to the method the process handle (either this will be the current one or another one).
     // 2. Pass the desired value for getting specific data (Consult ProcessInterop_Process_Information_Class
     // enum for more info).
@@ -3209,6 +3362,19 @@ internal static class ProcessInterop
     // native code. To do that , just make sure that you have called InteropServices.Marshal.SizeOf()
     // method with it's parameter the structure instance variable you created.
 
+    [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
+        CharSet = CharSet.Auto, EntryPoint = "SetProcessInformation")]
+#if NET7_0_OR_GREATER == false
+    [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
+        Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
+        UI = true)]
+#endif
+    public static extern unsafe System.Int32 SetProcInfo(
+        [In] System.IntPtr ProcessHandle,
+        [In] ProcessInterop_Process_Information_Class Class,
+        void* Info,
+        [In] System.UInt32 InfoSize);
+
     public static unsafe ProcessInterop_App_Memory_Information GetMemoryInfo(System.IntPtr ProcessHandle)
     {
         ProcessInterop_App_Memory_Information mem = new();
@@ -3216,6 +3382,43 @@ internal static class ProcessInterop
             ProcessInterop_Process_Information_Class.ProcessAppMemoryInfo,
              &mem, (System.UInt32)Marshal.SizeOf(mem)) != 0) { return mem; }
         return default;
+    }
+
+    public static unsafe ProcessInterop_Memory_Priority_Info GetMemPriorityInfo(System.IntPtr ProcessHandle)
+    {
+        ProcessInterop_Memory_Priority_Info pri = new();
+        if (GetProcInfo(ProcessHandle ,
+            ProcessInterop_Process_Information_Class.ProcessMemoryPriority,
+            &pri , (System.UInt32)Marshal.SizeOf(pri)) != 0) { return pri; }
+        return default;
+    }
+
+    [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi ,
+        CharSet = CharSet.Unicode , EntryPoint = "GetProcessTimes")]
+    private static extern Interop.BOOL GetProcTimes(
+        [In] System.IntPtr Handle,
+        out FileInterop_FILETIME ProcCreationTime,
+        out FileInterop_FILETIME ProcExitTime,
+        out FileInterop_FILETIME KernelTime,
+        out FileInterop_FILETIME UserTime);
+
+    public static ProcessTimes GetProcessTimes(System.IntPtr ProcessHandle) 
+    {
+        System.UInt64 Cyc;
+        if (GetProcTimes(ProcessHandle,
+            out FileInterop_FILETIME one,
+            out FileInterop_FILETIME two,
+            out FileInterop_FILETIME three,
+            out FileInterop_FILETIME four) == Interop.BOOL.FALSE) { return null; }
+        try { if (GetCPUCycles(ProcessHandle, out Cyc) == Interop.BOOL.FALSE) { Cyc = 0; } } catch { Cyc = 0; }
+        return new()
+        {
+            ExitedTime = two,
+            CreatedTime = one,
+            KernelTime = three,
+            UserTime = four,
+            ExecutionTime = Cyc
+        };
     }
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
@@ -3254,6 +3457,12 @@ internal static class ProcessInterop
 #endif
     public static extern System.IntPtr GetThisThread();
 
+    [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi ,
+        CharSet = CharSet.Auto , EntryPoint = "QueryProcessCycleTime")]
+    private static extern Interop.BOOL GetCPUCycles(
+        [In] System.IntPtr ProcessHandle,
+        [Out] out System.UInt64 Cycles);
+
     internal class ProcessHandleD
     {
         public volatile System.IntPtr ProcessHandle = System.IntPtr.Zero;
@@ -3264,10 +3473,24 @@ internal static class ProcessInterop
         public System.Boolean TerminateHandles() { return Interop.Kernel32.CloseHandle(ProcessHandle) && Interop.Kernel32.CloseHandle(ThreadHandle); }
     }
 
+    // Internal unmanaged-managed transition data class.
+    // Contains useful data which are consumed in the ProcessCreator class.
     internal class ProcessResult
     {
+        public ProcessInterop_Memory_Priority_Info MemPriorityInfo = new();
+        public ProcessInterop_App_Memory_Information MemInfo = new();
         public ProcessHandleD ProcessH = new();
         public System.Boolean Success = false;
+        public ProcessTimes Timing = new();
+    }
+
+    internal class ProcessTimes
+    {
+        public FileInterop_FILETIME KernelTime;
+        public FileInterop_FILETIME UserTime;
+        public FileInterop_FILETIME ExitedTime;
+        public FileInterop_FILETIME CreatedTime;
+        public System.UInt64 ExecutionTime;
     }
 
     public static ProcessResult LaunchProcess(System.String Path, System.String Args,
@@ -3282,9 +3505,14 @@ internal static class ProcessInterop
         PR.ProcessH.ProcessPID = (System.Int32)PD.dwProcessId;
         PR.ProcessH.ProcessHandle = PD.hProcess;
         PR.ProcessH.ThreadHandle = PD.hThread;
+        if (PR.Success)
+        {
+            PR.Timing = GetProcessTimes(PD.hProcess);
+            PR.MemInfo = GetMemoryInfo(PD.hProcess);
+            PR.MemPriorityInfo = GetMemPriorityInfo(PD.hProcess);
+        }
         return PR;
     }
-
 
 }
 
@@ -3560,11 +3788,28 @@ internal struct FileInterop_FILETIME
 {
     public System.UInt32 dwLowDateTime;
     public System.UInt32 dwHighDateTime;
+
+    // The below methods are taken from the FileTime structure of Microsoft.IO.Redist package.
+
+    public System.Int64 ToTicks()
+    {
+        return (System.Int64)(((ulong)dwHighDateTime << 32) + dwLowDateTime);
+    }
+
+    public DateTime ToDateTimeUtc()
+    {
+        return DateTime.FromFileTimeUtc(ToTicks());
+    }
+
+    public DateTimeOffset ToDateTimeOffset()
+    {
+        return DateTimeOffset.FromFileTime(ToTicks());
+    }
 }
 
 [SpecialName]
 [StructLayoutAttribute(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
-internal unsafe struct FileInterop_WIN32_FIND_DATA_W
+internal struct FileInterop_WIN32_FIND_DATA_W
 {
     public System.UInt32 dwFileAttributes;
     public FileInterop_FILETIME ftCreationTime;
@@ -3574,18 +3819,18 @@ internal unsafe struct FileInterop_WIN32_FIND_DATA_W
     public System.UInt32 nFileSizeLow;
     public System.UInt32 dwReserved0;
     public System.UInt32 dwReserved1;
-    public fixed System.Char cFileName[400];
-    public fixed System.Char cAlternateFileName[14];
+    public unsafe fixed System.Char cFileName[400];
+    public unsafe fixed System.Char cAlternateFileName[14];
     public System.UInt32 dwFileType;
     public System.UInt32 dwCreatorType;
     public System.UInt32 wFinderFlags;
 
-    public System.ReadOnlySpan<System.Char> FileName 
-    {  get 
-        { fixed (System.Char* ptr = cFileName)  { return new System.ReadOnlySpan<System.Char>(ptr, 400); } } 
+    public unsafe System.ReadOnlySpan<System.Char> FileName 
+    {  
+        get { fixed (System.Char* ptr = cFileName)  { return new System.ReadOnlySpan<System.Char>(ptr, 400); } } 
     }
 
-    public System.ReadOnlySpan<System.Char> AlternateFileName 
+    public unsafe System.ReadOnlySpan<System.Char> AlternateFileName 
     {
         get { fixed (System.Char* ptr = cAlternateFileName) { return new System.ReadOnlySpan<System.Char>(ptr, 14); } }
     }

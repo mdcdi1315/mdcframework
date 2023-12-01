@@ -22,7 +22,7 @@
 	<!-- Sign your assembly using an Strong Name Key. Use "False" to disable signing. -->
 	<SignAssembly>True</SignAssembly>  
 	<!-- The Strong Key .snk file to sign the assembly with. -->
-	<AssemblyOriginatorKeyFile>msft.snk</AssemblyOriginatorKeyFile>
+	<AssemblyOriginatorKeyFile>..\..\Source\msft-dotnetcore.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
 	<Compile Include="ResGen.cs" />

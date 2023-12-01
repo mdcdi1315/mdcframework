@@ -44,6 +44,9 @@
 	<DefineConstants Condition="'$(OS)' == 'Unix'">$(DefineConstants);IsUnix</DefineConstants>
 	<EnableNETAnalyzers>False</EnableNETAnalyzers>
 	<AnalysisLevel>6.0-all</AnalysisLevel>
+	<!-- Supresses the RG0000 warning when generated from the custom ResGen. -->
+	<!-- The RG0000 warning is disabled because we already know that the resources are embedded correctly. -->
+	<NoWarn Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' == 'net48'">$(NoWarn);RG0000</NoWarn>
   </PropertyGroup>
 
 	<!-- This property group will export a new preprocessor constant , "WPFExists". -->
@@ -124,6 +127,7 @@
 	<Compile Include=".\MDCFR-SYSREFM.cs" />
 	<Compile Include=".\MDCFR-SYSREFMLC.cs" />
 	<Compile Include=".\MDCFR-MIORT.cs" />
+	<Compile Include=".\MDCFR-SYSMEMDAT.cs" />
 	<EmbeddedResource Include=".\Resources\codepages.nlp" LogicalName="codepages.nlp" />
 	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Fader.resources" LogicalName="NAudio.WinForms.Gui.Fader.resources" />
 	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Pot.resources" LogicalName="NAudio.WinForms.Gui.Pot.resources" />
@@ -134,9 +138,7 @@
 	<None Remove="$(BaseIntermediateOutputPath)\**" />
   </ItemGroup>
 
-  <ItemGroup 
-	  Condition="'$(TargetFramework)' == 'net70-windows10.0.19041.0' OR '$(TargetFramework)' == 'net70'" 
-	  Label=".NET 7.0 project items">
+  <ItemGroup Condition="'$(TargetFramework)' == 'net70-windows10.0.19041.0' OR '$(TargetFramework)' == 'net70'" Label=".NET 7.0 project items">
 	<Compile Include=".\MDCFR-EXTERNALHASHESDIG.cs" />
 	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS.cs" />
 	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_BROTLI.cs" />
@@ -264,6 +266,11 @@
 	<Message Importance="High" Text="Sucessfull copying ..." />
   </Target>
 
+	<Target Name="CompServicesdotUnsafeBuild" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net48'">
+		<Message Importance="high" Text="Building Custom System.Runtime.CompilerServices.Unsafe DLL (needed for NET48)" />
+		<MSBuild Projects="..\MDCFR-SYSRUNUNS\System.Runtime.CompilerServices.Unsafe.ilproj" Properties="BuildingForMDCFR=True;Configuration=$(Configuration)" Targets="Restore;Build" StopOnFirstFailure="true" BuildInParallel="false" />
+		<Message Importance="high" Text="Done Building Custom System.Runtime.CompilerServices.Unsafe" />
+	</Target>
 
 	<!-- Proper overrides for building under dotnet build command. -->
 	<Target Name="DotnetCore0" BeforeTargets="BeforeBuild" Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' == 'net48'">

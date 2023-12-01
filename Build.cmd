@@ -29,9 +29,7 @@ for /f "tokens=1,2,3,4,5,6,7 delims= " %%d in ("%*") do (
 		Echo INFO: Clearing build artifacts.
 		Echo NOTICE: Tool will NOT execute ^(build^) anything after this.
 		Echo NOTICE: Explicitly call the script without arguments to run the build again.
-		1>nul rd /s /q "%cd%\bin"
-		Echo INFO: Done!
-		Exit /b 0
+		Set _CLER=1
 	)
 	
 	if not defined CUSTOM_DOTNT_BUILD_ARGS (
@@ -67,11 +65,37 @@ Echo INFO: Supply this variable with a valid .NET SDK ^> 7 path and retry.
 call :Exit 3
 ))
 
+Echo INFO: Starting operation...
+Echo INFO: Checking if the current directory is the location of this script...
+if not "%_BD%" == "%cd%\" (
+	Echo WARNING: This instance is NOT running on the directory where it is situated.
+	Echo INFO: Attempting to change to the script location...
+	chdir /d "%_BD%"
+)
+Echo INFO: Done!
+Set _BD=
+
+if defined _CLER (
+Echo INFO: Clearing outputs...
+for /f "tokens=* delims=" %%$ in ('dir /a:D /b /d /s "%cd%\*"') do (
+	if exist "%%$\_gene_r_ated_.gen" (1>nul 2>nul rd /s /q "%%$")
+)
+Echo INFO: Running dotnet clean on target ^(Debug configuration^)
+1>nul "%DOTNT_PATH%\dotnet.exe" clean -c Debug
+Echo INFO: Running dotnet clean on target ^(Release configuration^)
+1>nul "%DOTNT_PATH%\dotnet.exe" clean -c Release
+Echo INFO: Done!
+Set _CLER=
+Exit /b 0
+)
+
+if not defined CUSTOM_DOTNT_BUILD_ARGS (if not defined CUSTOM_DOTNT_RESTORE_ARGS (Set _Clean=1))
+
 if defined CUSTOM_DOTNT_BUILD_ARGS (
 Echo INFO: Custom dotnet arguments for build operations found. These
 Echo INFO: arguments will be passed to dotnet.exe
 Echo INFO: as restore options.
-) else Set "CUSTOM_DOTNT_BUILD_ARGS= --verbosity normal"
+) else Set "CUSTOM_DOTNT_BUILD_ARGS= --verbosity normal -c Release"
 
 if defined CUSTOM_DOTNT_RESTORE_ARGS (
 Echo INFO: Custom dotnet arguments for restore operations found. These
@@ -79,15 +103,7 @@ Echo INFO: arguments will be passed to dotnet.exe
 Echo INFO: as restore options.
 ) else Set "CUSTOM_DOTNT_RESTORE_ARGS= --verbosity normal"
 
-Echo INFO: Starting operation...
-Echo INFO: Checking if the current directory is the location of this script...
-if not "%_BD%" == "%cd%\" (
-Echo WARNING: This instance is NOT running on the directory where it is situated.
-Echo INFO: Attempting to change to the script location...
-chdir /d "%_BD%"
-Echo INFO: Done!
-) else (Echo INFO: Done!)
-Set _BD=
+Echo INFO: Starting up...
 
 if exist "%cd%\boss.script" (
 	Echo INFO: Found boss script file. Executing the file "%cd%\Boss.script" first.
@@ -116,7 +132,11 @@ for /f "tokens=* delims=" %%$ in ('dir /a:D /b /d /s "%cd%\*"') do (
 
 Echo INFO: Done building.
 Echo INFO: Exiting sucessfully...
-
+if defined _Clean (
+	Set CUSTOM_DOTNT_BUILD_ARGS=
+	Set CUSTOM_DOTNT_RESTORE_ARGS=
+	Set DOTNT_PATH=
+)
 Exit /b 0
 
 
@@ -303,6 +323,12 @@ for /f "tokens=*" %%@ in ('more "%1\BOSS.script"') do (
 				Echo ERROR: Cannot create the file. The location parameter was empty.
 			) else (
 				Echo. > "%%b"
+			)
+		) else if "%%a" == "ReportBuildOutputDirectory" (
+			if /I "%%b" == "" (
+				Echo ERROR: Cannot create the file. The location parameter was empty.
+			) else (
+				Echo. > "%%b\_gene_r_ated_.gen"
 			)
 		) else if "%%a" == "Stamp" (
 			Rem Stamp Action: Creates a new file that contains the current date and time.

@@ -35,7 +35,7 @@ using System.Diagnostics.Tracing;
 using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
-#pragma warning disable CS0809
+#pragma warning disable CS0809 , CS0114
 
 namespace System.IO
 {
@@ -44,7 +44,7 @@ namespace System.IO
 	/// buffers.
 	/// </summary>
 	/// <remarks>
-	/// This class works in tandem with the <see cref="T:Microsoft.IO.RecyclableMemoryStreamManager" /> to supply <c>MemoryStream</c>-derived
+	/// This class works in tandem with the <see cref="Microsoft.IO.RecyclableMemoryStreamManager" /> to supply <c>MemoryStream</c>-derived
 	/// objects to callers, while avoiding these specific problems:
 	/// <list type="number">
 	/// <item>
@@ -58,7 +58,7 @@ namespace System.IO
 	/// <item>
 	/// <term>Memory copying</term>
 	/// <description>Each time a <c>MemoryStream</c> grows, all the bytes are copied into new buffers.
-	/// This implementation only copies the bytes when <see cref="M:Microsoft.IO.RecyclableMemoryStream.GetBuffer" /> is called.</description>
+	/// This implementation only copies the bytes when <see cref="Microsoft.IO.RecyclableMemoryStream.GetBuffer" /> is called.</description>
 	/// </item>
 	/// <item>
 	/// <term>Memory fragmentation</term>
@@ -73,7 +73,7 @@ namespace System.IO
 	/// object itself.
 	/// </para>
 	/// <para>
-	/// The biggest wrinkle in this implementation is when <see cref="M:Microsoft.IO.RecyclableMemoryStream.GetBuffer" /> is called. This requires a single
+	/// The biggest wrinkle in this implementation is when <see cref="Microsoft.IO.RecyclableMemoryStream.GetBuffer" /> is called. This requires a single
 	/// contiguous buffer. If only a single block is in use, then that block is returned. If multiple blocks
 	/// are in use, we retrieve a larger buffer from the memory manager. These large buffers are also pooled,
 	/// split by size--they are multiples/exponentials of a chunk size (1 MB by default).
@@ -168,7 +168,7 @@ namespace System.IO
         /// <summary>
         /// Unique identifier for this stream across its entire lifetime.
         /// </summary>
-        /// <exception cref="T:System.ObjectDisposedException">Object has been disposed.</exception>
+        /// <exception cref="System.ObjectDisposedException">Object has been disposed.</exception>
         internal Guid Id
         {
             get
@@ -887,7 +887,7 @@ namespace System.IO
         /// </summary>
         /// <param name="buffer">Destination buffer.</param>
         /// <returns>The number of bytes read.</returns>
-        /// <exception cref="T:System.ObjectDisposedException">Object has been disposed.</exception>
+        /// <exception cref="System.ObjectDisposedException">Object has been disposed.</exception>
         public int Read(Span<byte> buffer)
         {
             return SafeRead(buffer, ref position);
@@ -988,8 +988,8 @@ namespace System.IO
         /// Writes the buffer to the stream.
         /// </summary>
         /// <param name="source">Source buffer.</param>
-        /// <exception cref="T:System.ArgumentNullException">buffer is null.</exception>
-        /// <exception cref="T:System.ObjectDisposedException">Object has been disposed.</exception>
+        /// <exception cref="System.ArgumentNullException">buffer is null.</exception>
+        /// <exception cref="System.ObjectDisposedException">Object has been disposed.</exception>
         public void Write(ReadOnlySpan<byte> source)
         {
             CheckDisposed();
@@ -3978,7 +3978,7 @@ namespace Microsoft.IO
         /// </summary>
         /// <param name="buffer">Destination buffer.</param>
         /// <returns>The number of bytes read.</returns>
-        /// <exception cref="T:System.ObjectDisposedException">Object has been disposed.</exception>
+        /// <exception cref="System.ObjectDisposedException">Object has been disposed.</exception>
         public int Read(Span<byte> buffer)
         {
             return SafeRead(buffer, ref position);
@@ -4079,8 +4079,8 @@ namespace Microsoft.IO
         /// Writes the buffer to the stream.
         /// </summary>
         /// <param name="source">Source buffer.</param>
-        /// <exception cref="T:System.ArgumentNullException">buffer is null.</exception>
-        /// <exception cref="T:System.ObjectDisposedException">Object has been disposed.</exception>
+        /// <exception cref="System.ArgumentNullException">buffer is null.</exception>
+        /// <exception cref="System.ObjectDisposedException">Object has been disposed.</exception>
         public void Write(ReadOnlySpan<byte> source)
         {
             CheckDisposed();

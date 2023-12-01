@@ -10,18 +10,15 @@ dotnet_diagnostic.IDE0063.severity = none
 dotnet_diagnostic.CS0436.severity = none
 
 [MDCFR-SYSCOLIMUT.cs]
-
 # Proper warning overrides for MDCFR-SYSCOLIMUT.cs file
 dotnet_diagnostic.CS8625.severity = none
 dotnet_diagnostic.CS8618.severity = none
 
 [MDCFR-EXTERNALCODE.cs]
-
 # Proper warning overrides for MDCFR-EXTERNALCODE.cs file
 dotnet_diagnostic.CS0169.severity = none
 
 [MDCFR-SYSTTD.cs]
-
 # Proper warning overrides for MDCFR-SYSTTD.cs file
 dotnet_diagnostic.CS8625.severity = none
 dotnet_diagnostic.CS8600.severity = none
@@ -34,12 +31,10 @@ dotnet_diagnostic.CS8767.severity = none
 dotnet_diagnostic.CS8769.severity = none
 
 [MDCFR-HTTPLIB.cs]
-
 # Proper warning overrides for MDCFR-HTTPLIB.cs file
 dotnet_diagnostic.CS1591.severity = none
 
 [MDCFR-SYSTEN.cs]
-
 # Proper warning overrides for MDCFR-SYSTEN.cs file
 dotnet_diagnostic.CS8600.severity = none
 dotnet_diagnostic.CS8601.severity = none
@@ -48,7 +43,6 @@ dotnet_diagnostic.CS8604.severity = none
 dotnet_diagnostic.CS8618.severity = none
 
 [MDCFR-NAUDIO.cs]
-
 # Proper warning overrides for MDCFR-NAUDIO.cs file
 dotnet_diagnostic.CS1591.severity = none
 dotnet_diagnostic.CS0649.severity = none
@@ -57,6 +51,19 @@ dotnet_diagnostic.CS0649.severity = none
 # Proper warning overrides for MDCFR-NAUDIO.cs file
 dotnet_diagnostic.CS0436.severity = none
 dotnet_diagnostic.CS0219.severity = none
+
+[MDCFR-MIORT.cs]
+# Proper warning overrides for MDCFR-MIORT.cs file
+dotnet_diagnostic.CS0649.severity = none
+dotnet_diagnostic.CS1591.severity = none
+dotnet_diagnostic.CS8603.severity = none
+dotnet_diagnostic.CS9080.severity = none
+dotnet_diagnostic.CS8600.severity = none
+dotnet_diagnostic.CS8601.severity = none
+dotnet_diagnostic.CS8604.severity = none
+dotnet_diagnostic.CS8625.severity = none
+dotnet_diagnostic.CS8618.severity = none
+dotnet_diagnostic.CS8602.severity = none
 
 [MDCFR-SYSREFM.cs]
 # Proper warning overrides for MDCFR-SYSREFM.cs file
@@ -80,8 +87,8 @@ dotnet_diagnostic.CS8604.severity = none
 dotnet_diagnostic.CS8605.severity = none
 dotnet_diagnostic.CS8625.severity = none
 dotnet_diagnostic.CS8643.severity = none
-dotnet_diagnostic.CS8765.severity = none
 dotnet_diagnostic.CS8762.severity = none
+dotnet_diagnostic.CS8765.severity = none
 dotnet_diagnostic.CS8618.severity = none
 dotnet_diagnostic.CS8619.severity = none
 dotnet_diagnostic.CS8620.severity = none

@@ -40,7 +40,7 @@ namespace System.Reflection
 		/// </summary>
 		WindowsRuntime = 0x200,
 		/// <summary>
-		/// Content type mask. Masked bits correspond to values of <see cref="T:System.Reflection.AssemblyContentType" />.
+		/// Content type mask. Masked bits correspond to values of <see cref="System.Reflection.AssemblyContentType" />.
 		/// </summary>
 		ContentTypeMask = 0xE00,
 		/// <summary>
@@ -1347,7 +1347,7 @@ namespace System.Reflection
 		}
 
 			/// <summary>
-			/// Provides tools for using <see cref="System.Collections.Immutable.ImmutableArray{T}" /> in interop scenarios.
+			/// Provides tools for using <see cref="ImmutableArray{T}" /> in interop scenarios.
 			/// </summary>
 			/// <remarks>
 			/// *** WARNING ***
@@ -1363,7 +1363,7 @@ namespace System.Reflection
 			/// This implementation is scoped to byte arrays as that is all that the metadata reader needs.
 			///
 			/// Also, since we don't have access to immutable collection internals, we use a trick involving
-			/// overlapping a <see cref="System.Collections.Immutable.ImmutableArray{T}" /> with an array reference. While
+			/// overlapping a <see cref="ImmutableArray{T}" /> with an array reference. While
 			/// unverifiable, it is valid. See ECMA-335, section II.10.7 Controlling instance layout:
 			///
 			/// "It is possible to overlap fields in this way, though offsets occupied by an object reference
@@ -1371,7 +1371,7 @@ namespace System.Reflection
 			/// another object reference. While one object reference can completely overlap another, this is
 			/// unverifiable."
 			///
-			/// Furthermore, the fact that <see cref="System.Collections.Immutable.ImmutableArray{T}" /> backed by a single byte array
+			/// Furthermore, the fact that <see cref="ImmutableArray{T}" /> backed by a single byte array
 			/// field is something inherent to the design of ImmutableArray in order to get its performance
 			/// characteristics and therefore something we (Microsoft) are comfortable defining as a contract that
 			/// can be depended upon as below.
@@ -1388,23 +1388,23 @@ namespace System.Reflection
 					internal System.Collections.Immutable.ImmutableArray<byte> ImmutableArray;
 				}
 
-				/// <summary>
-				/// Creates a new instance of <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> using a given mutable array as the backing
-				/// field, without creating a defensive copy. It is the responsibility of the caller to ensure no other mutable
-				/// references exist to the array.  Do not mutate the array after calling this method.
-				/// </summary>
-				/// <param name="array">The mutable array to use as the backing field. The incoming reference is set to null
-				/// since it should not be retained by the caller.</param>
-				/// <remarks>
-				/// Users of this method should take extra care to ensure that the mutable array given as a parameter
-				/// is never modified. The returned <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> will use the given array as its backing
-				/// field without creating a defensive copy, so changes made to the given mutable array will be observable
-				/// on the returned <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.  Instance and static methods of <see cref="T:System.Collections.Immutable.ImmutableArray`1" />
-				/// and <see cref="T:System.Collections.Immutable.ImmutableArray" /> may malfunction if they operate on an <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> instance
-				/// whose underlying backing field is modified.
-				/// </remarks>
-				/// <returns>An immutable array.</returns>
-				internal static System.Collections.Immutable.ImmutableArray<byte> DangerousCreateFromUnderlyingArray(ref byte[]? array)
+			/// <summary>
+			/// Creates a new instance of <see cref="ImmutableArray{T}" /> using a given mutable array as the backing
+			/// field, without creating a defensive copy. It is the responsibility of the caller to ensure no other mutable
+			/// references exist to the array.  Do not mutate the array after calling this method.
+			/// </summary>
+			/// <param name="array">The mutable array to use as the backing field. The incoming reference is set to null
+			/// since it should not be retained by the caller.</param>
+			/// <remarks>
+			/// Users of this method should take extra care to ensure that the mutable array given as a parameter
+			/// is never modified. The returned <see cref="ImmutableArray{T}" /> will use the given array as its backing
+			/// field without creating a defensive copy, so changes made to the given mutable array will be observable
+			/// on the returned <see cref="ImmutableArray{T}" />.  Instance and static methods of <see cref="ImmutableArray{T}" />
+			/// and <see cref="System.Collections.Immutable.ImmutableArray" /> may malfunction if they operate on an <see cref="ImmutableArray{T}" /> instance
+			/// whose underlying backing field is modified.
+			/// </remarks>
+			/// <returns>An immutable array.</returns>
+			internal static System.Collections.Immutable.ImmutableArray<byte> DangerousCreateFromUnderlyingArray(ref byte[]? array)
 				{
 					byte[] underlyingArray = array;
 					array = null;
@@ -1413,22 +1413,22 @@ namespace System.Reflection
 					return byteArrayUnion.ImmutableArray;
 				}
 
-				/// <summary>
-				/// Access the backing mutable array instance for the given <see cref="T:System.Collections.Immutable.ImmutableArray`1" />, without
-				/// creating a defensive copy.  It is the responsibility of the caller to ensure the array is not modified
-				/// through the returned mutable reference.  Do not mutate the returned array.
-				/// </summary>
-				/// <param name="array">The <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> from which to retrieve the backing field.</param>
-				/// <remarks>
-				/// Users of this method should take extra care to ensure that the returned mutable array is never modified.
-				/// The returned mutable array continues to be used as the backing field of the given <see cref="T:System.Collections.Immutable.ImmutableArray`1" />
-				/// without creating a defensive copy, so changes made to the returned mutable array will be observable
-				/// on the given <see cref="T:System.Collections.Immutable.ImmutableArray`1" />.  Instance and static methods of <see cref="T:System.Collections.Immutable.ImmutableArray`1" />
-				/// and <see cref="T:System.Collections.Immutable.ImmutableArray" /> may malfunction if they operate on an <see cref="T:System.Collections.Immutable.ImmutableArray`1" /> instance
-				/// whose underlying backing field is modified.
-				/// </remarks>
-				/// <returns>The underlying array, or null if <see cref="P:System.Collections.Immutable.ImmutableArray`1.IsDefault" /> is true.</returns>
-				internal static byte[]? DangerousGetUnderlyingArray(System.Collections.Immutable.ImmutableArray<byte> array)
+			/// <summary>
+			/// Access the backing mutable array instance for the given <see cref="ImmutableArray{T}" />, without
+			/// creating a defensive copy.  It is the responsibility of the caller to ensure the array is not modified
+			/// through the returned mutable reference.  Do not mutate the returned array.
+			/// </summary>
+			/// <param name="array">The <see cref="ImmutableArray{T}" /> from which to retrieve the backing field.</param>
+			/// <remarks>
+			/// Users of this method should take extra care to ensure that the returned mutable array is never modified.
+			/// The returned mutable array continues to be used as the backing field of the given <see cref="ImmutableArray{T}" />
+			/// without creating a defensive copy, so changes made to the returned mutable array will be observable
+			/// on the given <see cref="ImmutableArray{T}" />.  Instance and static methods of <see cref="ImmutableArray{T}" />
+			/// and <see cref="System.Collections.Immutable.ImmutableArray" /> may malfunction if they operate on an <see cref="ImmutableArray{T}" /> instance
+			/// whose underlying backing field is modified.
+			/// </remarks>
+			/// <returns>The underlying array, or null if <see cref="ImmutableArray{T}.IsDefault" /> is true.</returns>
+			internal static byte[]? DangerousGetUnderlyingArray(System.Collections.Immutable.ImmutableArray<byte> array)
 				{
 					ByteArrayUnion byteArrayUnion = default(ByteArrayUnion);
 					byteArrayUnion.ImmutableArray = array;
@@ -2237,7 +2237,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Creates and hydrates a memory block representing all data.
 			/// </summary>
-			/// <exception cref="T:System.IO.IOException">Error while reading from the memory source.</exception>
+			/// <exception cref="System.IO.IOException">Error while reading from the memory source.</exception>
 			public System.Reflection.Internal.AbstractMemoryBlock GetMemoryBlock()
 			{
 				return GetMemoryBlockImpl(0, Size);
@@ -2248,7 +2248,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="start">Starting offset relative to the beginning of the data represented by this provider.</param>
 			/// <param name="size">Size of the resulting block.</param>
-			/// <exception cref="T:System.IO.IOException">Error while reading from the memory source.</exception>
+			/// <exception cref="System.IO.IOException">Error while reading from the memory source.</exception>
 			public System.Reflection.Internal.AbstractMemoryBlock GetMemoryBlock(int start, int size)
 			{
 				if ((ulong)((long)(uint)start + (long)(uint)size) > (ulong)Size)
@@ -2258,11 +2258,11 @@ namespace System.Reflection
 				return GetMemoryBlockImpl(start, size);
 			}
 
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			protected abstract System.Reflection.Internal.AbstractMemoryBlock GetMemoryBlockImpl(int start, int size);
 
 			/// <summary>
-			/// Gets a seekable and readable <see cref="T:System.IO.Stream" /> that can be used to read all data.
+			/// Gets a seekable and readable <see cref="System.IO.Stream" /> that can be used to read all data.
 			/// The operations on the stream has to be done under a lock of <see cref="F:System.Reflection.Internal.StreamConstraints.GuardOpt" /> if non-null.
 			/// The image starts at <see cref="F:System.Reflection.Internal.StreamConstraints.ImageStart" /> and has size <see cref="F:System.Reflection.Internal.StreamConstraints.ImageSize" />.
 			/// It is the caller's responsibility not to read outside those bounds.
@@ -2743,7 +2743,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Copies specified amount of data from given stream to a target memory pointer.
 			/// </summary>
-			/// <exception cref="T:System.IO.IOException">unexpected stream end.</exception>
+			/// <exception cref="System.IO.IOException">unexpected stream end.</exception>
 			internal unsafe static void CopyTo(this Stream source, byte* destination, int size)
 			{
 				byte[] array = new byte[Math.Min(81920, size)];
@@ -2792,8 +2792,8 @@ namespace System.Reflection
 			/// Resolve image size as either the given user-specified size or distance from current position to end-of-stream.
 			/// Also performs the relevant argument validation and publicly visible caller has same argument names.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentException">size is 0 and distance from current position to end-of-stream can't fit in Int32.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end-of-stream from current position.</exception>
+			/// <exception cref="System.ArgumentException">size is 0 and distance from current position to end-of-stream can't fit in Int32.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end-of-stream from current position.</exception>
 			internal static int GetAndValidateSize(Stream stream, int size, string streamParameterName)
 			{
 				long num = stream.Length - stream.Position;
@@ -2858,7 +2858,7 @@ namespace System.Reflection
 				Interlocked.Exchange(ref _lazyMemoryMap, null)?.Dispose();
 			}
 
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
 			internal unsafe static System.Reflection.Internal.NativeHeapMemoryBlock ReadMemoryBlockNoLock(Stream stream, long start, int size)
 			{
 				System.Reflection.Internal.NativeHeapMemoryBlock nativeHeapMemoryBlock = new System.Reflection.Internal.NativeHeapMemoryBlock(size);
@@ -2883,7 +2883,7 @@ namespace System.Reflection
 				return nativeHeapMemoryBlock;
 			}
 
-			/// <exception cref="T:System.IO.IOException">Error while reading from the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error while reading from the stream.</exception>
 			protected override System.Reflection.Internal.AbstractMemoryBlock GetMemoryBlockImpl(int start, int size)
 			{
 				long start2 = _imageStart + start;
@@ -2907,7 +2907,7 @@ namespace System.Reflection
 				return _stream;
 			}
 
-			/// <exception cref="T:System.IO.IOException">IO error while mapping memory or not enough memory to create the mapping.</exception>
+			/// <exception cref="System.IO.IOException">IO error while mapping memory or not enough memory to create the mapping.</exception>
 			private bool TryCreateMemoryMappedFileBlock(long start, int size, [NotNullWhen(true)] out System.Reflection.Internal.MemoryMappedFileBlock block)
 			{
 				if (_lazyMemoryMap == null)
@@ -3134,7 +3134,7 @@ namespace System.Reflection
 			public StringHandle Name => _reader.FileTable.GetName(Handle);
 
 			/// <summary>
-			/// Hash value of the file content calculated using <see cref="P:System.Reflection.Metadata.AssemblyDefinition.HashAlgorithm" />.
+			/// Hash value of the file content calculated using <see cref="System.Reflection.Metadata.AssemblyDefinition.HashAlgorithm" />.
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to HashValue field of File table in ECMA-335 Standard.
@@ -3234,7 +3234,7 @@ namespace System.Reflection
 		}
 
 		/// <summary>
-		/// Represents a collection of <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />.
+		/// Represents a collection of <see cref="System.Reflection.Metadata.AssemblyFileHandle" />.
 		/// </summary>
 		public readonly struct AssemblyFileHandleCollection : IReadOnlyCollection<AssemblyFileHandle>, IEnumerable<AssemblyFileHandle>, IEnumerable
 		{
@@ -3923,7 +3923,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Returns a sequence of all blobs that represent the content of the builder.
 			/// </summary>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public Blobs GetBlobs()
 			{
 				if (!IsHead)
@@ -3936,7 +3936,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Compares the current content of this writer with another one.
 			/// </summary>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public bool ContentEquals(BlobBuilder other)
 			{
 				if (!IsHead)
@@ -3990,14 +3990,14 @@ namespace System.Reflection
 				return flag == flag2;
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public byte[] ToArray()
 			{
 				return ToArray(0, Count);
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public byte[] ToArray(int start, int byteCount)
 			{
 				System.Reflection.BlobUtilities.ValidateRange(Count, start, byteCount, "byteCount");
@@ -4023,22 +4023,22 @@ namespace System.Reflection
 				return array;
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public System.Collections.Immutable.ImmutableArray<byte> ToImmutableArray()
 			{
 				return ToImmutableArray(0, Count);
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public System.Collections.Immutable.ImmutableArray<byte> ToImmutableArray(int start, int byteCount)
 			{
 				byte[] array = ToArray(start, byteCount);
 				return ImmutableByteArrayInterop.DangerousCreateFromUnderlyingArray(ref array);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="destination" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="destination" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public void WriteContentTo(Stream destination)
 			{
 				if (destination == null)
@@ -4051,8 +4051,8 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="destination" /> is default(<see cref="T:System.Reflection.Metadata.BlobWriter" />).</exception>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="destination" /> is default(<see cref="System.Reflection.Metadata.BlobWriter" />).</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public void WriteContentTo(ref BlobWriter destination)
 			{
 				if (destination.IsDefault)
@@ -4065,8 +4065,8 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="destination" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="destination" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Content is not available, the builder has been linked with another one.</exception>
 			public void WriteContentTo(BlobBuilder destination)
 			{
 				if (destination == null)
@@ -4079,8 +4079,8 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="prefix" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="prefix" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void LinkPrefix(BlobBuilder prefix)
 			{
 				if (prefix == null)
@@ -4112,8 +4112,8 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="suffix" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="suffix" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void LinkSuffix(BlobBuilder suffix)
 			{
 				if (suffix == null)
@@ -4204,8 +4204,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Reserves a contiguous block of bytes.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public Blob ReserveBytes(int byteCount)
 			{
 				if (byteCount < 0)
@@ -4233,8 +4233,8 @@ namespace System.Reflection
 				return ReserveBytesImpl(byteCount);
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteBytes(byte value, int byteCount)
 			{
 				if (byteCount < 0)
@@ -4257,9 +4257,9 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public unsafe void WriteBytes(byte* buffer, int byteCount)
 			{
 				if (buffer == null)
@@ -4291,9 +4291,9 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="source" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="source" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			/// <returns>Bytes successfully written from the <paramref name="source" />.</returns>
 			public int TryWriteBytes(Stream source, int byteCount)
 			{
@@ -4331,31 +4331,31 @@ namespace System.Reflection
 				return num;
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteBytes(System.Collections.Immutable.ImmutableArray<byte> buffer)
 			{
 				WriteBytes(buffer, 0, (!buffer.IsDefault) ? buffer.Length : 0);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteBytes(System.Collections.Immutable.ImmutableArray<byte> buffer, int start, int byteCount)
 			{
 				WriteBytes(ImmutableByteArrayInterop.DangerousGetUnderlyingArray(buffer), start, byteCount);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteBytes(byte[] buffer)
 			{
 				WriteBytes(buffer, 0, (buffer != null) ? buffer.Length : 0);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public unsafe void WriteBytes(byte[] buffer, int start, int byteCount)
 			{
 				if (buffer == null)
@@ -4376,132 +4376,132 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void PadTo(int position)
 			{
 				WriteBytes(0, position - Count);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void Align(int alignment)
 			{
 				int count = Count;
 				WriteBytes(0, BitArithmetic.Align(count, alignment) - count);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteBoolean(bool value)
 			{
 				WriteByte((byte)(value ? 1u : 0u));
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteByte(byte value)
 			{
 				int start = ReserveBytesPrimitive(1);
 				_buffer.WriteByte(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteSByte(sbyte value)
 			{
 				WriteByte((byte)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteDouble(double value)
 			{
 				int start = ReserveBytesPrimitive(8);
 				_buffer.WriteDouble(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteSingle(float value)
 			{
 				int start = ReserveBytesPrimitive(4);
 				_buffer.WriteSingle(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteInt16(short value)
 			{
 				WriteUInt16((ushort)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUInt16(ushort value)
 			{
 				int start = ReserveBytesPrimitive(2);
 				_buffer.WriteUInt16(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteInt16BE(short value)
 			{
 				WriteUInt16BE((ushort)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUInt16BE(ushort value)
 			{
 				int start = ReserveBytesPrimitive(2);
 				_buffer.WriteUInt16BE(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteInt32BE(int value)
 			{
 				WriteUInt32BE((uint)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUInt32BE(uint value)
 			{
 				int start = ReserveBytesPrimitive(4);
 				_buffer.WriteUInt32BE(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteInt32(int value)
 			{
 				WriteUInt32((uint)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUInt32(uint value)
 			{
 				int start = ReserveBytesPrimitive(4);
 				_buffer.WriteUInt32(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteInt64(long value)
 			{
 				WriteUInt64((ulong)value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUInt64(ulong value)
 			{
 				int start = ReserveBytesPrimitive(8);
 				_buffer.WriteUInt64(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteDecimal(decimal value)
 			{
 				int start = ReserveBytesPrimitive(13);
 				_buffer.WriteDecimal(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteGuid(Guid value)
 			{
 				int start = ReserveBytesPrimitive(16);
 				_buffer.WriteGuid(start, value);
 			}
 
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteDateTime(DateTime value)
 			{
 				WriteInt64(value.Ticks);
@@ -4512,7 +4512,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="reference">Heap offset or table row number.</param>
 			/// <param name="isSmall">True to encode the reference as 16-bit integer, false to encode as 32-bit integer.</param>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteReference(int reference, bool isSmall)
 			{
 				if (isSmall)
@@ -4528,8 +4528,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes UTF16 (little-endian) encoded string at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public unsafe void WriteUTF16(char[] value)
 			{
 				if (value == null)
@@ -4561,8 +4561,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes UTF16 (little-endian) encoded string at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public unsafe void WriteUTF16(string value)
 			{
 				if (value == null)
@@ -4594,7 +4594,7 @@ namespace System.Reflection
 			/// The string is UTF8 encoded and prefixed by the its size in bytes.
 			/// Null string is represented as a single byte 0xFF.
 			/// </remarks>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteSerializedString(string? value)
 			{
 				if (value == null)
@@ -4617,7 +4617,7 @@ namespace System.Reflection
 			/// or its low byte is any of the following: 0x01-0x08, 0x0E-0x1F, 0x27, 0x2D, 0x7F. Otherwise, it holds 0.
 			/// The 1 signifies Unicode characters that require handling beyond that normally provided for 8-bit encoding sets.
 			/// </remarks>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUserString(string value)
 			{
 				if (value == null)
@@ -4636,8 +4636,8 @@ namespace System.Reflection
 			/// <param name="allowUnpairedSurrogates">
 			/// True to encode unpaired surrogates as specified, otherwise replace them with U+FFFD character.
 			/// </param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUTF8(string value, bool allowUnpairedSurrogates = true)
 			{
 				if (value == null)
@@ -4690,8 +4690,8 @@ namespace System.Reflection
 			/// If the value lies between -268435456 (0xF000000) and 268435455 (0x0FFFFFFF), inclusive, encode as a four-byte integer:
 			/// 31 set, 30 set, bit 29 clear, value bits 27 through 0 held in bits 28 through 1, sign bit(value bit 31) in bit 0.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed signed integer.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed signed integer.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteCompressedSignedInteger(int value)
 			{
 				BlobWriterImpl.WriteCompressedSignedInteger(this, value);
@@ -4709,8 +4709,8 @@ namespace System.Reflection
 			///
 			/// Otherwise, encode as a 4-byte integer, with bit 31 set, bit 30 set, bit 29 clear (value held in bits 28 through 0).
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed unsigned integer.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed unsigned integer.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteCompressedInteger(int value)
 			{
 				BlobWriterImpl.WriteCompressedInteger(this, (uint)value);
@@ -4719,8 +4719,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes a constant value (see ECMA-335 Partition II section 22.9) at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentException"><paramref name="value" /> is not of a constant type.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="value" /> is not of a constant type.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteConstant(object? value)
 			{
 				BlobWriterImpl.WriteConstant(this, value);
@@ -5000,7 +5000,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Gets or sets the offset from start of the blob to the current position.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">Offset is set outside the bounds of underlying reader.</exception>
+			/// <exception cref="System.BadImageFormatException">Offset is set outside the bounds of underlying reader.</exception>
 			public unsafe int Offset
 			{
 				get
@@ -5027,9 +5027,9 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="buffer">Pointer to the start of the memory block.</param>
 			/// <param name="length">Length in bytes of the memory block.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null and <paramref name="length" /> is greater than zero.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="length" /> is negative.</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is not little-endian.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null and <paramref name="length" /> is greater than zero.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length" /> is negative.</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is not little-endian.</exception>
 			public unsafe BlobReader(byte* buffer, int length)
 				: this(System.Reflection.Internal.MemoryBlock.CreateChecked(buffer, length))
 			{
@@ -5224,14 +5224,14 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Reads <see cref="T:System.Decimal" /> number.
+			/// Reads <see cref="System.Decimal" /> number.
 			/// </summary>
 			/// <remarks>
 			/// Decimal number is encoded in 13 bytes as follows:
 			/// - byte 0: highest bit indicates sign (1 for negative, 0 for non-negative); the remaining 7 bits encode scale
 			/// - bytes 1..12: 96-bit unsigned integer in little endian encoding.
 			/// </remarks>
-			/// <exception cref="T:System.BadImageFormatException">The data at the current position was not a valid <see cref="T:System.Decimal" /> number.</exception>
+			/// <exception cref="System.BadImageFormatException">The data at the current position was not a valid <see cref="System.Decimal" /> number.</exception>
 			public unsafe decimal ReadDecimal()
 			{
 				byte* currentPointerAndAdvance = GetCurrentPointerAndAdvance(13);
@@ -5278,7 +5278,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="byteCount">The number of bytes to read.</param>
 			/// <returns>The string.</returns>
-			/// <exception cref="T:System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
+			/// <exception cref="System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
 			public unsafe string ReadUTF8(int byteCount)
 			{
 				string result = _block.PeekUtf8(Offset, byteCount);
@@ -5291,7 +5291,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="byteCount">The number of bytes to read.</param>
 			/// <returns>The string.</returns>
-			/// <exception cref="T:System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
+			/// <exception cref="System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
 			public unsafe string ReadUTF16(int byteCount)
 			{
 				string result = _block.PeekUtf16(Offset, byteCount);
@@ -5304,7 +5304,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="byteCount">The number of bytes to read.</param>
 			/// <returns>The byte array.</returns>
-			/// <exception cref="T:System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
+			/// <exception cref="System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
 			public unsafe byte[] ReadBytes(int byteCount)
 			{
 				byte[] result = _block.PeekBytes(Offset, byteCount);
@@ -5318,7 +5318,7 @@ namespace System.Reflection
 			/// <param name="byteCount">The number of bytes to read.</param>
 			/// <param name="buffer">The destination buffer the bytes read will be written.</param>
 			/// <param name="bufferOffset">The offset in the destination buffer where the bytes read will be written.</param>
-			/// <exception cref="T:System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
+			/// <exception cref="System.BadImageFormatException"><paramref name="byteCount" /> bytes not available.</exception>
 			public unsafe void ReadBytes(int byteCount, byte[] buffer, int bufferOffset)
 			{
 				Marshal.Copy((IntPtr)GetCurrentPointerAndAdvance(byteCount), buffer, bufferOffset, byteCount);
@@ -5357,7 +5357,7 @@ namespace System.Reflection
 			/// See Metadata Specification section II.23.2: Blobs and signatures.
 			/// </summary>
 			/// <returns>The value of the compressed integer that was read.</returns>
-			/// <exception cref="T:System.BadImageFormatException">The data at the current position was not a valid compressed integer.</exception>
+			/// <exception cref="System.BadImageFormatException">The data at the current position was not a valid compressed integer.</exception>
 			public int ReadCompressedInteger()
 			{
 				if (!TryReadCompressedInteger(out var value))
@@ -5406,7 +5406,7 @@ namespace System.Reflection
 			/// See Metadata Specification section II.23.2: Blobs and signatures.
 			/// </summary>
 			/// <returns>The value of the compressed integer that was read.</returns>
-			/// <exception cref="T:System.BadImageFormatException">The data at the current position was not a valid compressed integer.</exception>
+			/// <exception cref="System.BadImageFormatException">The data at the current position was not a valid compressed integer.</exception>
 			public int ReadCompressedSignedInteger()
 			{
 				if (!TryReadCompressedSignedInteger(out var value))
@@ -5454,7 +5454,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <remarks>Defined as a 'SerString' in the ECMA CLI specification.</remarks>
 			/// <returns>String value or null.</returns>
-			/// <exception cref="T:System.BadImageFormatException">If the encoding is invalid.</exception>
+			/// <exception cref="System.BadImageFormatException">If the encoding is invalid.</exception>
 			public string? ReadSerializedString()
 			{
 				if (TryReadCompressedInteger(out var value))
@@ -5487,7 +5487,7 @@ namespace System.Reflection
 			/// Reads a #Blob heap handle encoded as a compressed integer.
 			/// </summary>
 			/// <remarks>
-			/// Blobs that contain references to other blobs are used in Portable PDB format, for example <see cref="P:System.Reflection.Metadata.Document.Name" />.
+			/// Blobs that contain references to other blobs are used in Portable PDB format, for example <see cref="System.Reflection.Metadata.Document.Name" />.
 			/// </remarks>
 			public BlobHandle ReadBlobHandle()
 			{
@@ -5497,8 +5497,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Reads a constant value (see ECMA-335 Partition II section 22.9) from the current position.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">Error while reading from the blob.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="typeCode" /> is not a valid <see cref="T:System.Reflection.Metadata.ConstantTypeCode" />.</exception>
+			/// <exception cref="System.BadImageFormatException">Error while reading from the blob.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="typeCode" /> is not a valid <see cref="System.Reflection.Metadata.ConstantTypeCode" />.</exception>
 			/// <returns>
 			/// Boxed constant value. To avoid allocating the object use Read* methods directly.
 			/// Constants of type <see cref="F:System.Reflection.Metadata.ConstantTypeCode.String" /> are encoded as UTF16 strings, use <see cref="M:System.Reflection.Metadata.BlobReader.ReadUTF16(System.Int32)" /> to read them.
@@ -5619,7 +5619,7 @@ namespace System.Reflection
 				return ToArray(0, Offset);
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
 			public byte[] ToArray(int start, int byteCount)
 			{
 				System.Reflection.BlobUtilities.ValidateRange(Length, start, byteCount, "byteCount");
@@ -5633,7 +5633,7 @@ namespace System.Reflection
 				return ToImmutableArray(0, Offset);
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the buffer content.</exception>
 			public System.Collections.Immutable.ImmutableArray<byte> ToImmutableArray(int start, int byteCount)
 			{
 				byte[] array = ToArray(start, byteCount);
@@ -5651,7 +5651,7 @@ namespace System.Reflection
 				return position;
 			}
 
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
 			public unsafe void WriteBytes(byte value, int byteCount)
 			{
 				if (byteCount < 0)
@@ -5669,8 +5669,8 @@ namespace System.Reflection
 				}
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
 			public unsafe void WriteBytes(byte* buffer, int byteCount)
 			{
 				if (buffer == null)
@@ -5690,7 +5690,7 @@ namespace System.Reflection
 				Marshal.Copy((IntPtr)buffer, _buffer, startIndex, byteCount);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="source" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="source" /> is null.</exception>
 			public void WriteBytes(BlobBuilder source)
 			{
 				if (source == null)
@@ -5700,8 +5700,8 @@ namespace System.Reflection
 				source.WriteContentTo(ref this);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="source" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="source" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
 			public int WriteBytes(Stream source, int byteCount)
 			{
 				if (source == null)
@@ -5718,27 +5718,27 @@ namespace System.Reflection
 				return num2;
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
 			public void WriteBytes(System.Collections.Immutable.ImmutableArray<byte> buffer)
 			{
 				WriteBytes(buffer, 0, (!buffer.IsDefault) ? buffer.Length : 0);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
 			public void WriteBytes(System.Collections.Immutable.ImmutableArray<byte> buffer, int start, int byteCount)
 			{
 				WriteBytes(ImmutableByteArrayInterop.DangerousGetUnderlyingArray(buffer), start, byteCount);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
 			public void WriteBytes(byte[] buffer)
 			{
 				WriteBytes(buffer, 0, (buffer != null) ? buffer.Length : 0);
 			}
 
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="buffer" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Range specified by <paramref name="start" /> and <paramref name="byteCount" /> falls outside of the bounds of the <paramref name="buffer" />.</exception>
 			public unsafe void WriteBytes(byte[] buffer, int start, int byteCount)
 			{
 				if (buffer == null)
@@ -5886,7 +5886,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes UTF16 (little-endian) encoded string at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 			public unsafe void WriteUTF16(char[] value)
 			{
 				if (value == null)
@@ -5914,7 +5914,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes UTF16 (little-endian) encoded string at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 			public unsafe void WriteUTF16(string value)
 			{
 				if (value == null)
@@ -5942,7 +5942,7 @@ namespace System.Reflection
 			/// The string is UTF8 encoded and prefixed by the its size in bytes.
 			/// Null string is represented as a single byte 0xFF.
 			/// </remarks>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteSerializedString(string? str)
 			{
 				if (str == null)
@@ -5965,7 +5965,7 @@ namespace System.Reflection
 			/// or its low byte is any of the following: 0x01-0x08, 0x0E-0x1F, 0x27, 0x2D, 0x7F. Otherwise, it holds 0.
 			/// The 1 signifies Unicode characters that require handling beyond that normally provided for 8-bit encoding sets.
 			/// </remarks>
-			/// <exception cref="T:System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
+			/// <exception cref="System.InvalidOperationException">Builder is not writable, it has been linked with another one.</exception>
 			public void WriteUserString(string value)
 			{
 				if (value == null)
@@ -5980,7 +5980,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes UTF8 encoded string at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 			public void WriteUTF8(string value, bool allowUnpairedSurrogates)
 			{
 				if (value == null)
@@ -6018,7 +6018,7 @@ namespace System.Reflection
 			/// If the value lies between -268435456 (0xF000000) and 268435455 (0x0FFFFFFF), inclusive, encode as a four-byte integer:
 			/// 31 set, 30 set, bit 29 clear, value bits 27 through 0 held in bits 28 through 1, sign bit(value bit 31) in bit 0.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed signed integer.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed signed integer.</exception>
 			public void WriteCompressedSignedInteger(int value)
 			{
 				BlobWriterImpl.WriteCompressedSignedInteger(ref this, value);
@@ -6036,7 +6036,7 @@ namespace System.Reflection
 			///
 			/// Otherwise, encode as a 4-byte integer, with bit 31 set, bit 30 set, bit 29 clear (value held in bits 28 through 0).
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed unsigned integer.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="value" /> can't be represented as a compressed unsigned integer.</exception>
 			public void WriteCompressedInteger(int value)
 			{
 				BlobWriterImpl.WriteCompressedInteger(ref this, (uint)value);
@@ -6045,7 +6045,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Writes a constant value (see ECMA-335 Partition II section 22.9) at the current position.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentException"><paramref name="value" /> is not of a constant type.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="value" /> is not of a constant type.</exception>
 			public void WriteConstant(object? value)
 			{
 				BlobWriterImpl.WriteConstant(ref this, value);
@@ -6356,7 +6356,7 @@ namespace System.Reflection
 			public BlobHandle Value => _reader.ConstantTable.GetValue(Handle);
 
 			/// <summary>
-			/// The parent handle (<see cref="T:System.Reflection.Metadata.ParameterHandle" />, <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />).
+			/// The parent handle (<see cref="System.Reflection.Metadata.ParameterHandle" />, <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />).
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to Parent field of Constant table in ECMA-335 Standard.
@@ -6482,7 +6482,7 @@ namespace System.Reflection
 			private MethodDefTreatment Treatment => (MethodDefTreatment)(_treatmentAndRowId >> 24);
 
 			/// <summary>
-			/// The constructor (<see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />) of the custom attribute type.
+			/// The constructor (<see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" />) of the custom attribute type.
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to Type field of CustomAttribute table in ECMA-335 Standard.
@@ -7042,7 +7042,7 @@ namespace System.Reflection
 			public MethodDefinitionHandle EntryPoint { get; }
 
 			/// <summary>
-			/// Gets the offset (in bytes) from the start of the metadata blob to the start of the <see cref="P:System.Reflection.Metadata.DebugMetadataHeader.Id" /> blob.
+			/// Gets the offset (in bytes) from the start of the metadata blob to the start of the <see cref="System.Reflection.Metadata.DebugMetadataHeader.Id" /> blob.
 			/// </summary>
 			public int IdStartOffset { get; }
 
@@ -7259,7 +7259,7 @@ namespace System.Reflection
 			public GuidHandle Language => _reader.DocumentTable.GetLanguage(Handle);
 
 			/// <summary>
-			/// Hash algorithm used to calculate <see cref="P:System.Reflection.Metadata.Document.Hash" /> (SHA1, SHA256, etc.)
+			/// Hash algorithm used to calculate <see cref="System.Reflection.Metadata.Document.Hash" /> (SHA1, SHA256, etc.)
 			/// </summary>
 			public GuidHandle HashAlgorithm => _reader.DocumentTable.GetHashAlgorithm(Handle);
 
@@ -7267,7 +7267,7 @@ namespace System.Reflection
 			/// Document content hash.
 			/// </summary>
 			/// <remarks>
-			/// <see cref="P:System.Reflection.Metadata.Document.HashAlgorithm" /> determines the algorithm used to produce this hash.
+			/// <see cref="System.Reflection.Metadata.Document.HashAlgorithm" /> determines the algorithm used to produce this hash.
 			/// The source document is hashed in its binary form as stored in the file.
 			/// </remarks>
 			public BlobHandle Hash => _reader.DocumentTable.GetHash(Handle);
@@ -7528,7 +7528,7 @@ namespace System.Reflection
 			internal int RowId => (int)(_vToken & 0xFFFFFF);
 
 			/// <summary>
-			/// Value stored in a specific entity handle (see <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, etc.).
+			/// Value stored in a specific entity handle (see <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, etc.).
 			/// </summary>
 			internal uint SpecificHandleValue => _vToken & 0x80FFFFFFu;
 
@@ -7975,9 +7975,9 @@ namespace System.Reflection
 			/// </summary>
 			/// <returns>
 			/// <list type="bullet">
-			/// <item><description><see cref="T:System.Reflection.Metadata.AssemblyFileHandle" /> representing another module in the assembly.</description></item>
-			/// <item><description><see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" /> representing another assembly if <see cref="P:System.Reflection.Metadata.ExportedType.IsForwarder" /> is true.</description></item>
-			/// <item><description><see cref="T:System.Reflection.Metadata.ExportedTypeHandle" /> representing the declaring exported type in which this was is nested.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.AssemblyFileHandle" /> representing another module in the assembly.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.AssemblyReferenceHandle" /> representing another assembly if <see cref="System.Reflection.Metadata.ExportedType.IsForwarder" /> is true.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.ExportedTypeHandle" /> representing the declaring exported type in which this was is nested.</description></item>
 			/// </list>
 			/// </returns>
 			public EntityHandle Implementation => reader.ExportedTypeTable.GetImplementation(rowId);
@@ -8075,7 +8075,7 @@ namespace System.Reflection
 		}
 
 		/// <summary>
-		/// Represents a collection of <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />.
+		/// Represents a collection of <see cref="System.Reflection.Metadata.TypeReferenceHandle" />.
 		/// </summary>
 		public readonly struct ExportedTypeHandleCollection : IReadOnlyCollection<ExportedTypeHandle>, IEnumerable<ExportedTypeHandle>, IEnumerable
 		{
@@ -8463,7 +8463,7 @@ namespace System.Reflection
 			private GenericParameterHandle Handle => GenericParameterHandle.FromRowId(_rowId);
 
 			/// <summary>
-			/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />.
+			/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />.
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to Owner field of GenericParam table in ECMA-335 Standard.
@@ -8520,7 +8520,7 @@ namespace System.Reflection
 			private GenericParameterConstraintHandle Handle => GenericParameterConstraintHandle.FromRowId(_rowId);
 
 			/// <summary>
-			/// The constrained <see cref="T:System.Reflection.Metadata.GenericParameterHandle" />.
+			/// The constrained <see cref="System.Reflection.Metadata.GenericParameterHandle" />.
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to Owner field of GenericParamConstraint table in ECMA-335 Standard.
@@ -8528,7 +8528,7 @@ namespace System.Reflection
 			public GenericParameterHandle Parameter => _reader.GenericParamConstraintTable.GetOwner(Handle);
 
 			/// <summary>
-			/// Handle (<see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />)
+			/// Handle (<see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />)
 			/// specifying from which type this generic parameter is constrained to derive,
 			/// or which interface this generic parameter is constrained to implement.
 			/// </summary>
@@ -8970,12 +8970,12 @@ namespace System.Reflection
 			internal uint Type => _vType & 0x7Fu;
 
 			/// <summary>
-			/// Value stored in an <see cref="T:System.Reflection.Metadata.EntityHandle" />.
+			/// Value stored in an <see cref="System.Reflection.Metadata.EntityHandle" />.
 			/// </summary>
 			internal uint EntityHandleValue => (uint)((_vType << 24) | _value);
 
 			/// <summary>
-			/// Value stored in a concrete entity handle (see <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, etc.).
+			/// Value stored in a concrete entity handle (see <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, etc.).
 			/// </summary>
 			internal uint SpecificEntityHandleValue => (uint)(((_vType & 0x80) << 24) | _value);
 
@@ -9005,7 +9005,7 @@ namespace System.Reflection
 			internal int Token => (_vType << 24) | _value;
 
 			/// <summary>
-			/// Creates <see cref="T:System.Reflection.Metadata.Handle" /> from a token or a token combined with a virtual flag.
+			/// Creates <see cref="System.Reflection.Metadata.Handle" /> from a token or a token combined with a virtual flag.
 			/// </summary>
 			internal static Handle FromVToken(uint vToken)
 			{
@@ -9091,7 +9091,7 @@ namespace System.Reflection
 			/// Compares two handles.
 			/// </summary>
 			/// <remarks>
-			/// The order of handles that differ in kind and are not <see cref="T:System.Reflection.Metadata.EntityHandle" /> is undefined.
+			/// The order of handles that differ in kind and are not <see cref="System.Reflection.Metadata.EntityHandle" /> is undefined.
 			/// Returns 0 if and only if <see cref="M:System.Reflection.Metadata.HandleComparer.Equals(System.Reflection.Metadata.Handle,System.Reflection.Metadata.Handle)" /> returns true.
 			/// </remarks>
 			public int Compare(Handle x, Handle y)
@@ -9183,12 +9183,12 @@ namespace System.Reflection
 		public interface ICustomAttributeTypeProvider<TType> : ISimpleTypeProvider<TType>, ISZArrayTypeProvider<TType>
 		{
 			/// <summary>
-			/// Gets the TType representation for <see cref="T:System.Type" />.
+			/// Gets the TType representation for <see cref="System.Type" />.
 			/// </summary>
 			TType GetSystemType();
 
 			/// <summary>
-			/// Returns true if the given type represents <see cref="T:System.Type" />.
+			/// Returns true if the given type represents <see cref="System.Type" />.
 			/// </summary>
 			bool IsSystemType(TType type);
 
@@ -9196,13 +9196,13 @@ namespace System.Reflection
 			/// Get the type symbol for the given serialized type name.
 			/// The serialized type name is in so-called "reflection notation" (i.e. as understood by <see cref="M:System.Type.GetType(System.String)" />.)
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The name is malformed.</exception>
+			/// <exception cref="System.BadImageFormatException">The name is malformed.</exception>
 			TType GetTypeFromSerializedName(string name);
 
 			/// <summary>
 			/// Gets the underlying type of the given enum type symbol.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The given type symbol does not represent an enum.</exception>
+			/// <exception cref="System.BadImageFormatException">The given type symbol does not represent an enum.</exception>
 			PrimitiveTypeCode GetUnderlyingEnumType(TType type);
 		}
 
@@ -9447,7 +9447,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="opCode">Branch op-code.</param>
 			/// <returns>1 if <paramref name="opCode" /> is a short branch or 4 if it is a long branch.</returns>
-			/// <exception cref="T:System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
+			/// <exception cref="System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
 			public static int GetBranchOperandSize(this ILOpCode opCode)
 			{
 				switch (opCode)
@@ -9492,7 +9492,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="opCode">Branch op-code.</param>
 			/// <returns>Short form of the branch op-code.</returns>
-			/// <exception cref="T:System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
+			/// <exception cref="System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
 			public static ILOpCode GetShortBranch(this ILOpCode opCode)
 			{
 				switch (opCode)
@@ -9550,7 +9550,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="opCode">Branch op-code.</param>
 			/// <returns>Long form of the branch op-code.</returns>
-			/// <exception cref="T:System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
+			/// <exception cref="System.ArgumentException">Specified <paramref name="opCode" /> is not a branch op-code.</exception>
 			public static ILOpCode GetLongBranch(this ILOpCode opCode)
 			{
 				switch (opCode)
@@ -9668,7 +9668,7 @@ namespace System.Reflection
 					_current = default(ImportDefinition);
 				}
 
-				/// <exception cref="T:System.BadImageFormatException">Invalid blob format.</exception>
+				/// <exception cref="System.BadImageFormatException">Invalid blob format.</exception>
 				public bool MoveNext()
 				{
 					if (_reader.RemainingBytes == 0)
@@ -9969,7 +9969,7 @@ namespace System.Reflection
 
 			/// <summary>
 			/// The interface that is implemented
-			/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />
+			/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />
 			/// </summary>
 			public EntityHandle Interface => _reader.InterfaceImplTable.GetInterface(_rowId);
 
@@ -10937,12 +10937,12 @@ namespace System.Reflection
 			public StringHandle Name => _reader.ManifestResourceTable.GetName(Handle);
 
 			/// <summary>
-			/// <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />, or nil handle.
+			/// <see cref="System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />, or nil handle.
 			/// </summary>
 			/// <remarks>
 			/// Corresponds to Implementation field of ManifestResource table in ECMA-335 Standard.
 			///
-			/// If nil then <see cref="P:System.Reflection.Metadata.ManifestResource.Offset" /> is an offset in the PE image that contains the metadata,
+			/// If nil then <see cref="System.Reflection.Metadata.ManifestResource.Offset" /> is an offset in the PE image that contains the metadata,
 			/// starting from the Resource entry in the CLI header.
 			/// </remarks>
 			public EntityHandle Implementation => _reader.ManifestResourceTable.GetImplementation(Handle);
@@ -11040,7 +11040,7 @@ namespace System.Reflection
 		}
 
 		/// <summary>
-		/// Represents a collection of <see cref="T:System.Reflection.Metadata.ManifestResourceHandle" />.
+		/// Represents a collection of <see cref="System.Reflection.Metadata.ManifestResourceHandle" />.
 		/// </summary>
 		public readonly struct ManifestResourceHandleCollection : IReadOnlyCollection<ManifestResourceHandle>, IEnumerable<ManifestResourceHandle>, IEnumerable
 		{
@@ -11185,7 +11185,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Determines if the member reference is to a method or field.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The member reference signature is invalid.</exception>
+			/// <exception cref="System.BadImageFormatException">The member reference signature is invalid.</exception>
 			public MemberReferenceKind GetKind()
 			{
 				return _reader.GetBlobReader(Signature).ReadSignatureHeader().Kind switch
@@ -11477,7 +11477,7 @@ namespace System.Reflection
 			private readonly System.Reflection.Metadata.Ecma335.TableMask _sortedTables;
 
 			/// <summary>
-			/// A row count for each possible table. May be indexed by <see cref="T:System.Reflection.Metadata.Ecma335.TableIndex" />.
+			/// A row count for each possible table. May be indexed by <see cref="System.Reflection.Metadata.Ecma335.TableIndex" />.
 			/// </summary>
 			internal int[] TableRowCounts;
 
@@ -11645,7 +11645,7 @@ namespace System.Reflection
 			public MetadataStringComparer StringComparer => new MetadataStringComparer(this);
 
 			/// <summary>
-			/// The decoder used by the reader to produce <see cref="T:System.String" /> instances from UTF8 encoded byte sequences.
+			/// The decoder used by the reader to produce <see cref="System.String" /> instances from UTF8 encoded byte sequences.
 			/// </summary>
 			public MetadataStringDecoder UTF8Decoder { get; }
 
@@ -11720,14 +11720,14 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Gets the <see cref="T:System.Reflection.AssemblyName" /> for a given file.
+			/// Gets the <see cref="System.Reflection.AssemblyName" /> for a given file.
 			/// </summary>
-			/// <param name="assemblyFile">The path for the assembly which <see cref="T:System.Reflection.AssemblyName" /> is to be returned.</param>
-			/// <returns>An <see cref="T:System.Reflection.AssemblyName" /> that represents the given <paramref name="assemblyFile" />.</returns>
-			/// <exception cref="T:System.ArgumentNullException">If <paramref name="assemblyFile" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException">If <paramref name="assemblyFile" /> is invalid.</exception>
-			/// <exception cref="T:System.IO.FileNotFoundException">If <paramref name="assemblyFile" /> is not found.</exception>
-			/// <exception cref="T:System.BadImageFormatException">If <paramref name="assemblyFile" /> is not a valid assembly.</exception>
+			/// <param name="assemblyFile">The path for the assembly which <see cref="System.Reflection.AssemblyName" /> is to be returned.</param>
+			/// <returns>An <see cref="System.Reflection.AssemblyName" /> that represents the given <paramref name="assemblyFile" />.</returns>
+			/// <exception cref="System.ArgumentNullException">If <paramref name="assemblyFile" /> is null.</exception>
+			/// <exception cref="System.ArgumentException">If <paramref name="assemblyFile" /> is invalid.</exception>
+			/// <exception cref="System.IO.FileNotFoundException">If <paramref name="assemblyFile" /> is not found.</exception>
+			/// <exception cref="System.BadImageFormatException">If <paramref name="assemblyFile" /> is not a valid assembly.</exception>
 			public unsafe static AssemblyName GetAssemblyName(string assemblyFile)
 			{
 				if (assemblyFile == null)
@@ -11799,7 +11799,7 @@ namespace System.Reflection
 			/// Creates a metadata reader from the metadata stored at the given memory location.
 			/// </summary>
 			/// <remarks>
-			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.Metadata.MetadataReader" />.
 			/// </remarks>
 			public unsafe MetadataReader(byte* metadata, int length)
 				: this(metadata, length, MetadataReaderOptions.Default, null, null)
@@ -11810,7 +11810,7 @@ namespace System.Reflection
 			/// Creates a metadata reader from the metadata stored at the given memory location.
 			/// </summary>
 			/// <remarks>
-			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.Metadata.MetadataReader" />.
 			/// Use <see cref="M:System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader(System.Reflection.PortableExecutable.PEReader,System.Reflection.Metadata.MetadataReaderOptions)" /> to obtain
 			/// metadata from a PE image.
 			/// </remarks>
@@ -11823,15 +11823,15 @@ namespace System.Reflection
 			/// Creates a metadata reader from the metadata stored at the given memory location.
 			/// </summary>
 			/// <remarks>
-			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+			/// The memory is owned by the caller and it must be kept memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.Metadata.MetadataReader" />.
 			/// Use <see cref="M:System.Reflection.Metadata.PEReaderExtensions.GetMetadataReader(System.Reflection.PortableExecutable.PEReader,System.Reflection.Metadata.MetadataReaderOptions,System.Reflection.Metadata.MetadataStringDecoder)" /> to obtain
 			/// metadata from a PE image.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="length" /> is not positive.</exception>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="metadata" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="T:System.Text.UTF8Encoding" />.</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is big-endian.</exception>
-			/// <exception cref="T:System.BadImageFormatException">Bad metadata header.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length" /> is not positive.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="metadata" /> is null.</exception>
+			/// <exception cref="System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="System.Text.UTF8Encoding" />.</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is big-endian.</exception>
+			/// <exception cref="System.BadImageFormatException">Bad metadata header.</exception>
 			public unsafe MetadataReader(byte* metadata, int length, MetadataReaderOptions options, MetadataStringDecoder? utf8Decoder)
 				: this(metadata, length, options, utf8Decoder, null)
 			{
@@ -13236,7 +13236,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="memberRef">The declaration token for the method</param>
 			/// <param name="isIDisposable">
-			/// Returns true if the redirected interface is <see cref="T:System.IDisposable" />.
+			/// Returns true if the redirected interface is <see cref="System.IDisposable" />.
 			/// </param>
 			/// <returns>True if the method implements a method on a redirected interface.
 			/// False otherwise.</returns>
@@ -13384,7 +13384,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Returns the type definition or reference handle of the attribute type.
 			/// </summary>
-			/// <returns><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or nil token if the metadata is invalid and the type can't be determined.</returns>
+			/// <returns><see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or nil token if the metadata is invalid and the type can't be determined.</returns>
 			private EntityHandle GetAttributeTypeRaw(CustomAttributeHandle handle)
 			{
 				EntityHandle constructor = CustomAttributeTable.GetConstructor(handle);
@@ -13413,8 +13413,8 @@ namespace System.Reflection
 			/// </summary>
 			None = 0,
 			/// <summary>
-			/// The options that are used when a <see cref="T:System.Reflection.Metadata.MetadataReader" /> is obtained
-			/// via an overload that does not take a <see cref="T:System.Reflection.Metadata.MetadataReaderOptions" />
+			/// The options that are used when a <see cref="System.Reflection.Metadata.MetadataReader" /> is obtained
+			/// via an overload that does not take a <see cref="System.Reflection.Metadata.MetadataReaderOptions" />
 			/// argument.
 			/// </summary>
 			Default = 1,
@@ -13458,12 +13458,12 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="start">Pointer to the start of the Portable PDB blob.</param>
 			/// <param name="size">The size of the Portable PDB blob.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="start" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="start" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
 			/// <remarks>
-			/// The memory is owned by the caller and not released on disposal of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />.
-			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />.
-			/// The content of the blob is not read during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// The memory is owned by the caller and not released on disposal of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />.
+			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />.
+			/// The content of the blob is not read during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// </remarks>
 			public unsafe static MetadataReaderProvider FromPortablePdbImage(byte* start, int size)
 			{
@@ -13475,12 +13475,12 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="start">Pointer to the start of the metadata blob.</param>
 			/// <param name="size">The size of the metadata blob.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="start" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="start" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
 			/// <remarks>
-			/// The memory is owned by the caller and not released on disposal of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />.
-			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />.
-			/// The content of the blob is not read during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// The memory is owned by the caller and not released on disposal of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />.
+			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />.
+			/// The content of the blob is not read during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// </remarks>
 			public unsafe static MetadataReaderProvider FromMetadataImage(byte* start, int size)
 			{
@@ -13500,9 +13500,9 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="image">Portable PDB image.</param>
 			/// <remarks>
-			/// The content of the image is not read during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// The content of the image is not read during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="image" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="image" /> is null.</exception>
 			public static MetadataReaderProvider FromPortablePdbImage(System.Collections.Immutable.ImmutableArray<byte> image)
 			{
 				return FromMetadataImage(image);
@@ -13513,9 +13513,9 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="image">Metadata image.</param>
 			/// <remarks>
-			/// The content of the image is not read during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// The content of the image is not read during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="image" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="image" /> is null.</exception>
 			public static MetadataReaderProvider FromMetadataImage(System.Collections.Immutable.ImmutableArray<byte> image)
 			{
 				if (image.IsDefault)
@@ -13533,21 +13533,21 @@ namespace System.Reflection
 			/// <param name="options">
 			/// Options specifying how sections of the image are read from the stream.
 			///
-			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
-			/// upon successful argument validation. It will be disposed by the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> and the caller must not manipulate it.
+			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
+			/// upon successful argument validation. It will be disposed by the <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> and the caller must not manipulate it.
 			///
 			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" /> is specified no data
-			/// is read from the stream during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />. Furthermore, the stream must not be manipulated
-			/// by caller while the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> is alive and undisposed.
+			/// is read from the stream during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />. Furthermore, the stream must not be manipulated
+			/// by caller while the <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> is alive and undisposed.
 			///
-			/// If <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" />, the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// If <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" />, the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// will have read all of the data requested during construction. As such, if <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is also
-			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// after construction.
 			/// </param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="stream" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException"><paramref name="stream" /> doesn't support read and seek operations.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="stream" /> is null.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="stream" /> doesn't support read and seek operations.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
 			public static MetadataReaderProvider FromPortablePdbStream(Stream stream, MetadataStreamOptions options = MetadataStreamOptions.Default, int size = 0)
 			{
 				return FromMetadataStream(stream, options, size);
@@ -13561,22 +13561,22 @@ namespace System.Reflection
 			/// <param name="options">
 			/// Options specifying how sections of the image are read from the stream.
 			///
-			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
-			/// upon successful argument validation. It will be disposed by the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> and the caller must not manipulate it.
+			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
+			/// upon successful argument validation. It will be disposed by the <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> and the caller must not manipulate it.
 			///
 			/// Unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" /> is specified no data
-			/// is read from the stream during the construction of the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />. Furthermore, the stream must not be manipulated
-			/// by caller while the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> is alive and undisposed.
+			/// is read from the stream during the construction of the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />. Furthermore, the stream must not be manipulated
+			/// by caller while the <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> is alive and undisposed.
 			///
-			/// If <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" />, the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// If <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" />, the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// will have read all of the data requested during construction. As such, if <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is also
-			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// after construction.
 			/// </param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="stream" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException"><paramref name="stream" /> doesn't support read and seek operations.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream (only when <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" /> is specified).</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="stream" /> is null.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="stream" /> doesn't support read and seek operations.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream (only when <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.PrefetchMetadata" /> is specified).</exception>
 			public static MetadataReaderProvider FromMetadataStream(Stream stream, MetadataStreamOptions options = MetadataStreamOptions.Default, int size = 0)
 			{
 				if (stream == null)
@@ -13622,7 +13622,7 @@ namespace System.Reflection
 			/// </summary>
 			/// <remarks>
 			/// <see cref="M:System.Reflection.Metadata.MetadataReaderProvider.Dispose" />  can be called multiple times (but not in parallel).
-			/// It is not safe to call <see cref="M:System.Reflection.Metadata.MetadataReaderProvider.Dispose" /> in parallel with any other operation on the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />
+			/// It is not safe to call <see cref="M:System.Reflection.Metadata.MetadataReaderProvider.Dispose" /> in parallel with any other operation on the <see cref="System.Reflection.Metadata.MetadataReaderProvider" />
 			/// or reading from the underlying memory.
 			/// </remarks>
 			public void Dispose()
@@ -13635,18 +13635,18 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Gets a <see cref="T:System.Reflection.Metadata.MetadataReader" /> from a <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" />.
+			/// Gets a <see cref="System.Reflection.Metadata.MetadataReader" /> from a <see cref="System.Reflection.Metadata.MetadataReaderProvider" />.
 			/// </summary>
 			/// <remarks>
-			/// The caller must keep the <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> undisposed throughout the lifetime of the metadata reader.
+			/// The caller must keep the <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> undisposed throughout the lifetime of the metadata reader.
 			///
 			/// If this method is called multiple times each call with arguments equal to the arguments passed to the previous successful call
-			/// returns the same instance of <see cref="T:System.Reflection.Metadata.MetadataReader" /> as the previous call.
+			/// returns the same instance of <see cref="System.Reflection.Metadata.MetadataReader" /> as the previous call.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="T:System.Text.UTF8Encoding" />.</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is big-endian.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.ObjectDisposedException">Provider has been disposed.</exception>
+			/// <exception cref="System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="System.Text.UTF8Encoding" />.</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is big-endian.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ObjectDisposedException">Provider has been disposed.</exception>
 			public unsafe MetadataReader GetMetadataReader(MetadataReaderOptions options = MetadataReaderOptions.Default, MetadataStringDecoder? utf8Decoder = null)
 			{
 				MetadataReader lazyMetadataReader = _lazyMetadataReader;
@@ -13675,8 +13675,8 @@ namespace System.Reflection
 				return false;
 			}
 
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.ObjectDisposedException">Provider has been disposed.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ObjectDisposedException">Provider has been disposed.</exception>
 			internal System.Reflection.Internal.AbstractMemoryBlock GetMetadataBlock()
 			{
 				if (_lazyMetadataBlock == null)
@@ -13710,8 +13710,8 @@ namespace System.Reflection
 			/// Reads PDB metadata into memory right away.
 			/// </summary>
 			/// <remarks>
-			/// The underlying file may be closed and even deleted after <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> is constructed.
-			/// <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified.
+			/// The underlying file may be closed and even deleted after <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> is constructed.
+			/// <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.Metadata.MetadataStreamOptions.LeaveOpen" /> is specified.
 			/// </remarks>
 			PrefetchMetadata = 2
 		}
@@ -13733,7 +13733,7 @@ namespace System.Reflection
 		/// No allocation is performed unless both the handle argument and the
 		/// value argument contain non-ascii text.
 		///
-		/// Obtain instances using <see cref="P:System.Reflection.Metadata.MetadataReader.StringComparer" />.
+		/// Obtain instances using <see cref="System.Reflection.Metadata.MetadataReader.StringComparer" />.
 		///
 		/// A default-initialized instance is useless and behaves as a null reference.
 		///
@@ -13855,14 +13855,14 @@ namespace System.Reflection
 			public Encoding Encoding { get; }
 
 			/// <summary>
-			/// The default decoder used by <see cref="T:System.Reflection.Metadata.MetadataReader" /> to decode UTF-8 when
+			/// The default decoder used by <see cref="System.Reflection.Metadata.MetadataReader" /> to decode UTF-8 when
 			/// no decoder is provided to the constructor.
 			/// </summary>
 			public static MetadataStringDecoder DefaultUTF8 { get; } = new MetadataStringDecoder(System.Text.Encoding.UTF8);
 
 
 			/// <summary>
-			/// Creates a <see cref="T:System.Reflection.Metadata.MetadataStringDecoder" /> for the given encoding.
+			/// Creates a <see cref="System.Reflection.Metadata.MetadataStringDecoder" /> for the given encoding.
 			/// </summary>
 			/// <param name="encoding">The encoding to use.</param>
 			/// <remarks>
@@ -13878,9 +13878,9 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// The mechanism through which the <see cref="T:System.Reflection.Metadata.MetadataReader" /> obtains strings
+			/// The mechanism through which the <see cref="System.Reflection.Metadata.MetadataReader" /> obtains strings
 			/// for byte sequences in metadata. Override this to cache strings if required.
-			/// Otherwise, it is implemented by forwarding straight to <see cref="P:System.Reflection.Metadata.MetadataStringDecoder.Encoding" />
+			/// Otherwise, it is implemented by forwarding straight to <see cref="System.Reflection.Metadata.MetadataStringDecoder.Encoding" />
 			/// and every call will allocate a new string.
 			/// </summary>
 			/// <param name="bytes">Pointer to bytes to decode.</param>
@@ -14114,7 +14114,7 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Returns a collection of sequence points decoded from <see cref="P:System.Reflection.Metadata.MethodDebugInformation.SequencePointsBlob" />.
+			/// Returns a collection of sequence points decoded from <see cref="System.Reflection.Metadata.MethodDebugInformation.SequencePointsBlob" />.
 			/// </summary>
 			public SequencePointCollection GetSequencePoints()
 			{
@@ -14210,10 +14210,10 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Returns a handle to <see cref="T:System.Reflection.Metadata.MethodDefinition" /> corresponding to this handle.
+			/// Returns a handle to <see cref="System.Reflection.Metadata.MethodDefinition" /> corresponding to this handle.
 			/// </summary>
 			/// <remarks>
-			/// The resulting handle is only valid within the context of a <see cref="T:System.Reflection.Metadata.MetadataReader" /> open on the type system metadata blob,
+			/// The resulting handle is only valid within the context of a <see cref="System.Reflection.Metadata.MetadataReader" /> open on the type system metadata blob,
 			/// which in case of standalone PDB file is a different reader than the one containing this method debug information.
 			/// </remarks>
 			public MethodDefinitionHandle ToDefinitionHandle()
@@ -14555,10 +14555,10 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Returns a handle to <see cref="T:System.Reflection.Metadata.MethodDebugInformation" /> corresponding to this handle.
+			/// Returns a handle to <see cref="MethodDebugInformation" /> corresponding to this handle.
 			/// </summary>
 			/// <remarks>
-			/// The resulting handle is only valid within the context of a <see cref="T:System.Reflection.Metadata.MetadataReader" /> open on the Portable PDB blob,
+			/// The resulting handle is only valid within the context of a <see cref="MetadataReader" /> open on the Portable PDB blob,
 			/// which in case of standalone PDB file is a different reader than the one containing this method definition.
 			/// </remarks>
 			public MethodDebugInformationHandle ToDebugInformationHandle()
@@ -14884,9 +14884,9 @@ namespace System.Reflection
 			public TType ReturnType { get; }
 
 			/// <summary>
-			/// Gets the number of parameters that are required. Will be equal to the length <see cref="P:System.Reflection.Metadata.MethodSignature`1.ParameterTypes" /> of
+			/// Gets the number of parameters that are required. Will be equal to the length <see cref="Metadata.MethodSignature{T}.ParameterTypes" /> of
 			/// unless this signature represents the standalone call site of a vararg method, in which case the entries
-			/// extra entries in <see cref="P:System.Reflection.Metadata.MethodSignature`1.ParameterTypes" /> are the types used for the optional parameters.
+			/// extra entries in <see cref="Metadata.MethodSignature{T}.ParameterTypes" /> are the types used for the optional parameters.
 			/// </summary>
 			public int RequiredParameterCount { get; }
 
@@ -14898,7 +14898,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Gets the method's parameter types.
 			/// </summary>
-			public System.Collections.Immutable.ImmutableArray<TType> ParameterTypes { get; }
+			public ImmutableArray<TType> ParameterTypes { get; }
 
 			public MethodSignature(SignatureHeader header, TType returnType, int requiredParameterCount, int genericParameterCount, System.Collections.Immutable.ImmutableArray<TType> parameterTypes)
 			{
@@ -14919,7 +14919,7 @@ namespace System.Reflection
 			private MethodSpecificationHandle Handle => MethodSpecificationHandle.FromRowId(_rowId);
 
 			/// <summary>
-			/// MethodDef or MemberRef handle specifying to which generic method this <see cref="T:System.Reflection.Metadata.MethodSpecification" /> refers,
+			/// MethodDef or MemberRef handle specifying to which generic method this <see cref="System.Reflection.Metadata.MethodSpecification" /> refers,
 			/// that is which generic method is it an instantiation of.
 			/// </summary>
 			public EntityHandle Method => _reader.MethodSpecTable.GetMethod(Handle);
@@ -14935,7 +14935,7 @@ namespace System.Reflection
 				_rowId = handle.RowId;
 			}
 
-			public System.Collections.Immutable.ImmutableArray<TType> DecodeSignature<TType, TGenericContext>(ISignatureTypeProvider<TType, TGenericContext> provider, TGenericContext genericContext)
+			public ImmutableArray<TType> DecodeSignature<TType, TGenericContext>(ISignatureTypeProvider<TType, TGenericContext> provider, TGenericContext genericContext)
 			{
 				SignatureDecoder<TType, TGenericContext> signatureDecoder = new SignatureDecoder<TType, TGenericContext>(provider, _reader, genericContext);
 				BlobReader blobReader = _reader.GetBlobReader(Signature);
@@ -15642,10 +15642,10 @@ namespace System.Reflection
 			/// <summary>
 			/// Returns a body block of a method with specified Relative Virtual Address (RVA);
 			/// </summary>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peReader" /> is null.</exception>
-			/// <exception cref="T:System.BadImageFormatException">The body is not found in the metadata or is invalid.</exception>
-			/// <exception cref="T:System.InvalidOperationException">Section where the method is stored is not available.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peReader" /> is null.</exception>
+			/// <exception cref="System.BadImageFormatException">The body is not found in the metadata or is invalid.</exception>
+			/// <exception cref="System.InvalidOperationException">Section where the method is stored is not available.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			public static MethodBodyBlock GetMethodBody(this PEReader peReader, int relativeVirtualAddress)
 			{
 				if (peReader == null)
@@ -15661,43 +15661,43 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Gets a <see cref="T:System.Reflection.Metadata.MetadataReader" /> from a <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
+			/// Gets a <see cref="System.Reflection.Metadata.MetadataReader" /> from a <see cref="System.Reflection.PortableExecutable.PEReader" />.
 			/// </summary>
 			/// <remarks>
-			/// The caller must keep the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> alive and undisposed throughout the lifetime of the metadata reader.
+			/// The caller must keep the <see cref="System.Reflection.PortableExecutable.PEReader" /> alive and undisposed throughout the lifetime of the metadata reader.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is big-endian.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is big-endian.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			public static MetadataReader GetMetadataReader(this PEReader peReader)
 			{
 				return peReader.GetMetadataReader(MetadataReaderOptions.Default, null);
 			}
 
 			/// <summary>
-			/// Gets a <see cref="T:System.Reflection.Metadata.MetadataReader" /> from a <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
+			/// Gets a <see cref="System.Reflection.Metadata.MetadataReader" /> from a <see cref="System.Reflection.PortableExecutable.PEReader" />.
 			/// </summary>
 			/// <remarks>
-			/// The caller must keep the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> alive and undisposed throughout the lifetime of the metadata reader.
+			/// The caller must keep the <see cref="System.Reflection.PortableExecutable.PEReader" /> alive and undisposed throughout the lifetime of the metadata reader.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is big-endian.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is big-endian.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			public static MetadataReader GetMetadataReader(this PEReader peReader, MetadataReaderOptions options)
 			{
 				return peReader.GetMetadataReader(options, null);
 			}
 
 			/// <summary>
-			/// Gets a <see cref="T:System.Reflection.Metadata.MetadataReader" /> from a <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
+			/// Gets a <see cref="System.Reflection.Metadata.MetadataReader" /> from a <see cref="System.Reflection.PortableExecutable.PEReader" />.
 			/// </summary>
 			/// <remarks>
-			/// The caller must keep the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> undisposed throughout the lifetime of the metadata reader.
+			/// The caller must keep the <see cref="System.Reflection.PortableExecutable.PEReader" /> undisposed throughout the lifetime of the metadata reader.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
-			/// <exception cref="T:System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="T:System.Text.UTF8Encoding" />.</exception>
-			/// <exception cref="T:System.PlatformNotSupportedException">The current platform is big-endian.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peReader" /> is null</exception>
+			/// <exception cref="System.ArgumentException">The encoding of <paramref name="utf8Decoder" /> is not <see cref="System.Text.UTF8Encoding" />.</exception>
+			/// <exception cref="System.PlatformNotSupportedException">The current platform is big-endian.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			public unsafe static MetadataReader GetMetadataReader(this PEReader peReader, MetadataReaderOptions options, MetadataStringDecoder? utf8Decoder)
 			{
 				if (peReader == null)
@@ -16127,7 +16127,7 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Returns a <see cref="T:System.Reflection.Metadata.BlobWriter" /> to be used to update the content.
+			/// Returns a <see cref="System.Reflection.Metadata.BlobWriter" /> to be used to update the content.
 			/// </summary>
 			public BlobWriter CreateWriter()
 			{
@@ -16461,7 +16461,7 @@ namespace System.Reflection
 		/// <summary>
 		/// Specified additional flags that can be applied to method signatures.
 		/// Underlying values correspond to the representation in the leading signature
-		/// byte represented by <see cref="T:System.Reflection.Metadata.SignatureHeader" />.
+		/// byte represented by <see cref="System.Reflection.Metadata.SignatureHeader" />.
 		/// </summary>
 		[Flags]
 		public enum SignatureAttributes : byte
@@ -16632,7 +16632,7 @@ namespace System.Reflection
 
 		/// <summary>
 		/// Specifies the signature kind. Underlying values correspond to the representation
-		/// in the leading signature byte represented by <see cref="T:System.Reflection.Metadata.SignatureHeader" />.
+		/// in the leading signature byte represented by <see cref="System.Reflection.Metadata.SignatureHeader" />.
 		/// </summary>
 		public enum SignatureKind : byte
 		{
@@ -16668,59 +16668,59 @@ namespace System.Reflection
 			/// </summary>
 			Invalid = 0,
 			/// <summary>
-			/// Represents <see cref="T:System.Void" /> in signatures.
+			/// Represents <see cref="System.Void" /> in signatures.
 			/// </summary>
 			Void = 1,
 			/// <summary>
-			/// Represents <see cref="T:System.Boolean" /> in signatures.
+			/// Represents <see cref="System.Boolean" /> in signatures.
 			/// </summary>
 			Boolean = 2,
 			/// <summary>
-			/// Represents <see cref="T:System.Char" /> in signatures.
+			/// Represents <see cref="System.Char" /> in signatures.
 			/// </summary>
 			Char = 3,
 			/// <summary>
-			/// Represents <see cref="T:System.SByte" /> in signatures.
+			/// Represents <see cref="System.SByte" /> in signatures.
 			/// </summary>
 			SByte = 4,
 			/// <summary>
-			/// Represents <see cref="T:System.Byte" /> in signatures.
+			/// Represents <see cref="System.Byte" /> in signatures.
 			/// </summary>
 			Byte = 5,
 			/// <summary>
-			/// Represents <see cref="T:System.Int16" /> in signatures.
+			/// Represents <see cref="System.Int16" /> in signatures.
 			/// </summary>
 			Int16 = 6,
 			/// <summary>
-			/// Represents <see cref="T:System.UInt16" /> in signatures.
+			/// Represents <see cref="System.UInt16" /> in signatures.
 			/// </summary>
 			UInt16 = 7,
 			/// <summary>
-			/// Represents <see cref="T:System.Int32" /> in signatures.
+			/// Represents <see cref="System.Int32" /> in signatures.
 			/// </summary>
 			Int32 = 8,
 			/// <summary>
-			/// Represents <see cref="T:System.UInt32" /> in signatures.
+			/// Represents <see cref="System.UInt32" /> in signatures.
 			/// </summary>
 			UInt32 = 9,
 			/// <summary>
-			/// Represents <see cref="T:System.Int64" /> in signatures.
+			/// Represents <see cref="System.Int64" /> in signatures.
 			/// </summary>
 			Int64 = 10,
 			/// <summary>
-			/// Represents <see cref="T:System.UInt64" /> in signatures.
+			/// Represents <see cref="System.UInt64" /> in signatures.
 			/// </summary>
 			UInt64 = 11,
 			/// <summary>
-			/// Represents <see cref="T:System.Single" /> in signatures.
+			/// Represents <see cref="System.Single" /> in signatures.
 			/// </summary>
 			Single = 12,
 			/// <summary>
-			/// Represents <see cref="T:System.Double" /> in signatures.
+			/// Represents <see cref="System.Double" /> in signatures.
 			/// </summary>
 			Double = 13,
 			/// <summary>
-			/// Represents <see cref="T:System.String" /> in signatures.
+			/// Represents <see cref="System.String" /> in signatures.
 			/// </summary>
 			String = 14,
 			/// <summary>
@@ -16738,7 +16738,7 @@ namespace System.Reflection
 			/// </summary>
 			GenericTypeParameter = 19,
 			/// <summary>
-			/// Represents a generalized <see cref="T:System.Array" /> in signatures.
+			/// Represents a generalized <see cref="System.Array" /> in signatures.
 			/// </summary>
 			Array = 20,
 			/// <summary>
@@ -16750,11 +16750,11 @@ namespace System.Reflection
 			/// </summary>
 			TypedReference = 22,
 			/// <summary>
-			/// Represents a <see cref="T:System.IntPtr" /> in signatures.
+			/// Represents a <see cref="System.IntPtr" /> in signatures.
 			/// </summary>
 			IntPtr = 24,
 			/// <summary>
-			/// Represents a <see cref="T:System.UIntPtr" /> in signatures.
+			/// Represents a <see cref="System.UIntPtr" /> in signatures.
 			/// </summary>
 			UIntPtr = 25,
 			/// <summary>
@@ -16762,11 +16762,11 @@ namespace System.Reflection
 			/// </summary>
 			FunctionPointer = 27,
 			/// <summary>
-			/// Represents <see cref="T:System.Object" />
+			/// Represents <see cref="System.Object" />
 			/// </summary>
 			Object = 28,
 			/// <summary>
-			/// Represents a single dimensional <see cref="T:System.Array" /> with 0 lower bound.
+			/// Represents a single dimensional <see cref="System.Array" /> with 0 lower bound.
 			/// </summary>
 			SZArray = 29,
 			/// <summary>
@@ -16782,7 +16782,7 @@ namespace System.Reflection
 			/// </summary>
 			OptionalModifier = 32,
 			/// <summary>
-			/// Precedes a type <see cref="T:System.Reflection.Metadata.EntityHandle" /> in signatures.
+			/// Precedes a type <see cref="System.Reflection.Metadata.EntityHandle" /> in signatures.
 			/// </summary>
 			/// <remarks>
 			/// In raw metadata, this will be encoded as either ELEMENT_TYPE_CLASS (0x12) for reference
@@ -16858,7 +16858,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Determines the kind of signature, which can be <see cref="F:System.Reflection.Metadata.SignatureKind.Method" /> or <see cref="F:System.Reflection.Metadata.SignatureKind.LocalVariables" />
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The signature is invalid.</exception>
+			/// <exception cref="System.BadImageFormatException">The signature is invalid.</exception>
 			public StandaloneSignatureKind GetKind()
 			{
 				return _reader.GetBlobReader(Signature).ReadSignatureHeader().Kind switch
@@ -16956,11 +16956,11 @@ namespace System.Reflection
 		public enum StandaloneSignatureKind
 		{
 			/// <summary>
-			/// The <see cref="T:System.Reflection.Metadata.StandaloneSignature" /> represents a standalone method signature.
+			/// The <see cref="System.Reflection.Metadata.StandaloneSignature" /> represents a standalone method signature.
 			/// </summary>
 			Method,
 			/// <summary>
-			/// The <see cref="T:System.Reflection.Metadata.MemberReference" /> references a local variable signature.
+			/// The <see cref="System.Reflection.Metadata.MemberReference" /> references a local variable signature.
 			/// </summary>
 			LocalVariables
 		}
@@ -17241,7 +17241,7 @@ namespace System.Reflection
 
 			/// <summary>
 			/// The base type of the type definition: either
-			/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />.
+			/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />.
 			/// </summary>
 			public EntityHandle BaseType
 			{
@@ -17482,7 +17482,7 @@ namespace System.Reflection
 		}
 
 		/// <summary>
-		/// Represents a collection of <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />.
+		/// Represents a collection of <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />.
 		/// </summary>
 		public readonly struct TypeDefinitionHandleCollection : IReadOnlyCollection<TypeDefinitionHandle>, IEnumerable<TypeDefinitionHandle>, IEnumerable
 		{
@@ -17592,16 +17592,16 @@ namespace System.Reflection
 			private TypeReferenceHandle Handle => TypeReferenceHandle.FromRowId(RowId);
 
 			/// <summary>
-			/// Resolution scope in which the target type is defined and is uniquely identified by the specified <see cref="P:System.Reflection.Metadata.TypeReference.Namespace" /> and <see cref="P:System.Reflection.Metadata.TypeReference.Name" />.
+			/// Resolution scope in which the target type is defined and is uniquely identified by the specified <see cref="System.Reflection.Metadata.TypeReference.Namespace" /> and <see cref="System.Reflection.Metadata.TypeReference.Name" />.
 			/// </summary>
 			/// <remarks>
 			/// Resolution scope can be one of the following handles:
 			/// <list type="bullet">
-			/// <item><description><see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> of the enclosing type, if the target type is a nested type.</description></item>
-			/// <item><description><see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />, if the target type is defined in another module within the same assembly as this one.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.TypeReferenceHandle" /> of the enclosing type, if the target type is a nested type.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.ModuleReferenceHandle" />, if the target type is defined in another module within the same assembly as this one.</description></item>
 			/// <item><description><see cref="F:System.Reflection.Metadata.EntityHandle.ModuleDefinition" />, if the target type is defined in the current module. This should not occur in a CLI compressed metadata module.</description></item>
-			/// <item><description><see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />, if the target type is defined in a different assembly from the current module.</description></item>
-			/// <item><description>Nil handle if the target type must be resolved by searching the <see cref="P:System.Reflection.Metadata.MetadataReader.ExportedTypes" /> for a matching <see cref="P:System.Reflection.Metadata.TypeReference.Namespace" /> and <see cref="P:System.Reflection.Metadata.TypeReference.Name" />.</description></item>
+			/// <item><description><see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />, if the target type is defined in a different assembly from the current module.</description></item>
+			/// <item><description>Nil handle if the target type must be resolved by searching the <see cref="System.Reflection.Metadata.MetadataReader.ExportedTypes" /> for a matching <see cref="System.Reflection.Metadata.TypeReference.Namespace" /> and <see cref="System.Reflection.Metadata.TypeReference.Name" />.</description></item>
 			/// </list>
 			/// </remarks>
 			public EntityHandle ResolutionScope
@@ -17792,7 +17792,7 @@ namespace System.Reflection
 		}
 
 		/// <summary>
-		/// Represents a collection of <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />.
+		/// Represents a collection of <see cref="System.Reflection.Metadata.TypeReferenceHandle" />.
 		/// </summary>
 		public readonly struct TypeReferenceHandleCollection : IReadOnlyCollection<TypeReferenceHandle>, IEnumerable<TypeReferenceHandle>, IEnumerable
 		{
@@ -18060,15 +18060,15 @@ namespace System.Reflection
 				/// Dimension sizes. The array may be shorter than <paramref name="rank" /> but not longer.
 				/// </param>
 				/// <param name="lowerBounds">
-				/// Dimension lower bounds, or <c>default(<see cref="T:System.Collections.Immutable.ImmutableArray`1" />)</c> to set all <paramref name="rank" /> lower bounds to 0.
+				/// Dimension lower bounds, or <c>default(<see cref="ImmutableArray{T}" />)</c> to set all <paramref name="rank" /> lower bounds to 0.
 				/// The array may be shorter than <paramref name="rank" /> but not longer.
 				/// </param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="rank" /> is outside of range [1, 0xffff],
 				/// smaller than <paramref name="sizes" />.Length, or
 				/// smaller than <paramref name="lowerBounds" />.Length.
 				/// </exception>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="sizes" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="sizes" /> is null.</exception>
 				public void Shape(int rank, System.Collections.Immutable.ImmutableArray<int> sizes, System.Collections.Immutable.ImmutableArray<int> lowerBounds)
 				{
 					//IL_005b: Unknown result type (might be due to invalid IL or missing references)
@@ -18429,7 +18429,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="genericArgumentCount">Number of generic arguments.</param>
 				/// <returns>Encoder of generic arguments.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="genericArgumentCount" /> is not in range [0, 0xffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="genericArgumentCount" /> is not in range [0, 0xffff].</exception>
 				public GenericTypeArgumentsEncoder MethodSpecificationSignature(int genericArgumentCount)
 				{
 					if ((uint)genericArgumentCount > 65535u)
@@ -18448,7 +18448,7 @@ namespace System.Reflection
 				/// <param name="genericParameterCount">Number of generic parameters.</param>
 				/// <param name="isInstanceMethod">True to encode an instance method signature, false to encode a static method signature.</param>
 				/// <returns>An Encoder of the rest of the signature including return value and parameters.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="genericParameterCount" /> is not in range [0, 0xffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="genericParameterCount" /> is not in range [0, 0xffff].</exception>
 				public MethodSignatureEncoder MethodSignature(SignatureCallingConvention convention = SignatureCallingConvention.Default, int genericParameterCount = 0, bool isInstanceMethod = false)
 				{
 					if ((uint)genericParameterCount > 65535u)
@@ -18493,7 +18493,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="fixedArguments">Called first, to encode fixed arguments.</param>
 				/// <param name="namedArguments">Called second, to encode named arguments.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="fixedArguments" /> or <paramref name="namedArguments" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="fixedArguments" /> or <paramref name="namedArguments" /> is null.</exception>
 				public void CustomAttributeSignature(Action<FixedArgumentsEncoder> fixedArguments, Action<CustomAttributeNamedArgumentsEncoder> namedArguments)
 				{
 					if (fixedArguments == null)
@@ -18514,7 +18514,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="variableCount">Number of local variables.</param>
 				/// <returns>Encoder of a sequence of local variables.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="variableCount" /> is not in range [0, 0x1fffffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="variableCount" /> is not in range [0, 0x1fffffff].</exception>
 				public LocalVariablesEncoder LocalVariableSignature(int variableCount)
 				{
 					if ((uint)variableCount > 536870911u)
@@ -18542,7 +18542,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="attributeCount">Number of attributes in the set.</param>
 				/// <returns>Permission Set encoder.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="attributeCount" /> is not in range [0, 0x1fffffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="attributeCount" /> is not in range [0, 0x1fffffff].</exception>
 				public PermissionSetEncoder PermissionSetBlob(int attributeCount)
 				{
 					if ((uint)attributeCount > 536870911u)
@@ -18991,30 +18991,30 @@ namespace System.Reflection
 				/// Calculates a HasCustomAttribute coded index for the specified handle.
 				/// </summary>
 				/// <param name="handle">
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.InterfaceImplementationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.EventDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.StandaloneSignatureHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ManifestResourceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterConstraintHandle" /> or
-				/// <see cref="T:System.Reflection.Metadata.MethodSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.ParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.InterfaceImplementationHandle" />,
+				/// <see cref="System.Reflection.Metadata.MemberReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
+				/// <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.EventDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.StandaloneSignatureHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyFileHandle" />,
+				/// <see cref="System.Reflection.Metadata.ExportedTypeHandle" />,
+				/// <see cref="System.Reflection.Metadata.ManifestResourceHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterConstraintHandle" /> or
+				/// <see cref="System.Reflection.Metadata.MethodSpecificationHandle" />.
 				/// </param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasCustomAttribute(EntityHandle handle)
 				{
 					return (handle.RowId << 5) | (int)ToHasCustomAttributeTag(handle.Kind);
@@ -19023,8 +19023,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a HasConstant coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.ParameterHandle" />, <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.ParameterHandle" />, <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasConstant(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToHasConstantTag(handle.Kind);
@@ -19033,8 +19033,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a CustomAttributeType coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int CustomAttributeType(EntityHandle handle)
 				{
 					return (handle.RowId << 3) | (int)ToCustomAttributeTypeTag(handle.Kind);
@@ -19043,8 +19043,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a HasDeclSecurity coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, or <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, or <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasDeclSecurity(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToHasDeclSecurityTag(handle.Kind);
@@ -19053,8 +19053,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a HasFieldMarshal coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.ParameterHandle" /> or <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.ParameterHandle" /> or <see cref="System.Reflection.Metadata.FieldDefinitionHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasFieldMarshal(EntityHandle handle)
 				{
 					return (handle.RowId << 1) | (int)ToHasFieldMarshalTag(handle.Kind);
@@ -19063,8 +19063,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a HasSemantics coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.EventDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.EventDefinitionHandle" /> or <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasSemantics(EntityHandle handle)
 				{
 					return (handle.RowId << 1) | (int)ToHasSemanticsTag(handle.Kind);
@@ -19073,8 +19073,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a Implementation coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" /> or <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="System.Reflection.Metadata.ExportedTypeHandle" /> or <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int Implementation(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToImplementationTag(handle.Kind);
@@ -19083,8 +19083,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a MemberForwarded coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.FieldDefinition" />, <see cref="T:System.Reflection.Metadata.MethodDefinition" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.FieldDefinition" />, <see cref="System.Reflection.Metadata.MethodDefinition" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int MemberForwarded(EntityHandle handle)
 				{
 					return (handle.RowId << 1) | (int)ToMemberForwardedTag(handle.Kind);
@@ -19094,13 +19094,13 @@ namespace System.Reflection
 				/// Calculates a MemberRefParent coded index for the specified handle.
 				/// </summary>
 				/// <param name="handle">
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, or
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, or
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.
 				/// </param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int MemberRefParent(EntityHandle handle)
 				{
 					return (handle.RowId << 3) | (int)ToMemberRefParentTag(handle.Kind);
@@ -19109,8 +19109,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a MethodDefOrRef coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int MethodDefOrRef(EntityHandle handle)
 				{
 					return (handle.RowId << 1) | (int)ToMethodDefOrRefTag(handle.Kind);
@@ -19119,8 +19119,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a ResolutionScope coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />, <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />, <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />, <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeReferenceHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int ResolutionScope(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToResolutionScopeTag(handle.Kind);
@@ -19129,8 +19129,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a TypeDefOrRef coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.TypeReferenceHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int TypeDefOrRef(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToTypeDefOrRefTag(handle.Kind);
@@ -19139,8 +19139,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a TypeDefOrRefOrSpec coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int TypeDefOrRefOrSpec(EntityHandle handle)
 				{
 					return (handle.RowId << 2) | (int)ToTypeDefOrRefOrSpecTag(handle.Kind);
@@ -19149,8 +19149,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Calculates a TypeOrMethodDef coded index for the specified handle.
 				/// </summary>
-				/// <param name="handle"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /></param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <param name="handle"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MethodDefinitionHandle" /></param>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int TypeOrMethodDef(EntityHandle handle)
 				{
 					return (handle.RowId << 1) | (int)ToTypeOrMethodDefTag(handle.Kind);
@@ -19160,35 +19160,35 @@ namespace System.Reflection
 				/// Calculates a HasCustomDebugInformation coded index for the specified handle.
 				/// </summary>
 				/// <param name="handle">
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.InterfaceImplementationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.EventDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.StandaloneSignatureHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ManifestResourceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterConstraintHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MethodSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DocumentHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalScopeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalVariableHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalConstantHandle" /> or
-				/// <see cref="T:System.Reflection.Metadata.ImportScopeHandle" />.
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.ParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.InterfaceImplementationHandle" />,
+				/// <see cref="System.Reflection.Metadata.MemberReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
+				/// <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.EventDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.StandaloneSignatureHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyFileHandle" />,
+				/// <see cref="System.Reflection.Metadata.ExportedTypeHandle" />,
+				/// <see cref="System.Reflection.Metadata.ManifestResourceHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterConstraintHandle" />,
+				/// <see cref="System.Reflection.Metadata.MethodSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.DocumentHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalScopeHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalVariableHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalConstantHandle" /> or
+				/// <see cref="System.Reflection.Metadata.ImportScopeHandle" />.
 				/// </param>
-				/// <exception cref="T:System.ArgumentException">Unexpected handle kind.</exception>
+				/// <exception cref="System.ArgumentException">Unexpected handle kind.</exception>
 				public static int HasCustomDebugInformation(EntityHandle handle)
 				{
 					return (handle.RowId << 5) | (int)ToHasCustomDebugInformationTag(handle.Kind);
@@ -19721,8 +19721,8 @@ namespace System.Reflection
 				/// <param name="tryEnd">Label marking the instruction immediately following the try block.</param>
 				/// <param name="handlerStart">Label marking the first instruction of the handler.</param>
 				/// <param name="handlerEnd">Label marking the instruction immediately following the handler.</param>
-				/// <exception cref="T:System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
-				/// <exception cref="T:System.ArgumentNullException">A label has default value.</exception>
+				/// <exception cref="System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
+				/// <exception cref="System.ArgumentNullException">A label has default value.</exception>
 				public void AddFinallyRegion(LabelHandle tryStart, LabelHandle tryEnd, LabelHandle handlerStart, LabelHandle handlerEnd)
 				{
 					AddExceptionRegion(ExceptionRegionKind.Finally, tryStart, tryEnd, handlerStart, handlerEnd);
@@ -19735,8 +19735,8 @@ namespace System.Reflection
 				/// <param name="tryEnd">Label marking the instruction immediately following the try block.</param>
 				/// <param name="handlerStart">Label marking the first instruction of the handler.</param>
 				/// <param name="handlerEnd">Label marking the instruction immediately following the handler.</param>
-				/// <exception cref="T:System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
-				/// <exception cref="T:System.ArgumentNullException">A label has default value.</exception>
+				/// <exception cref="System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
+				/// <exception cref="System.ArgumentNullException">A label has default value.</exception>
 				public void AddFaultRegion(LabelHandle tryStart, LabelHandle tryEnd, LabelHandle handlerStart, LabelHandle handlerEnd)
 				{
 					AddExceptionRegion(ExceptionRegionKind.Fault, tryStart, tryEnd, handlerStart, handlerEnd);
@@ -19749,10 +19749,10 @@ namespace System.Reflection
 				/// <param name="tryEnd">Label marking the instruction immediately following the try block.</param>
 				/// <param name="handlerStart">Label marking the first instruction of the handler.</param>
 				/// <param name="handlerEnd">Label marking the instruction immediately following the handler.</param>
-				/// <param name="catchType">The type of exception to be caught: <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.</param>
-				/// <exception cref="T:System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
-				/// <exception cref="T:System.ArgumentException"><paramref name="catchType" /> is not a valid type handle.</exception>
-				/// <exception cref="T:System.ArgumentNullException">A label has default value.</exception>
+				/// <param name="catchType">The type of exception to be caught: <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.</param>
+				/// <exception cref="System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="catchType" /> is not a valid type handle.</exception>
+				/// <exception cref="System.ArgumentNullException">A label has default value.</exception>
 				public void AddCatchRegion(LabelHandle tryStart, LabelHandle tryEnd, LabelHandle handlerStart, LabelHandle handlerEnd, EntityHandle catchType)
 				{
 					if (!ExceptionRegionEncoder.IsValidCatchTypeHandle(catchType))
@@ -19770,8 +19770,8 @@ namespace System.Reflection
 				/// <param name="handlerStart">Label marking the first instruction of the handler.</param>
 				/// <param name="handlerEnd">Label marking the instruction immediately following the handler.</param>
 				/// <param name="filterStart">Label marking the first instruction of the filter block.</param>
-				/// <exception cref="T:System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
-				/// <exception cref="T:System.ArgumentNullException">A label has default value.</exception>
+				/// <exception cref="System.ArgumentException">A label was not defined by an instruction encoder this builder is associated with.</exception>
+				/// <exception cref="System.ArgumentNullException">A label has default value.</exception>
 				public void AddFilterRegion(LabelHandle tryStart, LabelHandle tryEnd, LabelHandle handlerStart, LabelHandle handlerEnd, LabelHandle filterStart)
 				{
 					ValidateLabel(filterStart, "filterStart");
@@ -19791,7 +19791,7 @@ namespace System.Reflection
 					_lazyExceptionHandlers.Add(new ExceptionHandlerInfo(kind, tryStart, tryEnd, handlerStart, handlerEnd, filterStart, catchType));
 				}
 
-				/// <exception cref="T:System.InvalidOperationException" />
+				/// <exception cref="System.InvalidOperationException" />
 				internal void CopyCodeAndFixupBranches(BlobBuilder srcBuilder, BlobBuilder dstBuilder)
 				{
 					BranchInfo branchInfo = _branches[0];
@@ -20756,10 +20756,10 @@ namespace System.Reflection
 				/// <summary>
 				/// Encodes a custom modifier.
 				/// </summary>
-				/// <param name="type"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.</param>
+				/// <param name="type"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.</param>
 				/// <param name="isOptional">Is optional modifier.</param>
 				/// <returns>Encoder of subsequent modifiers.</returns>
-				/// <exception cref="T:System.ArgumentException"><paramref name="type" /> is nil or of an unexpected kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="type" /> is nil or of an unexpected kind.</exception>
 				public CustomModifiersEncoder AddModifier(EntityHandle type, bool isOptional)
 				{
 					if (type.IsNil)
@@ -21238,10 +21238,10 @@ namespace System.Reflection
 				/// <param name="handlerOffset">Handler start offset.</param>
 				/// <param name="handlerLength">Handler length.</param>
 				/// <returns>Encoder for the next clause.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="tryOffset" />, <paramref name="tryLength" />, <paramref name="handlerOffset" /> or <paramref name="handlerLength" /> is out of range.
 				/// </exception>
-				/// <exception cref="T:System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
+				/// <exception cref="System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
 				public ExceptionRegionEncoder AddFinally(int tryOffset, int tryLength, int handlerOffset, int handlerLength)
 				{
 					return Add(ExceptionRegionKind.Finally, tryOffset, tryLength, handlerOffset, handlerLength);
@@ -21255,10 +21255,10 @@ namespace System.Reflection
 				/// <param name="handlerOffset">Handler start offset.</param>
 				/// <param name="handlerLength">Handler length.</param>
 				/// <returns>Encoder for the next clause.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="tryOffset" />, <paramref name="tryLength" />, <paramref name="handlerOffset" /> or <paramref name="handlerLength" /> is out of range.
 				/// </exception>
-				/// <exception cref="T:System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
+				/// <exception cref="System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
 				public ExceptionRegionEncoder AddFault(int tryOffset, int tryLength, int handlerOffset, int handlerLength)
 				{
 					return Add(ExceptionRegionKind.Fault, tryOffset, tryLength, handlerOffset, handlerLength);
@@ -21272,14 +21272,14 @@ namespace System.Reflection
 				/// <param name="handlerOffset">Handler start offset.</param>
 				/// <param name="handlerLength">Handler length.</param>
 				/// <param name="catchType">
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.
 				/// </param>
 				/// <returns>Encoder for the next clause.</returns>
-				/// <exception cref="T:System.ArgumentException"><paramref name="catchType" /> is invalid.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentException"><paramref name="catchType" /> is invalid.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="tryOffset" />, <paramref name="tryLength" />, <paramref name="handlerOffset" /> or <paramref name="handlerLength" /> is out of range.
 				/// </exception>
-				/// <exception cref="T:System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
+				/// <exception cref="System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
 				public ExceptionRegionEncoder AddCatch(int tryOffset, int tryLength, int handlerOffset, int handlerLength, EntityHandle catchType)
 				{
 					return Add(ExceptionRegionKind.Catch, tryOffset, tryLength, handlerOffset, handlerLength, catchType);
@@ -21294,10 +21294,10 @@ namespace System.Reflection
 				/// <param name="handlerLength">Handler length.</param>
 				/// <param name="filterOffset">Offset of the filter block.</param>
 				/// <returns>Encoder for the next clause.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="tryOffset" />, <paramref name="tryLength" />, <paramref name="handlerOffset" /> or <paramref name="handlerLength" /> is out of range.
 				/// </exception>
-				/// <exception cref="T:System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
+				/// <exception cref="System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
 				public ExceptionRegionEncoder AddFilter(int tryOffset, int tryLength, int handlerOffset, int handlerLength, int filterOffset)
 				{
 					return Add(ExceptionRegionKind.Filter, tryOffset, tryLength, handlerOffset, handlerLength, default(EntityHandle), filterOffset);
@@ -21312,19 +21312,19 @@ namespace System.Reflection
 				/// <param name="handlerOffset">Handler start offset.</param>
 				/// <param name="handlerLength">Handler length.</param>
 				/// <param name="catchType">
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />,
 				/// or nil if <paramref name="kind" /> is not <see cref="F:System.Reflection.Metadata.ExceptionRegionKind.Catch" />
 				/// </param>
 				/// <param name="filterOffset">
 				/// Offset of the filter block, or 0 if the <paramref name="kind" /> is not <see cref="F:System.Reflection.Metadata.ExceptionRegionKind.Filter" />.
 				/// </param>
 				/// <returns>Encoder for the next clause.</returns>
-				/// <exception cref="T:System.ArgumentException"><paramref name="catchType" /> is invalid.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="kind" /> has invalid value.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentException"><paramref name="catchType" /> is invalid.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="kind" /> has invalid value.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="tryOffset" />, <paramref name="tryLength" />, <paramref name="handlerOffset" /> or <paramref name="handlerLength" /> is out of range.
 				/// </exception>
-				/// <exception cref="T:System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
+				/// <exception cref="System.InvalidOperationException">Method body was not declared to have exception regions.</exception>
 				public ExceptionRegionEncoder Add(ExceptionRegionKind kind, int tryOffset, int tryLength, int handlerOffset, int handlerLength, EntityHandle catchType = default(EntityHandle), int filterOffset = 0)
 				{
 					if (Builder == null)
@@ -21427,7 +21427,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Gets a hint at the likely row number of the target type in the TypeDef table of its module.
 				/// If the namespaces and names do not match, resolution falls back to a full search of the
-				/// target TypeDef table. Ignored and should be zero if <see cref="P:System.Reflection.Metadata.ExportedType.IsForwarder" /> is
+				/// target TypeDef table. Ignored and should be zero if <see cref="System.Reflection.Metadata.ExportedType.IsForwarder" /> is
 				/// true.
 				/// </summary>
 				public static int GetTypeDefinitionId(this ExportedType exportedType)
@@ -22040,7 +22040,7 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// These constants are all in the byte range and apply to the interpretation of <see cref="P:System.Reflection.Metadata.Handle.VType" />,
+			/// These constants are all in the byte range and apply to the interpretation of <see cref="System.Reflection.Metadata.Handle.VType" />,
 			/// </summary>
 			internal static class HandleType
 			{
@@ -22747,7 +22747,7 @@ namespace System.Reflection
 				/// <param name="codeBuilder">Builder to write encoded instructions to.</param>
 				/// <param name="controlFlowBuilder">
 				/// Builder tracking labels, branches and exception handlers.
-				/// Must be specified to be able to use some of the control-flow factory methods of <see cref="T:System.Reflection.Metadata.Ecma335.InstructionEncoder" />,
+				/// Must be specified to be able to use some of the control-flow factory methods of <see cref="System.Reflection.Metadata.Ecma335.InstructionEncoder" />,
 				/// such as <see cref="M:System.Reflection.Metadata.Ecma335.InstructionEncoder.Branch(System.Reflection.Metadata.ILOpCode,System.Reflection.Metadata.Ecma335.LabelHandle)" />, <see cref="M:System.Reflection.Metadata.Ecma335.InstructionEncoder.DefineLabel" />, <see cref="M:System.Reflection.Metadata.Ecma335.InstructionEncoder.MarkLabel(System.Reflection.Metadata.Ecma335.LabelHandle)" /> etc.
 				/// </param>
 				public InstructionEncoder(BlobBuilder codeBuilder, ControlFlowBuilder? controlFlowBuilder = null)
@@ -22850,7 +22850,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes <see cref="T:System.Int32" /> constant load instruction.
+				/// Encodes <see cref="System.Int32" /> constant load instruction.
 				/// </summary>
 				public void LoadConstantI4(int value)
 				{
@@ -22904,7 +22904,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes <see cref="T:System.Int64" /> constant load instruction.
+				/// Encodes <see cref="System.Int64" /> constant load instruction.
 				/// </summary>
 				public void LoadConstantI8(long value)
 				{
@@ -22913,7 +22913,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes <see cref="T:System.Single" /> constant load instruction.
+				/// Encodes <see cref="System.Single" /> constant load instruction.
 				/// </summary>
 				public void LoadConstantR4(float value)
 				{
@@ -22922,7 +22922,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes <see cref="T:System.Double" /> constant load instruction.
+				/// Encodes <see cref="System.Double" /> constant load instruction.
 				/// </summary>
 				public void LoadConstantR8(double value)
 				{
@@ -22934,7 +22934,7 @@ namespace System.Reflection
 				/// Encodes local variable load instruction.
 				/// </summary>
 				/// <param name="slotIndex">Index of the local variable slot.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
 				public void LoadLocal(int slotIndex)
 				{
 					switch (slotIndex)
@@ -22972,7 +22972,7 @@ namespace System.Reflection
 				/// Encodes local variable store instruction.
 				/// </summary>
 				/// <param name="slotIndex">Index of the local variable slot.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
 				public void StoreLocal(int slotIndex)
 				{
 					switch (slotIndex)
@@ -23010,7 +23010,7 @@ namespace System.Reflection
 				/// Encodes local variable address load instruction.
 				/// </summary>
 				/// <param name="slotIndex">Index of the local variable slot.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="slotIndex" /> is negative.</exception>
 				public void LoadLocalAddress(int slotIndex)
 				{
 					if ((uint)slotIndex <= 255u)
@@ -23033,7 +23033,7 @@ namespace System.Reflection
 				/// Encodes argument load instruction.
 				/// </summary>
 				/// <param name="argumentIndex">Index of the argument.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
 				public void LoadArgument(int argumentIndex)
 				{
 					switch (argumentIndex)
@@ -23071,7 +23071,7 @@ namespace System.Reflection
 				/// Encodes argument address load instruction.
 				/// </summary>
 				/// <param name="argumentIndex">Index of the argument.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
 				public void LoadArgumentAddress(int argumentIndex)
 				{
 					if ((uint)argumentIndex <= 255u)
@@ -23094,7 +23094,7 @@ namespace System.Reflection
 				/// Encodes argument store instruction.
 				/// </summary>
 				/// <param name="argumentIndex">Index of the argument.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="argumentIndex" /> is negative.</exception>
 				public void StoreArgument(int argumentIndex)
 				{
 					if ((uint)argumentIndex <= 255u)
@@ -23117,7 +23117,7 @@ namespace System.Reflection
 				/// Defines a label that can later be used to mark and refer to a location in the instruction stream.
 				/// </summary>
 				/// <returns>Label handle.</returns>
-				/// <exception cref="T:System.InvalidOperationException"><see cref="P:System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
+				/// <exception cref="System.InvalidOperationException"><see cref="System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
 				public LabelHandle DefineLabel()
 				{
 					return GetBranchBuilder().AddLabel();
@@ -23128,10 +23128,10 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="code">Branch instruction to encode.</param>
 				/// <param name="label">Label of the target location in instruction stream.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="code" /> is not a branch instruction.</exception>
-				/// <exception cref="T:System.ArgumentException"><paramref name="label" /> was not defined by this encoder.</exception>
-				/// <exception cref="T:System.InvalidOperationException"><see cref="P:System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="label" /> has default value.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="code" /> is not a branch instruction.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="label" /> was not defined by this encoder.</exception>
+				/// <exception cref="System.InvalidOperationException"><see cref="System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="label" /> has default value.</exception>
 				public void Branch(ILOpCode code, LabelHandle label)
 				{
 					int branchOperandSize = code.GetBranchOperandSize();
@@ -23154,9 +23154,9 @@ namespace System.Reflection
 				/// <remarks>
 				/// A single label may be marked multiple times, the last offset wins.
 				/// </remarks>
-				/// <exception cref="T:System.InvalidOperationException"><see cref="P:System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentException"><paramref name="label" /> was not defined by this encoder.</exception>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="label" /> has default value.</exception>
+				/// <exception cref="System.InvalidOperationException"><see cref="System.Reflection.Metadata.Ecma335.InstructionEncoder.ControlFlowBuilder" /> is null.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="label" /> was not defined by this encoder.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="label" /> has default value.</exception>
 				public void MarkLabel(LabelHandle label)
 				{
 					GetBranchBuilder().MarkLabel(Offset, label);
@@ -23234,7 +23234,7 @@ namespace System.Reflection
 			public readonly struct LabelHandle : IEquatable<LabelHandle>
 			{
 				/// <summary>
-				/// 1-based id identifying the label within the context of a <see cref="T:System.Reflection.Metadata.Ecma335.ControlFlowBuilder" />.
+				/// 1-based id identifying the label within the context of a <see cref="System.Reflection.Metadata.Ecma335.ControlFlowBuilder" />.
 				/// </summary>
 				public int Id { get; }
 
@@ -23306,7 +23306,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="arrayType">Called first, to encode the type of the vector.</param>
 				/// <param name="vector">Called second, to encode the items of the vector.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="arrayType" /> or <paramref name="vector" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="arrayType" /> or <paramref name="vector" /> is null.</exception>
 				public void TaggedVector(Action<CustomAttributeArrayTypeEncoder> arrayType, Action<VectorEncoder> vector)
 				{
 					if (arrayType == null)
@@ -23348,7 +23348,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="type">Called first, to encode the type of the literal.</param>
 				/// <param name="scalar">Called second, to encode the value of the literal.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="type" /> or <paramref name="scalar" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="type" /> or <paramref name="scalar" /> is null.</exception>
 				public void TaggedScalar(Action<CustomAttributeElementTypeEncoder> type, Action<ScalarEncoder> scalar)
 				{
 					if (type == null)
@@ -24699,8 +24699,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Sets the capacity of the specified table.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="table" /> is not a valid table index.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="rowCount" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="table" /> is not a valid table index.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="rowCount" /> is negative.</exception>
 				/// <remarks>
 				/// Use to reduce allocations if the approximate number of rows is known ahead of time.
 				/// </remarks>
@@ -24868,7 +24868,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="table">Table index.</param>
 				/// <returns>The number of entires in the table.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="table" /> is not a valid table index.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="table" /> is not a valid table index.</exception>
 				public int GetRowCount(TableIndex table)
 				{
 					switch (table)
@@ -25108,7 +25108,7 @@ namespace System.Reflection
 				/// <param name="attributes">Attributes</param>
 				/// <param name="namespace">Namespace</param>
 				/// <param name="name">Type name</param>
-				/// <param name="baseType"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />, <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" /> or nil.</param>
+				/// <param name="baseType"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" />, <see cref="System.Reflection.Metadata.TypeSpecificationHandle" /> or nil.</param>
 				/// <param name="fieldList">
 				/// If the type declares fields the handle of the first one, otherwise the handle of the first field declared by the next type definition.
 				/// If no type defines any fields in the module, <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.FieldDefinitionHandle(System.Int32)" />(1).
@@ -25117,7 +25117,7 @@ namespace System.Reflection
 				/// If the type declares methods the handle of the first one, otherwise the handle of the first method declared by the next type definition.
 				/// If no type defines any methods in the module, <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.MethodDefinitionHandle(System.Int32)" />(1).
 				/// </param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="baseType" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="baseType" /> doesn't have the expected handle kind.</exception>
 				public TypeDefinitionHandle AddTypeDefinition(TypeAttributes attributes, StringHandle @namespace, StringHandle name, EntityHandle baseType, FieldDefinitionHandle fieldList, MethodDefinitionHandle methodList)
 				{
 					_typeDefTable.Add(new TypeDefRow
@@ -25165,13 +25165,13 @@ namespace System.Reflection
 				/// <param name="type">The type implementing the interface.</param>
 				/// <param name="implementedInterface">
 				/// The interface being implemented:
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.
 				/// </param>
 				/// <remarks>
 				/// Interface implementations must be added in the same order as the corresponding type definitions implementing the interface.
 				/// If a type implements multiple interfaces the corresponding entries must be added in the order determined by their coded indices (<see cref="M:System.Reflection.Metadata.Ecma335.CodedIndex.TypeDefOrRefOrSpec(System.Reflection.Metadata.EntityHandle)" />).
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentException"><paramref name="implementedInterface" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="implementedInterface" /> doesn't have the expected handle kind.</exception>
 				public InterfaceImplementationHandle AddInterfaceImplementation(TypeDefinitionHandle type, EntityHandle implementedInterface)
 				{
 					_interfaceImplTable.Add(new InterfaceImplRow
@@ -25204,11 +25204,11 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="resolutionScope">
 				/// The entity declaring the target type:
-				/// <see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />, <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />, or nil.
+				/// <see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />, <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />, <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" />, or nil.
 				/// </param>
 				/// <param name="namespace">Namespace.</param>
 				/// <param name="name">Type name.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="resolutionScope" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="resolutionScope" /> doesn't have the expected handle kind.</exception>
 				public TypeReferenceHandle AddTypeReference(EntityHandle resolutionScope, StringHandle @namespace, StringHandle name)
 				{
 					_typeRefTable.Add(new TypeRefRow
@@ -25269,8 +25269,8 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="attributes">Attributes</param>
 				/// <param name="name">Name</param>
-				/// <param name="type">Type of the event: <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" /></param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="type" /> doesn't have the expected handle kind.</exception>
+				/// <param name="type">Type of the event: <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" />, or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" /></param>
+				/// <exception cref="System.ArgumentException"><paramref name="type" /> doesn't have the expected handle kind.</exception>
 				public EventDefinitionHandle AddEvent(EventAttributes attributes, StringHandle name, EntityHandle type)
 				{
 					_eventTable.Add(new EventRow
@@ -25294,12 +25294,12 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds a default value for a parameter, field or property.
 				/// </summary>
-				/// <param name="parent"><see cref="T:System.Reflection.Metadata.ParameterHandle" />, <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
+				/// <param name="parent"><see cref="System.Reflection.Metadata.ParameterHandle" />, <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />, or <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" /></param>
 				/// <param name="value">The constant value.</param>
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				public ConstantHandle AddConstant(EntityHandle parent, object? value)
 				{
 					int num = CodedIndex.HasConstant(parent);
@@ -25317,10 +25317,10 @@ namespace System.Reflection
 				/// <summary>
 				/// Associates a method (a getter, a setter, an adder, etc.) with a property or an event.
 				/// </summary>
-				/// <param name="association"><see cref="T:System.Reflection.Metadata.EventDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />.</param>
+				/// <param name="association"><see cref="System.Reflection.Metadata.EventDefinitionHandle" /> or <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />.</param>
 				/// <param name="semantics">Semantics.</param>
 				/// <param name="methodDefinition">Method definition.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="association" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="association" /> doesn't have the expected handle kind.</exception>
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
@@ -25342,31 +25342,31 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="parent">
 				/// An entity to attach the custom attribute to:
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.InterfaceImplementationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.EventDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.StandaloneSignatureHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ManifestResourceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterConstraintHandle" /> or
-				/// <see cref="T:System.Reflection.Metadata.MethodSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.ParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.InterfaceImplementationHandle" />,
+				/// <see cref="System.Reflection.Metadata.MemberReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
+				/// <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.EventDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.StandaloneSignatureHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyFileHandle" />,
+				/// <see cref="System.Reflection.Metadata.ExportedTypeHandle" />,
+				/// <see cref="System.Reflection.Metadata.ManifestResourceHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterConstraintHandle" /> or
+				/// <see cref="System.Reflection.Metadata.MethodSpecificationHandle" />.
 				/// </param>
 				/// <param name="constructor">
-				/// Custom attribute constructor: <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />
+				/// Custom attribute constructor: <see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" />
 				/// </param>
 				/// <param name="value">
 				/// Custom attribute value blob.
@@ -25374,7 +25374,7 @@ namespace System.Reflection
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				public CustomAttributeHandle AddCustomAttribute(EntityHandle parent, EntityHandle constructor, BlobHandle value)
 				{
 					int num = CodedIndex.HasCustomAttribute(parent);
@@ -25392,9 +25392,9 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds a method specification (instantiation).
 				/// </summary>
-				/// <param name="method">Generic method: <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" /></param>
+				/// <param name="method">Generic method: <see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" /></param>
 				/// <param name="instantiation">Instantiation blob encoding the generic arguments of the method.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="method" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="method" /> doesn't have the expected handle kind.</exception>
 				public MethodSpecificationHandle AddMethodSpecification(EntityHandle method, BlobHandle instantiation)
 				{
 					_methodSpecTable.Add(new MethodSpecRow
@@ -25417,10 +25417,10 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds a parameter definition.
 				/// </summary>
-				/// <param name="attributes"><see cref="T:System.Reflection.ParameterAttributes" /></param>
+				/// <param name="attributes"><see cref="System.Reflection.ParameterAttributes" /></param>
 				/// <param name="name">Parameter name (optional).</param>
 				/// <param name="sequenceNumber">Sequence number of the parameter. Value of 0 refers to the owner method's return type; its parameters are then numbered from 1 onwards.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="sequenceNumber" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="sequenceNumber" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
 				public ParameterHandle AddParameter(ParameterAttributes attributes, StringHandle name, int sequenceNumber)
 				{
 					if ((uint)sequenceNumber > 65535u)
@@ -25439,7 +25439,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds a generic parameter definition.
 				/// </summary>
-				/// <param name="parent">Parent entity handle: <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /></param>
+				/// <param name="parent">Parent entity handle: <see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MethodDefinitionHandle" /></param>
 				/// <param name="attributes">Attributes.</param>
 				/// <param name="name">Parameter name.</param>
 				/// <param name="index">Zero-based parameter index.</param>
@@ -25447,8 +25447,8 @@ namespace System.Reflection
 				/// Generic parameters must be added in an order determined by the coded index of their parent entity (<see cref="M:System.Reflection.Metadata.Ecma335.CodedIndex.TypeOrMethodDef(System.Reflection.Metadata.EntityHandle)" />).
 				/// Generic parameters with the same parent must be ordered by their <paramref name="index" />.
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
 				public GenericParameterHandle AddGenericParameter(EntityHandle parent, GenericParameterAttributes attributes, StringHandle name, int index)
 				{
 					if ((uint)index > 65535u)
@@ -25469,8 +25469,8 @@ namespace System.Reflection
 				/// Adds a type constraint to a generic parameter.
 				/// </summary>
 				/// <param name="genericParameter">Generic parameter to constrain.</param>
-				/// <param name="constraint">Type constraint: <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" /></param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="genericParameter" /> doesn't have the expected handle kind.</exception>
+				/// <param name="constraint">Type constraint: <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.TypeReferenceHandle" /> or <see cref="System.Reflection.Metadata.TypeSpecificationHandle" /></param>
+				/// <exception cref="System.ArgumentException"><paramref name="genericParameter" /> doesn't have the expected handle kind.</exception>
 				/// <remarks>
 				/// Constraints must be added in the same order as the corresponding generic parameters.
 				/// </remarks>
@@ -25521,9 +25521,9 @@ namespace System.Reflection
 				/// <summary>
 				/// Add marshalling information to a field or a parameter.
 				/// </summary>
-				/// <param name="parent"><see cref="T:System.Reflection.Metadata.ParameterHandle" /> or <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />.</param>
+				/// <param name="parent"><see cref="System.Reflection.Metadata.ParameterHandle" /> or <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />.</param>
 				/// <param name="descriptor">Descriptor blob.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
@@ -25551,7 +25551,7 @@ namespace System.Reflection
 				/// <remarks>
 				/// Entires must be added in the same order as the corresponding field definitions.
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="offset" /> is negative.</exception>
 				public void AddFieldRelativeVirtualAddress(FieldDefinitionHandle field, int offset)
 				{
 					if (offset < 0)
@@ -25568,8 +25568,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds a method definition.
 				/// </summary>
-				/// <param name="attributes"><see cref="T:System.Reflection.MethodAttributes" /></param>
-				/// <param name="implAttributes"><see cref="T:System.Reflection.MethodImplAttributes" /></param>
+				/// <param name="attributes"><see cref="System.Reflection.MethodAttributes" /></param>
+				/// <param name="implAttributes"><see cref="System.Reflection.MethodImplAttributes" /></param>
 				/// <param name="name">Method name/</param>
 				/// <param name="signature">Method signature.</param>
 				/// <param name="bodyOffset">
@@ -25583,7 +25583,7 @@ namespace System.Reflection
 				/// If the method declares parameters in Params table the handle of the first one, otherwise the handle of the first parameter declared by the next method definition.
 				/// If no parameters are declared in the module, <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.ParameterHandle(System.Int32)" />(1).
 				/// </param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="bodyOffset" /> is less than -1.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="bodyOffset" /> is less than -1.</exception>
 				public MethodDefinitionHandle AddMethodDefinition(MethodAttributes attributes, MethodImplAttributes implAttributes, StringHandle name, BlobHandle signature, int bodyOffset, ParameterHandle parameterList)
 				{
 					if (bodyOffset < -1)
@@ -25627,12 +25627,12 @@ namespace System.Reflection
 				/// Defines an implementation for a method declaration within a type.
 				/// </summary>
 				/// <param name="type">Type</param>
-				/// <param name="methodBody"><see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" /> which provides the implementation.</param>
-				/// <param name="methodDeclaration"><see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" /> the method being implemented.</param>
+				/// <param name="methodBody"><see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" /> which provides the implementation.</param>
+				/// <param name="methodDeclaration"><see cref="System.Reflection.Metadata.MethodDefinitionHandle" /> or <see cref="System.Reflection.Metadata.MemberReferenceHandle" /> the method being implemented.</param>
 				/// <remarks>
 				/// Method implementations must be added in the same order as the corresponding type definitions.
 				/// </remarks>
-				/// <exception cref="T:System.ArgumentException"><paramref name="methodBody" /> or <paramref name="methodDeclaration" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="methodBody" /> or <paramref name="methodDeclaration" /> doesn't have the expected handle kind.</exception>
 				public MethodImplementationHandle AddMethodImplementation(TypeDefinitionHandle type, EntityHandle methodBody, EntityHandle methodDeclaration)
 				{
 					_methodImplTable.Add(new MethodImplRow
@@ -25648,15 +25648,15 @@ namespace System.Reflection
 				/// Adds a MemberRef table row.
 				/// </summary>
 				/// <param name="parent">Containing entity:
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, or
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />.
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, or
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />.
 				/// </param>
 				/// <param name="name">Member name.</param>
 				/// <param name="signature">Member signature.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				public MemberReferenceHandle AddMemberReference(EntityHandle parent, StringHandle name, BlobHandle signature)
 				{
 					_memberRefTable.Add(new MemberRefRow
@@ -25673,9 +25673,9 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="attributes">Attributes</param>
 				/// <param name="name">Resource name</param>
-				/// <param name="implementation"><see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />, or nil</param>
+				/// <param name="implementation"><see cref="System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />, or nil</param>
 				/// <param name="offset">Specifies the byte offset within the referenced file at which this resource record begins.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="implementation" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="implementation" /> doesn't have the expected handle kind.</exception>
 				public ManifestResourceHandle AddManifestResource(ManifestResourceAttributes attributes, StringHandle name, EntityHandle implementation, uint offset)
 				{
 					_manifestResourceTable.Add(new ManifestResourceRow
@@ -25705,9 +25705,9 @@ namespace System.Reflection
 				/// <param name="attributes">Attributes</param>
 				/// <param name="namespace">Namespace</param>
 				/// <param name="name">Type name</param>
-				/// <param name="implementation"><see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" /> or <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" /></param>
+				/// <param name="implementation"><see cref="System.Reflection.Metadata.AssemblyFileHandle" />, <see cref="System.Reflection.Metadata.ExportedTypeHandle" /> or <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" /></param>
 				/// <param name="typeDefinitionId">Type definition id</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="implementation" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="implementation" /> doesn't have the expected handle kind.</exception>
 				public ExportedTypeHandle AddExportedType(TypeAttributes attributes, StringHandle @namespace, StringHandle name, EntityHandle implementation, int typeDefinitionId)
 				{
 					_exportedTypeTable.Add(new ExportedTypeRow
@@ -25724,10 +25724,10 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds declarative security attribute to a type, method or an assembly.
 				/// </summary>
-				/// <param name="parent"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />, or <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" /></param>
+				/// <param name="parent"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" />, <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />, or <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" /></param>
 				/// <param name="action">Security action</param>
 				/// <param name="permissionSet">Permission set blob.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
@@ -25846,10 +25846,10 @@ namespace System.Reflection
 				/// <summary>
 				/// Add local variable debug information.
 				/// </summary>
-				/// <param name="attributes"><see cref="T:System.Reflection.Metadata.LocalVariableAttributes" /></param>
+				/// <param name="attributes"><see cref="System.Reflection.Metadata.LocalVariableAttributes" /></param>
 				/// <param name="index">Local variable index in the local signature (zero-based).</param>
 				/// <param name="name">Name of the variable.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="index" /> is greater than <see cref="F:System.UInt16.MaxValue" />.</exception>
 				public LocalVariableHandle AddLocalVariable(LocalVariableAttributes attributes, int index, StringHandle name)
 				{
 					if ((uint)index > 65535u)
@@ -25921,37 +25921,37 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="parent">
 				/// An entity to attach the debug information to:
-				/// <see cref="T:System.Reflection.Metadata.MethodDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.FieldDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.InterfaceImplementationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MemberReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.PropertyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.EventDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.StandaloneSignatureHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ModuleReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyDefinitionHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyReferenceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.AssemblyFileHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ExportedTypeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.ManifestResourceHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.GenericParameterConstraintHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.MethodSpecificationHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.DocumentHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalScopeHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalVariableHandle" />,
-				/// <see cref="T:System.Reflection.Metadata.LocalConstantHandle" /> or
-				/// <see cref="T:System.Reflection.Metadata.ImportScopeHandle" />.
+				/// <see cref="System.Reflection.Metadata.MethodDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.FieldDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.ParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.InterfaceImplementationHandle" />,
+				/// <see cref="System.Reflection.Metadata.MemberReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.DeclarativeSecurityAttributeHandle" />,
+				/// <see cref="System.Reflection.Metadata.PropertyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.EventDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.StandaloneSignatureHandle" />,
+				/// <see cref="System.Reflection.Metadata.ModuleReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.TypeSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyDefinitionHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyReferenceHandle" />,
+				/// <see cref="System.Reflection.Metadata.AssemblyFileHandle" />,
+				/// <see cref="System.Reflection.Metadata.ExportedTypeHandle" />,
+				/// <see cref="System.Reflection.Metadata.ManifestResourceHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterHandle" />,
+				/// <see cref="System.Reflection.Metadata.GenericParameterConstraintHandle" />,
+				/// <see cref="System.Reflection.Metadata.MethodSpecificationHandle" />,
+				/// <see cref="System.Reflection.Metadata.DocumentHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalScopeHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalVariableHandle" />,
+				/// <see cref="System.Reflection.Metadata.LocalConstantHandle" /> or
+				/// <see cref="System.Reflection.Metadata.ImportScopeHandle" />.
 				/// </param>
 				/// <param name="kind">Information kind. Determines the structure of the <paramref name="value" /> blob.</param>
 				/// <param name="value">Custom debug information blob.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="parent" /> doesn't have the expected handle kind.</exception>
 				/// <remarks>
 				/// Entries may be added in any order. The table is automatically sorted when serialized.
 				/// </remarks>
@@ -26872,9 +26872,9 @@ namespace System.Reflection
 				/// Start offset of the Guid heap.
 				/// The cumulative size of Guid heaps of all previous EnC generations. Should be 0 unless the metadata is EnC delta metadata.
 				/// </param>
-				/// <exception cref="T:System.Reflection.Metadata.ImageFormatLimitationException">Offset is too big.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">Offset is negative.</exception>
-				/// <exception cref="T:System.ArgumentException"><paramref name="guidHeapStartOffset" /> is not a multiple of size of GUID.</exception>
+				/// <exception cref="System.Reflection.Metadata.ImageFormatLimitationException">Offset is too big.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException">Offset is negative.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="guidHeapStartOffset" /> is not a multiple of size of GUID.</exception>
 				public MetadataBuilder(int userStringHeapStartOffset = 0, int stringHeapStartOffset = 0, int blobHeapStartOffset = 0, int guidHeapStartOffset = 0)
 				{
 					if (userStringHeapStartOffset >= 16777215)
@@ -26915,8 +26915,8 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="heap">Heap index.</param>
 				/// <param name="byteCount">Number of bytes.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="heap" /> is not a valid heap index.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="heap" /> is not a valid heap index.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="byteCount" /> is negative.</exception>
 				/// <remarks>
 				/// Use to reduce allocations if the approximate number of bytes is known ahead of time.
 				/// </remarks>
@@ -26968,9 +26968,9 @@ namespace System.Reflection
 				/// <summary>
 				/// Adds specified blob to Blob heap, if it's not there already.
 				/// </summary>
-				/// <param name="value"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing the blob.</param>
+				/// <param name="value"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing the blob.</param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddBlob(BlobBuilder value)
 				{
 					if (value == null)
@@ -26985,7 +26985,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="value">Array containing the blob.</param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddBlob(byte[] value)
 				{
 					if (value == null)
@@ -27000,7 +27000,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="value">Array containing the blob.</param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddBlob(System.Collections.Immutable.ImmutableArray<byte> value)
 				{
 					if (value.IsDefault)
@@ -27040,7 +27040,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="value">String.</param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddBlobUTF16(string value)
 				{
 					PooledBlobBuilder instance = PooledBlobBuilder.GetInstance();
@@ -27058,7 +27058,7 @@ namespace System.Reflection
 				/// True to encode unpaired surrogates as specified, otherwise replace them with U+FFFD character.
 				/// </param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddBlobUTF8(string value, bool allowUnpairedSurrogates = true)
 				{
 					PooledBlobBuilder instance = PooledBlobBuilder.GetInstance();
@@ -27076,7 +27076,7 @@ namespace System.Reflection
 				/// Handle to the added or existing document name blob
 				/// (see https://github.com/dotnet/runtime/blob/main/docs/design/specs/PortablePdb-Metadata.md#DocumentNameBlob).
 				/// </returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public BlobHandle GetOrAddDocumentName(string value)
 				{
 					if (value == null)
@@ -27159,9 +27159,9 @@ namespace System.Reflection
 				/// Reserves space on the Guid heap for a GUID.
 				/// </summary>
 				/// <returns>
-				/// Handle to the reserved Guid and a <see cref="T:System.Reflection.Metadata.Blob" /> representing the GUID blob as stored on the heap.
+				/// Handle to the reserved Guid and a <see cref="System.Reflection.Metadata.Blob" /> representing the GUID blob as stored on the heap.
 				/// </returns>
-				/// <exception cref="T:System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
+				/// <exception cref="System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
 				public ReservedBlob<GuidHandle> ReserveGuid()
 				{
 					GuidHandle newGuidHandle = GetNewGuidHandle();
@@ -27179,7 +27179,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="value">Array containing the blob.</param>
 				/// <returns>Handle to the added or existing blob.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public StringHandle GetOrAddString(string value)
 				{
 					if (value == null)
@@ -27204,13 +27204,13 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="length">The number of characters to reserve.</param>
 				/// <returns>
-				/// Handle to the reserved User String and a <see cref="T:System.Reflection.Metadata.Blob" /> representing the entire User String blob (including its length and terminal character).
+				/// Handle to the reserved User String and a <see cref="System.Reflection.Metadata.Blob" /> representing the entire User String blob (including its length and terminal character).
 				///
 				/// Handle may be used in <see cref="M:System.Reflection.Metadata.Ecma335.InstructionEncoder.LoadString(System.Reflection.Metadata.UserStringHandle)" />.
 				/// Use <see cref="M:System.Reflection.Metadata.BlobWriter.WriteUserString(System.String)" /> to fill in the blob content.
 				/// </returns>
-				/// <exception cref="T:System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="length" /> is negative.</exception>
+				/// <exception cref="System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="length" /> is negative.</exception>
 				public ReservedBlob<UserStringHandle> ReserveUserString(int length)
 				{
 					if (length < 0)
@@ -27231,8 +27231,8 @@ namespace System.Reflection
 				/// Handle to the added or existing string.
 				/// May be used in <see cref="M:System.Reflection.Metadata.Ecma335.InstructionEncoder.LoadString(System.Reflection.Metadata.UserStringHandle)" />.
 				/// </returns>
-				/// <exception cref="T:System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="value" /> is null.</exception>
+				/// <exception cref="System.Reflection.Metadata.ImageFormatLimitationException">The remaining space on the heap is too small to fit the string.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="value" /> is null.</exception>
 				public UserStringHandle GetOrAddUserString(string value)
 				{
 					if (value == null)
@@ -27349,8 +27349,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the size of a row in the specified table.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="tableIndex" /> is not a valid table index.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="tableIndex" /> is not a valid table index.</exception>
 				public static int GetTableRowSize(this MetadataReader reader, TableIndex tableIndex)
 				{
 					if (reader == null)
@@ -27419,8 +27419,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the offset from the start of metadata to the specified table.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="tableIndex" /> is not a valid table index.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="tableIndex" /> is not a valid table index.</exception>
 				public unsafe static int GetTableMetadataOffset(this MetadataReader reader, TableIndex tableIndex)
 				{
 					if (reader == null)
@@ -27494,8 +27494,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the size of the specified heap.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
 				public static int GetHeapSize(this MetadataReader reader, HeapIndex heapIndex)
 				{
 					if (reader == null)
@@ -27508,8 +27508,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the offset from the start of metadata to the specified heap.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
 				public unsafe static int GetHeapMetadataOffset(this MetadataReader reader, HeapIndex heapIndex)
 				{
 					if (reader == null)
@@ -27522,8 +27522,8 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the size of the specified heap.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="heapIndex" /> is not a valid heap index.</exception>
 				private static System.Reflection.Internal.MemoryBlock GetMetadataBlock(this MetadataReader reader, HeapIndex heapIndex)
 				{
 					return heapIndex switch
@@ -27539,7 +27539,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the a handle to the UserString that follows the given one in the UserString heap or a nil handle if it is the last one.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
 				public static UserStringHandle GetNextHandle(this MetadataReader reader, UserStringHandle handle)
 				{
 					if (reader == null)
@@ -27552,7 +27552,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the a handle to the Blob that follows the given one in the Blob heap or a nil handle if it is the last one.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
 				public static BlobHandle GetNextHandle(this MetadataReader reader, BlobHandle handle)
 				{
 					if (reader == null)
@@ -27565,7 +27565,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Returns the a handle to the String that follows the given one in the String heap or a nil handle if it is the last one.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
 				public static StringHandle GetNextHandle(this MetadataReader reader, StringHandle handle)
 				{
 					if (reader == null)
@@ -27578,7 +27578,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Enumerates entries of EnC log.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
 				public static IEnumerable<EditAndContinueLogEntry> GetEditAndContinueLogEntries(this MetadataReader reader)
 				{
 					if (reader == null)
@@ -27598,7 +27598,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Enumerates entries of EnC map.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="reader" /> is null.</exception>
 				public static IEnumerable<EntityHandle> GetEditAndContinueMapEntries(this MetadataReader reader)
 				{
 					if (reader == null)
@@ -27620,7 +27620,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <returns>
 				/// The resulting sequence corresponds exactly to entries in PropertyMap table,
-				/// i.e. n-th returned <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> is stored in n-th row of PropertyMap.
+				/// i.e. n-th returned <see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> is stored in n-th row of PropertyMap.
 				/// </returns>
 				public static IEnumerable<TypeDefinitionHandle> GetTypesWithProperties(this MetadataReader reader)
 				{
@@ -27643,7 +27643,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <returns>
 				/// The resulting sequence corresponds exactly to entries in EventMap table,
-				/// i.e. n-th returned <see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> is stored in n-th row of EventMap.
+				/// i.e. n-th returned <see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> is stored in n-th row of EventMap.
 				/// </returns>
 				public static IEnumerable<TypeDefinitionHandle> GetTypesWithEvents(this MetadataReader reader)
 				{
@@ -27751,8 +27751,8 @@ namespace System.Reflection
 				/// The validation verifies that entries in the tables were added in order required by the ECMA specification.
 				/// It does not enforce all specification requirements on metadata tables.
 				/// </param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="tablesAndHeaps" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentException"><paramref name="metadataVersion" /> is too long (the number of bytes when UTF8-encoded must be less than 255).</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="tablesAndHeaps" /> is null.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="metadataVersion" /> is too long (the number of bytes when UTF8-encoded must be less than 255).</exception>
 				public MetadataRootBuilder(MetadataBuilder tablesAndHeaps, string? metadataVersion = null, bool suppressValidation = false)
 				{
 					if (tablesAndHeaps == null)
@@ -27771,7 +27771,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Serializes metadata root content into the given <see cref="T:System.Reflection.Metadata.BlobBuilder" />.
+				/// Serializes metadata root content into the given <see cref="System.Reflection.Metadata.BlobBuilder" />.
 				/// </summary>
 				/// <param name="builder">Builder to write to.</param>
 				/// <param name="methodBodyStreamRva">
@@ -27782,10 +27782,10 @@ namespace System.Reflection
 				/// The relative virtual address of the start of the field init data stream.
 				/// Used to calculate the final value of RVA fields of FieldRVA table.
 				/// </param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is null.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="methodBodyStreamRva" /> or <paramref name="mappedFieldDataStreamRva" /> is negative.</exception>
-				/// <exception cref="T:System.InvalidOperationException">
-				/// A metadata table is not ordered as required by the specification and <see cref="P:System.Reflection.Metadata.Ecma335.MetadataRootBuilder.SuppressValidation" /> is false.
+				/// <exception cref="System.ArgumentNullException"><paramref name="builder" /> is null.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="methodBodyStreamRva" /> or <paramref name="mappedFieldDataStreamRva" /> is negative.</exception>
+				/// <exception cref="System.InvalidOperationException">
+				/// A metadata table is not ordered as required by the specification and <see cref="System.Reflection.Metadata.Ecma335.MetadataRootBuilder.SuppressValidation" /> is false.
 				/// </exception>
 				public void Serialize(BlobBuilder builder, int methodBodyStreamRva, int mappedFieldDataStreamRva)
 				{
@@ -28175,7 +28175,7 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" /> in the context of <paramref name="reader" />.
 				/// </summary>
 				/// <returns>One based row number.</returns>
-				/// <exception cref="T:System.ArgumentException">The <paramref name="handle" /> is not a valid metadata table handle.</exception>
+				/// <exception cref="System.ArgumentException">The <paramref name="handle" /> is not a valid metadata table handle.</exception>
 				public static int GetRowNumber(this MetadataReader reader, EntityHandle handle)
 				{
 					if (handle.IsVirtual)
@@ -28190,8 +28190,8 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" /> in the context of <paramref name="reader" />.
 				/// </summary>
 				/// <returns>Zero based offset, or -1 if <paramref name="handle" /> isn't a metadata heap handle.</returns>
-				/// <exception cref="T:System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
-				/// <exception cref="T:System.ArgumentException">The <paramref name="handle" /> is invalid.</exception>
+				/// <exception cref="System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
+				/// <exception cref="System.ArgumentException">The <paramref name="handle" /> is invalid.</exception>
 				public static int GetHeapOffset(this MetadataReader reader, Handle handle)
 				{
 					if (!handle.IsHeapHandle)
@@ -28209,7 +28209,7 @@ namespace System.Reflection
 				/// Returns the metadata token of the specified <paramref name="handle" /> in the context of <paramref name="reader" />.
 				/// </summary>
 				/// <returns>Metadata token.</returns>
-				/// <exception cref="T:System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
+				/// <exception cref="System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
 				public static int GetToken(this MetadataReader reader, EntityHandle handle)
 				{
 					if (handle.IsVirtual)
@@ -28223,11 +28223,11 @@ namespace System.Reflection
 				/// Returns the metadata token of the specified <paramref name="handle" /> in the context of <paramref name="reader" />.
 				/// </summary>
 				/// <returns>Metadata token.</returns>
-				/// <exception cref="T:System.ArgumentException">
+				/// <exception cref="System.ArgumentException">
 				/// Handle represents a metadata entity that doesn't have a token.
 				/// A token can only be retrieved for a metadata table handle or a heap handle of type <see cref="F:System.Reflection.Metadata.HandleKind.UserString" />.
 				/// </exception>
-				/// <exception cref="T:System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
+				/// <exception cref="System.NotSupportedException">The operation is not supported for the specified <paramref name="handle" />.</exception>
 				public static int GetToken(this MetadataReader reader, Handle handle)
 				{
 					if (!handle.IsEntityOrUserStringHandle)
@@ -28261,7 +28261,7 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// One based row number, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+				/// One based row number, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetRowNumber(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.EntityHandle)" />.
 				/// </returns>
 				public static int GetRowNumber(EntityHandle handle)
@@ -28278,7 +28278,7 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// An offset in the corresponding heap, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" /> or <see cref="T:System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
+				/// An offset in the corresponding heap, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" /> or <see cref="System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetHeapOffset(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.Handle)" />.
 				/// </returns>
 				public static int GetHeapOffset(Handle handle)
@@ -28299,7 +28299,7 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// Zero based offset, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" /> or <see cref="T:System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
+				/// Zero based offset, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" /> or <see cref="System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetHeapOffset(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.Handle)" />.
 				/// </returns>
 				public static int GetHeapOffset(BlobHandle handle)
@@ -28340,7 +28340,7 @@ namespace System.Reflection
 				/// to the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// Zero based offset, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" /> or <see cref="T:System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
+				/// Zero based offset, or -1 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" /> or <see cref="System.Reflection.Metadata.Ecma335.MetadataBuilder" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetHeapOffset(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.Handle)" />.
 				/// </returns>
 				public static int GetHeapOffset(StringHandle handle)
@@ -28356,10 +28356,10 @@ namespace System.Reflection
 				/// Returns the metadata token of the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// Metadata token, or 0 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+				/// Metadata token, or 0 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetToken(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.Handle)" />.
 				/// </returns>
-				/// <exception cref="T:System.ArgumentException">
+				/// <exception cref="System.ArgumentException">
 				/// Handle represents a metadata entity that doesn't have a token.
 				/// A token can only be retrieved for a metadata table handle or a heap handle of type <see cref="F:System.Reflection.Metadata.HandleKind.UserString" />.
 				/// </exception>
@@ -28380,7 +28380,7 @@ namespace System.Reflection
 				/// Returns the metadata token of the specified <paramref name="handle" />.
 				/// </summary>
 				/// <returns>
-				/// Metadata token, or 0 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="T:System.Reflection.Metadata.MetadataReader" />.
+				/// Metadata token, or 0 if <paramref name="handle" /> can only be interpreted in a context of a specific <see cref="System.Reflection.Metadata.MetadataReader" />.
 				/// See <see cref="M:System.Reflection.Metadata.Ecma335.MetadataTokens.GetToken(System.Reflection.Metadata.MetadataReader,System.Reflection.Metadata.EntityHandle)" />.
 				/// </returns>
 				public static int GetToken(EntityHandle handle)
@@ -28393,7 +28393,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Gets the <see cref="T:System.Reflection.Metadata.Ecma335.TableIndex" /> of the table corresponding to the specified <see cref="T:System.Reflection.Metadata.HandleKind" />.
+				/// Gets the <see cref="System.Reflection.Metadata.Ecma335.TableIndex" /> of the table corresponding to the specified <see cref="System.Reflection.Metadata.HandleKind" />.
 				/// </summary>
 				/// <param name="type">Handle type.</param>
 				/// <param name="index">Table index.</param>
@@ -28410,7 +28410,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Gets the <see cref="T:System.Reflection.Metadata.Ecma335.HeapIndex" /> of the heap corresponding to the specified <see cref="T:System.Reflection.Metadata.HandleKind" />.
+				/// Gets the <see cref="System.Reflection.Metadata.Ecma335.HeapIndex" /> of the heap corresponding to the specified <see cref="System.Reflection.Metadata.HandleKind" />.
 				/// </summary>
 				/// <param name="type">Handle type.</param>
 				/// <param name="index">Heap index.</param>
@@ -28441,7 +28441,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Creates a handle from a token value.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentException">
+				/// <exception cref="System.ArgumentException">
 				/// <paramref name="token" /> is not a valid metadata token.
 				/// It must encode a metadata table entity or an offset in <see cref="F:System.Reflection.Metadata.HandleKind.UserString" /> heap.
 				/// </exception>
@@ -28457,7 +28457,7 @@ namespace System.Reflection
 				/// <summary>
 				/// Creates an entity handle from a token value.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentException"><paramref name="token" /> is not a valid metadata entity token.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="token" /> is not a valid metadata entity token.</exception>
 				public static EntityHandle EntityHandle(int token)
 				{
 					if (!System.Reflection.Metadata.Ecma335.TokenTypeIds.IsEntityToken((uint)token))
@@ -28468,9 +28468,9 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Creates an <see cref="T:System.Reflection.Metadata.EntityHandle" /> from a token value.
+				/// Creates an <see cref="System.Reflection.Metadata.EntityHandle" /> from a token value.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentException">
+				/// <exception cref="System.ArgumentException">
 				/// <paramref name="tableIndex" /> is not a valid table index.</exception>
 				public static EntityHandle EntityHandle(TableIndex tableIndex, int rowNumber)
 				{
@@ -28478,9 +28478,9 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Creates an <see cref="T:System.Reflection.Metadata.EntityHandle" /> from a token value.
+				/// Creates an <see cref="System.Reflection.Metadata.EntityHandle" /> from a token value.
 				/// </summary>
-				/// <exception cref="T:System.ArgumentException">
+				/// <exception cref="System.ArgumentException">
 				/// <paramref name="tableIndex" /> is not a valid table index.</exception>
 				public static EntityHandle Handle(TableIndex tableIndex, int rowNumber)
 				{
@@ -28820,7 +28820,7 @@ namespace System.Reflection
 				/// <param name="localVariablesSignature">Local variables signature handle.</param>
 				/// <param name="attributes">Attributes.</param>
 				/// <returns>The offset of the encoded body within the method body stream.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="codeSize" />, <paramref name="exceptionRegionCount" />, or <paramref name="maxStack" /> is out of allowed range.
 				/// </exception>
 				public MethodBody AddMethodBody(int codeSize, int maxStack, int exceptionRegionCount, bool hasSmallExceptionRegions, StandaloneSignatureHandle localVariablesSignature, MethodBodyAttributes attributes)
@@ -28839,7 +28839,7 @@ namespace System.Reflection
 				/// <param name="attributes">Attributes.</param>
 				/// <param name="hasDynamicStackAllocation">True if the method allocates from dynamic local memory pool (<c>localloc</c> instruction).</param>
 				/// <returns>The offset of the encoded body within the method body stream.</returns>
-				/// <exception cref="T:System.ArgumentOutOfRangeException">
+				/// <exception cref="System.ArgumentOutOfRangeException">
 				/// <paramref name="codeSize" />, <paramref name="exceptionRegionCount" />, or <paramref name="maxStack" /> is out of allowed range.
 				/// </exception>
 				public MethodBody AddMethodBody(int codeSize, int maxStack = 8, int exceptionRegionCount = 0, bool hasSmallExceptionRegions = true, StandaloneSignatureHandle localVariablesSignature = default(StandaloneSignatureHandle), MethodBodyAttributes attributes = MethodBodyAttributes.InitLocals, bool hasDynamicStackAllocation = false)
@@ -28870,9 +28870,9 @@ namespace System.Reflection
 				/// <param name="localVariablesSignature">Local variables signature handle.</param>
 				/// <param name="attributes">Attributes.</param>
 				/// <returns>The offset of the encoded body within the method body stream.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="instructionEncoder" /> has default value.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="maxStack" /> is out of range [0, <see cref="F:System.UInt16.MaxValue" />].</exception>
-				/// <exception cref="T:System.InvalidOperationException">
+				/// <exception cref="System.ArgumentNullException"><paramref name="instructionEncoder" /> has default value.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="maxStack" /> is out of range [0, <see cref="F:System.UInt16.MaxValue" />].</exception>
+				/// <exception cref="System.InvalidOperationException">
 				/// A label targeted by a branch in the instruction stream has not been marked,
 				/// or the distance between a branch instruction and the target label doesn't fit the size of the instruction operand.
 				/// </exception>
@@ -28891,9 +28891,9 @@ namespace System.Reflection
 				/// <param name="hasDynamicStackAllocation">True if the method allocates from dynamic local memory pool (the IL contains <c>localloc</c> instruction).
 				/// </param>
 				/// <returns>The offset of the encoded body within the method body stream.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="instructionEncoder" /> has default value.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="maxStack" /> is out of range [0, <see cref="F:System.UInt16.MaxValue" />].</exception>
-				/// <exception cref="T:System.InvalidOperationException">
+				/// <exception cref="System.ArgumentNullException"><paramref name="instructionEncoder" /> has default value.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="maxStack" /> is out of range [0, <see cref="F:System.UInt16.MaxValue" />].</exception>
+				/// <exception cref="System.InvalidOperationException">
 				/// A label targeted by a branch in the instruction stream has not been marked,
 				/// or the distance between a branch instruction and the target label doesn't fit the size of the instruction operand.
 				/// </exception>
@@ -29268,7 +29268,7 @@ namespace System.Reflection
 				/// <param name="parameterCount">Number of parameters.</param>
 				/// <param name="returnType">Called first, to encode the return type.</param>
 				/// <param name="parameters">Called second, to encode the actual parameters.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="returnType" /> or <paramref name="parameters" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="returnType" /> or <paramref name="parameters" /> is null.</exception>
 				public void Parameters(int parameterCount, Action<ReturnTypeEncoder> returnType, Action<ParametersEncoder> parameters)
 				{
 					if (returnType == null)
@@ -29526,7 +29526,7 @@ namespace System.Reflection
 				/// <param name="type">Called first, to encode the type of the argument.</param>
 				/// <param name="name">Called second, to encode the name of the field or property.</param>
 				/// <param name="literal">Called third, to encode the literal value of the argument.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="type" />, <paramref name="name" /> or <paramref name="literal" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="type" />, <paramref name="name" /> or <paramref name="literal" /> is null.</exception>
 				public void AddArgument(bool isField, Action<NamedArgumentTypeEncoder> type, Action<NameEncoder> name, Action<LiteralEncoder> literal)
 				{
 					if (type == null)
@@ -30260,7 +30260,7 @@ namespace System.Reflection
 				/// </param>
 				/// <param name="typeSystemRowCounts">
 				/// Row counts of all tables that the associated type-system metadata contain.
-				/// Each slot in the array corresponds to a table (<see cref="T:System.Reflection.Metadata.Ecma335.TableIndex" />).
+				/// Each slot in the array corresponds to a table (<see cref="System.Reflection.Metadata.Ecma335.TableIndex" />).
 				/// The length of the array must be equal to <see cref="F:System.Reflection.Metadata.Ecma335.MetadataTokens.TableCount" />.
 				/// </param>
 				/// <param name="entryPoint">
@@ -30272,7 +30272,7 @@ namespace System.Reflection
 				/// (<see cref="M:System.Reflection.Metadata.BlobContentId.GetTimeBasedProvider" />).
 				/// You must specify a deterministic function to produce a deterministic Portable PDB image.
 				/// </param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="tablesAndHeaps" /> or <paramref name="typeSystemRowCounts" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="tablesAndHeaps" /> or <paramref name="typeSystemRowCounts" /> is null.</exception>
 				public PortablePdbBuilder(MetadataBuilder tablesAndHeaps, System.Collections.Immutable.ImmutableArray<int> typeSystemRowCounts, MethodDefinitionHandle entryPoint, Func<IEnumerable<Blob>, BlobContentId>? idProvider = null)
 				{
 					if (tablesAndHeaps == null)
@@ -30326,11 +30326,11 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Serializes Portable PDB content into the given <see cref="T:System.Reflection.Metadata.BlobBuilder" />.
+				/// Serializes Portable PDB content into the given <see cref="System.Reflection.Metadata.BlobBuilder" />.
 				/// </summary>
 				/// <param name="builder">Builder to write to.</param>
 				/// <returns>The id of the serialized content.</returns>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="builder" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="builder" /> is null.</exception>
 				public BlobContentId Serialize(BlobBuilder builder)
 				{
 					if (builder == null)
@@ -30549,7 +30549,7 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes <c>null</c> literal of type <see cref="T:System.Array" />.
+				/// Encodes <c>null</c> literal of type <see cref="System.Array" />.
 				/// </summary>
 				public void NullArray()
 				{
@@ -30561,22 +30561,22 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="value">
 				/// Constant of type
-				/// <see cref="T:System.Boolean" />,
-				/// <see cref="T:System.Byte" />,
-				/// <see cref="T:System.SByte" />,
-				/// <see cref="T:System.Int16" />,
-				/// <see cref="T:System.UInt16" />,
-				/// <see cref="T:System.Int32" />,
-				/// <see cref="T:System.UInt32" />,
-				/// <see cref="T:System.Int64" />,
-				/// <see cref="T:System.UInt64" />,
-				/// <see cref="T:System.Single" />,
-				/// <see cref="T:System.Double" />,
-				/// <see cref="T:System.Char" /> (encoded as two-byte Unicode character),
-				/// <see cref="T:System.String" /> (encoded as SerString), or
-				/// <see cref="T:System.Enum" /> (encoded as the underlying integer value).
+				/// <see cref="System.Boolean" />,
+				/// <see cref="System.Byte" />,
+				/// <see cref="System.SByte" />,
+				/// <see cref="System.Int16" />,
+				/// <see cref="System.UInt16" />,
+				/// <see cref="System.Int32" />,
+				/// <see cref="System.UInt32" />,
+				/// <see cref="System.Int64" />,
+				/// <see cref="System.UInt64" />,
+				/// <see cref="System.Single" />,
+				/// <see cref="System.Double" />,
+				/// <see cref="System.Char" /> (encoded as two-byte Unicode character),
+				/// <see cref="System.String" /> (encoded as SerString), or
+				/// <see cref="System.Enum" /> (encoded as the underlying integer value).
 				/// </param>
-				/// <exception cref="T:System.ArgumentException">Unexpected constant type.</exception>
+				/// <exception cref="System.ArgumentException">Unexpected constant type.</exception>
 				public void Constant(object? value)
 				{
 					string text = value as string;
@@ -30591,10 +30591,10 @@ namespace System.Reflection
 				}
 
 				/// <summary>
-				/// Encodes literal of type <see cref="T:System.Type" /> (possibly null).
+				/// Encodes literal of type <see cref="System.Type" /> (possibly null).
 				/// </summary>
 				/// <param name="serializedTypeName">The name of the type, or null.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="serializedTypeName" /> is empty.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="serializedTypeName" /> is empty.</exception>
 				public void SystemType(string? serializedTypeName)
 				{
 					if (serializedTypeName != null && serializedTypeName.Length == 0)
@@ -30663,11 +30663,11 @@ namespace System.Reflection
 				/// Decodes a type embedded in a signature and advances the reader past the type.
 				/// </summary>
 				/// <param name="blobReader">The blob reader positioned at the leading SignatureTypeCode</param>
-				/// <param name="allowTypeSpecifications">Allow a <see cref="T:System.Reflection.Metadata.TypeSpecificationHandle" /> to follow a (CLASS | VALUETYPE) in the signature.
+				/// <param name="allowTypeSpecifications">Allow a <see cref="System.Reflection.Metadata.TypeSpecificationHandle" /> to follow a (CLASS | VALUETYPE) in the signature.
 				/// At present, the only context where that would be valid is in a LocalConstantSig as defined by the Portable PDB specification.
 				/// </param>
 				/// <returns>The decoded type.</returns>
-				/// <exception cref="T:System.BadImageFormatException">The reader was not positioned at a valid signature type.</exception>
+				/// <exception cref="System.BadImageFormatException">The reader was not positioned at a valid signature type.</exception>
 				public TType DecodeType(ref BlobReader blobReader, bool allowTypeSpecifications = false)
 				{
 					return DecodeType(ref blobReader, allowTypeSpecifications, blobReader.ReadCompressedInteger());
@@ -30829,7 +30829,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="blobReader">The blob reader positioned at a local variable signature.</param>
 				/// <returns>The local variable types.</returns>
-				/// <exception cref="T:System.BadImageFormatException">The local variable signature is invalid.</exception>
+				/// <exception cref="System.BadImageFormatException">The local variable signature is invalid.</exception>
 				public System.Collections.Immutable.ImmutableArray<TType> DecodeLocalSignature(ref BlobReader blobReader)
 				{
 					SignatureHeader header = blobReader.ReadSignatureHeader();
@@ -31036,7 +31036,7 @@ namespace System.Reflection
 				/// Writes primitive type code.
 				/// </summary>
 				/// <param name="type">Any primitive type code except for <see cref="F:System.Reflection.Metadata.PrimitiveTypeCode.TypedReference" /> and <see cref="F:System.Reflection.Metadata.PrimitiveTypeCode.Void" />.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="type" /> is not valid in this context.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="type" /> is not valid in this context.</exception>
 				public void PrimitiveType(PrimitiveTypeCode type)
 				{
 					switch (type)
@@ -31083,7 +31083,7 @@ namespace System.Reflection
 				/// </summary>
 				/// <param name="elementType">Called first, to encode the type of the element.</param>
 				/// <param name="arrayShape">Called second, to encode the shape of the array.</param>
-				/// <exception cref="T:System.ArgumentNullException"><paramref name="elementType" /> or <paramref name="arrayShape" /> is null.</exception>
+				/// <exception cref="System.ArgumentNullException"><paramref name="elementType" /> or <paramref name="arrayShape" /> is null.</exception>
 				public void Array(Action<SignatureTypeEncoder> elementType, Action<ArrayShapeEncoder> arrayShape)
 				{
 					if (elementType == null)
@@ -31102,9 +31102,9 @@ namespace System.Reflection
 				/// <summary>
 				/// Encodes a reference to a type.
 				/// </summary>
-				/// <param name="type"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />.</param>
+				/// <param name="type"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.TypeReferenceHandle" />.</param>
 				/// <param name="isValueType">True to mark the type as value type, false to mark it as a reference type in the signature.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="type" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="type" /> doesn't have the expected handle kind.</exception>
 				public void Type(EntityHandle type, bool isValueType)
 				{
 					int value = CodedIndex.TypeDefOrRef(type);
@@ -31118,8 +31118,8 @@ namespace System.Reflection
 				/// <param name="convention">Calling convention.</param>
 				/// <param name="attributes">Function pointer attributes.</param>
 				/// <param name="genericParameterCount">Generic parameter count.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="attributes" /> is invalid.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="genericParameterCount" /> is not in range [0, 0xffff].</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="attributes" /> is invalid.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="genericParameterCount" /> is not in range [0, 0xffff].</exception>
 				public MethodSignatureEncoder FunctionPointer(SignatureCallingConvention convention = SignatureCallingConvention.Default, FunctionPointerAttributes attributes = FunctionPointerAttributes.None, int genericParameterCount = 0)
 				{
 					if (attributes != 0 && attributes != FunctionPointerAttributes.HasThis && attributes != FunctionPointerAttributes.HasExplicitThis)
@@ -31142,11 +31142,11 @@ namespace System.Reflection
 				/// <summary>
 				/// Starts a generic instantiation signature.
 				/// </summary>
-				/// <param name="genericType"><see cref="T:System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="T:System.Reflection.Metadata.TypeReferenceHandle" />.</param>
+				/// <param name="genericType"><see cref="System.Reflection.Metadata.TypeDefinitionHandle" /> or <see cref="System.Reflection.Metadata.TypeReferenceHandle" />.</param>
 				/// <param name="genericArgumentCount">Generic argument count.</param>
 				/// <param name="isValueType">True to mark the type as value type, false to mark it as a reference type in the signature.</param>
-				/// <exception cref="T:System.ArgumentException"><paramref name="genericType" /> doesn't have the expected handle kind.</exception>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="genericArgumentCount" /> is not in range [1, 0xffff].</exception>
+				/// <exception cref="System.ArgumentException"><paramref name="genericType" /> doesn't have the expected handle kind.</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="genericArgumentCount" /> is not in range [1, 0xffff].</exception>
 				public GenericTypeArgumentsEncoder GenericInstantiation(EntityHandle genericType, int genericArgumentCount, bool isValueType)
 				{
 					if ((uint)(genericArgumentCount - 1) > 65534u)
@@ -31165,7 +31165,7 @@ namespace System.Reflection
 				/// Encodes a reference to type parameter of a containing generic method.
 				/// </summary>
 				/// <param name="parameterIndex">Parameter index.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="parameterIndex" /> is not in range [0, 0xffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="parameterIndex" /> is not in range [0, 0xffff].</exception>
 				public void GenericMethodTypeParameter(int parameterIndex)
 				{
 					if ((uint)parameterIndex > 65535u)
@@ -31180,7 +31180,7 @@ namespace System.Reflection
 				/// Encodes a reference to type parameter of a containing generic type.
 				/// </summary>
 				/// <param name="parameterIndex">Parameter index.</param>
-				/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="parameterIndex" /> is not in range [0, 0xffff].</exception>
+				/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="parameterIndex" /> is not in range [0, 0xffff].</exception>
 				public void GenericTypeParameter(int parameterIndex)
 				{
 					if ((uint)parameterIndex > 65535u)
@@ -32475,7 +32475,7 @@ namespace System.Reflection
 			/// <param name="version">Entry version.</param>
 			/// <param name="stamp">Entry stamp.</param>
 			/// <param name="data">Data passed to <paramref name="dataSerializer" />.</param>
-			/// <param name="dataSerializer">Serializes data to a <see cref="T:System.Reflection.Metadata.BlobBuilder" />.</param>
+			/// <param name="dataSerializer">Serializes data to a <see cref="System.Reflection.Metadata.BlobBuilder" />.</param>
 			public void AddEntry<TData>(DebugDirectoryEntryType type, uint version, uint stamp, TData data, Action<BlobBuilder, TData> dataSerializer)
 			{
 				if (dataSerializer == null)
@@ -32494,9 +32494,9 @@ namespace System.Reflection
 			/// <param name="pdbPath">Path to the PDB. Shall not be empty.</param>
 			/// <param name="pdbContentId">Unique id of the PDB content.</param>
 			/// <param name="portablePdbVersion">Version of Portable PDB format (e.g. 0x0100 for 1.0), or 0 if the PDB is not portable.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="pdbPath" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException"><paramref name="pdbPath" /> contains NUL character.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="pdbPath" /> is null.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="pdbPath" /> contains NUL character.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
 			public void AddCodeViewEntry(string pdbPath, BlobContentId pdbContentId, ushort portablePdbVersion)
 			{
 				AddCodeViewEntry(pdbPath, pdbContentId, portablePdbVersion, 1);
@@ -32509,10 +32509,10 @@ namespace System.Reflection
 			/// <param name="pdbContentId">Unique id of the PDB content.</param>
 			/// <param name="portablePdbVersion">Version of Portable PDB format (e.g. 0x0100 for 1.0), or 0 if the PDB is not portable.</param>
 			/// <param name="age">Age (iteration) of the PDB. Shall be 1 for Portable PDBs.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="pdbPath" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException"><paramref name="pdbPath" /> contains NUL character.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="age" /> is less than 1.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="pdbPath" /> is null.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="pdbPath" /> contains NUL character.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="age" /> is less than 1.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
 			public void AddCodeViewEntry(string pdbPath, BlobContentId pdbContentId, ushort portablePdbVersion, int age)
 			{
 				if (pdbPath == null)
@@ -32562,8 +32562,8 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="algorithmName">Hash algorithm name (e.g. "SHA256").</param>
 			/// <param name="checksum">Checksum.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="algorithmName" /> or <paramref name="checksum" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentException"><paramref name="algorithmName" /> or <paramref name="checksum" /> is empty.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="algorithmName" /> or <paramref name="checksum" /> is null.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="algorithmName" /> or <paramref name="checksum" /> is empty.</exception>
 			public void AddPdbChecksumEntry(string algorithmName, System.Collections.Immutable.ImmutableArray<byte> checksum)
 			{
 				if (algorithmName == null)
@@ -32635,8 +32635,8 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="debugMetadata">Portable PDB metadata builder.</param>
 			/// <param name="portablePdbVersion">Version of Portable PDB format (e.g. 0x0100 for 1.0).</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="debugMetadata" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="debugMetadata" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="portablePdbVersion" /> is smaller than 0x0100.</exception>
 			public void AddEmbeddedPortablePdbEntry(BlobBuilder debugMetadata, ushort portablePdbVersion)
 			{
 				if (debugMetadata == null)
@@ -33408,14 +33408,14 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="builder">An empty builder to serialize section data to.</param>
 			/// <param name="relativeVirtualAddess">Relative virtual address of the section within the containing PE file.</param>
-			/// <param name="entryPointTokenOrRelativeVirtualAddress">Entry point token or RVA (<see cref="P:System.Reflection.PortableExecutable.CorHeader.EntryPointTokenOrRelativeVirtualAddress" />)</param>
-			/// <param name="corFlags">COR Flags (<see cref="P:System.Reflection.PortableExecutable.CorHeader.Flags" />).</param>
+			/// <param name="entryPointTokenOrRelativeVirtualAddress">Entry point token or RVA (<see cref="System.Reflection.PortableExecutable.CorHeader.EntryPointTokenOrRelativeVirtualAddress" />)</param>
+			/// <param name="corFlags">COR Flags (<see cref="System.Reflection.PortableExecutable.CorHeader.Flags" />).</param>
 			/// <param name="baseAddress">Base address of the PE image.</param>
-			/// <param name="metadataBuilder"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing metadata. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
-			/// <param name="ilBuilder"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing IL stream. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
-			/// <param name="mappedFieldDataBuilderOpt"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing mapped field data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
-			/// <param name="resourceBuilderOpt"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing managed resource data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
-			/// <param name="debugDataBuilderOpt"><see cref="T:System.Reflection.Metadata.BlobBuilder" /> containing PE debug table and data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
+			/// <param name="metadataBuilder"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing metadata. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
+			/// <param name="ilBuilder"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing IL stream. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
+			/// <param name="mappedFieldDataBuilderOpt"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing mapped field data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
+			/// <param name="resourceBuilderOpt"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing managed resource data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
+			/// <param name="debugDataBuilderOpt"><see cref="System.Reflection.Metadata.BlobBuilder" /> containing PE debug table and data. Must be populated with data. Linked into the <paramref name="builder" /> and can't be expanded afterwards.</param>
 			/// <param name="strongNameSignature">Blob reserved in the <paramref name="builder" /> for strong name signature.</param>
 			public void Serialize(BlobBuilder builder, int relativeVirtualAddess, int entryPointTokenOrRelativeVirtualAddress, CorFlags corFlags, ulong baseAddress, BlobBuilder metadataBuilder, BlobBuilder ilBuilder, BlobBuilder? mappedFieldDataBuilderOpt, BlobBuilder? resourceBuilderOpt, BlobBuilder? debugDataBuilderOpt, out Blob strongNameSignature)
 			{
@@ -34282,7 +34282,7 @@ namespace System.Reflection
 			public ulong ImageBase { get; }
 
 			/// <summary>
-			/// The alignment (in bytes) of sections when they are loaded into memory. It must be greater than or equal to <see cref="P:System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
+			/// The alignment (in bytes) of sections when they are loaded into memory. It must be greater than or equal to <see cref="System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
 			/// The default is the page size for the architecture.
 			/// </summary>
 			public int SectionAlignment { get; }
@@ -34290,8 +34290,8 @@ namespace System.Reflection
 			/// <summary>
 			/// The alignment factor (in bytes) that is used to align the raw data of sections in the image file.
 			/// The value should be a power of 2 between 512 and 64K, inclusive. The default is 512.
-			/// If the <see cref="P:System.Reflection.PortableExecutable.PEHeader.SectionAlignment" /> is less than the architecture's page size,
-			/// then <see cref="P:System.Reflection.PortableExecutable.PEHeader.FileAlignment" /> must match <see cref="P:System.Reflection.PortableExecutable.PEHeader.SectionAlignment" />.
+			/// If the <see cref="System.Reflection.PortableExecutable.PEHeader.SectionAlignment" /> is less than the architecture's page size,
+			/// then <see cref="System.Reflection.PortableExecutable.PEHeader.FileAlignment" /> must match <see cref="System.Reflection.PortableExecutable.PEHeader.SectionAlignment" />.
 			/// </summary>
 			public int FileAlignment { get; }
 
@@ -34327,7 +34327,7 @@ namespace System.Reflection
 
 			/// <summary>
 			/// The size (in bytes) of the image, including all headers, as the image is loaded in memory.
-			/// It must be a multiple of <see cref="P:System.Reflection.PortableExecutable.PEHeader.SectionAlignment" />.
+			/// It must be a multiple of <see cref="System.Reflection.PortableExecutable.PEHeader.SectionAlignment" />.
 			/// </summary>
 			public int SizeOfImage { get; }
 
@@ -34349,7 +34349,7 @@ namespace System.Reflection
 			public DllCharacteristics DllCharacteristics { get; }
 
 			/// <summary>
-			/// The size of the stack to reserve. Only <see cref="P:System.Reflection.PortableExecutable.PEHeader.SizeOfStackCommit" /> is committed;
+			/// The size of the stack to reserve. Only <see cref="System.Reflection.PortableExecutable.PEHeader.SizeOfStackCommit" /> is committed;
 			/// the rest is made available one page at a time until the reserve size is reached.
 			/// </summary>
 			public ulong SizeOfStackReserve { get; }
@@ -34360,7 +34360,7 @@ namespace System.Reflection
 			public ulong SizeOfStackCommit { get; }
 
 			/// <summary>
-			/// The size of the local heap space to reserve. Only <see cref="P:System.Reflection.PortableExecutable.PEHeader.SizeOfHeapCommit" /> is committed;
+			/// The size of the local heap space to reserve. Only <see cref="System.Reflection.PortableExecutable.PEHeader.SizeOfHeapCommit" /> is committed;
 			/// the rest is made available one page at a time until the reserve size is reached.
 			/// </summary>
 			public ulong SizeOfHeapReserve { get; }
@@ -34371,7 +34371,7 @@ namespace System.Reflection
 			public ulong SizeOfHeapCommit { get; }
 
 			/// <summary>
-			/// The number of data-directory entries in the remainder of the <see cref="T:System.Reflection.PortableExecutable.PEHeader" />. Each describes a location and size.
+			/// The number of data-directory entries in the remainder of the <see cref="System.Reflection.PortableExecutable.PEHeader" />. Each describes a location and size.
 			/// </summary>
 			public int NumberOfRvaAndSizes { get; }
 
@@ -34596,7 +34596,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Creates PE header builder.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">
+			/// <exception cref="System.ArgumentOutOfRangeException">
 			/// <paramref name="fileAlignment" /> is not power of 2 between 512 and 64K, or
 			/// <paramref name="sectionAlignment" /> not power of 2 or it's less than <paramref name="fileAlignment" />.
 			/// </exception>
@@ -34760,10 +34760,10 @@ namespace System.Reflection
 			/// Reads PE headers from the current location in the stream.
 			/// </summary>
 			/// <param name="peStream">Stream containing PE image starting at the stream's current position and ending at the end of the stream.</param>
-			/// <exception cref="T:System.BadImageFormatException">The data read from stream have invalid format.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
-			/// <exception cref="T:System.ArgumentException">The stream doesn't support seek operations.</exception>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
+			/// <exception cref="System.BadImageFormatException">The data read from stream have invalid format.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.ArgumentException">The stream doesn't support seek operations.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
 			public PEHeaders(Stream peStream)
 				: this(peStream, 0)
 			{
@@ -34774,11 +34774,11 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="peStream">Stream containing PE image of the given size starting at its current position.</param>
 			/// <param name="size">Size of the PE image.</param>
-			/// <exception cref="T:System.BadImageFormatException">The data read from stream have invalid format.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
-			/// <exception cref="T:System.ArgumentException">The stream doesn't support seek operations.</exception>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
+			/// <exception cref="System.BadImageFormatException">The data read from stream have invalid format.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.ArgumentException">The stream doesn't support seek operations.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
 			public PEHeaders(Stream peStream, int size)
 				: this(peStream, size, isLoadedImage: false)
 			{
@@ -34790,11 +34790,11 @@ namespace System.Reflection
 			/// <param name="peStream">Stream containing PE image of the given size starting at its current position.</param>
 			/// <param name="size">Size of the PE image.</param>
 			/// <param name="isLoadedImage">True if the PE image has been loaded into memory by the OS loader.</param>
-			/// <exception cref="T:System.BadImageFormatException">The data read from stream have invalid format.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
-			/// <exception cref="T:System.ArgumentException">The stream doesn't support seek operations.</exception>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
+			/// <exception cref="System.BadImageFormatException">The data read from stream have invalid format.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.ArgumentException">The stream doesn't support seek operations.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
 			public PEHeaders(Stream peStream, int size, bool isLoadedImage)
 			{
 				if (peStream == null)
@@ -35023,7 +35023,7 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Creates <see cref="T:System.Reflection.Metadata.BlobReader" /> for a blob spanning the entire block.
+			/// Creates <see cref="System.Reflection.Metadata.BlobReader" /> for a blob spanning the entire block.
 			/// </summary>
 			public unsafe BlobReader GetReader()
 			{
@@ -35031,9 +35031,9 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Creates <see cref="T:System.Reflection.Metadata.BlobReader" /> for a blob spanning a part of the block.
+			/// Creates <see cref="System.Reflection.Metadata.BlobReader" /> for a blob spanning a part of the block.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Specified range is not contained within the block.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Specified range is not contained within the block.</exception>
 			public unsafe BlobReader GetReader(int start, int length)
 			{
 				System.Reflection.BlobUtilities.ValidateRange(Length, start, length, "length");
@@ -35051,7 +35051,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Reads the content of a part of the block into an array.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Specified range is not contained within the block.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Specified range is not contained within the block.</exception>
 			public System.Collections.Immutable.ImmutableArray<byte> GetContent(int start, int length)
 			{
 				System.Reflection.BlobUtilities.ValidateRange(Length, start, length, "length");
@@ -35093,8 +35093,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Gets the PE headers.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The headers contain invalid data.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.BadImageFormatException">The headers contain invalid data.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
 			public PEHeaders PEHeaders
 			{
 				get
@@ -35111,7 +35111,7 @@ namespace System.Reflection
 			/// Return true if the reader can access the entire PE image.
 			/// </summary>
 			/// <remarks>
-			/// Returns false if the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is constructed from a stream and only part of it is prefetched into memory.
+			/// Returns false if the <see cref="System.Reflection.PortableExecutable.PEReader" /> is constructed from a stream and only part of it is prefetched into memory.
 			/// </remarks>
 			public bool IsEntireImageAvailable
 			{
@@ -35128,8 +35128,8 @@ namespace System.Reflection
 			/// <summary>
 			/// Returns true if the PE image contains CLI metadata.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">The PE headers contain invalid data.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the underlying stream.</exception>
+			/// <exception cref="System.BadImageFormatException">The PE headers contain invalid data.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the underlying stream.</exception>
 			public bool HasMetadata => PEHeaders.MetadataSize > 0;
 
 			/// <summary>
@@ -35137,12 +35137,12 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="peImage">Pointer to the start of the PE image.</param>
 			/// <param name="size">The size of the PE image.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peImage" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peImage" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
 			/// <remarks>
-			/// The memory is owned by the caller and not released on disposal of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
-			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
-			/// The content of the image is not read during the construction of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// The memory is owned by the caller and not released on disposal of the <see cref="System.Reflection.PortableExecutable.PEReader" />.
+			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.PortableExecutable.PEReader" />.
+			/// The content of the image is not read during the construction of the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// </remarks>
 			public unsafe PEReader(byte* peImage, int size)
 				: this(peImage, size, isLoadedImage: false)
@@ -35155,12 +35155,12 @@ namespace System.Reflection
 			/// <param name="peImage">Pointer to the start of the PE image.</param>
 			/// <param name="size">The size of the PE image.</param>
 			/// <param name="isLoadedImage">True if the PE image has been loaded into memory by the OS loader.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peImage" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peImage" /> is <see cref="F:System.IntPtr.Zero" />.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="size" /> is negative.</exception>
 			/// <remarks>
-			/// The memory is owned by the caller and not released on disposal of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
-			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />.
-			/// The content of the image is not read during the construction of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// The memory is owned by the caller and not released on disposal of the <see cref="System.Reflection.PortableExecutable.PEReader" />.
+			/// The caller is responsible for keeping the memory alive and unmodified throughout the lifetime of the <see cref="System.Reflection.PortableExecutable.PEReader" />.
+			/// The content of the image is not read during the construction of the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// </remarks>
 			public unsafe PEReader(byte* peImage, int size, bool isLoadedImage)
 			{
@@ -35180,10 +35180,10 @@ namespace System.Reflection
 			/// Creates a Portable Executable reader over a PE image stored in a stream.
 			/// </summary>
 			/// <param name="peStream">PE image stream.</param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
 			/// <remarks>
-			/// Ownership of the stream is transferred to the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> upon successful validation of constructor arguments. It will be
-			/// disposed by the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
+			/// Ownership of the stream is transferred to the <see cref="System.Reflection.PortableExecutable.PEReader" /> upon successful validation of constructor arguments. It will be
+			/// disposed by the <see cref="System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
 			/// </remarks>
 			public PEReader(Stream peStream)
 				: this(peStream, PEStreamOptions.Default)
@@ -35197,22 +35197,22 @@ namespace System.Reflection
 			/// <param name="options">
 			/// Options specifying how sections of the PE image are read from the stream.
 			///
-			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
-			/// upon successful argument validation. It will be disposed by the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
+			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="System.Reflection.PortableExecutable.PEReader" />
+			/// upon successful argument validation. It will be disposed by the <see cref="System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
 			///
 			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" /> is specified no data
-			/// is read from the stream during the construction of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />. Furthermore, the stream must not be manipulated
-			/// by caller while the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is alive and undisposed.
+			/// is read from the stream during the construction of the <see cref="System.Reflection.PortableExecutable.PEReader" />. Furthermore, the stream must not be manipulated
+			/// by caller while the <see cref="System.Reflection.PortableExecutable.PEReader" /> is alive and undisposed.
 			///
-			/// If <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" />, the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// If <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" />, the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// will have read all of the data requested during construction. As such, if <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is also
-			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// after construction.
 			/// </param>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="options" /> has an invalid value.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream (only when prefetching data).</exception>
-			/// <exception cref="T:System.BadImageFormatException"><see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> is specified and the PE headers of the image are invalid.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peStream" /> is null.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="options" /> has an invalid value.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream (only when prefetching data).</exception>
+			/// <exception cref="System.BadImageFormatException"><see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> is specified and the PE headers of the image are invalid.</exception>
 			public PEReader(Stream peStream, PEStreamOptions options)
 				: this(peStream, options, 0)
 			{
@@ -35226,21 +35226,21 @@ namespace System.Reflection
 			/// <param name="options">
 			/// Options specifying how sections of the PE image are read from the stream.
 			///
-			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
-			/// upon successful argument validation. It will be disposed by the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
+			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified, ownership of the stream is transferred to the <see cref="System.Reflection.PortableExecutable.PEReader" />
+			/// upon successful argument validation. It will be disposed by the <see cref="System.Reflection.PortableExecutable.PEReader" /> and the caller must not manipulate it.
 			///
 			/// Unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" /> is specified no data
-			/// is read from the stream during the construction of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />. Furthermore, the stream must not be manipulated
-			/// by caller while the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is alive and undisposed.
+			/// is read from the stream during the construction of the <see cref="System.Reflection.PortableExecutable.PEReader" />. Furthermore, the stream must not be manipulated
+			/// by caller while the <see cref="System.Reflection.PortableExecutable.PEReader" /> is alive and undisposed.
 			///
-			/// If <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" />, the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// If <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> or <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchEntireImage" />, the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// will have read all of the data requested during construction. As such, if <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is also
-			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// specified, the caller retains full ownership of the stream and is assured that it will not be manipulated by the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// after construction.
 			/// </param>
-			/// <exception cref="T:System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream (only when prefetching data).</exception>
-			/// <exception cref="T:System.BadImageFormatException"><see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> is specified and the PE headers of the image are invalid.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException">Size is negative or extends past the end of the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream (only when prefetching data).</exception>
+			/// <exception cref="System.BadImageFormatException"><see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.PrefetchMetadata" /> is specified and the PE headers of the image are invalid.</exception>
 			public unsafe PEReader(Stream peStream, PEStreamOptions options, int size)
 			{
 				if (peStream == null)
@@ -35295,9 +35295,9 @@ namespace System.Reflection
 			/// </summary>
 			/// <param name="peImage">PE image.</param>
 			/// <remarks>
-			/// The content of the image is not read during the construction of the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
+			/// The content of the image is not read during the construction of the <see cref="System.Reflection.PortableExecutable.PEReader" />
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peImage" /> is null.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peImage" /> is null.</exception>
 			public PEReader(System.Collections.Immutable.ImmutableArray<byte> peImage)
 			{
 				if (peImage.IsDefault)
@@ -35312,8 +35312,8 @@ namespace System.Reflection
 			/// </summary>
 			/// <remarks>
 			/// <see cref="M:System.Reflection.PortableExecutable.PEReader.Dispose" />  can be called multiple times (but not in parallel).
-			/// It is not safe to call <see cref="M:System.Reflection.PortableExecutable.PEReader.Dispose" /> in parallel with any other operation on the <see cref="T:System.Reflection.PortableExecutable.PEReader" />
-			/// or reading from <see cref="T:System.Reflection.PortableExecutable.PEMemoryBlock" />s retrieved from the reader.
+			/// It is not safe to call <see cref="M:System.Reflection.PortableExecutable.PEReader.Dispose" /> in parallel with any other operation on the <see cref="System.Reflection.PortableExecutable.PEReader" />
+			/// or reading from <see cref="System.Reflection.PortableExecutable.PEMemoryBlock" />s retrieved from the reader.
 			/// </remarks>
 			public void Dispose()
 			{
@@ -35350,7 +35350,7 @@ namespace System.Reflection
 				return peImage;
 			}
 
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
 			private void InitializePEHeaders()
 			{
 				System.Reflection.Internal.StreamConstraints constraints;
@@ -35370,7 +35370,7 @@ namespace System.Reflection
 				Interlocked.CompareExchange(ref _lazyPEHeaders, value, null);
 			}
 
-			/// <exception cref="T:System.IO.IOException">Error reading from the stream.</exception>
+			/// <exception cref="System.IO.IOException">Error reading from the stream.</exception>
 			private static PEHeaders ReadPEHeadersNoLock(Stream stream, long imageStartPosition, int imageSize, bool isLoadedImage)
 			{
 				stream.Seek(imageStartPosition, SeekOrigin.Begin);
@@ -35380,7 +35380,7 @@ namespace System.Reflection
 			/// <summary>
 			/// Returns a view of the entire image as a pointer and length.
 			/// </summary>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			private System.Reflection.Internal.AbstractMemoryBlock GetEntireImageBlock()
 			{
 				if (_lazyImageBlock == null)
@@ -35394,8 +35394,8 @@ namespace System.Reflection
 				return _lazyImageBlock;
 			}
 
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image doesn't have metadata.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image doesn't have metadata.</exception>
 			private System.Reflection.Internal.AbstractMemoryBlock GetMetadataBlock()
 			{
 				if (!HasMetadata)
@@ -35413,8 +35413,8 @@ namespace System.Reflection
 				return _lazyMetadataBlock;
 			}
 
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			private System.Reflection.Internal.AbstractMemoryBlock GetPESectionBlock(int index)
 			{
 				System.Reflection.Internal.MemoryBlockProvider pEImage = GetPEImage();
@@ -35440,9 +35440,9 @@ namespace System.Reflection
 			}
 
 			/// <summary>
-			/// Gets a pointer to and size of the PE image if available (<see cref="P:System.Reflection.PortableExecutable.PEReader.IsEntireImageAvailable" />).
+			/// Gets a pointer to and size of the PE image if available (<see cref="System.Reflection.PortableExecutable.PEReader.IsEntireImageAvailable" />).
 			/// </summary>
-			/// <exception cref="T:System.InvalidOperationException">The entire PE image is not available.</exception>
+			/// <exception cref="System.InvalidOperationException">The entire PE image is not available.</exception>
 			public PEMemoryBlock GetEntireImage()
 			{
 				return new PEMemoryBlock(GetEntireImageBlock());
@@ -35451,9 +35451,9 @@ namespace System.Reflection
 			/// <summary>
 			/// Loads PE section that contains CLI metadata.
 			/// </summary>
-			/// <exception cref="T:System.InvalidOperationException">The PE image doesn't contain metadata (<see cref="P:System.Reflection.PortableExecutable.PEReader.HasMetadata" /> returns false).</exception>
-			/// <exception cref="T:System.BadImageFormatException">The PE headers contain invalid data.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">The PE image doesn't contain metadata (<see cref="System.Reflection.PortableExecutable.PEReader.HasMetadata" /> returns false).</exception>
+			/// <exception cref="System.BadImageFormatException">The PE headers contain invalid data.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
 			public PEMemoryBlock GetMetadata()
 			{
 				return new PEMemoryBlock(GetMetadataBlock());
@@ -35467,10 +35467,10 @@ namespace System.Reflection
 			/// <returns>
 			/// An empty block if <paramref name="relativeVirtualAddress" /> doesn't represent a location in any of the PE sections of this PE image.
 			/// </returns>
-			/// <exception cref="T:System.BadImageFormatException">The PE headers contain invalid data.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
-			/// <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="relativeVirtualAddress" /> is negative.</exception>
+			/// <exception cref="System.BadImageFormatException">The PE headers contain invalid data.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.ArgumentOutOfRangeException"><paramref name="relativeVirtualAddress" /> is negative.</exception>
 			public PEMemoryBlock GetSectionData(int relativeVirtualAddress)
 			{
 				if (relativeVirtualAddress < 0)
@@ -35498,8 +35498,8 @@ namespace System.Reflection
 			/// <returns>
 			/// An empty block if no section of the given <paramref name="sectionName" /> exists in this PE image.
 			/// </returns>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="sectionName" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="sectionName" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			public PEMemoryBlock GetSectionData(string sectionName)
 			{
 				if (sectionName == null)
@@ -35517,9 +35517,9 @@ namespace System.Reflection
 			/// <summary>
 			/// Reads all Debug Directory table entries.
 			/// </summary>
-			/// <exception cref="T:System.BadImageFormatException">Bad format of the entry.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.BadImageFormatException">Bad format of the entry.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			public System.Collections.Immutable.ImmutableArray<DebugDirectoryEntry> ReadDebugDirectory()
 			{
 				DirectoryEntry debugTableDirectory = PEHeaders.PEHeader.DebugTableDirectory;
@@ -35570,10 +35570,10 @@ namespace System.Reflection
 			/// <summary>
 			/// Reads the data pointed to by the specified Debug Directory entry and interprets them as CodeView.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentException"><paramref name="entry" /> is not a CodeView entry.</exception>
-			/// <exception cref="T:System.BadImageFormatException">Bad format of the data.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="entry" /> is not a CodeView entry.</exception>
+			/// <exception cref="System.BadImageFormatException">Bad format of the data.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			public CodeViewDebugDirectoryData ReadCodeViewDebugDirectoryData(DebugDirectoryEntry entry)
 			{
 				if (entry.Type != DebugDirectoryEntryType.CodeView)
@@ -35600,10 +35600,10 @@ namespace System.Reflection
 			/// <summary>
 			/// Reads the data pointed to by the specified Debug Directory entry and interprets them as PDB Checksum entry.
 			/// </summary>
-			/// <exception cref="T:System.ArgumentException"><paramref name="entry" /> is not a PDB Checksum entry.</exception>
-			/// <exception cref="T:System.BadImageFormatException">Bad format of the data.</exception>
-			/// <exception cref="T:System.IO.IOException">IO error while reading from the underlying stream.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="entry" /> is not a PDB Checksum entry.</exception>
+			/// <exception cref="System.BadImageFormatException">Bad format of the data.</exception>
+			/// <exception cref="System.IO.IOException">IO error while reading from the underlying stream.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			public PdbChecksumDebugDirectoryData ReadPdbChecksumDebugDirectoryData(DebugDirectoryEntry entry)
 			{
 				if (entry.Type != DebugDirectoryEntryType.PdbChecksum)
@@ -35633,14 +35633,14 @@ namespace System.Reflection
 			/// The path to the PE image. The path is used to locate the PDB file located in the directory containing the PE file.
 			/// </param>
 			/// <param name="pdbFileStreamProvider">
-			/// If specified, called to open a <see cref="T:System.IO.Stream" /> for a given file path.
-			/// The provider is expected to either return a readable and seekable <see cref="T:System.IO.Stream" />,
+			/// If specified, called to open a <see cref="System.IO.Stream" /> for a given file path.
+			/// The provider is expected to either return a readable and seekable <see cref="System.IO.Stream" />,
 			/// or <c>null</c> if the target file doesn't exist or should be ignored for some reason.
 			///
-			/// The provider shall throw <see cref="T:System.IO.IOException" /> if it fails to open the file due to an unexpected IO error.
+			/// The provider shall throw <see cref="System.IO.IOException" /> if it fails to open the file due to an unexpected IO error.
 			/// </param>
 			/// <param name="pdbReaderProvider">
-			/// If successful, a new instance of <see cref="T:System.Reflection.Metadata.MetadataReaderProvider" /> to be used to read the Portable PDB,.
+			/// If successful, a new instance of <see cref="System.Reflection.Metadata.MetadataReaderProvider" /> to be used to read the Portable PDB,.
 			/// </param>
 			/// <param name="pdbPath">
 			/// If successful and the PDB is found in a file, the path to the file. Returns <c>null</c> if the PDB is embedded in the PE image itself.
@@ -35658,10 +35658,10 @@ namespace System.Reflection
 			///
 			/// The first PDB that matches the information specified in the Debug Directory is returned.
 			/// </remarks>
-			/// <exception cref="T:System.ArgumentNullException"><paramref name="peImagePath" /> or <paramref name="pdbFileStreamProvider" /> is null.</exception>
-			/// <exception cref="T:System.InvalidOperationException">The stream returned from <paramref name="pdbFileStreamProvider" /> doesn't support read and seek operations.</exception>
-			/// <exception cref="T:System.BadImageFormatException">No matching PDB file is found due to an error: The PE image or the PDB is invalid.</exception>
-			/// <exception cref="T:System.IO.IOException">No matching PDB file is found due to an error: An IO error occurred while reading the PE image or the PDB.</exception>
+			/// <exception cref="System.ArgumentNullException"><paramref name="peImagePath" /> or <paramref name="pdbFileStreamProvider" /> is null.</exception>
+			/// <exception cref="System.InvalidOperationException">The stream returned from <paramref name="pdbFileStreamProvider" /> doesn't support read and seek operations.</exception>
+			/// <exception cref="System.BadImageFormatException">No matching PDB file is found due to an error: The PE image or the PDB is invalid.</exception>
+			/// <exception cref="System.IO.IOException">No matching PDB file is found due to an error: An IO error occurred while reading the PE image or the PDB.</exception>
 			public bool TryOpenAssociatedPortablePdb(string peImagePath, Func<string, Stream?> pdbFileStreamProvider, out MetadataReaderProvider? pdbReaderProvider, out string? pdbPath)
 			{
 				if (peImagePath == null)
@@ -35818,9 +35818,9 @@ namespace System.Reflection
 			/// Provider of a metadata reader reading the embedded Portable PDB image.
 			/// Dispose to release resources allocated for the embedded PDB.
 			/// </returns>
-			/// <exception cref="T:System.ArgumentException"><paramref name="entry" /> is not a <see cref="F:System.Reflection.PortableExecutable.DebugDirectoryEntryType.EmbeddedPortablePdb" /> entry.</exception>
-			/// <exception cref="T:System.BadImageFormatException">Bad format of the data.</exception>
-			/// <exception cref="T:System.InvalidOperationException">PE image not available.</exception>
+			/// <exception cref="System.ArgumentException"><paramref name="entry" /> is not a <see cref="F:System.Reflection.PortableExecutable.DebugDirectoryEntryType.EmbeddedPortablePdb" /> entry.</exception>
+			/// <exception cref="System.BadImageFormatException">Bad format of the data.</exception>
+			/// <exception cref="System.InvalidOperationException">PE image not available.</exception>
 			public MetadataReaderProvider ReadEmbeddedPortablePdbDebugDirectoryData(DebugDirectoryEntry entry)
 			{
 				if (entry.Type != DebugDirectoryEntryType.EmbeddedPortablePdb)
@@ -35907,28 +35907,28 @@ namespace System.Reflection
 		public enum PEStreamOptions
 		{
 			/// <summary>
-			/// By default the stream is disposed when <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is disposed and sections of the PE image are read lazily.
+			/// By default the stream is disposed when <see cref="System.Reflection.PortableExecutable.PEReader" /> is disposed and sections of the PE image are read lazily.
 			/// </summary>
 			Default = 0,
 			/// <summary>
-			/// Keep the stream open when the <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is disposed.
+			/// Keep the stream open when the <see cref="System.Reflection.PortableExecutable.PEReader" /> is disposed.
 			/// </summary>
 			LeaveOpen = 1,
 			/// <summary>
 			/// Reads metadata section into memory right away.
 			/// </summary>
 			/// <remarks>
-			/// Reading from other sections of the file is not allowed (<see cref="T:System.InvalidOperationException" /> is thrown by the <see cref="T:System.Reflection.PortableExecutable.PEReader" />).
-			/// The underlying file may be closed and even deleted after <see cref="T:System.Reflection.PortableExecutable.PEReader" /> is constructed.
+			/// Reading from other sections of the file is not allowed (<see cref="System.InvalidOperationException" /> is thrown by the <see cref="System.Reflection.PortableExecutable.PEReader" />).
+			/// The underlying file may be closed and even deleted after <see cref="System.Reflection.PortableExecutable.PEReader" /> is constructed.
 			///
-			/// <see cref="T:System.Reflection.PortableExecutable.PEReader" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified.
+			/// <see cref="System.Reflection.PortableExecutable.PEReader" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified.
 			/// </remarks>
 			PrefetchMetadata = 2,
 			/// <summary>
 			/// Reads the entire image into memory right away.
 			/// </summary>
 			/// <remarks>
-			/// <see cref="T:System.Reflection.PortableExecutable.PEReader" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified.
+			/// <see cref="System.Reflection.PortableExecutable.PEReader" /> closes the stream automatically by the time the constructor returns unless <see cref="F:System.Reflection.PortableExecutable.PEStreamOptions.LeaveOpen" /> is specified.
 			/// </remarks>
 			PrefetchEntireImage = 4,
 			/// <summary>
@@ -36017,7 +36017,7 @@ namespace System.Reflection
 
 			/// <summary>
 			/// The total size of the section when loaded into memory.
-			/// If this value is greater than <see cref="P:System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" />, the section is zero-padded.
+			/// If this value is greater than <see cref="System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" />, the section is zero-padded.
 			/// This field is valid only for PE images and should be set to zero for object files.
 			/// </summary>
 			public int VirtualSize { get; }
@@ -36032,17 +36032,17 @@ namespace System.Reflection
 
 			/// <summary>
 			/// The size of the section (for object files) or the size of the initialized data on disk (for image files).
-			/// For PE images, this must be a multiple of <see cref="P:System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
-			/// If this is less than <see cref="P:System.Reflection.PortableExecutable.SectionHeader.VirtualSize" />, the remainder of the section is zero-filled.
-			/// Because the <see cref="P:System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" /> field is rounded but the <see cref="P:System.Reflection.PortableExecutable.SectionHeader.VirtualSize" /> field is not,
-			/// it is possible for <see cref="P:System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" /> to be greater than <see cref="P:System.Reflection.PortableExecutable.SectionHeader.VirtualSize" /> as well.
+			/// For PE images, this must be a multiple of <see cref="System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
+			/// If this is less than <see cref="System.Reflection.PortableExecutable.SectionHeader.VirtualSize" />, the remainder of the section is zero-filled.
+			/// Because the <see cref="System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" /> field is rounded but the <see cref="System.Reflection.PortableExecutable.SectionHeader.VirtualSize" /> field is not,
+			/// it is possible for <see cref="System.Reflection.PortableExecutable.SectionHeader.SizeOfRawData" /> to be greater than <see cref="System.Reflection.PortableExecutable.SectionHeader.VirtualSize" /> as well.
 			///  When a section contains only uninitialized data, this field should be zero.
 			/// </summary>
 			public int SizeOfRawData { get; }
 
 			/// <summary>
 			/// The file pointer to the first page of the section within the COFF file.
-			/// For PE images, this must be a multiple of <see cref="P:System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
+			/// For PE images, this must be a multiple of <see cref="System.Reflection.PortableExecutable.PEHeader.FileAlignment" />.
 			/// For object files, the value should be aligned on a 4 byte boundary for best performance.
 			/// When a section contains only uninitialized data, this field should be zero.
 			/// </summary>
