@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFrameworks>net48;net70-windows10.0.19041</TargetFrameworks>
+    <TargetFrameworks>$(DotNetFrameworkIdentifier);$(DotNetCoreWindowsIdentifier)</TargetFrameworks>
     <RootNamespace>MDCFR</RootNamespace>
 	<StartupObject>MDCFR.AsInterfaceValidator</StartupObject>
 	<!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->  

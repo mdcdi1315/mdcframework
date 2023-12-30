@@ -3,21 +3,30 @@
 [Build:MDCFR-DEP_HTTPLIB.csproj]
 # .NET 7 - Windows Release
 # Move the resulting binary to the top-level bin directory.
-[Move:.\bin\Debug\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll]
-[Move:.\bin\Debug\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
-[Move:.\bin\Debug\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml]
-# (For debug builds) Transfer the debug symbols produced too.
-[Move:.\bin\Debug\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.pdb$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.pdb]
-[Move:.\bin\Release\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll]
-[Move:.\bin\Release\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
-[Move:.\bin\Release\net70-windows10.0.19041.0\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml]
+[SetVariable:PathGen$.\bin\Release\net70-windows10.0.19041.0]
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\Release\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml] }
+
 # .NET 7 - Abstract Generic Assembly Release
 # Move the resulting binary to the top-level bin directory.
-[Move:.\bin\Debug\net70\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.dll]
-[Move:.\bin\Debug\net70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
-[Move:.\bin\Debug\net70\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.xml]
+[SetVariable:PathGen$.\bin\Debug\net70]
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.dll] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.deps.json] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.xml] }
 # (For debug builds) Transfer the debug symbols produced too.
-[Move:.\bin\Debug\net70\DEPRECATION_COMPONENTS_HTTPLIB.pdb$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.pdb]
-[Move:.\bin\Release\net70\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.dll]
-[Move:.\bin\Release\net70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.deps.json]
-[Move:.\bin\Release\net70\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.xml]
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.pdb$..\..\bin\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.pdb] }
+[SetVariable:PathGen$.\bin\Release\net70]
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.dll] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.deps.json] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\Release\NET70-NW\DEPRECATION_COMPONENTS_HTTPLIB.xml] }
+
+# ExitScript command does not accept arguments , at least specify the :.
+[SetVariable:PathGen$.\bin\Debug\net70-windows10.0.19041.0]
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.dll$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.dll] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.deps.json$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.deps.json] }
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.xml$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.xml] }
+# (For debug builds) Transfer the debug symbols produced too.
+[IfDirExists:%PathGen%] { [Move:%PathGen%\DEPRECATION_COMPONENTS_HTTPLIB.pdb$..\..\bin\NET70\DEPRECATION_COMPONENTS_HTTPLIB.pdb] }
+# When setting and deleting variables , use the variable name and not inside in %%'s.
+[DeleteVariable:PathGen]

@@ -1,0 +1,15 @@
+
+# Restore and build the System.Resources.Extensions assembly
+[Restore:MDCFR-SYSRESEXT.csproj]
+[Build:MDCFR-SYSRESEXT.csproj]
+# Copy assets to the output directory
+[SetVariable:PathGen$.\bin\Debug\net48]
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.dll$..\..\bin\NET48\System.Resources.Extensions.dll] }
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.xml$..\..\bin\NET48\System.Resources.Extensions.xml] }
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.pdb$..\..\bin\NET48\System.Resources.Extensions.pdb] }
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.targets$..\..\bin\NET48\System.Resources.Extensions.targets] }
+[SetVariable:PathGen$.\bin\Release\net48]
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.dll$..\..\bin\Release\NET48\System.Resources.Extensions.dll] }
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.xml$..\..\bin\Release\NET48\System.Resources.Extensions.xml] }
+[IfDirExists:%PathGen%] { [Copy:%PathGen%\System.Resources.Extensions.targets$..\..\bin\Release\NET48\System.Resources.Extensions.targets] }
+[DeleteVariable:PathGen]

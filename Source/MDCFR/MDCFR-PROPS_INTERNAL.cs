@@ -1,5 +1,7 @@
 ﻿
 // Internal class embedded in MDCFR. This file defines generic assembly information.
+// For all MDCFR projects , this class must exist inside them so as to distinguish the 
+// MDCFR assemblies from normal runtime assemblies.
 
 using System.Runtime.InteropServices;
 
@@ -11,6 +13,17 @@ using System.Runtime.InteropServices;
 [System.Runtime.CompilerServices.CompilationRelaxations(System.Runtime.CompilerServices.CompilationRelaxations.NoStringInterning)]
 internal static class mdcdi1315
 {
+
+    /// <summary>
+    /// Assembly version for .NET .
+    /// </summary>
+    public const System.String AssemblyVersionNetCore = "7.0.8.0";
+
+    /// <summary>
+    /// Assembly version for .NET Framework.
+    /// </summary>
+    public const System.String AssemblyVersionNetFramework = "4.4.0.0";
+
     /// <summary>
     /// An internal string defining the current product.
     /// </summary>
@@ -49,7 +62,7 @@ internal static class mdcdi1315
     /// <summary>
     /// The current version of the MDCFR .
     /// </summary>
-    public const System.String VersionNumber = "1.5.5.080";
+    public const System.String VersionNumber = "1.5.6.010";
 
     /// <summary>
     /// This is the result of the bit-wise combination of <see cref="DllImportSearchPath.AssemblyDirectory"/> and <see cref="DllImportSearchPath.System32"/> enumeration values.

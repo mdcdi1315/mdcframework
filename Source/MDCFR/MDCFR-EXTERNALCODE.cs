@@ -65,7 +65,7 @@ namespace Internal
             {
                 internal static System.Exception CreateMissingMetadataException(System.Type t)
                 {
-                    return new System.Exception();
+                    return new System.Exception($"Error: Could not resolve type {t}.");
                 }
             }
         }
@@ -424,6 +424,7 @@ namespace System
             /// some call sites with jit intrinsic expansions.
             /// Types marked with this attribute may be specially treated by the runtime/compiler.
             /// </summary>
+            [Obsolete("For MDCFR internal use only." , false , DiagnosticId = "MDCFR001")]
             [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Method | AttributeTargets.Constructor | AttributeTargets.Field, Inherited = false)]
             public sealed class IntrinsicAttribute : Attribute { }
 
@@ -924,6 +925,8 @@ namespace System
                     return new ConfiguredCancelableAsyncEnumerable<T>(_enumerable, _continueOnCapturedContext, cancellationToken);
                 }
 
+                /// <summary>Returns an enumerator that iterates asynchronously through the collection.</summary>
+                /// <returns>An enumerator that can be used to iterate asynchronously through the collection.</returns>
                 public Enumerator GetAsyncEnumerator()
                 {
                     return new Enumerator(_enumerable.GetAsyncEnumerator(_cancellationToken), _continueOnCapturedContext);
@@ -1835,8 +1838,10 @@ namespace System
             }
 
             /// <summary>
-            /// [INHERITEDFROMDOTNET7] An attribute that specifies the platform that the assembly ,
-            /// method , class , structure or token can run to.
+            /// [INHERITEDFROMDOTNET7] Indicates that an API is supported for a specified platform or operating system. <br />
+            ///     If a version is specified, the API cannot be called from an earlier version.<br />
+            ///     Multiple attributes can be applied to indicate support on multiple operating
+            ///     systems.
             /// </summary>
             [System.AttributeUsageAttribute(System.AttributeTargets.Assembly | System.AttributeTargets.Class
                 | System.AttributeTargets.Constructor | System.AttributeTargets.Enum
@@ -3032,7 +3037,6 @@ namespace System
         using System.Text;
         using System.Collections;
         using System.Collections.Generic;
-        using System.Diagnostics.CodeAnalysis;
 
         /// <summary>Contains internal volume helpers that are shared between many projects.</summary>
         internal static class DriveInfoInternal
@@ -3311,6 +3315,84 @@ namespace System
             }
         }
 
+        internal sealed class ReadLinesIterator : System.IO.Iterator<string>
+        {
+            private readonly string _path;
+
+            private readonly Encoding _encoding;
+
+            private StreamReader _reader;
+
+            private ReadLinesIterator(string path, Encoding encoding, StreamReader reader)
+            {
+                _path = path;
+                _encoding = encoding;
+                _reader = reader;
+            }
+
+            public override bool MoveNext()
+            {
+                if (_reader != null)
+                {
+                    current = _reader.ReadLine();
+                    if (current != null)
+                    {
+                        return true;
+                    }
+                    Dispose();
+                }
+                return false;
+            }
+
+            protected override System.IO.Iterator<string> Clone()
+            {
+                return CreateIterator(_path, _encoding, _reader);
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                try
+                {
+                    if (disposing && _reader != null)
+                    {
+                        _reader.Dispose();
+                    }
+                }
+                finally
+                {
+                    _reader = null;
+                    base.Dispose(disposing);
+                }
+            }
+
+            internal static System.IO.ReadLinesIterator CreateIterator(string path, Encoding encoding)
+            {
+                return CreateIterator(path, encoding, null);
+            }
+
+            private static System.IO.ReadLinesIterator CreateIterator(string path, Encoding encoding, StreamReader reader)
+            {
+                return new System.IO.ReadLinesIterator(path, encoding, reader ?? new StreamReader(path, encoding));
+            }
+        }
+
+        internal static class TextWriterExtensions
+        {
+            public static void WritePartialString(this TextWriter writer, string value, int offset, int count)
+            {
+                if (offset == 0 && count == value.Length)
+                {
+                    writer.Write(value);
+                    return;
+                }
+                ReadOnlySpan<char> readOnlySpan = value.AsSpan(offset, count);
+                char[] array = System.Buffers.ArrayPool<char>.Shared.Rent(readOnlySpan.Length);
+                readOnlySpan.CopyTo(array);
+                writer.Write(array, 0, readOnlySpan.Length);
+                System.Buffers.ArrayPool<char>.Shared.Return(array);
+            }
+        }
+
         /// <summary>Contains internal path helpers that are shared between many projects.</summary>
         internal static class PathInternal
         {
@@ -3459,7 +3541,7 @@ namespace System
             internal static string RemoveRelativeSegments(string path, int rootLength)
             {
                 System.Span<char> initialBuffer = stackalloc char[260];
-                ValueStringBuilder sb = new ValueStringBuilder(initialBuffer);
+                System.Text.ValueStringBuilder sb = new System.Text.ValueStringBuilder(initialBuffer);
                 if (RemoveRelativeSegments(MemoryExtensions.AsSpan(path), rootLength, ref sb))
                 {
                     path = sb.ToString();
@@ -3475,7 +3557,7 @@ namespace System
             /// <param name="rootLength">The length of the root of the given path</param>
             /// <param name="sb">String builder that will store the result</param>
             /// <returns>"true" if the path was modified</returns>
-            internal static bool RemoveRelativeSegments(System.ReadOnlySpan<char> path, int rootLength, ref ValueStringBuilder sb)
+            internal static bool RemoveRelativeSegments(System.ReadOnlySpan<char> path, int rootLength, ref System.Text.ValueStringBuilder sb)
             {
                 bool flag = false;
                 int num = rootLength;
@@ -3538,7 +3620,7 @@ namespace System
             /// <summary>
             /// Trims one trailing directory separator beyond the root of the path.
             /// </summary>
-            [return: NotNullIfNotNull(nameof(path))]
+            [return: Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(path))]
             internal static string TrimEndingDirectorySeparator(string path)
             {
                 if (!EndsInDirectorySeparator(path) || IsRoot(MemoryExtensions.AsSpan(path)))
@@ -3624,7 +3706,7 @@ namespace System
             /// away from paths during normalization, but if we see such a path at this point it should be
             /// normalized and has retained the final characters. (Typically from one of the *Info classes)
             /// </summary>
-            [return: NotNullIfNotNull(nameof(path))]
+            [return: Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(path))]
             internal static string EnsureExtendedPrefixIfNeeded(string path)
             {
                 if (path != null && (path.Length >= 260 || EndsWithPeriodOrSpace(path)))
@@ -3804,7 +3886,7 @@ namespace System
             ///   3. Doesn't play nice with string logic
             ///   4. Isn't a cross-plat friendly concept/behavior
             /// </remarks>
-            [return: NotNullIfNotNull(nameof(path))]
+            [return: Diagnostics.CodeAnalysis.NotNullIfNotNull(nameof(path))]
             internal static string NormalizeDirectorySeparators(string path)
             {
                 if (string.IsNullOrEmpty(path))
@@ -3825,8 +3907,7 @@ namespace System
                 {
                     return path;
                 }
-                System.Span<char> initialBuffer = stackalloc char[260];
-                ValueStringBuilder valueStringBuilder = new ValueStringBuilder(initialBuffer);
+                Text.ValueStringBuilder valueStringBuilder = new Text.ValueStringBuilder(stackalloc char[260]);
                 int num = 0;
                 if (IsDirectorySeparator(path[num]))
                 {
@@ -3867,248 +3948,6 @@ namespace System
                     }
                 }
                 return true;
-            }
-        }
-
-        internal sealed class ReadLinesIterator : System.IO.Iterator<string>
-        {
-            private readonly string _path;
-
-            private readonly Encoding _encoding;
-
-            private StreamReader _reader;
-
-            private ReadLinesIterator(string path, Encoding encoding, StreamReader reader)
-            {
-                _path = path;
-                _encoding = encoding;
-                _reader = reader;
-            }
-
-            public override bool MoveNext()
-            {
-                if (_reader != null)
-                {
-                    current = _reader.ReadLine();
-                    if (current != null)
-                    {
-                        return true;
-                    }
-                    Dispose();
-                }
-                return false;
-            }
-
-            protected override System.IO.Iterator<string> Clone()
-            {
-                return CreateIterator(_path, _encoding, _reader);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                try
-                {
-                    if (disposing && _reader != null)
-                    {
-                        _reader.Dispose();
-                    }
-                }
-                finally
-                {
-                    _reader = null;
-                    base.Dispose(disposing);
-                }
-            }
-
-            internal static System.IO.ReadLinesIterator CreateIterator(string path, Encoding encoding)
-            {
-                return CreateIterator(path, encoding, null);
-            }
-
-            private static System.IO.ReadLinesIterator CreateIterator(string path, Encoding encoding, StreamReader reader)
-            {
-                return new System.IO.ReadLinesIterator(path, encoding, reader ?? new StreamReader(path, encoding));
-            }
-        }
-
-        /// <summary>
-        /// Provides static methods for converting from Win32 errors codes to exceptions, HRESULTS and error messages.
-        /// </summary>
-        internal static class Win32Marshal
-        {
-            /// <summary>
-            /// Converts, resetting it, the last Win32 error into a corresponding <see cref="T:System.Exception" /> object, optionally
-            /// including the specified path in the error message.
-            /// </summary>
-            internal static Exception GetExceptionForLastWin32Error(string path = "")
-            {
-                return GetExceptionForWin32Error(Marshal.GetLastWin32Error(), path);
-            }
-
-            /// <summary>
-            /// Converts the specified Win32 error into a corresponding <see cref="T:System.Exception" /> object, optionally
-            /// including the specified path in the error message.
-            /// </summary>
-            internal static Exception GetExceptionForWin32Error(int errorCode, string path = "")
-            {
-                switch (errorCode)
-                {
-                    case 2:
-                        return new FileNotFoundException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_FileNotFound : System.SR.Format(MDCFR.Properties.Resources.IO_FileNotFound_FileName, path), path);
-                    case 3:
-                        return new DirectoryNotFoundException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_PathNotFound_NoPathName : System.SR.Format(MDCFR.Properties.Resources.IO_PathNotFound_Path, path));
-                    case 5:
-                        return new UnauthorizedAccessException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.UnauthorizedAccess_IODenied_NoPathName : System.SR.Format(MDCFR.Properties.Resources.UnauthorizedAccess_IODenied_Path, path));
-                    case 183:
-                        if (!string.IsNullOrEmpty(path))
-                        {
-                            return new IOException(System.SR.Format(MDCFR.Properties.Resources.IO_AlreadyExists_Name, path), MakeHRFromErrorCode(errorCode));
-                        }
-                        break;
-                    case 206:
-                        return new PathTooLongException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_PathTooLong : System.SR.Format(MDCFR.Properties.Resources.IO_PathTooLong_Path, path));
-                    case 32:
-                        return new IOException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_SharingViolation_NoFileName : System.SR.Format(MDCFR.Properties.Resources.IO_SharingViolation_File, path), MakeHRFromErrorCode(errorCode));
-                    case 80:
-                        if (!string.IsNullOrEmpty(path))
-                        {
-                            return new IOException(System.SR.Format(MDCFR.Properties.Resources.IO_FileExists_Name, path), MakeHRFromErrorCode(errorCode));
-                        }
-                        break;
-                    case 995:
-                        return new OperationCanceledException();
-                }
-                return new IOException(string.IsNullOrEmpty(path) ? GetMessage(errorCode) : (GetMessage(errorCode) + " : '" + path + "'"), MakeHRFromErrorCode(errorCode));
-            }
-
-            /// <summary>
-            /// If not already an HRESULT, returns an HRESULT for the specified Win32 error code.
-            /// </summary>
-            internal static int MakeHRFromErrorCode(int errorCode)
-            {
-                if ((0xFFFF0000u & errorCode) != 0L)
-                {
-                    return errorCode;
-                }
-                return -2147024896 | errorCode;
-            }
-
-            /// <summary>
-            /// Returns a Win32 error code for the specified HRESULT if it came from FACILITY_WIN32
-            /// If not, returns the HRESULT unchanged
-            /// </summary>
-            internal static int TryMakeWin32ErrorCodeFromHR(int hr)
-            {
-                if ((0xFFFF0000u & hr) == 2147942400u)
-                {
-                    hr &= 0xFFFF;
-                }
-                return hr;
-            }
-
-            /// <summary>
-            /// Returns a string message for the specified Win32 error code.
-            /// </summary>
-            internal static string GetMessage(int errorCode)
-            {
-                return global::Interop.Kernel32.GetMessage(errorCode);
-            }
-        }
-
-        internal static class TextWriterExtensions
-        {
-            public static void WritePartialString(this TextWriter writer, string value, int offset, int count)
-            {
-                if (offset == 0 && count == value.Length)
-                {
-                    writer.Write(value);
-                    return;
-                }
-                ReadOnlySpan<char> readOnlySpan = value.AsSpan(offset, count);
-                char[] array = System.Buffers.ArrayPool<char>.Shared.Rent(readOnlySpan.Length);
-                readOnlySpan.CopyTo(array);
-                writer.Write(array, 0, readOnlySpan.Length);
-                System.Buffers.ArrayPool<char>.Shared.Return(array);
-            }
-        }
-
-        internal sealed unsafe class PinnedBufferMemoryStream : UnmanagedMemoryStream
-        {
-            private readonly byte[] _array;
-            private GCHandle _pinningHandle;
-
-            internal PinnedBufferMemoryStream(byte[] array)
-            {
-                Debug.Assert(array != null, "Array can't be null");
-
-                _array = array;
-                _pinningHandle = GCHandle.Alloc(array, GCHandleType.Pinned);
-                // Now the byte[] is pinned for the lifetime of this instance.
-                // But I also need to get a pointer to that block of memory...
-                int len = array.Length;
-                fixed (byte* ptr = &MemoryMarshal.GetReference((Span<byte>)array))
-                    Initialize(ptr, len, len, FileAccess.Read);
-            }
-
-            ~PinnedBufferMemoryStream()
-            {
-                Dispose(false);
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                if (_pinningHandle.IsAllocated)
-                {
-                    _pinningHandle.Free();
-                }
-
-                base.Dispose(disposing);
-            }
-
-           
-
-        }
-
-        internal static class BinaryWriterExtensions
-        {
-            public static void Write7BitEncodedInt(this BinaryWriter writer, int value)
-            {
-                // Write out an int 7 bits at a time.  The high bit of the byte,
-                // when on, tells reader to continue reading more bytes.
-                uint v = (uint)value;   // support negative numbers
-                while (v >= 0x80)
-                {
-                    writer.Write((byte)(v | 0x80));
-                    v >>= 7;
-                }
-                writer.Write((byte)v);
-            }
-        }
-
-        internal static class BinaryReaderExtensions
-        {
-            public static int Read7BitEncodedInt(this BinaryReader reader)
-            {
-                // Read out an Int32 7 bits at a time.  The high bit
-                // of the byte when on means to continue reading more bytes.
-                int count = 0;
-                int shift = 0;
-                byte b;
-                do
-                {
-                    // Check for a corrupted stream.  Read a max of 5 bytes.
-                    // In a future version, add a DataFormatException.
-                    if (shift == 5 * 7)  // 5 bytes max per Int32, shift += 7
-                    {
-                        throw new FormatException("Bad Encoded 7-Bit Integer encountered.");
-                    }
-
-                    // ReadByte handles end of stream cases for us.
-                    b = reader.ReadByte();
-                    count |= (b & 0x7F) << shift;
-                    shift += 7;
-                } while ((b & 0x80) != 0);
-                return count;
             }
         }
 
@@ -4293,7 +4132,6 @@ namespace System
         }
     }
 
-
     // Reference: https://github.com/dotnet/corefx/blob/48363ac826ccf66fbe31a5dcb1dc2aab9a7dd768/src/Common/src/CoreLib/System/Diagnostics/CodeAnalysis/NullableAttributes.cs
 
     // Licensed to the .NET Foundation under one or more agreements.
@@ -4379,6 +4217,250 @@ namespace System
                 public bool ParameterValue { get; }
             }
     }
+
+    namespace Threading
+    {
+
+        /// <summary>Represents a timer that can have its due time and period changed.</summary>
+        /// <remarks>
+        /// Implementations of <see cref="Change"/>, <see cref="IDisposable.Dispose"/>, and <see cref="IAsyncDisposable.DisposeAsync"/>
+        /// must all be thread-safe such that the timer instance may be accessed concurrently from multiple threads.
+        /// </remarks>
+        public interface ITimer : IDisposable, IAsyncDisposable
+        {
+            /// <summary>Changes the start time and the interval between method invocations for a timer, using <see cref="TimeSpan"/> values to measure time intervals.</summary>
+            /// <param name="dueTime">
+            /// A <see cref="TimeSpan"/> representing the amount of time to delay before invoking the callback method specified when the <see cref="ITimer"/> was constructed.
+            /// Specify <see cref="Timeout.InfiniteTimeSpan"/> to prevent the timer from restarting. Specify <see cref="TimeSpan.Zero"/> to restart the timer immediately.
+            /// </param>
+            /// <param name="period">
+            /// The time interval between invocations of the callback method specified when the Timer was constructed.
+            /// Specify <see cref="Timeout.InfiniteTimeSpan"/> to disable periodic signaling.
+            /// </param>
+            /// <returns><see langword="true"/> if the timer was successfully updated; otherwise, <see langword="false"/>.</returns>
+            /// <exception cref="ArgumentOutOfRangeException">The <paramref name="dueTime"/> or <paramref name="period"/> parameter, in milliseconds, is less than -1 or greater than 4294967294.</exception>
+            /// <remarks>
+            /// It is the responsibility of the implementer of the ITimer interface to ensure thread safety.
+            /// </remarks>
+            bool Change(TimeSpan dueTime, TimeSpan period);
+        }
+    }
+
+#nullable enable
+    /// <summary>Provides an abstraction for time.</summary>
+    public abstract class TimeProvider
+    {
+        /// <summary>
+        /// Gets a <see cref="TimeProvider"/> that provides a clock based on <see cref="DateTimeOffset.UtcNow"/>,
+        /// a time zone based on <see cref="TimeZoneInfo.Local"/>, a high-performance time stamp based on <see cref="Stopwatch"/>,
+        /// and a timer based on <see cref="Threading.Timer"/>.
+        /// </summary>
+        /// <remarks>
+        /// If the <see cref="TimeZoneInfo.Local"/> changes after the object is returned, the change will be reflected in any subsequent operations that retrieve <see cref="GetLocalNow"/>.
+        /// </remarks>
+        public static TimeProvider System { get; } = new SystemTimeProvider();
+
+        /// <summary>
+        /// Initializes the <see cref="TimeProvider"/>.
+        /// </summary>
+        protected TimeProvider() { }
+
+        /// <summary>
+        /// Gets a <see cref="DateTimeOffset"/> value whose date and time are set to the current
+        /// Coordinated Universal Time (UTC) date and time and whose offset is Zero,
+        /// all according to this <see cref="TimeProvider"/>'s notion of time.
+        /// </summary>
+        /// <remarks>The default implementation returns <see cref="DateTimeOffset.UtcNow"/>.</remarks>
+        public virtual DateTimeOffset GetUtcNow() => DateTimeOffset.UtcNow;
+
+        private static readonly long s_minDateTicks = DateTime.MinValue.Ticks;
+        private static readonly long s_maxDateTicks = DateTime.MaxValue.Ticks;
+
+        /// <summary>
+        /// Gets a <see cref="DateTimeOffset"/> value that is set to the current date and time according to this <see cref="TimeProvider"/>'s
+        /// notion of time based on <see cref="GetUtcNow"/>, with the offset set to the <see cref="LocalTimeZone"/>'s offset from Coordinated Universal Time (UTC).
+        /// </summary>
+        public DateTimeOffset GetLocalNow()
+        {
+            DateTimeOffset utcDateTime = GetUtcNow();
+            TimeZoneInfo zoneInfo = LocalTimeZone;
+            if (zoneInfo is null)
+            {
+                throw new InvalidOperationException(MDCFR.Properties.Resources.InvalidOperation_TimeProviderNullLocalTimeZone);
+            }
+            TimeSpan offset = zoneInfo.GetUtcOffset(utcDateTime);
+            if (offset.Ticks is 0)
+            {
+                return utcDateTime;
+            }
+
+            long localTicks = utcDateTime.Ticks + offset.Ticks;
+            if ((ulong)localTicks > (ulong)s_maxDateTicks)
+            {
+                localTicks = localTicks < s_minDateTicks ? s_minDateTicks : s_maxDateTicks;
+            }
+
+            return new DateTimeOffset(localTicks, offset);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="TimeZoneInfo"/> object that represents the local time zone according to this <see cref="TimeProvider"/>'s notion of time.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation returns <see cref="TimeZoneInfo.Local"/>.
+        /// </remarks>
+        public virtual TimeZoneInfo LocalTimeZone => TimeZoneInfo.Local;
+
+        /// <summary>
+        /// Gets the frequency of <see cref="GetTimestamp"/> of high-frequency value per second.
+        /// </summary>
+        /// <remarks>
+        /// The default implementation returns <see cref="Stopwatch.Frequency"/>. For a given TimeProvider instance, the value must be idempotent and remain unchanged.
+        /// </remarks>
+        public virtual long TimestampFrequency => Stopwatch.Frequency;
+
+        /// <summary>
+        /// Gets the current high-frequency value designed to measure small time intervals with high accuracy in the timer mechanism.
+        /// </summary>
+        /// <returns>A long integer representing the high-frequency counter value of the underlying timer mechanism. </returns>
+        /// <remarks>
+        /// The default implementation returns <see cref="Stopwatch.GetTimestamp"/>.
+        /// </remarks>
+        public virtual long GetTimestamp() => Stopwatch.GetTimestamp();
+
+        /// <summary>
+        /// Gets the elapsed time between two timestamps retrieved using <see cref="GetTimestamp"/>.
+        /// </summary>
+        /// <param name="startingTimestamp">The timestamp marking the beginning of the time period.</param>
+        /// <param name="endingTimestamp">The timestamp marking the end of the time period.</param>
+        /// <returns>A <see cref="TimeSpan"/> for the elapsed time between the starting and ending timestamps.</returns>
+        public TimeSpan GetElapsedTime(long startingTimestamp, long endingTimestamp)
+        {
+            long timestampFrequency = TimestampFrequency;
+            if (timestampFrequency <= 0)
+            {
+                throw new InvalidOperationException(MDCFR.Properties.Resources.InvalidOperation_TimeProviderInvalidTimestampFrequency);
+            }
+
+            return new TimeSpan((long)((endingTimestamp - startingTimestamp) * ((double)TimeSpan.TicksPerSecond / timestampFrequency)));
+        }
+
+        /// <summary>
+        /// Gets the elapsed time since the <paramref name="startingTimestamp"/> value retrieved using <see cref="GetTimestamp"/>.
+        /// </summary>
+        /// <param name="startingTimestamp">The timestamp marking the beginning of the time period.</param>
+        /// <returns>A <see cref="TimeSpan"/> for the elapsed time between the starting timestamp and the time of this call.</returns>
+        public TimeSpan GetElapsedTime(long startingTimestamp) => GetElapsedTime(startingTimestamp, GetTimestamp());
+
+        /// <summary>Creates a new <see cref="Threading.ITimer"/> instance, using <see cref="TimeSpan"/> values to measure time intervals.</summary>
+        /// <param name="callback">
+        /// A delegate representing a method to be executed when the timer fires. The method specified for callback should be reentrant,
+        /// as it may be invoked simultaneously on two threads if the timer fires again before or while a previous callback is still being handled.
+        /// </param>
+        /// <param name="state">An object to be passed to the <paramref name="callback"/>. This may be null.</param>
+        /// <param name="dueTime">The amount of time to delay before <paramref name="callback"/> is invoked. Specify <see cref="Threading.Timeout.InfiniteTimeSpan"/> to prevent the timer from starting. Specify <see cref="TimeSpan.Zero"/> to start the timer immediately.</param>
+        /// <param name="period">The time interval between invocations of <paramref name="callback"/>. Specify <see cref="Threading.Timeout.InfiniteTimeSpan"/> to disable periodic signaling.</param>
+        /// <returns>
+        /// The newly created <see cref="Threading.ITimer"/> instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="callback"/> is null.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">The number of milliseconds in the value of <paramref name="dueTime"/> or <paramref name="period"/> is negative and not equal to <see cref="Threading.Timeout.Infinite"/>, or is greater than <see cref="int.MaxValue"/>.</exception>
+        /// <remarks>
+        /// <para>
+        /// The delegate specified by the callback parameter is invoked once after <paramref name="dueTime"/> elapses, and thereafter each time the <paramref name="period"/> time interval elapses.
+        /// </para>
+        /// <para>
+        /// If <paramref name="dueTime"/> is zero, the callback is invoked immediately. If <paramref name="dueTime"/> is -1 milliseconds, <paramref name="callback"/> is not invoked; the timer is disabled,
+        /// but can be re-enabled by calling the <see cref="Threading.ITimer.Change"/> method.
+        /// </para>
+        /// <para>
+        /// If <paramref name="period"/> is 0 or -1 milliseconds and <paramref name="dueTime"/> is positive, <paramref name="callback"/> is invoked once; the periodic behavior of the timer is disabled,
+        /// but can be re-enabled using the <see cref="Threading.ITimer.Change"/> method.
+        /// </para>
+        /// <para>
+        /// The return <see cref="Threading.ITimer"/> instance will be implicitly rooted while the timer is still scheduled.
+        /// </para>
+        /// <para>
+        /// <see cref="CreateTimer"/> captures the <see cref="Threading.ExecutionContext"/> and stores that with the <see cref="Threading.ITimer"/> for use in invoking <paramref name="callback"/>
+        /// each time it's called. That capture can be suppressed with <see cref="Threading.ExecutionContext.SuppressFlow"/>.
+        /// </para>
+        /// </remarks>
+        public virtual Threading.ITimer CreateTimer(Threading.TimerCallback callback, object? state, TimeSpan dueTime, TimeSpan period)
+        {
+            if (callback is null) { throw new ArgumentNullException(nameof(callback)); }
+
+            return new SystemTimeProviderTimer(dueTime, period, callback, state);
+        }
+
+        /// <summary>Thin wrapper for a <see cref="Threading.Timer"/>.</summary>
+        /// <remarks>
+        /// We don't return a TimerQueueTimer directly as it implements IThreadPoolWorkItem and we don't
+        /// want it exposed in a way that user code could directly queue the timer to the thread pool.
+        /// We also use this instead of Timer because CreateTimer needs to return a timer that's implicitly
+        /// rooted while scheduled.
+        /// </remarks>
+        private sealed class SystemTimeProviderTimer : Threading.ITimer
+        {
+            private readonly Threading.Timer _timer;
+
+            public SystemTimeProviderTimer(TimeSpan dueTime, TimeSpan period, Threading.TimerCallback callback, object? state)
+            {
+                // We need to ensure the timer roots itself. Timer created with a duration and period argument
+                // only roots the state object, so to root the timer we need the state object to reference the
+                // timer recursively.
+                var timerState = new TimerState(callback, state);
+                timerState.Timer = _timer = new Threading.Timer(static s =>
+                {
+                    TimerState ts = (TimerState)s!;
+                    ts.Callback(ts.State);
+                }, timerState, dueTime, period);
+            }
+
+            private sealed class TimerState
+            {
+                Threading.TimerCallback TC;
+                System.Object? STE;
+                public TimerState(Threading.TimerCallback callback, object? state) { TC = callback; STE = state;  }
+
+                public Threading.TimerCallback Callback { get { return TC; } }
+                public object? State { get { return STE; } }
+                public System.Threading.Timer? Timer { get; set; }
+            }
+
+            public bool Change(TimeSpan dueTime, TimeSpan period)
+            {
+                try
+                {
+                    return _timer.Change(dueTime, period);
+                }
+                catch (ObjectDisposedException)
+                {
+                    return false;
+                }
+            }
+
+            public void Dispose() => _timer.Dispose();
+
+            public Threading.Tasks.ValueTask DisposeAsync()
+            {
+                _timer.Dispose();
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// Used to create a <see cref="TimeProvider"/> instance returned from <see cref="System"/> and uses the default implementation
+        /// provided by <see cref="TimeProvider"/> which uses <see cref="DateTimeOffset.UtcNow"/>, <see cref="TimeZoneInfo.Local"/>, <see cref="Stopwatch"/>, and <see cref="Threading.Timer"/>.
+        /// </summary>
+        private sealed class SystemTimeProvider : TimeProvider
+        {
+            /// <summary>Initializes the instance.</summary>
+            internal SystemTimeProvider() : base()
+            {
+            }
+        }
+    }
+#nullable disable
 
     internal static class DecimalDecCalc
     {
@@ -4910,33 +4992,327 @@ namespace System
         }
     }
 
-    internal static class MathF
+    /*============================================================
+    **
+    ** Purpose: Some single-precision floating-point math operations
+    **
+    ===========================================================*/
+
+    //The class MathF contains only static members and doesn't require serialization.
+
+    //For most of this implementation for .NET Framework we just defer to System.Math and do a cast internally from single to double.
+    //We do this because it safer and less likely to break people since that is what they are alrady doing. Also, adding in the
+    //extra pinvokes needed to not do this route would probably incur an extra overhead that would be undersired.
+
+    //For any version of .NET Core this just forwards directly to the MathF implementation inside the runtime.
+
+    //There are a few cases where .NET Framework handles things differently than .NET Core does. For example, it returns -0 and +0
+    //when using things like Min/Max, and they count as different values from each other. This is fixed in .NET Core, but since its
+    //inherent in .NET Framework we decided to leave that behavior as is for this BCL.
+
+    /// <summary>Provides constants and static methods for trigonometric, logarithmic, and other common mathematical functions.</summary>
+    public static class MathF
     {
-        public const float PI = 3.1415927f;
+        /// <summary>
+        /// Represents the ratio of the circumference of a circle to its diameter, specified by the constant, p.
+        /// </summary>
+        public const float PI = 3.14159265f;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Abs(float x) { return Math.Abs(x); }
+        /// <summary>
+        /// Represents the natural logarithmic base, specified by the constant, e.
+        /// </summary>
+        public const float E = 2.71828183f;
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Acos(float x) { return (float)Math.Acos(x); }
+        private static float NegativeZero = Int32BitsToSingle(unchecked((int)0x80000000));
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Cos(float x) { return (float)Math.Cos(x); }
+        private static unsafe float Int32BitsToSingle(int value)
+        {
+            return *((float*)&value);
+        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float IEEERemainder(float x, float y) { return (float)Math.IEEERemainder(x, y); }
+        [Diagnostics.Contracts.Pure]
+        private static unsafe bool IsNegative(float f)
+        {
+            return (*(uint*)(&f) & 0x80000000) == 0x80000000;
+        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Pow(float x, float y) { return (float)Math.Pow(x, y); }
+        /// <summary>
+        /// Returns the absolute value of a single-precision floating-point number.
+        /// </summary>
+        /// <param name="x">The number to take the absolute value of.</param>
+        /// <returns>The absolute value of <paramref name="x"/></returns>
+        public static float Abs(float x) => Math.Abs(x);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sin(float x) { return (float)Math.Sin(x); }
+        /// <summary>
+        /// Returns the angle whose cosine is the specified number.
+        /// </summary>
+        /// <param name="x">The number to take the acos of.</param>
+        /// <returns>The acos of <paramref name="x"/></returns>
+        public static float Acos(float x) => (float)Math.Acos(x);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Sqrt(float x) { return (float)Math.Sqrt(x); }
+        /// <summary>
+        /// Returns the angle whose sine is the specified number.
+        /// </summary>
+        /// <param name="x">The number to take the asin of.</param>
+        /// <returns>The asin of <paramref name="x"/></returns>
+        public static float Asin(float x) => (float)Math.Asin(x);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static float Tan(float x) { return (float)Math.Tan(x); }
+        /// <summary>
+        /// Returns the angle whose tangent is the specified number.
+        /// </summary>
+        /// <param name="x">The number to take the atan of.</param>
+        /// <returns>The atan of <paramref name="x"/></returns>
+        public static float Atan(float x) => (float)Math.Atan(x);
+
+        /// <summary>
+        /// Returns the angle whose tangent is the quotient of two specified numbers.
+        /// </summary>
+        /// <param name="y">The first number.</param>
+        /// <param name="x">The second number.</param>
+        /// <returns>The angle whose tangent is the quotient of <paramref name="y"/> and <paramref name="x"/></returns>
+        public static float Atan2(float y, float x) => (float)Math.Atan2(y, x);
+
+        /// <summary>
+        /// Returns the smallest integral value that is greater than or equal to the specified single-precision floating-point number.
+        /// </summary>
+        /// <param name="x">The number to take the ceiling of.</param>
+        /// <returns>The ceiling of <paramref name="x"/></returns>
+        public static float Ceiling(float x) => (float)Math.Ceiling(x);
+
+        /// <summary>
+        /// Returns the cosine of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the cosine of.</param>
+        /// <returns>The cosine of <paramref name="x"/></returns>
+        public static float Cos(float x) => (float)Math.Cos(x);
+
+        /// <summary>
+        /// Returns the hyperbolic cosine of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the hyperbolic cosine of.</param>
+        /// <returns>The hyperbolic cosine of <paramref name="x"/></returns>
+        public static float Cosh(float x) => (float)Math.Cosh(x);
+
+        /// <summary>
+        /// Returns e raised to the specified power.
+        /// </summary>
+        /// <param name="x">The number to raise e to.</param>
+        /// <returns>e raised to the power of <paramref name="x"/></returns>
+        public static float Exp(float x) => (float)Math.Exp(x);
+
+        /// <summary>
+        /// Returns the largest integral value less than or equal to the specified single-precision floating-point number.
+        /// </summary>
+        /// <param name="x">The number to take the floor of.</param>
+        /// <returns>The floor of <paramref name="x"/></returns>
+        public static float Floor(float x) => (float)Math.Floor(x);
+
+        /// <summary>
+        /// Returns the remainder resulting from the division of a specified number by another specified number.
+        /// </summary>
+        /// <param name="x">The numerator</param>
+        /// <param name="y">The denominator</param>
+        /// <returns>The result of dividing <paramref name="x"/> by <paramref name="y"/></returns>
+        public static float IEEERemainder(float x, float y)
+        {
+            if (float.IsNaN(x))
+            {
+                return x; // IEEE 754-2008: NaN payload must be preserved
+            }
+
+            if (float.IsNaN(y))
+            {
+                return y; // IEEE 754-2008: NaN payload must be preserved
+            }
+
+            var regularMod = x % y;
+
+            if (float.IsNaN(regularMod))
+            {
+                return float.NaN;
+            }
+
+            if ((regularMod == 0) && IsNegative(x))
+            {
+                return NegativeZero;
+            }
+
+            var alternativeResult = (regularMod - (Abs(y) * Sign(x)));
+
+            if (Abs(alternativeResult) == Abs(regularMod))
+            {
+                var divisionResult = x / y;
+                var roundedResult = Round(divisionResult);
+
+                if (Abs(roundedResult) > Abs(divisionResult))
+                {
+                    return alternativeResult;
+                }
+                else
+                {
+                    return regularMod;
+                }
+            }
+
+            if (Abs(alternativeResult) < Abs(regularMod))
+            {
+                return alternativeResult;
+            }
+            else
+            {
+                return regularMod;
+            }
+        }
+
+        /// <summary>
+        /// Returns the natural (base e) logarithm of a specified number.
+        /// </summary>
+        /// <param name="x">The number to take the natural log of.</param>
+        /// <returns>The natural log of <paramref name="x"/></returns>
+        public static float Log(float x) => (float)Math.Log(x);
+
+        /// <summary>
+        /// Returns the logarithm of a specified number in a specified base.
+        /// </summary>
+        /// <param name="x">The number to take the log of.</param>
+        /// <param name="y">The base of the log</param>
+        /// <returns>The log of <paramref name="x"/> with base <paramref name="y"/></returns>
+        public static float Log(float x, float y)
+        {
+            if (float.IsNaN(x))
+            {
+                return x; // IEEE 754-2008: NaN payload must be preserved
+            }
+
+            if (float.IsNaN(y))
+            {
+                return y; // IEEE 754-2008: NaN payload must be preserved
+            }
+
+            if (y == 1)
+            {
+                return float.NaN;
+            }
+
+            if ((x != 1) && ((y == 0) || float.IsPositiveInfinity(y)))
+            {
+                return float.NaN;
+            }
+
+            return Log(x) / Log(y);
+        }
+
+        /// <summary>
+        /// Returns the base 10 logarithm of a specified number.
+        /// </summary>
+        /// <param name="x">The number to take the base 10 log of.</param>
+        /// <returns>The base 10 log of <paramref name="x"/></returns>
+        public static float Log10(float x) => (float)Math.Log10(x);
+
+        /// <summary>
+        /// Returns the larger of two single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="x">The first number to compare.</param>
+        /// <param name="y">The second number to compare.</param>
+        /// <returns>The larger of <paramref name="x"/> and <paramref name="y"/></returns>
+        public static float Max(float x, float y) => Math.Max(x, y);
+
+        /// <summary>
+        /// Returns the smaller of two single-precision floating-point numbers.
+        /// </summary>
+        /// <param name="x">The first number to compare.</param>
+        /// <param name="y">The second number to compare.</param>
+        /// <returns>The smaller of <paramref name="x"/> and <paramref name="y"/></returns>
+        public static float Min(float x, float y) => Math.Min(x, y);
+
+        /// <summary>
+        /// Returns a specified number raised to the specified power.
+        /// </summary>
+        /// <param name="x">The base number.</param>
+        /// <param name="y">The specified power.</param>
+        /// <returns><paramref name="x"/> raised to the power of <paramref name="y"/></returns>
+        public static float Pow(float x, float y) => (float)Math.Pow(x, y);
+
+        /// <summary>
+        /// Rounds a single-precision floating-point value to the nearest integral value, and rounds midpoint values to the nearest even number.
+        /// </summary>
+        /// <param name="x">The number to round.</param>
+        /// <returns>The rounded representation of <paramref name="x"/></returns>
+        public static float Round(float x) => (float)Math.Round(x);
+
+        /// <summary>
+        /// Rounds a single-precision floating-point value to a specified number of fractional digits, and rounds midpoint values to the nearest even number.
+        /// </summary>
+        /// <param name="x">The number to round.</param>
+        /// <param name="digits">How many fractional digits to keep.</param>
+        /// <returns>The rounded representation of <paramref name="x"/> with <paramref name="digits"/> fractional digits</returns>
+        public static float Round(float x, int digits) => (float)Math.Round(x, digits);
+
+        /// <summary>
+        /// Rounds a single-precision floating-point value to a specified number of fractional digits using the specified rounding convention.
+        /// </summary>
+        /// <param name="x">The number to round.</param>
+        /// <param name="digits">How many fractional digits to keep.</param>
+        /// <param name="mode">The rounding convention to use.</param>
+        /// <returns>The rounded representation of <paramref name="x"/> with <paramref name="digits"/> fractional digits using <paramref name="mode"/> rounding convention</returns>
+        public static float Round(float x, int digits, MidpointRounding mode) => (float)Math.Round(x, digits, mode);
+
+        /// <summary>
+        /// Rounds a single-precision floating-point value to an integer using the specified rounding convention.
+        /// </summary>
+        /// <param name="x">The number to round.</param>
+        /// <param name="mode">The rounding convention to use.</param>
+        /// <returns>The rounded representation of <paramref name="x"/> using <paramref name="mode"/> rounding convention</returns>
+        public static float Round(float x, MidpointRounding mode) => (float)Math.Round(x, mode);
+
+        /// <summary>
+        /// Returns an integer that indicates the sign of a single-precision floating-point number.
+        /// </summary>
+        /// <param name="x">The number check the sign of.</param>
+        /// <returns>The sign of <paramref name="x"/></returns>
+        public static int Sign(float x) => Math.Sign(x);
+
+        /// <summary>
+        /// Returns the sine of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the sine of.</param>
+        /// <returns>The sine of <paramref name="x"/></returns>
+        public static float Sin(float x) => (float)Math.Sin(x);
+
+        /// <summary>
+        /// Returns the hyperbolic sine of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the hyperbolic sine of.</param>
+        /// <returns>The hyperbolic sine of <paramref name="x"/></returns>
+        public static float Sinh(float x) => (float)Math.Sinh(x);
+
+        /// <summary>
+        /// Returns the square root of a specified number.
+        /// </summary>
+        /// <param name="x">The number to take the square root of.</param>
+        /// <returns>The square root of <paramref name="x"/></returns>
+        public static float Sqrt(float x) => (float)Math.Sqrt(x);
+
+        /// <summary>
+        /// Returns the tangent of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the tangent of.</param>
+        /// <returns>The tangent of <paramref name="x"/></returns>
+        public static float Tan(float x) => (float)Math.Tan(x);
+
+        /// <summary>
+        /// Returns the hyperbolic tangent of the specified angle.
+        /// </summary>
+        /// <param name="x">The angle to take the hyperbolic tangent of.</param>
+        /// <returns>The hyperbolic tangent of <paramref name="x"/></returns>
+        public static float Tanh(float x) => (float)Math.Tanh(x);
+
+        /// <summary>
+        /// Calculates the integral part of a specified single-precision floating-point number.
+        /// </summary>
+        /// <param name="x">The number to truncate.</param>
+        /// <returns>The truncated representation of <paramref name="x"/></returns>
+        public static float Truncate(float x) => (float)Math.Truncate(x);
     }
 
     /// <summary>Provides a mechanism for releasing unmanaged resources asynchronously.</summary>
@@ -5677,6 +6053,93 @@ namespace System
 
     #pragma warning restore CS1591
 
+    namespace IO
+    {
+        /// <summary>
+        /// Provides static methods for converting from Win32 errors codes to exceptions, HRESULTS and error messages.
+        /// </summary>
+        internal static class Win32Marshal
+        {
+            /// <summary>
+            /// Converts, resetting it, the last Win32 error into a corresponding <see cref="T:System.Exception" /> object, optionally
+            /// including the specified path in the error message.
+            /// </summary>
+            internal static Exception GetExceptionForLastWin32Error(string path = "")
+            {
+                return GetExceptionForWin32Error(Marshal.GetLastWin32Error(), path);
+            }
+
+            /// <summary>
+            /// Converts the specified Win32 error into a corresponding <see cref="T:System.Exception" /> object, optionally
+            /// including the specified path in the error message.
+            /// </summary>
+            internal static Exception GetExceptionForWin32Error(int errorCode, string path = "")
+            {
+                switch (errorCode)
+                {
+                    case 2:
+                        return new FileNotFoundException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_FileNotFound : System.SR.Format(MDCFR.Properties.Resources.IO_FileNotFound_FileName, path), path);
+                    case 3:
+                        return new DirectoryNotFoundException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_PathNotFound_NoPathName : System.SR.Format(MDCFR.Properties.Resources.IO_PathNotFound_Path, path));
+                    case 5:
+                        return new UnauthorizedAccessException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.UnauthorizedAccess_IODenied_NoPathName : System.SR.Format(MDCFR.Properties.Resources.UnauthorizedAccess_IODenied_Path, path));
+                    case 183:
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            return new IOException(System.SR.Format(MDCFR.Properties.Resources.IO_AlreadyExists_Name, path), MakeHRFromErrorCode(errorCode));
+                        }
+                        break;
+                    case 206:
+                        return new PathTooLongException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_PathTooLong : System.SR.Format(MDCFR.Properties.Resources.IO_PathTooLong_Path, path));
+                    case 32:
+                        return new IOException(string.IsNullOrEmpty(path) ? MDCFR.Properties.Resources.IO_SharingViolation_NoFileName : System.SR.Format(MDCFR.Properties.Resources.IO_SharingViolation_File, path), MakeHRFromErrorCode(errorCode));
+                    case 80:
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            return new IOException(System.SR.Format(MDCFR.Properties.Resources.IO_FileExists_Name, path), MakeHRFromErrorCode(errorCode));
+                        }
+                        break;
+                    case 995:
+                        return new OperationCanceledException();
+                }
+                return new IOException(string.IsNullOrEmpty(path) ? GetMessage(errorCode) : (GetMessage(errorCode) + " : '" + path + "'"), MakeHRFromErrorCode(errorCode));
+            }
+
+            /// <summary>
+            /// If not already an HRESULT, returns an HRESULT for the specified Win32 error code.
+            /// </summary>
+            internal static int MakeHRFromErrorCode(int errorCode)
+            {
+                if ((0xFFFF0000u & errorCode) != 0L)
+                {
+                    return errorCode;
+                }
+                return -2147024896 | errorCode;
+            }
+
+            /// <summary>
+            /// Returns a Win32 error code for the specified HRESULT if it came from FACILITY_WIN32
+            /// If not, returns the HRESULT unchanged
+            /// </summary>
+            internal static int TryMakeWin32ErrorCodeFromHR(int hr)
+            {
+                if ((0xFFFF0000u & hr) == 2147942400u)
+                {
+                    hr &= 0xFFFF;
+                }
+                return hr;
+            }
+
+            /// <summary>
+            /// Returns a string message for the specified Win32 error code.
+            /// </summary>
+            internal static string GetMessage(int errorCode)
+            {
+                return global::Interop.Kernel32.GetMessage(errorCode);
+            }
+        }
+    }
+
     namespace Runtime.InteropServices
     {
         [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = false)]
@@ -5788,6 +6251,14 @@ internal static partial class Interop
 
         internal const string GlobalizationNative = "System.Globalization.Native";
 
+        internal const string CoreFile_L1 = "api-ms-win-core-file-l1-1-0.dll";
+
+        internal const string Kernel32_L2 = "api-ms-win-core-kernel32-legacy-l1-1-0.dll";
+
+        internal const string ErrorHandling = "api-ms-win-core-errorhandling-l1-1-0.dll";
+
+        internal const string Localization = "api-ms-win-core-localization-l1-2-0.dll";
+
         internal const string MsQuic = "msquic.dll";
 
         internal const string HostPolicy = "hostpolicy.dll";
@@ -5827,6 +6298,60 @@ internal static partial class Interop
     [System.Security.SuppressUnmanagedCodeSecurity]
     internal static partial class Kernel32
     {
+
+        [DllImport(Libraries.Kernel32, BestFitMapping = true, CharSet = CharSet.Unicode, EntryPoint = "FormatMessageW", ExactSpelling = true, SetLastError = true)]
+        private unsafe static extern int FormatMessage(int dwFlags, System.IntPtr lpSource, uint dwMessageId, int dwLanguageId, void* lpBuffer, int nSize, System.IntPtr arguments);
+
+        /// <summary>
+        /// Returns a string message for the specified Win32 error code.
+        /// </summary>
+        internal static string GetMessage(int errorCode) { return GetMessage(errorCode, System.IntPtr.Zero); }
+
+        internal unsafe static string GetMessage(int errorCode, System.IntPtr moduleHandle)
+        {
+            int num = 12800;
+            if (moduleHandle != System.IntPtr.Zero)
+            {
+                num |= 0x800;
+            }
+            System.Span<char> span = stackalloc char[256];
+            fixed (char* lpBuffer = span)
+            {
+                int num2 = FormatMessage(num, moduleHandle, (uint)errorCode, 0, lpBuffer, span.Length, System.IntPtr.Zero);
+                if (num2 > 0)
+                {
+                    return GetAndTrimString(span.Slice(0, num2));
+                }
+            }
+            if (Marshal.GetLastWin32Error() == 122)
+            {
+                System.IntPtr intPtr = default(System.IntPtr);
+                try
+                {
+                    int num3 = FormatMessage(num | 0x100, moduleHandle, (uint)errorCode, 0, &intPtr, 0, System.IntPtr.Zero);
+                    if (num3 > 0)
+                    {
+                        return GetAndTrimString(new System.Span<char>((void*)intPtr, num3));
+                    }
+                }
+                finally
+                {
+                    Marshal.FreeHGlobal(intPtr);
+                }
+            }
+            return $"Unknown error (0x{errorCode:x})";
+        }
+
+        private static string GetAndTrimString(System.Span<char> buffer)
+        {
+            int num = buffer.Length;
+            while (num > 0 && buffer[num - 1] <= ' ')
+            {
+                num--;
+            }
+            return buffer.Slice(0, num).ToString();
+        }
+
         [StructLayout(LayoutKind.Sequential, CharSet = CharSet.Unicode)]
         private struct CPINFOEXW
         {

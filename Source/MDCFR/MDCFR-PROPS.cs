@@ -15,30 +15,30 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyDescriptionAttribute(mdcdi1315.Description)]
 [assembly: AssemblyFileVersionAttribute(mdcdi1315.VersionNumber)]
 [assembly: AssemblyInformationalVersionAttribute($"{mdcdi1315.VersionNumber} Built by: © MDCDI1315.")]
-[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.5.0 Minor 8.0")]
+[assembly: AssemblyProductAttribute($"{mdcdi1315.Product} , Version 1.5.6.0 Pre-Release 1.0")]
 #if NET7_0_OR_GREATER
-    [assembly: AssemblyVersionAttribute("7.0.8.0")]
+    [assembly: AssemblyVersionAttribute(mdcdi1315.AssemblyVersionNetCore)]
 #else
-    [assembly: AssemblyVersionAttribute("4.4.0.0")]
+    [assembly: AssemblyVersionAttribute(mdcdi1315.AssemblyVersionNetFramework)]
 #endif
 [assembly: DefaultDllImportSearchPathsAttribute((DllImportSearchPath) mdcdi1315.DefaultDllImportSearchPathConst)]
 [assembly: AssemblyMetadataAttribute(mdcdi1315.Author , mdcdi1315.AuthorLinkGitHub)]
 [assembly: AssemblyMetadataAttribute("Repository URL" , mdcdi1315.SourceLink)]
 #if DEBUG
-#if NET7_0_OR_GREATER
-            [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Debug Flavor) (Direct-Level Translation Assembly for .NET 7.0)")]
-#else
-            [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Debug Flavor)")]
-#endif
+    #if NET7_0_OR_GREATER
+                [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Debug Flavor) (Direct-Level Translation Assembly for .NET 7.0)")]
+    #else
+                [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Debug Flavor)")]
+    #endif
     [assembly: AssemblyConfigurationAttribute("Debug")]
     [assembly: AssemblyMetadataAttribute("RELEASECHANNEL", "FALSE")]
     [assembly: AssemblyMetadataAttribute("DEBUGCHANNEL", "TRUE")]
 #else
-#if NET7_0_OR_GREATER
-            [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Direct-Level Translation Assembly for .NET 7.0)")]
-#else
-            [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
-#endif
+    #if NET7_0_OR_GREATER
+                [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework (Direct-Level Translation Assembly for .NET 7.0)")]
+    #else
+                [assembly: AssemblyTitleAttribute("\".NET Framework 4.8\" Application Development Framework")]
+    #endif
     [assembly: AssemblyConfigurationAttribute("Release")]
     [assembly: AssemblyMetadataAttribute("RELEASECHANNEL" , "TRUE")]
     [assembly: AssemblyMetadataAttribute("DEBUGCHANNEL" , "FALSE")]
@@ -53,20 +53,21 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTrademark(mdcdi1315.Trademark)]
 [assembly: ComVisibleAttribute(false)]
 [assembly: CLSCompliantAttribute(false)]
+
 #if NET7_0_OR_GREATER
 // This InternalsVisibleTo attribute allows the HTTPLIB deprecated component to access all the types marked
 // within MDCFR as 'internal' ones. This helps us to access some API from MDCFR which is needed back to the 
 // deprecated component.
 [assembly: InternalsVisibleTo(mdcdi1315.DepHttpLibAssemblyName)]
+// Needed for the Native Marshalling types.
+[assembly: DisableRuntimeMarshalling]
 // These type forwards allow the programmer to use the proper .NET 7.0 packages.
-// However , the packages still provided in .NET Framework 4.8. are still needed though
+// However , the packages provided in .NET Framework 4.8. are still needed though
 // because these packages were implemented at first with .NET 6 and later.
 // The type forwards are needed to inform the programmer to add the potiential missing
 // dependency. Many of the NuGet dependencies can be just references in .NET 6 and 
 // later and are provided by the runtime , so no actual package overload is added , that
 // is the case for .NET Framework 4.8.
-[assembly: TypeForwardedTo(typeof(System.Resources.Extensions.DeserializingResourceReader))]
-[assembly: TypeForwardedTo(typeof(System.Resources.Extensions.PreserializedResourceWriter))]
 [assembly: TypeForwardedTo(typeof(System.Numerics.Vector))]
 [assembly: TypeForwardedTo(typeof(System.Numerics.Vector<>))]
 [assembly: TypeForwardedTo(typeof(System.Text.Encodings.Web.HtmlEncoder))]
@@ -410,6 +411,67 @@ using System.Runtime.InteropServices;
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableQueue<>))]
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableSortedDictionary<,>))]
 [assembly: TypeForwardedTo(typeof(System.Collections.Immutable.ImmutableSortedSet<>))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonCommentHandling))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonDocument))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonDocumentOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonElement))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonEncodedText))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonException))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonNamingPolicy))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonProperty))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonReaderOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonReaderState))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonSerializer))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonSerializerDefaults))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonSerializerOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonTokenType))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonValueKind))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.JsonWriterOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Utf8JsonReader))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Utf8JsonWriter))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Nodes.JsonArray))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Nodes.JsonNode))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Nodes.JsonNodeOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Nodes.JsonObject))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Nodes.JsonValue))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.IJsonOnDeserialized))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.IJsonOnDeserializing))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.IJsonOnSerialized))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.IJsonOnSerializing))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonConstructorAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonConverter))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonConverterAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonConverterFactory))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonDerivedTypeAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonExtensionDataAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonIgnoreAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonIgnoreCondition))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonIncludeAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonKnownNamingPolicy))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonNumberHandling))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonNumberHandlingAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonPolymorphicAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonPropertyNameAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonPropertyOrderAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonRequiredAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonSerializableAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonSerializerContext))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonSourceGenerationMode))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonSourceGenerationOptionsAttribute))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonStringEnumConverter))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.JsonUnknownTypeHandling))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.ReferenceHandler))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.ReferenceResolver))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.DefaultJsonTypeInfoResolver))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonDerivedType))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonPolymorphismOptions))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonPropertyInfo))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonTypeInfo))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonTypeInfoKind))]
+[assembly: TypeForwardedTo(typeof(System.Text.Json.Serialization.Metadata.JsonTypeInfoResolver))]
 
 #endif
 //[assembly: TypeForwardedTo(typeof())]

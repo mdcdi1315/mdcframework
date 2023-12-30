@@ -19,9 +19,19 @@
 		<Compile Include="$(MSBuildProjectDirectory)\System.Runtime.CompilerServices.Unsafe.il" />
 	</ItemGroup>
 	
-	<Target Name="Sys_Complete" AfterTargets="AfterBuild" Condition="'$(BuildingForMDCFR)' == 'True'">
+	<Target Name="Sys_Complete_1" AfterTargets="AfterBuild">
+		<Message Importance="normal" Text="Copying XML documentation file..." />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\System.Runtime.CompilerServices.Unsafe.xml" DestinationFolder="$(MSBuildProjectDirectory)\$(OutputPath)" 
+		Retries="2" RetryDelayMilliseconds="300" SkipUnchangedFiles="true" ContinueOnError="false" />
+		<Message Importance="normal" Text="XML documentation file copied sucessfully." />
+	</Target>
+	
+	<Target Name="Sys_Complete" AfterTargets="Sys_Complete_1" Condition="'$(BuildingForMDCFR)' == 'True'">
 		<Message Importance="normal" Text="Completing task..." />
-		<Exec Command="1>nul Copy /y &quot;$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll&quot; &quot;..\MDCFR\Imports\NETFR48\System.Runtime.CompilerServices.Unsafe.dll&quot;" />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\$(OutputPath)\System.Runtime.CompilerServices.Unsafe.dll" DestinationFolder="..\MDCFR\Imports\NETFR48" 
+		Retries="2" RetryDelayMilliseconds="300" SkipUnchangedFiles="true" ContinueOnError="false" />
+		<Copy SourceFiles="$(MSBuildProjectDirectory)\$(OutputPath)\System.Runtime.CompilerServices.Unsafe.xml" DestinationFolder="..\MDCFR\Imports\NETFR48" 
+		Retries="2" RetryDelayMilliseconds="300" SkipUnchangedFiles="true" ContinueOnError="false" />
 		<Message Importance="normal" Text="Done!" />
 	</Target>
 </Project>

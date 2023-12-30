@@ -15,7 +15,21 @@
 	  <!-- Do not add the netX.X folder. Pass the contents immediately to /bin/debug , for example.-->
 	  <!--<AppendTargetFrameworkToOutputPath>False</AppendTargetFrameworkToOutputPath> -->
 	  <!-- Use this value that specifies the path to save the build artifacts. -->
-	  <OutputPath>.\bin\$(Configuration)\</OutputPath>
+	  <OutputPath>bin\$(Configuration)\</OutputPath>
+  </PropertyGroup>
+  
+  <!-- 
+	Provides read-only properties for MDCFR Runtime Configurations. 
+	Notes to public: supplying your own values to these properties passed from
+	command-line overrides these values.
+	Exception is WindowsSDKVersionBuild , which only supplies a value to DotNetCoreWindowsIdentifier.
+	Just make sure to pass up a valid value to DotNetCoreWindowsIdentifier.
+   -->
+  <PropertyGroup Label="Runtime Configurations">
+	<DotNetFrameworkIdentifier Condition="'$(DotNetFrameworkIdentifier)' == ''">net48</DotNetFrameworkIdentifier>
+	<DotNetCoreIdentifier Condition="'$(DotNetCoreIdentifier)' == ''">net70</DotNetCoreIdentifier>
+	<WindowsSDKVersionBuild>10.0.19041.0</WindowsSDKVersionBuild>
+	<DotNetCoreWindowsIdentifier Condition="'$(DotNetCoreWindowsIdentifier)' == ''">net70-windows$(WindowsSDKVersionBuild)</DotNetCoreWindowsIdentifier>
   </PropertyGroup>
 
   <ItemGroup>

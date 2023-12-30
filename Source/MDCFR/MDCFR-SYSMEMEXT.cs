@@ -2346,10 +2346,7 @@ namespace System
     {
         internal static readonly IntPtr StringAdjustment = MeasureStringAdjustment();
 
-        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span)
-        {
-            return span.TrimStart().TrimEnd();
-        }
+        public static ReadOnlySpan<char> Trim(this ReadOnlySpan<char> span) { return span.TrimStart().TrimEnd(); }
 
         public static ReadOnlySpan<char> TrimStart(this ReadOnlySpan<char> span)
         {
@@ -2439,6 +2436,11 @@ namespace System
             return SpanHelpers.IndexOf(ref MemoryMarshal.GetReference(span), value, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified sequence and returns the index of its first occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The sequence to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOf<T>(this Span<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2449,6 +2451,11 @@ namespace System
             return SpanHelpers.IndexOf(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(value), value.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified value and returns the index of its last occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The value to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOf<T>(this Span<T> span, T value) where T : IEquatable<T>
         {
@@ -2463,6 +2470,11 @@ namespace System
             return SpanHelpers.LastIndexOf(ref MemoryMarshal.GetReference(span), value, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified sequence and returns the index of its last occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The sequence to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOf<T>(this Span<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2472,7 +2484,10 @@ namespace System
             }
             return SpanHelpers.LastIndexOf(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(value), value.Length);
         }
-
+        /// <summary>
+        /// Determines whether two sequences are equal by comparing the elements using IEquatable{T}.Equals(T).
+        /// </summary>
+        [Intrinsic] // Unrolled and vectorized for half-constant input
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool SequenceEqual<T>(this Span<T> span, ReadOnlySpan<T> other) where T : IEquatable<T>
         {
@@ -2492,6 +2507,9 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Determines the relative order of the sequences being compared by comparing the elements using IComparable{T}.CompareTo(T).
+        /// </summary>
         public static int SequenceCompareTo<T>(this Span<T> span, ReadOnlySpan<T> other) where T : IComparable<T>
         {
             if (typeof(T) == typeof(byte))
@@ -2505,6 +2523,11 @@ namespace System
             return SpanHelpers.SequenceCompareTo(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(other), other.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified value and returns the index of its first occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The value to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOf<T>(this ReadOnlySpan<T> span, T value) where T : IEquatable<T>
         {
@@ -2519,6 +2542,11 @@ namespace System
             return SpanHelpers.IndexOf(ref MemoryMarshal.GetReference(span), value, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified sequence and returns the index of its first occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The sequence to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOf<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2529,6 +2557,11 @@ namespace System
             return SpanHelpers.IndexOf(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(value), value.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified value and returns the index of its last occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The value to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOf<T>(this ReadOnlySpan<T> span, T value) where T : IEquatable<T>
         {
@@ -2543,6 +2576,11 @@ namespace System
             return SpanHelpers.LastIndexOf(ref MemoryMarshal.GetReference(span), value, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the specified sequence and returns the index of its last occurrence. If not found, returns -1. Values are compared using IEquatable{T}.Equals(T).
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value">The sequence to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOf<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2553,6 +2591,12 @@ namespace System
             return SpanHelpers.LastIndexOf(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(value), value.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this Span<T> span, T value0, T value1) where T : IEquatable<T>
         {
@@ -2563,6 +2607,13 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
+        /// <param name="value2">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this Span<T> span, T value0, T value1, T value2) where T : IEquatable<T>
         {
@@ -2573,6 +2624,11 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, value2, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="values">The set of values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this Span<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
         {
@@ -2583,6 +2639,12 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(values), values.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this ReadOnlySpan<T> span, T value0, T value1) where T : IEquatable<T>
         {
@@ -2593,6 +2655,13 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
+        /// <param name="value2">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this ReadOnlySpan<T> span, T value0, T value1, T value2) where T : IEquatable<T>
         {
@@ -2603,6 +2672,11 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, value2, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the first index of any of the specified values similar to calling IndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="values">The set of values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int IndexOfAny<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
         {
@@ -2613,6 +2687,12 @@ namespace System
             return SpanHelpers.IndexOfAny(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(values), values.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this Span<T> span, T value0, T value1) where T : IEquatable<T>
         {
@@ -2623,6 +2703,13 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
+        /// <param name="value2">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this Span<T> span, T value0, T value1, T value2) where T : IEquatable<T>
         {
@@ -2633,6 +2720,11 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, value2, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="values">The set of values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this Span<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
         {
@@ -2643,6 +2735,12 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(values), values.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this ReadOnlySpan<T> span, T value0, T value1) where T : IEquatable<T>
         {
@@ -2653,6 +2751,13 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="value0">One of the values to search for.</param>
+        /// <param name="value1">One of the values to search for.</param>
+        /// <param name="value2">One of the values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this ReadOnlySpan<T> span, T value0, T value1, T value2) where T : IEquatable<T>
         {
@@ -2663,6 +2768,11 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), value0, value1, value2, span.Length);
         }
 
+        /// <summary>
+        /// Searches for the last index of any of the specified values similar to calling LastIndexOf several times with the logical OR operator. If not found, returns -1.
+        /// </summary>
+        /// <param name="span">The span to search.</param>
+        /// <param name="values">The set of values to search for.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int LastIndexOfAny<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> values) where T : IEquatable<T>
         {
@@ -2673,6 +2783,10 @@ namespace System
             return SpanHelpers.LastIndexOfAny(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(values), values.Length);
         }
 
+        /// <summary>
+        /// Determines whether two sequences are equal by comparing the elements using IEquatable{T}.Equals(T).
+        /// </summary>
+        [Intrinsic] // Unrolled and vectorized for half-constant input
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool SequenceEqual<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other) where T : IEquatable<T>
         {
@@ -2692,6 +2806,9 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Determines the relative order of the sequences being compared by comparing the elements using IComparable{T}.CompareTo(T).
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SequenceCompareTo<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other) where T : IComparable<T>
         {
@@ -2706,6 +2823,10 @@ namespace System
             return SpanHelpers.SequenceCompareTo(ref MemoryMarshal.GetReference(span), span.Length, ref MemoryMarshal.GetReference(other), other.Length);
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence appears at the start of the span.
+        /// </summary>
+        [Intrinsic] // Unrolled and vectorized for half-constant input
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool StartsWith<T>(this Span<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2725,6 +2846,10 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence appears at the start of the span.
+        /// </summary>
+        [Intrinsic] // Unrolled and vectorized for half-constant input
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool StartsWith<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2744,6 +2869,9 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence appears at the end of the span.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EndsWith<T>(this Span<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2764,6 +2892,9 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Determines whether the specified sequence appears at the end of the span.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool EndsWith<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> value) where T : IEquatable<T>
         {
@@ -2784,6 +2915,9 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Reverses the sequence of the elements in the entire span.
+        /// </summary>
         public static void Reverse<T>(this Span<T> span)
         {
             ref T reference = ref MemoryMarshal.GetReference(span);
@@ -2796,15 +2930,44 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Creates a new span over the target array.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this T[] array) { return new Span<T>(array); }
 
+        /// <summary>
+        /// Creates a new Span over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="array">The target array.</param>
+        /// <param name="start">The index at which to begin the Span.</param>
+        /// <param name="length">The number of items in the Span.</param>
+        /// <remarks>Returns default when <paramref name="array"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="array"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;Length).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this T[] array, int start, int length) { return new Span<T>(array, start, length); }
 
+        /// <summary>
+        /// Creates a new span over the portion of the target array segment.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this ArraySegment<T> segment) { return new Span<T>(segment.Array, segment.Offset, segment.Count); }
 
+        /// <summary>
+        /// Creates a new Span over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="segment">The target array.</param>
+        /// <param name="start">The index at which to begin the Span.</param>
+        /// <remarks>Returns default when <paramref name="segment"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="segment"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;segment.Count).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this ArraySegment<T> segment, int start)
         {
@@ -2815,6 +2978,18 @@ namespace System
             return new Span<T>(segment.Array, segment.Offset + start, segment.Count - start);
         }
 
+        /// <summary>
+        /// Creates a new Span over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="segment">The target array.</param>
+        /// <param name="start">The index at which to begin the Span.</param>
+        /// <param name="length">The number of items in the Span.</param>
+        /// <remarks>Returns default when <paramref name="segment"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="segment"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;segment.Count).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Span<T> AsSpan<T>(this ArraySegment<T> segment, int start, int length)
         {
@@ -2829,14 +3004,54 @@ namespace System
             return new Span<T>(segment.Array, segment.Offset + start, length);
         }
 
+        /// <summary>
+        /// Creates a new memory over the target array.
+        /// </summary>
         public static Memory<T> AsMemory<T>(this T[] array) { return new Memory<T>(array); }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="array">The target array.</param>
+        /// <param name="start">The index at which to begin the memory.</param>
+        /// <remarks>Returns default when <paramref name="array"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="array"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;array.Length).
+        /// </exception>
         public static Memory<T> AsMemory<T>(this T[] array, int start) { return new Memory<T>(array, start); }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="array">The target array.</param>
+        /// <param name="start">The index at which to begin the memory.</param>
+        /// <param name="length">The number of items in the memory.</param>
+        /// <remarks>Returns default when <paramref name="array"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="array"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;Length).
+        /// </exception>
         public static Memory<T> AsMemory<T>(this T[] array, int start, int length) { return new Memory<T>(array, start, length); }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array.
+        /// </summary>
         public static Memory<T> AsMemory<T>(this ArraySegment<T> segment) { return new Memory<T>(segment.Array, segment.Offset, segment.Count); }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="segment">The target array.</param>
+        /// <param name="start">The index at which to begin the memory.</param>
+        /// <remarks>Returns <see langword="default" /> when <paramref name="segment"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="segment"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;segment.Count).
+        /// </exception>
         public static Memory<T> AsMemory<T>(this ArraySegment<T> segment, int start)
         {
             if ((uint)start > segment.Count)
@@ -2846,6 +3061,18 @@ namespace System
             return new Memory<T>(segment.Array, segment.Offset + start, segment.Count - start);
         }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="segment">The target array.</param>
+        /// <param name="start">The index at which to begin the memory.</param>
+        /// <param name="length">The number of items in the memory.</param>
+        /// <remarks>Returns <see langword="default" /> when <paramref name="segment"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="segment"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;segment.Count).
+        /// </exception>
         public static Memory<T> AsMemory<T>(this ArraySegment<T> segment, int start, int length)
         {
             if ((uint)start > segment.Count)
@@ -2859,18 +3086,177 @@ namespace System
             return new Memory<T>(segment.Array, segment.Offset + start, length);
         }
 
+        /// <summary>
+        /// Copies the contents of the array into the span. If the source
+        /// and destinations overlap, this method behaves as if the original values in
+        /// a temporary location before the destination is overwritten.
+        ///
+        ///<param name="source">The array to copy items from.</param>
+        /// <param name="destination">The span to copy items into.</param>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown when the destination Span is shorter than the source array.
+        /// </exception>
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyTo<T>(this T[] source, Span<T> destination) { new ReadOnlySpan<T>(source).CopyTo(destination); }
 
+        /// <summary>
+        /// Copies the contents of the array into the memory. If the source
+        /// and destinations overlap, this method behaves as if the original values are in
+        /// a temporary location before the destination is overwritten.
+        ///
+        ///<param name="source">The array to copy items from.</param>
+        /// <param name="destination">The memory to copy items into.</param>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown when the destination is shorter than the source array.
+        /// </exception>
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void CopyTo<T>(this T[] source, Memory<T> destination) { source.CopyTo(destination.Span); }
 
+        //
+        //  Overlaps
+        //  ========
+        //
+        //  The following methods can be used to determine if two sequences
+        //  overlap in memory.
+        //
+        //  Two sequences overlap if they have positions in common and neither
+        //  is empty. Empty sequences do not overlap with any other sequence.
+        //
+        //  If two sequences overlap, the element offset is the number of
+        //  elements by which the second sequence is offset from the first
+        //  sequence (i.e., second minus first). An exception is thrown if the
+        //  number is not a whole number, which can happen when a sequence of a
+        //  smaller type is cast to a sequence of a larger type with unsafe code
+        //  or NonPortableCast. If the sequences do not overlap, the offset is
+        //  meaningless and arbitrarily set to zero.
+        //
+        //  Implementation
+        //  --------------
+        //
+        //  Implementing this correctly is quite tricky due of two problems:
+        //
+        //  * If the sequences refer to two different objects on the managed
+        //    heap, the garbage collector can move them freely around or change
+        //    their relative order in memory.
+        //
+        //  * The distance between two sequences can be greater than
+        //    int.MaxValue (on a 32-bit system) or long.MaxValue (on a 64-bit
+        //    system).
+        //
+        //  (For simplicity, the following text assumes a 32-bit system, but
+        //  everything also applies to a 64-bit system if every 32 is replaced a
+        //  64.)
+        //
+        //  The first problem is solved by calculating the distance with exactly
+        //  one atomic operation. If the garbage collector happens to move the
+        //  sequences afterwards and the sequences overlapped before, they will
+        //  still overlap after the move and their distance hasn't changed. If
+        //  the sequences did not overlap, the distance can change but the
+        //  sequences still won't overlap.
+        //
+        //  The second problem is solved by making all addresses relative to the
+        //  start of the first sequence and performing all operations in
+        //  unsigned integer arithmetic modulo 2^32.
+        //
+        //  Example
+        //  -------
+        //
+        //  Let's say there are two sequences, x and y. Let
+        //
+        //      ref T xRef = MemoryMarshal.GetReference(x)
+        //      uint xLength = x.Length * Unsafe.SizeOf<T>()
+        //      ref T yRef = MemoryMarshal.GetReference(y)
+        //      uint yLength = y.Length * Unsafe.SizeOf<T>()
+        //
+        //  Visually, the two sequences are located somewhere in the 32-bit
+        //  address space as follows:
+        //
+        //      [----------------------------------------------)                            normal address space
+        //      0                                             2^32
+        //                            [------------------)                                  first sequence
+        //                            xRef            xRef + xLength
+        //              [--------------------------)     .                                  second sequence
+        //              yRef          .         yRef + yLength
+        //              :             .            .     .
+        //              :             .            .     .
+        //                            .            .     .
+        //                            .            .     .
+        //                            .            .     .
+        //                            [----------------------------------------------)      relative address space
+        //                            0            .     .                          2^32
+        //                            [------------------)             :                    first sequence
+        //                            x1           .     x2            :
+        //                            -------------)                   [-------------       second sequence
+        //                                         y2                  y1
+        //
+        //  The idea is to make all addresses relative to xRef: Let x1 be the
+        //  start address of x in this relative address space, x2 the end
+        //  address of x, y1 the start address of y, and y2 the end address of
+        //  y:
+        //
+        //      nuint x1 = 0
+        //      nuint x2 = xLength
+        //      nuint y1 = (nuint)Unsafe.ByteOffset(xRef, yRef)
+        //      nuint y2 = y1 + yLength
+        //
+        //  xRef relative to xRef is 0.
+        //
+        //  x2 is simply x1 + xLength. This cannot overflow.
+        //
+        //  yRef relative to xRef is (yRef - xRef). If (yRef - xRef) is
+        //  negative, casting it to an unsigned 32-bit integer turns it into
+        //  (yRef - xRef + 2^32). So, in the example above, y1 moves to the right
+        //  of x2.
+        //
+        //  y2 is simply y1 + yLength. Note that this can overflow, as in the
+        //  example above, which must be avoided.
+        //
+        //  The two sequences do *not* overlap if y is entirely in the space
+        //  right of x in the relative address space. (It can't be left of it!)
+        //
+        //          (y1 >= x2) && (y2 <= 2^32)
+        //
+        //  Inversely, they do overlap if
+        //
+        //          (y1 < x2) || (y2 > 2^32)
+        //
+        //  After substituting x2 and y2 with their respective definition:
+        //
+        //      == (y1 < xLength) || (y1 + yLength > 2^32)
+        //
+        //  Since yLength can't be greater than the size of the address space,
+        //  the overflow can be avoided as follows:
+        //
+        //      == (y1 < xLength) || (y1 > 2^32 - yLength)
+        //
+        //  However, 2^32 cannot be stored in an unsigned 32-bit integer, so one
+        //  more change is needed to keep doing everything with unsigned 32-bit
+        //  integers:
+        //
+        //      == (y1 < xLength) || (y1 > -yLength)
+        //
+        //  Due to modulo arithmetic, this gives exactly same result *except* if
+        //  yLength is zero, since 2^32 - 0 is 0 and not 2^32. So the case
+        //  y.IsEmpty must be handled separately first.
+        //
+
+        /// <summary>
+        /// Determines whether two sequences overlap in memory.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other) { return ((ReadOnlySpan<T>)span).Overlaps(other); }
 
+        /// <summary>
+        /// Determines whether two sequences overlap in memory and outputs the element offset.
+        /// </summary>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Overlaps<T>(this Span<T> span, ReadOnlySpan<T> other, out int elementOffset) { return ((ReadOnlySpan<T>)span).Overlaps(other, out elementOffset); }
 
+        /// <summary>
+        /// Determines whether two sequences overlap in memory.
+        /// </summary>
         public static bool Overlaps<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other)
         {
             if (span.IsEmpty || other.IsEmpty)
@@ -2893,6 +3279,9 @@ namespace System
             return true;
         }
 
+        /// <summary>
+        /// Determines whether two sequences overlap in memory and outputs the element offset.
+        /// </summary>
         public static bool Overlaps<T>(this ReadOnlySpan<T> span, ReadOnlySpan<T> other, out int elementOffset)
         {
             if (span.IsEmpty || other.IsEmpty) { elementOffset = 0; return false; }
@@ -2914,21 +3303,123 @@ namespace System
             elementOffset = 0; return false;
         }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="Span{T}"/> for a value
+        /// using the specified <see cref="IComparable{T}"/> generic interface.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <param name="span">The sorted <see cref="Span{T}"/> to search.</param>
+        /// <param name="comparable">The <see cref="IComparable{T}"/> to use when comparing.</param>
+        /// <returns>
+        /// The zero-based index of <paramref name="comparable"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="comparable"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="comparable"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="Span{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparable" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T>(this Span<T> span, IComparable<T> comparable) { return span.BinarySearch<T, IComparable<T>>(comparable); }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="Span{T}"/> for a value
+        /// using the specified <typeparamref name="TComparable"/> generic type.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <typeparam name="TComparable">The specific type of <see cref="IComparable{T}"/>.</typeparam>
+        /// <param name="span">The sorted <see cref="Span{T}"/> to search.</param>
+        /// <param name="comparable">The <typeparamref name="TComparable"/> to use when comparing.</param>
+        /// <returns>
+        /// The zero-based index of <paramref name="comparable"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="comparable"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="comparable"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="Span{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparable" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T, TComparable>(this Span<T> span, TComparable comparable) where TComparable : IComparable<T> { return BinarySearch((ReadOnlySpan<T>)span, comparable); }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="Span{T}"/> for the specified <paramref name="value"/>
+        /// using the specified <typeparamref name="TComparer"/> generic type.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <typeparam name="TComparer">The specific type of <see cref="IComparer{T}"/>.</typeparam>
+        /// <param name="span">The sorted <see cref="Span{T}"/> to search.</param>
+        /// <param name="value">The object to locate. The value can be null for reference types.</param>
+        /// <param name="comparer">The <typeparamref name="TComparer"/> to use when comparing.</param>
+        /// /// <returns>
+        /// The zero-based index of <paramref name="value"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="value"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="value"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="Span{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparer" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T, TComparer>(this Span<T> span, T value, TComparer comparer) where TComparer : IComparer<T> { return ((ReadOnlySpan<T>)span).BinarySearch(value, comparer); }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="ReadOnlySpan{T}"/> for a value
+        /// using the specified <see cref="IComparable{T}"/> generic interface.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <param name="span">The sorted <see cref="ReadOnlySpan{T}"/> to search.</param>
+        /// <param name="comparable">The <see cref="IComparable{T}"/> to use when comparing.</param>
+        /// <returns>
+        /// The zero-based index of <paramref name="comparable"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="comparable"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="comparable"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="ReadOnlySpan{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparable" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T>(this ReadOnlySpan<T> span, IComparable<T> comparable) { return BinarySearch<T, IComparable<T>>(span, comparable); }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="ReadOnlySpan{T}"/> for a value
+        /// using the specified <typeparamref name="TComparable"/> generic type.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <typeparam name="TComparable">The specific type of <see cref="IComparable{T}"/>.</typeparam>
+        /// <param name="span">The sorted <see cref="ReadOnlySpan{T}"/> to search.</param>
+        /// <param name="comparable">The <typeparamref name="TComparable"/> to use when comparing.</param>
+        /// <returns>
+        /// The zero-based index of <paramref name="comparable"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="comparable"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="comparable"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="ReadOnlySpan{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparable" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T, TComparable>(this ReadOnlySpan<T> span, TComparable comparable) where TComparable : IComparable<T> { return SpanHelpers.BinarySearch(span, comparable); }
 
+        /// <summary>
+        /// Searches an entire sorted <see cref="ReadOnlySpan{T}"/> for the specified <paramref name="value"/>
+        /// using the specified <typeparamref name="TComparer"/> generic type.
+        /// </summary>
+        /// <typeparam name="T">The element type of the span.</typeparam>
+        /// <typeparam name="TComparer">The specific type of <see cref="IComparer{T}"/>.</typeparam>
+        /// <param name="span">The sorted <see cref="ReadOnlySpan{T}"/> to search.</param>
+        /// <param name="value">The object to locate. The value can be null for reference types.</param>
+        /// <param name="comparer">The <typeparamref name="TComparer"/> to use when comparing.</param>
+        /// /// <returns>
+        /// The zero-based index of <paramref name="value"/> in the sorted <paramref name="span"/>,
+        /// if <paramref name="value"/> is found; otherwise, a negative number that is the bitwise complement
+        /// of the index of the next element that is larger than <paramref name="value"/> or, if there is
+        /// no larger element, the bitwise complement of <see cref="ReadOnlySpan{T}.Length"/>.
+        /// </returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// <paramref name = "comparer" /> is <see langword="null"/> .
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int BinarySearch<T, TComparer>(this ReadOnlySpan<T> span, T value, TComparer comparer) where TComparer : IComparer<T>
         {
@@ -3738,7 +4229,8 @@ namespace System
     /// <remarks>
     /// Like <see cref="Span{T}"/>, <see cref="Memory{T}"/> represents a contiguous region 
     /// of memory. Unlike <see cref="Span{T}"/>, however, <see cref="Memory{T}"/> is not a 
-    /// ref struct. This means that <see cref="Memory{T}"/> can be placed on the managed heap,
+    /// <see langword="ref"/> <see langword="struct"/>. 
+    /// This means that <see cref="Memory{T}"/> can be placed on the managed heap,
     /// whereas <see cref="Span{T}"/> cannot. As a result, the <see cref="Memory{T}"/> 
     /// structure does not have the same restrictions as a <see cref="Span{T}"/> 
     /// instance. In particular:
@@ -4111,6 +4603,10 @@ namespace System
         private static int CombineHashCodes(int h1, int h2, int h3) { return CombineHashCodes(CombineHashCodes(h1, h2), h3); }
     }
 
+    /// <summary>
+    /// Represents a contiguous region of memory, similar to <see cref="ReadOnlySpan{T}"/>.
+    /// Unlike <see cref="ReadOnlySpan{T}"/>, it is not a by<see langword="ref"/>-like type.
+    /// </summary>
     [DebuggerTypeProxy(typeof(MemoryDebugView<>))]
     [DebuggerDisplay("{ToString(),raw}")]
     public readonly struct ReadOnlyMemory<T>
@@ -4123,12 +4619,20 @@ namespace System
 
         internal const int RemoveFlagsBitMask = int.MaxValue;
 
+        /// <summary>
+        /// Returns an empty <see cref="ReadOnlyMemory{T}"/>
+        /// </summary>
         public static ReadOnlyMemory<T> Empty => default(ReadOnlyMemory<T>);
 
+        /// <summary>
+        /// The number of items in the memory.
+        /// </summary>
         public int Length => _length & 0x7FFFFFFF;
 
+        /// <summary>Returns true if Length is 0.</summary>
         public bool IsEmpty => (_length & 0x7FFFFFFF) == 0;
 
+        /// <summary>Returns a span from the memory.</summary>
         public ReadOnlySpan<T> Span
         {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -4153,6 +4657,12 @@ namespace System
             }
         }
 
+        /// <summary>
+        /// Creates a new memory over the entirety of the target array.
+        /// </summary>
+        /// <param name="array">The target array.</param>
+        /// <remarks>Returns default when <paramref name="array"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="array"/> is covariant and array's type is not exactly T[].</exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlyMemory(T[] array)
         {
@@ -4166,6 +4676,18 @@ namespace System
             _length = array.Length;
         }
 
+        /// <summary>
+        /// Creates a new memory over the portion of the target array beginning
+        /// at 'start' index and ending at 'end' index (exclusive).
+        /// </summary>
+        /// <param name="array">The target array.</param>
+        /// <param name="start">The index at which to begin the memory.</param>
+        /// <param name="length">The number of items in the memory.</param>
+        /// <remarks>Returns default when <paramref name="array"/> is null.</remarks>
+        /// <exception cref="System.ArrayTypeMismatchException">Thrown when <paramref name="array"/> is covariant and array's type is not exactly T[].</exception>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in the range (&lt;0 or &gt;Length).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlyMemory(T[] array, int start, int length)
         {
@@ -4195,16 +4717,20 @@ namespace System
             _length = length;
         }
 
-        public static implicit operator ReadOnlyMemory<T>(T[] array)
-        {
-            return new ReadOnlyMemory<T>(array);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of an array to a <see cref="ReadOnlyMemory{T}"/>
+        /// </summary>
+        public static implicit operator ReadOnlyMemory<T>(T[] array) => new ReadOnlyMemory<T>(array);
 
-        public static implicit operator ReadOnlyMemory<T>(ArraySegment<T> segment)
-        {
-            return new ReadOnlyMemory<T>(segment.Array, segment.Offset, segment.Count);
-        }
+        /// <summary>
+        /// Defines an implicit conversion of a <see cref="ArraySegment{T}"/> to a <see cref="ReadOnlyMemory{T}"/>
+        /// </summary>
+        public static implicit operator ReadOnlyMemory<T>(ArraySegment<T> segment) => new ReadOnlyMemory<T>(segment.Array, segment.Offset, segment.Count);
 
+        /// <summary>
+        /// For <see cref="ReadOnlyMemory{Char}"/>, returns a new instance of string that represents the characters pointed to by the memory.
+        /// Otherwise, returns a <see cref="string"/> with the name of the type and the number of elements.
+        /// </summary>
         public override string ToString()
         {
             if (typeof(T) == typeof(char))
@@ -4218,6 +4744,13 @@ namespace System
             return $"System.ReadOnlyMemory<{typeof(T).Name}>[{_length & 0x7FFFFFFF}]";
         }
 
+        /// <summary>
+        /// Forms a slice out of the given memory, beginning at 'start'.
+        /// </summary>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> index is not in range (&lt;0 or &gt;Length).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlyMemory<T> Slice(int start)
         {
@@ -4230,6 +4763,14 @@ namespace System
             return new ReadOnlyMemory<T>(_object, _index + start, length - start);
         }
 
+        /// <summary>
+        /// Forms a slice out of the given memory, beginning at 'start', of given length
+        /// </summary>
+        /// <param name="start">The index at which to begin this slice.</param>
+        /// <param name="length">The desired length for the slice (exclusive).</param>
+        /// <exception cref="System.ArgumentOutOfRangeException">
+        /// Thrown when the specified <paramref name="start"/> or end index is not in range (&lt;0 or &gt;Length).
+        /// </exception>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ReadOnlyMemory<T> Slice(int start, int length)
         {
@@ -4242,16 +4783,43 @@ namespace System
             return new ReadOnlyMemory<T>(_object, _index + start, length | (length2 & int.MinValue));
         }
 
+        /// <summary>
+        /// Copies the contents of the read-only memory into the destination. If the source
+        /// and destination overlap, this method behaves as if the original values are in
+        /// a temporary location before the destination is overwritten.
+        ///
+        /// <param name="destination">The Memory to copy items into.</param>
+        /// <exception cref="System.ArgumentException">
+        /// Thrown when the destination is shorter than the source.
+        /// </exception>
+        /// </summary>
         public void CopyTo(Memory<T> destination)
         {
             Span.CopyTo(destination.Span);
         }
 
+        /// <summary>
+        /// Copies the contents of the readonly-only memory into the destination. If the source
+        /// and destination overlap, this method behaves as if the original values are in
+        /// a temporary location before the destination is overwritten.
+        ///
+        /// <returns>If the destination is shorter than the source, this method
+        /// return false and no data is written to the destination.</returns>
+        /// </summary>
+        /// <param name="destination">The span to copy items into.</param>
         public bool TryCopyTo(Memory<T> destination)
         {
             return Span.TryCopyTo(destination.Span);
         }
 
+        /// <summary>
+        /// Creates a handle for the memory.
+        /// The GC will not move the memory until the returned <see cref="MemoryHandle"/>
+        /// is disposed, enabling taking and using the memory's address.
+        /// <exception cref="System.ArgumentException">
+        /// An instance with nonprimitive (non-blittable) members cannot be pinned.
+        /// </exception>
+        /// </summary>
         public unsafe MemoryHandle Pin()
         {
             if (_index < 0)
@@ -4278,13 +4846,19 @@ namespace System
             return default(MemoryHandle);
         }
 
+        /// <summary>
+        /// Copies the contents from the memory into a new array.  This heap
+        /// allocates, so should generally be avoided, however it is sometimes
+        /// necessary to bridge the gap with APIs written in terms of arrays.
+        /// </summary>
         public T[] ToArray()
         {
             return Span.ToArray();
         }
 
+        /// <summary>Determines whether the specified object is equal to the current object.</summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public override bool Equals(object obj)
+        public override bool Equals([System.Diagnostics.CodeAnalysis.NotNullWhen(true)] object obj)
         {
             if (obj is ReadOnlyMemory<T> other)
             {
@@ -4297,6 +4871,10 @@ namespace System
             return false;
         }
 
+        /// <summary>
+        /// Returns true if the memory points to the same array and has the same length.  Note that
+        /// this does *not* check to see if the *contents* are equal.
+        /// </summary>
         public bool Equals(ReadOnlyMemory<T> other)
         {
             if (_object == other._object && _index == other._index)
@@ -4306,13 +4884,11 @@ namespace System
             return false;
         }
 
+        /// <summary>Returns the hash code for this <see cref="ReadOnlyMemory{T}"/></summary>
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override int GetHashCode()
         {
-            if (_object == null)
-            {
-                return 0;
-            }
+            if (_object == null) { return 0; }
             return CombineHashCodes(_object.GetHashCode(), _index.GetHashCode(), _length.GetHashCode());
         }
 

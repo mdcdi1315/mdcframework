@@ -1,15 +1,16 @@
-﻿
-
-// An All-In-One framework abstracting the most important classes that are used in .NET
-// that are more easily and more consistently to be used.
-// The framework was designed to host many different operations , with the last goal 
-// to be everything accessible for everyone.
+﻿/*
+ * An All-In-One framework abstracting the most important classes that are used in .NET
+ * that are more easily and more consistently to be used.
+ * The framework was designed to host many different operations , with the last goal 
+ * to be everything accessible for everyone. 
+*/
 
 // Global namespaces
 using System;
 using System.Runtime.Versioning;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+
 
 #if WPFExists
 using System.Drawing;
@@ -23,1539 +24,9 @@ using System.Windows.Forms;
 namespace ROOT
 {
 
-    namespace CryptographicOperations
-    {
-        // A Collection Namespace of encrypting and decrypting files.
-        // For now (At the time of writing this code) , only UTF-8 is supported.
-
-        /// <summary>
-        /// A storage class used to take values from the randomizer (Function <see cref="AESEncryption.MakeNewKeyAndInitVector"/>).
-        /// </summary>
-        public class KeyGenTable
-        {
-            private System.String ERC;
-            private System.Byte[] _IV_;
-            private System.Byte[] _EK_;
-            private System.Int32 EMF_;
-
-            /// <summary>
-            /// Returns the <c>"Error"</c> <see cref="System.String"/> 
-            /// in case of error; otherwise , the <see cref="System.String"/> <c>"OK"</c>.
-            /// </summary>
-            public System.String ErrorCode
-            {
-                get { return ERC; }
-                set { ERC = value; }
-            }
-
-            /// <summary>
-            /// Create a new <see cref="AESEncryption"/> class , if the required data were got.
-            /// </summary>
-            [SupportedOSPlatform("windows")]
-            public AESEncryption Create
-            {
-                get
-                {
-                    if (CallerErroredOut == false)
-                    {
-                        AESEncryption EW = new();
-                        EW.EncryptionKey = _EK_;
-                        EW.IV = _IV_;
-                        return EW;
-                    }
-                    else
-                    {
-                        throw new InvalidOperationException("The data were not got , so it is not possible to instantiate a new AES Encryption class.");
-                    }
-                }
-            }
-
-            /// <summary>
-            /// Returns a <see cref="System.Boolean"/> indicating whether the function or any function that uses this has errored out.
-            /// </summary>
-            public System.Boolean CallerErroredOut
-            {
-                get { if (ERC == null) { return false; } else { if (ERC == "Error") { return true; } else { return false; } } }
-            }
-
-            /// <summary>
-            /// The Encryption key. Recommended to be more than 32 bytes.
-            /// </summary>
-            public System.Byte[] Key
-            {
-                get { return _EK_; }
-                set { _EK_ = value; }
-            }
-
-            /// <summary>
-            /// The initialisation vector to use. Recommended to be more than 16 bytes.
-            /// </summary>
-            public System.Byte[] IV
-            {
-                get { return _IV_; }
-                set { _IV_ = value; }
-            }
-
-            /// <summary>
-            /// Returns the actual message key length as of <see cref="System.Int32"/> units.
-            /// </summary>
-            public System.Int32 KeyLengthInBits
-            {
-                get { return EMF_; }
-                set { EMF_ = value; }
-            }
-        }
-
-        /// <summary>
-        /// AES Encryption class. It can also encrypt files.
-        /// NOTE: You are NOT allowed to override this class.
-        /// </summary>
-        /// <remarks>Only files with UTF-8 encoding can be sucessfully encrypted and decrypted for now.</remarks>
-        public sealed class AESEncryption : System.IDisposable
-        {
-            // Cryptographic Operations Class.
-            private System.Byte[] _EncryptionKey_;
-            private System.Byte[] _InitVec_;
-            private System.Security.Cryptography.AesCng CNGBaseObject = new();
-
-            /// <summary>
-            /// The encryption key to set for encoding/decoding.
-            /// </summary>
-            public System.Byte[] EncryptionKey { set { _EncryptionKey_ = value; } }
-
-            /// <summary>
-            /// The Initialisation Vector to set for encoding/decoding.
-            /// </summary>
-            public System.Byte[] IV { set { _InitVec_ = value; } }
-
-            /// <summary>
-            /// Create a new random key and Initialisation vector to use.
-            /// </summary>
-            /// <returns>A new <see cref="KeyGenTable"/> containing the key and the IV.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public static KeyGenTable MakeNewKeyAndInitVector()
-            {
-                System.Security.Cryptography.AesCng RETM;
-                KeyGenTable RDM = new();
-                try { RETM = new System.Security.Cryptography.AesCng(); }
-                catch (System.Exception) { RDM.ErrorCode = "Error"; return RDM; }
-                RDM.ErrorCode = "OK";
-                RDM.IV = RETM.IV;
-                RDM.Key = RETM.Key;
-                RDM.KeyLengthInBits = RETM.KeySize;
-                return RDM;
-            }
-
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            private System.Boolean _CheckPredefinedProperties()
-            {
-                if ((_EncryptionKey_ is null) || (_InitVec_ is null)) { return true; }
-                if ((_EncryptionKey_.Length <= 0) || (_InitVec_.Length <= 0)) { return true; }
-                return false;
-            }
-
-            /// <summary>
-            /// Encrypts the specified <see cref="System.String"/> plain text as <see cref="System.Byte"/>[] units.
-            /// </summary>
-            /// <param name="PlainText">The text to encrypt.</param>
-            /// <returns>The encrypted AES CNG message.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.Byte[] EncryptSpecifiedData(System.String PlainText)
-            {
-                if (System.String.IsNullOrEmpty(PlainText))
-                {
-                    return null;
-                }
-                if (_CheckPredefinedProperties())
-                {
-                    return null;
-                }
-                System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
-                ENC_1.Key = _EncryptionKey_;
-                ENC_1.IV = _InitVec_;
-                ENC_1.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ENC_1.Mode = System.Security.Cryptography.CipherMode.CBC;
-                System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateEncryptor();
-                System.Byte[] EncryptedArray;
-                using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream())
-                {
-                    using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Write))
-                    {
-                        using (System.IO.StreamWriter SDM = new System.IO.StreamWriter(CryptStrEnc, System.Text.Encoding.UTF8))
-                        {
-                            SDM.Write(PlainText);
-                        }
-                        EncryptedArray = MSSSR.ToArray();
-                    }
-                }
-                return EncryptedArray;
-            }
-
-            /// <summary>
-            /// Encrypts the alive <see cref="System.IO.FileStream"/> with all of it's containing data as <see cref="System.Byte"/>[] units.
-            /// </summary>
-            /// <param name="UnderlyingStream">The <see cref="System.IO.Stream"/> object to get data from.</param>
-            /// <returns>The encrypted AES CNG message.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.Byte[] EncryptSpecifiedDataForFiles(System.IO.Stream UnderlyingStream)
-            {
-                if (!(UnderlyingStream is System.IO.FileStream) || (UnderlyingStream.CanRead == false)) { return null; }
-                if (_CheckPredefinedProperties()) { return null; }
-                System.Byte[] ByteArray = new System.Byte[UnderlyingStream.Length];
-                UnderlyingStream.Read(ByteArray, 0, System.Convert.ToInt32(UnderlyingStream.Length));
-                System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
-                ENC_1.Key = _EncryptionKey_;
-                ENC_1.IV = _InitVec_;
-                ENC_1.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ENC_1.Mode = System.Security.Cryptography.CipherMode.CBC;
-                System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateEncryptor();
-                System.Byte[] EncryptedArray;
-                using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream())
-                {
-                    using (System.Security.Cryptography.CryptoStream CryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Write))
-                    {
-                        using (System.IO.BinaryWriter SDM = new System.IO.BinaryWriter(CryptStrEnc, System.Text.Encoding.UTF8))
-                        {
-                            SDM.Write(ByteArray, 0, ByteArray.Length);
-                        }
-                        EncryptedArray = MSSSR.ToArray();
-                    }
-                }
-                return EncryptedArray;
-            }
-
-            /// <summary>
-            /// Decrypts the encdoed AES CNG message to <see cref="System.String"/> units.
-            /// </summary>
-            /// <param name="EncryptedArray">The encrypted AES CNG message.</param>
-            /// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.String DecryptSpecifiedData(System.Byte[] EncryptedArray)
-            {
-                if ((EncryptedArray is null) || (EncryptedArray.Length <= 0))
-                {
-                    return null;
-                }
-                if (_CheckPredefinedProperties()) { return null; }
-                System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
-                ENC_1.Key = _EncryptionKey_;
-                ENC_1.IV = _InitVec_;
-                ENC_1.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ENC_1.Mode = System.Security.Cryptography.CipherMode.CBC;
-                System.String StringToReturn = null;
-                System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateDecryptor();
-                using (System.IO.MemoryStream MSSSR = new System.IO.MemoryStream(EncryptedArray))
-                {
-                    using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(MSSSR, ENC_2, System.Security.Cryptography.CryptoStreamMode.Read))
-                    {
-                        using (System.IO.StreamReader SDE = new System.IO.StreamReader(DCryptStrEnc, System.Text.Encoding.UTF8))
-                        {
-                            StringToReturn = SDE.ReadToEnd();
-                        }
-                    }
-                }
-                return StringToReturn;
-            }
-
-            /// <summary>
-            /// Decrypts the encdoed AES CNG message from an alive <see cref="System.IO.Stream"/> 
-            /// object to <see cref="System.String"/> units.
-            /// </summary>
-            /// <param name="EncasingStream">The <see cref="System.IO.Stream"/> object which contains the encoded AES CNG message.</param>
-            /// <returns>The decoded message , as <see cref="System.String"/> code units.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public System.String DecryptSpecifiedDataForFiles(System.IO.Stream EncasingStream)
-            {
-                if (EncasingStream.CanRead == false) { return null; }
-                if (_CheckPredefinedProperties()) { return null; }
-                System.Security.Cryptography.AesCng ENC_1 = CNGBaseObject;
-                ENC_1.Key = _EncryptionKey_;
-                ENC_1.IV = _InitVec_;
-                ENC_1.Padding = System.Security.Cryptography.PaddingMode.PKCS7;
-                ENC_1.Mode = System.Security.Cryptography.CipherMode.CBC;
-                System.String FinalString = null;
-                System.Security.Cryptography.ICryptoTransform ENC_2 = ENC_1.CreateDecryptor();
-                using (System.Security.Cryptography.CryptoStream DCryptStrEnc = new System.Security.Cryptography.CryptoStream(EncasingStream, ENC_2, System.Security.Cryptography.CryptoStreamMode.Read))
-                {
-                    using (System.IO.StreamReader SDE = new(DCryptStrEnc, System.Text.Encoding.UTF8)) { FinalString = SDE.ReadToEnd(); }
-                }
-                return FinalString;
-            }
-
-            /// <summary>
-            /// Converts either the key or Initialisation Vector to a safety-secure Base64 <see cref="System.String"/>.
-            /// </summary>
-            /// <param name="ByteValue">The Key or Initalisation Vector to convert.</param>
-            /// <returns>A new Base64 <see cref="System.String"/> , which contains the encoded key or initialisation vector.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public static System.String ConvertTextKeyOrIvToString(System.Byte[] ByteValue)
-            {
-                if ((ByteValue is null) || (ByteValue.Length <= 0)) { return null; }
-                try
-                {
-                    ReadOnlySpan<System.Byte> In = ByteValue;
-                    Span<System.Byte> Out = new();
-                    if (System.Buffers.Text.Base64.EncodeToUtf8(In, Out, out System.Int32 BG,
-                        out System.Int32 BW, true) == System.Buffers.OperationStatus.Done)
-                    {
-                        return System.Text.Encoding.UTF8.GetString(Out.ToArray());
-                    }
-                    else { return null; }
-                }
-                catch (System.Exception) { return null; }
-            }
-
-            /// <summary>
-            /// Converts the converted key or Initialisation Vector from a Base64 <see cref="System.String"/> 
-            /// back to a <see cref="System.Byte"/>[] array.
-            /// </summary>
-            /// <param name="StringValue">The Base64 encoded <see cref="System.String"/>.</param>
-            /// <returns>The <see cref="System.Byte"/>[] before the conversion.</returns>
-            [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-            public static System.Byte[] ConvertTextKeyOrIvFromStringToByteArray(System.String StringValue)
-            {
-                if (System.String.IsNullOrEmpty(StringValue)) { return null; }
-                try
-                {
-                    ReadOnlySpan<System.Byte> In = System.Text.Encoding.UTF8.GetBytes(StringValue);
-                    Span<System.Byte> Out = new();
-                    if (System.Buffers.Text.Base64.DecodeFromUtf8(In, Out, out System.Int32 BG,
-                        out System.Int32 ED, true) == System.Buffers.OperationStatus.Done)
-                    {
-                        return Out.ToArray();
-                    }
-                    else { return null; }
-                }
-                catch (System.Exception) { return null; }
-            }
-
-            /// <summary>
-            /// Use the <see cref="Dispose"/> method to clear up the current key and Initialisation Vector so as to prepare
-            /// the encryptor/decryptor for a new session or to invalidate it.
-            /// </summary>
-            public void Dispose() { DISPMETHOD(); }
-
-            private void DISPMETHOD()
-            {
-                _EncryptionKey_ = null;
-                _InitVec_ = null;
-#pragma warning disable CS0219
-                CNGBaseObject.Dispose();
-                CNGBaseObject = null;
-#pragma warning restore CS0219
-            }
-        }
-
-        /// <summary>
-        /// An example class demonstrating how you can encrypt and decrypt UTF-8 files.
-        /// </summary>
-        [SupportedOSPlatform("Windows")]
-        public static class EDAFile
-        {
-            /// <summary>
-            /// An storage class used in the example.
-            /// </summary>
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", 
-                "CA1034:Nested types should not be visible", 
-                Justification = "It is just an example , not meant for the real world.")]
-            public class EncryptionContext
-            {
-                private System.String _ERC_;
-                private System.Byte[] _KEY_;
-                private System.Byte[] _IV_;
-
-                /// <summary>
-                /// The error code of the <see cref="EncryptAFile(string, string)"/> function.
-                /// </summary>
-                public System.String ErrorCode
-                {
-                    get { return _ERC_; }
-                    set { _ERC_ = value; }
-                }
-
-                /// <summary>
-                /// The key that the function <see cref="EncryptAFile(string, string)"/> used.
-                /// </summary>
-                [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", 
-                    "CA1819:Properties should not return arrays", 
-                    Justification = "It is just an example , not meant for the real world.")]
-                public System.Byte[] KeyUsed
-                {
-                    get { return _KEY_; }
-                    set { _KEY_ = value; }
-                }
-
-                /// <summary>
-                /// The Initialisation Vector that the function <see cref="EncryptAFile(string, string)"/> used.
-                /// </summary>
-                [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance",
-                    "CA1819:Properties should not return arrays",
-                    Justification = "It is just an example , not meant for the real world.")]
-                public System.Byte[] InitVectorUsed
-                {
-                    get { return _IV_; }
-                    set { _IV_ = value; }
-                }
-            }
-
-            /// <summary>
-            /// Encrypts the specified file and puts the encrypted contents to a new file.
-            /// </summary>
-            /// <param name="FilePath">The file to encrypt.</param>
-            /// <param name="FileOutputPath">The file path to put th encrypted file.</param>
-            /// <returns>A new <see cref="EncryptionContext"/> class containing the key used and the Initialisation Vector</returns>
-            public static EncryptionContext EncryptAFile(System.String FilePath, System.String FileOutputPath = "")
-            {
-                if (!(System.IO.File.Exists(FilePath))) { return null; }
-                if (System.String.IsNullOrEmpty(FileOutputPath))
-                {
-                    FileOutputPath = (FilePath).Remove(FilePath.IndexOf(".")) + "_ENCRYPTED_" + (FilePath).Substring(FilePath.IndexOf("."));
-                }
-                EncryptionContext DMF = new EncryptionContext();
-                AESEncryption MDA = new AESEncryption();
-                KeyGenTable MAKER = AESEncryption.MakeNewKeyAndInitVector();
-                if (MAKER.ErrorCode == "Error")
-                {
-                    DMF.ErrorCode = "Error";
-                    return DMF;
-                }
-                MDA.EncryptionKey = MAKER.Key;
-                MDA.IV = MAKER.IV;
-                try
-                {
-                    using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath, System.IO.FileMode.Open))
-                    {
-                        using (System.IO.FileStream MNH = System.IO.File.OpenWrite(FileOutputPath))
-                        {
-                            System.Byte[] FLL = MDA.EncryptSpecifiedDataForFiles(MDR);
-                            MNH.Write(FLL, 0, System.Convert.ToInt32(FLL.Length));
-                        }
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    DMF.ErrorCode = "Error";
-                    return DMF;
-                }
-                MDA.Dispose();
-                DMF.KeyUsed = MAKER.Key;
-                DMF.InitVectorUsed = MAKER.IV;
-                return DMF;
-            }
-
-            /// <summary>
-            /// Decrypts the specified file and puts it's decrypted contents to the file path pointed out.
-            /// </summary>
-            /// <param name="FilePath">The encrypted file.</param>
-            /// <param name="Key">The key that this file uses.</param>
-            /// <param name="IV">The Initialisation Vector that this file uses.</param>
-            /// <param name="FileOutputPath">The output from the decrypted file.</param>
-            public static void DecryptAFile(System.String FilePath, System.Byte[] Key,
-            System.Byte[] IV, System.String FileOutputPath = "")
-            {
-                if (!(System.IO.File.Exists(FilePath))) { return; }
-                if ((Key is null) || (IV is null)) { return; }
-                if ((Key.Length <= 0) || (IV.Length <= 0)) { return; }
-                if (System.String.IsNullOrEmpty(FileOutputPath))
-                {
-                    FileOutputPath = (FilePath).Remove(FilePath.IndexOf(".")) + "_UNENCRYPTED_" + (FilePath).Substring(FilePath.IndexOf("."));
-                }
-                AESEncryption MDA = new AESEncryption();
-                MDA.EncryptionKey = Key;
-                MDA.IV = IV;
-                try
-                {
-                    using (System.IO.FileStream MDR = new System.IO.FileStream(FilePath, System.IO.FileMode.Open))
-                    {
-                        using (System.IO.StreamWriter MNH = new System.IO.StreamWriter(System.IO.File.OpenWrite(FileOutputPath)))
-                        {
-                            MNH.WriteLine(MDA.DecryptSpecifiedDataForFiles(MDR));
-                        }
-                    }
-                }
-                catch (System.Exception EX)
-                {
-                    MAIN.WriteConsoleText(EX.Message);
-                    return;
-                }
-                MDA.Dispose();
-                return;
-            }
-
-            // Executable code examples for encrypting and unencrypting files:
-            // Executable code starts here: <--
-            // EDAFile.EncryptionContext RDF = EDAFile.EncryptAFile("E:\winrt\base.h" , "E:\IMAGES\winrtbase_h.Encrypted")
-            // EDAFile.DecryptAFile("E:\IMAGES\winrtbase_h.Encrypted" , RDF.KeyUsed , RDF.InitVectorUsed , "E:\IMAGES\Unencrypted-4664.h")
-            // --> Executable code ended.
-            // This is the simpliest way to encrypt and decrypt the files , but you can make use of the original AES API and make the encryption/decryption as you like to.
-            // To Access that API , use MDCFR.CryptographicOperations.AESEncryption .
-            // More instructions on how to do such security conversions can be found in our Developing Website.
-        }
-
-    }
-
-    namespace Archives
-    {
-        // A Collection Namespace for making and extracting archives.
-
-        /// <summary>
-        /// The Current Progress class represents an handler to check the archiving progress.
-        /// </summary>
-        public class CurrentProgress
-        {
-            private System.Int32 TFS;
-            private System.Int32 FPD;
-            private System.String WOF;
-            private System.String WOFP;
-            private CurrentOperation OP = CurrentOperation.None;
-
-            /// <summary>
-            /// Initialises a new instance of the <see cref="CurrentProgress"/> class. <br />
-            /// When the initialisation completes , it fires up the <see cref="GlobalArchiveProgress.ProgressChanged"/>
-            /// event.
-            /// </summary>
-            public CurrentProgress() { GlobalArchiveProgress.FireChanged(); }
-
-            /// <summary>
-            /// The number of the files that will be added to the archive.
-            /// </summary>
-            public System.Int32 TotalFiles { get { return TFS; } set { TFS = value; GlobalArchiveProgress.FireChanged(); } }
-            /// <summary>
-            /// The number of processed files that were added to or extracted from the archive.
-            /// </summary>
-            public System.Int32 FilesProcessed { get { return FPD; } set { FPD = value; GlobalArchiveProgress.FireChanged(); } }
-            /// <summary>
-            /// The name of the file that the operation is working on.
-            /// </summary>
-            public System.String WorkingOnFile { get { return WOF; } set { WOF = value; GlobalArchiveProgress.FireChanged(); } }
-            /// <summary>
-            /// The fully qualified path of the file that the operation is running on.
-            /// </summary>
-            public System.String WorkingOnFileFullPath { get { return WOFP; } set { WOFP = value; GlobalArchiveProgress.FireChanged(); } }
-            /// <summary>
-            /// The current operation undertaken. A default instance of this class auto-fills this value with <see cref="CurrentOperation.None"/> .
-            /// </summary>
-            public CurrentOperation Operation { get { return OP; } set { OP = value; GlobalArchiveProgress.FireChanged(); } }
-
-            /// <summary>
-            /// The remaining files to be processed. This is actually a subtraction of 
-            /// <see cref="TotalFiles"/> and <see cref="FilesProcessed"/>
-            /// properties.
-            /// </summary>
-            public System.Int32 FilesRemaining 
-            { 
-                get 
-                { 
-                    if (TotalFiles >= 0 && FilesProcessed >= 0) 
-                    { return TotalFiles - FilesProcessed; } 
-                    else { return 0; } 
-                }
-            }
-
-            /// <summary>
-            /// Gets a value whether this operation compresses a multiple of files.
-            /// </summary>
-            public System.Boolean IsMultipleFileOperation { get; internal set; }
-
-            internal void SetOpFailed() { Operation = CurrentOperation.Failed; }
-
-            internal void SetOpEnum() { Operation = CurrentOperation.Enumeration; }
-
-            internal void SetOpCmp() { Operation = CurrentOperation.Compression; }
-
-            internal void SetOpDcmp() { Operation = CurrentOperation.Extraction; }
-
-            internal void SetOpTerm() { Operation = CurrentOperation.Termination; }
-
-            internal void SetOpNone() { Operation = CurrentOperation.None; }
-        }
-
-        /// <summary>
-        /// The progress class field that is globally used by all classes contained in this namespace.
-        /// </summary>
-        public static class GlobalArchiveProgress
-        {
-            /// <summary>
-            /// The progress of any executed or executing operation.
-            /// </summary>
-
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Usage", 
-                "CA2211:Non-constant fields should not be visible", 
-                Justification = "This field must be static , plus be visible " +
-                "because it exposes the current progress of the archives." +
-                "Finally , when this value is refreshed is done through the" +
-                " ProgressChanged event. ")]
-            public static CurrentProgress Progress;
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static System.Int32 FastAbs(System.Int32 Num)
-            {
-                System.Int32 Value = Num;
-                if (Num < 0) { Value = Value * (-1); }
-                return Value;
-            }
-
-            
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            [System.Diagnostics.CodeAnalysis.SuppressMessage("Performance", 
-                "CA1810:Initialize reference type static fields inline", 
-                Justification = "Required so as to properly set the required values." +
-                " Failure to do so ends up with an System.NullReferenceException.")]
-            static GlobalArchiveProgress() 
-            {
-                ProgressChanged = new(NullEventHandler);
-                Progress = new();
-            }
-
-            /// <summary>
-            /// This event is fired up when one of the properties of the <see cref="CurrentProgress"/> class was changed.
-            /// </summary>
-            public static event System.EventHandler ProgressChanged;
-
-            internal static void FireChanged() { ProgressChanged.Invoke(typeof(GlobalArchiveProgress) , EventArgs.Empty); }
-
-            private static void NullEventHandler(System.Object sender , System.EventArgs e) { }
-
-            internal static System.Boolean IsDecompOpForCab { get; set; }
-
-            internal static void GetProgressFromCabinets(System.Object sender, ExternalArchivingMethods.Cabinets.ArchiveProgressEventArgs e)
-            {
-                if (Progress == null) { Progress = new CurrentProgress() { IsMultipleFileOperation = true }; }
-                Progress.TotalFiles = e.TotalFiles;
-                Progress.WorkingOnFile = e.CurrentFileName;
-                Progress.WorkingOnFileFullPath = e.CurrentFileName;
-                Progress.FilesProcessed = FastAbs(e.CurrentFileNumber);
-                if (e.ProgressType == ExternalArchivingMethods.Cabinets.ArchiveProgressType.StartFile ||
-                    e.ProgressType == ExternalArchivingMethods.Cabinets.ArchiveProgressType.StartArchive)
-                {
-                    if (IsDecompOpForCab) { Progress.SetOpDcmp(); }
-                    else { Progress.Operation = CurrentOperation.Compression; }
-                }
-                else if (e.ProgressType == ExternalArchivingMethods.Cabinets.ArchiveProgressType.FinishArchive)
-                {
-                    Progress.Operation = CurrentOperation.Termination;
-                }
-            }
-        }
-
-        /// <summary>
-        /// The Current Operation enumeration is used in the <see cref="CurrentProgress"/> class 
-        /// and represents the current archive operation.
-        /// </summary>
-        public enum CurrentOperation
-        {
-            /// <summary>
-            /// No outstanding operations are running.
-            /// </summary>
-            None = 0,
-            /// <summary>
-            /// The Enumeration operation enumerates the files to compress , or the files to extract.
-            /// </summary>
-            Enumeration = 1,
-            /// <summary>
-            /// The Extraction operation extracts files from an archive.
-            /// </summary>
-            Extraction = 2,
-            /// <summary>
-            /// The Compression operation compresses files to an archive.
-            /// </summary>
-            Compression = 3,
-            /// <summary>
-            /// The Termination operation does clear-up tasks before returning control to the caller.
-            /// </summary>
-            Termination = 4,
-            /// <summary>
-            /// The Failed field indicates that the called function terminated before the execution was completed.
-            /// </summary>
-            Failed = 5
-        }
-
-        /// <summary>
-        /// Archive files using the GZIP algorithm from the ZIP managed library.
-        /// </summary>
-        public static class GZipArchives
-        {
-
-            /// <summary>
-            /// Compress the specified file to GZIP format.
-            /// </summary>
-            /// <param name="FilePath">The file to compress.</param>
-            /// <param name="ArchivePath">The output file.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
-            {
-                GlobalArchiveProgress.Progress = new CurrentProgress() { IsMultipleFileOperation = false };
-                if (MAIN.FileExists(FilePath) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-
-                System.String OutputFile;
-                if (System.String.IsNullOrEmpty(ArchivePath))
-                {
-                    System.IO.FileInfo FSIData = new System.IO.FileInfo(FilePath);
-                    OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.gz";
-                    GlobalArchiveProgress.Progress.WorkingOnFile = FSIData.Name;
-                    FSIData = null;
-                }
-                else { OutputFile = ArchivePath; }
-                GlobalArchiveProgress.Progress.WorkingOnFileFullPath = OutputFile;
-                GlobalArchiveProgress.Progress.SetOpCmp();
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-                try { FSI = System.IO.File.OpenRead(FilePath); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try { FSO = System.IO.File.OpenWrite(OutputFile); }
-                catch (System.Exception EX)
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try
-                {
-                    ExternalArchivingMethods.SharpZipLib.GZip.Compress(FSI, FSO, false, 1024, 5);
-                }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                finally
-                {
-                    if (FSI != null)
-                    {
-                        FSI.Close();
-                        FSI.Dispose();
-                    }
-                    if (FSO != null)
-                    {
-                        FSO.Close();
-                        FSO.Dispose();
-                    }
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-            /// <summary>
-            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
-            /// compress to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
-            /// <param name="OutputFileStream">The compressed data.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
-            {
-                GlobalArchiveProgress.Progress = new CurrentProgress() { IsMultipleFileOperation = false };
-                if (InputFileStream.CanRead == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (OutputFileStream.CanWrite == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                GlobalArchiveProgress.Progress.SetOpCmp();
-                try
-                {
-                    ExternalArchivingMethods.SharpZipLib.GZip.Compress(InputFileStream, OutputFileStream, false, 1024, 5);
-                }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress a GZIP archive back a decompressed file.
-            /// </summary>
-            /// <param name="ArchiveFile">The Archive file path.</param>
-            /// <param name="OutputPath">Path to put the decompressed data.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
-            {
-                GlobalArchiveProgress.Progress = new CurrentProgress() { IsMultipleFileOperation = false };
-                if (MAIN.FileExists(ArchiveFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                System.String OutputFile;
-
-                if (System.String.IsNullOrEmpty(OutputPath))
-                {
-                    System.IO.FileInfo ArchInfo = new System.IO.FileInfo(ArchiveFile);
-                    System.String TruncatePath = ArchInfo.FullName.Substring(ArchInfo.DirectoryName.Length);
-                    System.String FPH = TruncatePath.Remove(TruncatePath.Length - 3);
-                    OutputFile = $"{ArchInfo.DirectoryName}\\{FPH}";
-                    GlobalArchiveProgress.Progress.WorkingOnFile = ArchiveFile;
-                    FPH = null;
-                    ArchInfo = null;
-                    TruncatePath = null;
-                }
-                else { OutputFile = OutputPath; }
-                GlobalArchiveProgress.Progress.WorkingOnFileFullPath = ArchiveFile;
-                GlobalArchiveProgress.Progress.SetOpDcmp();
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-                try { FSI = System.IO.File.OpenRead(ArchiveFile); }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-
-                try { FSO = System.IO.File.OpenWrite(OutputFile); }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    FSI.Close();
-                    FSI.Dispose();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try { ExternalArchivingMethods.SharpZipLib.GZip.Decompress(FSI, FSO, false); }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                finally
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    FSO.Close();
-                    FSO.Dispose();
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
-            /// to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="ArchiveFileStream">The compressed data.</param>
-            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
-            {
-                GlobalArchiveProgress.Progress = new CurrentProgress() { IsMultipleFileOperation = false };
-                GlobalArchiveProgress.Progress.SetOpDcmp();
-                if (ArchiveFileStream.CanRead == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (DecompressedFileStream.CanWrite == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                try { ExternalArchivingMethods.SharpZipLib.GZip.Decompress(ArchiveFileStream, DecompressedFileStream, false); }
-                catch (System.Exception EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-        }
-
-        /// <summary>
-        /// Archive files using the BZip2 format.
-        /// </summary>
-        public static class BZip2Archives
-        {
-            /// <summary>
-            /// Compress the specified file to GZIP format.
-            /// </summary>
-            /// <param name="FilePath">The file to compress.</param>
-            /// <param name="ArchivePath">The output file.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressTheSelectedFile(System.String FilePath, System.String ArchivePath = null)
-            {
-                if (MAIN.FileExists(FilePath) == false) { return false; }
-
-                System.String OutputFile;
-                if (System.String.IsNullOrEmpty(ArchivePath))
-                {
-                    System.IO.FileInfo FSIData = new System.IO.FileInfo(FilePath);
-                    OutputFile = $"{FSIData.DirectoryName}\\{FSIData.Name}.bz2";
-                    FSIData = null;
-                }
-                else { OutputFile = ArchivePath; }
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-                try { FSI = System.IO.File.OpenRead(FilePath); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try { FSO = System.IO.File.OpenWrite(OutputFile); }
-                catch (System.Exception EX)
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try { ExternalArchivingMethods.SharpZipLib.BZip2.Compress(FSI, FSO, false, 5); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                finally
-                {
-                    if (FSI != null)
-                    {
-                        FSI.Close();
-                        FSI.Dispose();
-                    }
-                    if (FSO != null)
-                    {
-                        FSO.Close();
-                        FSO.Dispose();
-                    }
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Compress an alive <see cref="System.IO.FileStream"/> that contains the data to 
-            /// compress to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="InputFileStream">The input file stream that contains the data to compress.</param>
-            /// <param name="OutputFileStream">The compressed data.</param>
-            /// <returns><c>true</c> if the command succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressAsFileStreams(System.IO.FileStream InputFileStream, System.IO.FileStream OutputFileStream)
-            {
-                if (InputFileStream.CanRead == false) { return false; }
-                if (OutputFileStream.CanWrite == false) { return false; }
-                try { ExternalArchivingMethods.SharpZipLib.BZip2.Compress(InputFileStream, OutputFileStream, false, 5); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress a GZIP archive back to the file.
-            /// </summary>
-            /// <param name="ArchiveFile">The Archive file path.</param>
-            /// <param name="OutputPath">Path to put the decompressed data.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressTheSelectedFile(System.String ArchiveFile, System.String OutputPath = null)
-            {
-                if (MAIN.FileExists(ArchiveFile) == false) { return false; }
-                System.String OutputFile;
-                if (System.String.IsNullOrEmpty(OutputPath))
-                {
-                    System.IO.FileInfo ArchInfo = new System.IO.FileInfo(ArchiveFile);
-                    System.String TruncatePath = ArchInfo.FullName.Substring(ArchInfo.DirectoryName.Length);
-                    System.String FPH = TruncatePath.Remove(TruncatePath.Length - 4);
-                    OutputFile = $"{ArchInfo.DirectoryName}\\{FPH}";
-                    FPH = null;
-                    ArchInfo = null;
-                    TruncatePath = null;
-                }
-                else { OutputFile = OutputPath; }
-                System.IO.FileStream FSI;
-                System.IO.FileStream FSO;
-
-                try { FSI = System.IO.File.OpenRead(ArchiveFile); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-
-                try { FSO = System.IO.File.OpenWrite(OutputFile); }
-                catch (System.Exception EX)
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                try { ExternalArchivingMethods.SharpZipLib.BZip2.Decompress(FSI, FSO, false); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                finally
-                {
-                    FSI.Close();
-                    FSI.Dispose();
-                    FSO.Close();
-                    FSO.Dispose();
-                }
-                return true;
-            }
-
-            /// <summary>
-            /// Decompress an alive <see cref="System.IO.FileStream"/> and send the decompressed data
-            /// to another alive <see cref="System.IO.FileStream"/> object.
-            /// </summary>
-            /// <param name="ArchiveFileStream">The compressed data.</param>
-            /// <param name="DecompressedFileStream">The decompressed data to put to.</param>
-            /// <returns><c>true</c> if the decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressAsFileStreams(System.IO.FileStream ArchiveFileStream, System.IO.FileStream DecompressedFileStream)
-            {
-                if (ArchiveFileStream.CanRead == false) { return false; }
-                if (DecompressedFileStream.CanWrite == false) { return false; }
-                try { ExternalArchivingMethods.SharpZipLib.BZip2.Decompress(ArchiveFileStream, DecompressedFileStream, false); }
-                catch (System.Exception EX)
-                {
-#if NET7_0_OR_GREATER
-                    System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
-                    return false;
-                }
-                return true;
-            }
-
-        }
-
-        /// <summary>
-        /// Zip Files compression level.
-        /// </summary>
-        public enum ZipCompressionLevel : System.Int32
-        {
-            /// <summary>
-            /// The Compression level is set to zero (almost the files are stored.)
-            /// </summary>
-            Zero = 0,
-            /// <summary>
-            /// Low Compression Level.
-            /// </summary>
-            Low = 2,
-            /// <summary>
-            /// A medium compression level will be applied. It is the most casual case.
-            /// </summary>
-            Medium = 5,
-            /// <summary>
-            /// High compression level sacrifices performance for better compression.
-            /// </summary>
-            High = 8,
-            /// <summary>
-            /// The Ultra compression level uses as most as possible the available computer 
-            /// resources so as to achieve the best compression ratio as possible.
-            /// </summary>
-            Ultra = 9
-        }
-
-        /// <summary>
-        /// Class that abstracts the methods of the ZIP managed library.
-        /// </summary>
-        public static class ZipArchives
-        {
-
-            /// <summary>
-            /// Extract all the contents of a ZIP file to the specified directory path.
-            /// </summary>
-            /// <param name="InputArchivePath">The archive file.</param>
-            /// <param name="OutputPath">The directory to put the extracted data.</param>
-            /// <param name="UsingCorruptCheck">If this parameter is set to <see langword="true"/> , then it will also perform a check
-            /// in the extracted files whether the corrupted files that were not captured in the archive
-            /// to be deleted.</param>
-            /// <returns><c>true</c> if extraction succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean ExtractZipFileToSpecifiedLocation
-                (System.String InputArchivePath, System.String OutputPath , System.Boolean UsingCorruptCheck = false)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                if (MAIN.FileExists(InputArchivePath) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (MAIN.DirExists(OutputPath) == false) { MAIN.CreateADir(OutputPath); }
-                System.IO.FileStream FS = MAIN.ReadAFileUsingFileStream(InputArchivePath);
-                System.IO.FileStream DI;
-                if (FS == null) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                ExternalArchivingMethods.SharpZipLib.ZipFile CT = new(FS);
-                GlobalArchiveProgress.Progress.SetOpEnum();
-                if (CT.Count < System.Int32.MaxValue)
-                {
-                    GlobalArchiveProgress.Progress.TotalFiles = (System.Int32)CT.Count;
-                } else { GlobalArchiveProgress.Progress.TotalFiles = 0; }
-                GlobalArchiveProgress.Progress.SetOpDcmp();
-                foreach (ExternalArchivingMethods.SharpZipLib.ZipEntry un in CT)
-                {
-                    if (un.IsFile || un.IsDOSEntry)
-                    {
-                        System.String g = MAIN.ChangeDefinedChar(un.Name, '/', '\\');
-                        System.String jk = null;
-                        if (g.IndexOf('\\') != -1)
-                        {
-                            jk = g.Remove(g.LastIndexOf('\\'));
-                            if (MAIN.DirExists($"{OutputPath}\\{jk}") == false)
-                            {
-                                if (MAIN.CreateADir($"{OutputPath}\\{jk}") == false) 
-                                {
-                                    System.String[] Directs = jk.Split('\\');
-                                    System.String Tmp = null;
-                                    for (System.Int32 I = 0; I < Directs.Length; I++) 
-                                    {
-                                        Tmp += Directs[I] + "\\";
-                                        if (ROOT.MAIN.DirExists($"{OutputPath}\\{Tmp}") == false)
-                                        {
-                                            if (ROOT.MAIN.CreateADir($"{OutputPath}\\{Tmp}") == false) { goto GI_ERR; }
-                                        }
-                                    }
-                                }
-                            }
-                            jk = null;
-                        }
-                        DI = MAIN.CreateANewFile($"{OutputPath}\\{g}");
-                        GlobalArchiveProgress.Progress.WorkingOnFile = g;
-                        GlobalArchiveProgress.Progress.WorkingOnFileFullPath = $"{OutputPath}\\{g}";
-                        g = null;
-                        if (DI == null) { goto GI_ERR; }
-                        using (DI) { CT.GetInputStream(un).CopyTo(DI); }
-                        if (UsingCorruptCheck && ROOT.MAIN.GetACryptographyHashForAFile(
-                            $"{OutputPath}\\{g}", HashDigestSelection.SHA256) ==
-                            "ece758103b8bb6d4fbe7a7c90889f3c6fb516370648c152a6f587bc2f0522b5a")
-                        {
-                            ROOT.MAIN.DeleteAFile($"{OutputPath}\\{g}");
-                        }
-                        GlobalArchiveProgress.Progress.FilesProcessed++;
-                        DI = null;
-                    }
-                }
-                GlobalArchiveProgress.Progress.SetOpTerm();
-                FS.Close();
-                FS.Dispose();
-                return true;
-                GI_ERR: { FS.Close(); FS.Dispose(); GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-            }
-
-            /// <summary>
-            /// Create a new ZIP archive by capturing data from a specified directory.
-            /// </summary>
-            /// <param name="PathOfZipToMake">The file path that the archive will be created.</param>
-            /// <param name="PathToCollect">The directory path to capture data from.</param>
-            /// <param name="CmpLevel">The Compression level to apply. For migration reasons , 
-            /// it is optional and it's value is <see cref="ZipCompressionLevel.Medium"/> .</param>
-            /// <returns><c>true</c> if the operation succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean MakeZipFromDir
-                (System.String PathOfZipToMake,
-                System.String PathToCollect,
-                ZipCompressionLevel CmpLevel = ZipCompressionLevel.Medium)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                // Start up the Make ZIP from Directory procedure.
-
-                // Check if the parameters are correct:
-                // PathOfZipToMake is not NULL and
-                // PathToCollect is an existing directory.
-                if (System.String.IsNullOrEmpty(PathOfZipToMake)) { goto GI_ERR2; }
-                if (System.IO.Directory.Exists(PathToCollect) == false) { goto GI_ERR2; }
-                // This FileStream is a temporary FileStream that will open the files to compress
-                // in the ZIP.
-                System.IO.FileStream GDX = null;
-                // Create a new DirectoryInfo class from the PathToCollect argument.
-                System.IO.DirectoryInfo E1 = new(PathToCollect);
-                // Set the Base Directory. This directory will be used so as to compare 
-                // the files to add against it.
-                System.String BaseDir = E1.FullName;
-                System.String TempPathConstructor = null;
-                GlobalArchiveProgress.Progress.SetOpEnum();
-                // Internal string array that makes the recursion reality.
-                System.Collections.Generic.List<System.String> Dirs = new();
-                // Add just ONE element in the new list created: The top directory itself.
-                Dirs.Add(BaseDir);
-                // This for statement will find out ALL directories and will save them all in the list we created above.
-                for (System.Int32 I = 0; I < Dirs.Count; I++)
-                {
-                    foreach (System.IO.DirectoryInfo DS in new System.IO.DirectoryInfo(Dirs[I]).GetDirectories())
-                    {
-                        Dirs.Add(DS.FullName);
-                        foreach (System.IO.FileInfo SA in DS.GetFiles()) { GlobalArchiveProgress.Progress.TotalFiles++; }
-                    }
-                }
-                // Open a new FileStream to the desired path.
-                // Exit with FALSE if it could not be opened.
-                System.IO.FileStream EDI = ROOT.MAIN.CreateANewFile(PathOfZipToMake);
-                if (EDI == null) { goto GI_ERR2; }
-                // The fundamental ZIP class: The ZIP Stream that is being used for compression.
-                ExternalArchivingMethods.SharpZipLib.ZipOutputStream DI = new(EDI);
-                // Begin execution Phase. Set the compression level to the desired one.
-                DI.SetLevel((System.Int32)CmpLevel);
-                GlobalArchiveProgress.Progress.SetOpCmp();
-                // Now just add all the files in the archive! So simple.
-                foreach (System.String D_A in Dirs)
-                {
-                    System.IO.DirectoryInfo DA_ = new(D_A);
-                    TempPathConstructor = ExternalArchivingMethods.SharpZipLib.ZipEntry.CleanName(DA_.FullName.Substring(BaseDir.Length));
-                    System.Byte[] TempBuf = null;
-                    if (DA_.GetFiles() == System.Array.Empty<System.IO.FileInfo>()) { continue; }
-                    foreach (System.IO.FileInfo DOI in DA_.GetFiles())
-                    {
-                        // Determine whether the file will be saved into the top directory or to a deeper location.
-                        if (TempPathConstructor == "")
-                        {
-                            // Top-level directory case: Files are plainly added.
-                            DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry(DOI.Name));
-                        }
-                        else
-                        {
-                            // The file will be added in a ZIP directory.
-                            DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry($"{TempPathConstructor}/{DOI.Name}"));
-                        }
-                        // Read the file to be added at this point.
-                        GlobalArchiveProgress.Progress.WorkingOnFile = DOI.Name;
-                        GlobalArchiveProgress.Progress.WorkingOnFileFullPath = DOI.FullName;
-                        GDX = MAIN.ReadAFileUsingFileStream(DOI.FullName);
-                        try
-                        {
-                            // Check whether the file could not be got. Exit in this case with FALSE.
-                            // Special case: The file denies access.
-                            if (MAIN.ExceptionData.GetType() == typeof(System.UnauthorizedAccessException))
-                            {
-                                System.Byte[] FA = System.Text.Encoding.UTF8.GetBytes("This file had an access error and could not be flushed. " +
-                                    "Use hashing utilities during extract to remove these dummy files.");
-                                MAIN.ExceptionData = null; DI.Write(FA, 0, FA.Length); DI.CloseEntry(); continue;
-                            }
-                            if (GDX == null) { goto GI_ERR; }
-                        }
-                        catch { }
-                        System.Int64 I = 0;
-                        for (; (I < GDX.Length) && ((GDX.Length - I) > 2048); I += 2048)
-                        {
-                            TempBuf = new System.Byte[2048];
-                            GDX.Read(TempBuf, 0, 2048);
-                            DI.Write(TempBuf, 0, TempBuf.Length);
-                        }
-                        if ((GDX.Length - I) <= 2048)
-                        {
-                            for (; GDX.Length > I; I++)
-                            {
-                                DI.WriteByte((System.Byte)GDX.ReadByte());
-                            }
-                        }
-                        GDX.Close();
-                        GDX.Dispose();
-                        DI.CloseEntry();
-                        GlobalArchiveProgress.Progress.FilesProcessed++;
-                        GDX = null;
-                    }
-                }
-                GlobalArchiveProgress.Progress.SetOpTerm();
-                Dirs.Clear();
-                BaseDir = null;
-                GDX = null;
-                Dirs = null;
-                DI.Close();
-                DI.Dispose();
-                EDI.Close();
-                EDI.Dispose();
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-                GI_ERR: {
-                    if (DI != null) { DI.Close(); DI.Dispose(); }
-                    if (EDI != null) { EDI.Close(); EDI.Dispose(); }
-                    if (GDX != null) { GDX.Close(); GDX.Dispose(); }
-                    if (Dirs != null) { Dirs.Clear(); Dirs = null; }
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    return false;
-                }
-                GI_ERR2: {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    return false;
-                }
-            }
-
-            /// <summary>
-            /// Add all the files detected in a <see cref="System.IO.FileSystemInfo"/>[] array to the root of the ZIP archive.
-            /// </summary>
-            /// <param name="PathofZipToCreate">The file path of the existing archive.</param>
-            /// <param name="InfoObject">The <see cref="System.IO.FileSystemInfo"/> array to purge and add the files to the archive.</param>
-            /// <param name="ENTCMPL">The compression level to apply while processing the files.</param>
-            /// <returns><c>true</c> if all the files were added to the archive.; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CreateZipArchiveViaFileSystemInfo(System.String PathofZipToCreate, System.IO.FileSystemInfo[] InfoObject, ZipCompressionLevel ENTCMPL)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                if (System.String.IsNullOrEmpty(PathofZipToCreate)) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (InfoObject == null || InfoObject.Length <= 0) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                System.IO.FileStream EDI = ROOT.MAIN.CreateANewFile(PathofZipToCreate);
-                if (EDI == null) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                GlobalArchiveProgress.Progress.SetOpCmp();
-                ExternalArchivingMethods.SharpZipLib.ZipOutputStream DI = new(EDI);
-                System.IO.FileStream GDX = null;
-                System.Byte[] TempBuf = null;
-                GlobalArchiveProgress.Progress.TotalFiles = InfoObject.Length;
-                foreach (System.IO.FileSystemInfo DF in InfoObject)
-                {
-                    if (DF is System.IO.FileInfo)
-                    {
-                        // Create a new entry.
-                        DI.PutNextEntry(new ExternalArchivingMethods.SharpZipLib.ZipEntry(DF.Name));
-                        // Open the file to read it.
-                        GDX = MAIN.ReadAFileUsingFileStream(DF.FullName);
-                        // Exit if the file could not be opened.
-                        if (GDX == null)
-                        {
-                            DI.Close();
-                            DI.Dispose();
-                            EDI.Close();
-                            EDI.Dispose();
-                            return false;
-                        }
-                        System.Int64 I = 0;
-                        for (; (I < GDX.Length) && ((GDX.Length - I) > 2048); I += 2048)
-                        {
-                            TempBuf = new System.Byte[2048];
-                            GDX.Read(TempBuf, 0, 2048);
-                            DI.Write(TempBuf, 0, TempBuf.Length);
-                        }
-                        if ((GDX.Length - I) <= 2048)
-                        {
-                            for (; GDX.Length > I; I++)
-                            {
-                                DI.WriteByte((System.Byte)GDX.ReadByte());
-                            }
-                        }
-                        // Close the stream.
-                        GDX.Close();
-                        GDX.Dispose();
-                        DI.CloseEntry();
-                        GlobalArchiveProgress.Progress.FilesProcessed++;
-                        GDX = null;
-                    }
-                }
-                GlobalArchiveProgress.Progress.SetOpTerm();
-                GDX = null;
-                DI.Finish();
-                DI.Close();
-                DI.Dispose();
-                EDI.Close();
-                EDI.Dispose();
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-        }
-
-        /// <summary>
-        /// Compress files and directories using the Microsoft's Cabinet format.
-        /// </summary>
-        [SupportedOSPlatform("windows")]
-        public static class Cabinets
-        {
-            /// <summary>
-            /// Compress files of the specified directory and add them to a new Cabinet file.
-            /// </summary>
-            /// <param name="DirToCapture">The directory to purge and add the files to the archive.</param>
-            /// <param name="OutputArchivePath">The archive output file path.</param>
-            /// <param name="CLevel">The compression level to apply. If left unspecified , 
-            /// it is set to <see cref="CabinetCompressionLevel.Medium"/>.</param>
-            /// <returns><c>true</c> if archiving succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean CompressFromDirectory(System.String DirToCapture, System.String OutputArchivePath,
-                CabinetCompressionLevel CLevel = CabinetCompressionLevel.Medium)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                GlobalArchiveProgress.IsDecompOpForCab = false;
-                if (MAIN.DirExists(DirToCapture) == false) { return false; }
-                ExternalArchivingMethods.Cabinets.CabEngine DC = new();
-                try
-                {
-                    ExternalArchivingMethods.Cabinets.CabInfo CI = new(OutputArchivePath);
-                    GlobalArchiveProgress.Progress.SetOpEnum();
-                    System.IO.FileSystemInfo[] FileArray = MAIN.GetANewFileSystemInfo(DirToCapture);
-                    if (FileArray == null) { return false; }
-                    IList<System.String> FLT = new List<System.String>();
-                    foreach (System.IO.FileSystemInfo FI in FileArray) { if (FI is System.IO.FileInfo) { FLT.Add(FI.Name); } }
-                    GlobalArchiveProgress.Progress.SetOpCmp();
-                    CI.PackFiles(DirToCapture, FLT, FLT, (ExternalArchivingMethods.Cabinets.CompressionLevel)CLevel,
-                        GlobalArchiveProgress.GetProgressFromCabinets);
-                    CI.Refresh();
-                }
-                catch (System.IO.IOException EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                } finally { DC.Dispose(); }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-            /// <summary>
-            /// Decompresses all the files located in the archive to the specified directory.
-            /// </summary>
-            /// <param name="DestDir">The destination directory to unpack the files in.</param>
-            /// <param name="ArchiveFile">The archive file path from where the files will be extracted from.</param>
-            /// <returns><c>true</c> if decompression succeeded; otherwise , <c>false</c>.</returns>
-            public static System.Boolean DecompressFromArchive(System.String DestDir, System.String ArchiveFile)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                GlobalArchiveProgress.IsDecompOpForCab = true;
-                if (MAIN.DirExists(DestDir) == false) { ROOT.MAIN.CreateADir(DestDir); }
-                if (MAIN.FileExists(ArchiveFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                GlobalArchiveProgress.Progress.SetOpDcmp();
-                try
-                {
-                    ExternalArchivingMethods.Cabinets.CabInfo CI = new(ArchiveFile);
-                    CI.Unpack(DestDir, GlobalArchiveProgress.GetProgressFromCabinets);
-                }
-                catch (System.IO.IOException EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-            /// <summary>
-            /// Add a file to an existing archive. The archive must be valid and an existing one.
-            /// </summary>
-            /// <param name="FilePath">The file which you want to add.</param>
-            /// <param name="CabinetFile">The archive file to add the file to.</param>
-            /// <param name="CLevel">The compression level to apply. If left unspecified , 
-            /// it is set to <see cref="CabinetCompressionLevel.Medium"/>.</param>
-            /// <returns><c>true</c> if the file was added to the archive; otherwise , <c>false</c>.</returns>
-            public static System.Boolean AddAFileToCabinet(System.String FilePath, System.String CabinetFile,
-                CabinetCompressionLevel CLevel = CabinetCompressionLevel.Medium)
-            {
-                GlobalArchiveProgress.Progress = new() { IsMultipleFileOperation = true };
-                GlobalArchiveProgress.IsDecompOpForCab = false;
-                if (ROOT.MAIN.FileExists(CabinetFile) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                if (ROOT.MAIN.FileExists(FilePath) == false) { GlobalArchiveProgress.Progress.SetOpFailed(); return false; }
-                try
-                {
-                    System.IO.FileInfo FI = new System.IO.FileInfo(FilePath);
-                    IList<System.String> IL = new List<System.String>();
-                    IL.Add(FI.Name);
-                    ExternalArchivingMethods.Cabinets.CabInfo CI = new(CabinetFile);
-                    GlobalArchiveProgress.Progress.SetOpCmp();
-                    CI.PackFiles(FI.DirectoryName, IL, IL, (ExternalArchivingMethods.Cabinets.CompressionLevel)CLevel
-                        , GlobalArchiveProgress.GetProgressFromCabinets);
-                }
-                catch (System.Security.SecurityException EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                catch (System.IO.IOException EX)
-                {
-                    GlobalArchiveProgress.Progress.SetOpFailed();
-                    MAIN.WriteConsoleText(EX.Message);
-                    return false;
-                }
-                GlobalArchiveProgress.Progress.SetOpNone();
-                return true;
-            }
-
-        }
-
-        /// <summary>
-        /// Cabinet files compression level.
-        /// </summary>
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", 
-            "CA1027:Mark enums with FlagsAttribute", 
-            Justification = "Cannot apply bitwise combinations of constants" +
-            " in an enumeration which holds a file compression level.")]
-        public enum CabinetCompressionLevel
-        {
-            /// <summary>
-            /// The files added to the cabinet are just stored.
-            /// </summary>
-            Store = ExternalArchivingMethods.Cabinets.CompressionLevel.None,
-            /// <summary>
-            /// About 3% archiving ratio , really low.
-            /// </summary>
-            ReallyLow = 1,
-            /// <summary>
-            /// The intermediate step between Low and Store modes.
-            /// </summary>
-            MidToLow = 2,
-            /// <summary>
-            /// The files are compressed in Low mode , about 10% ratio.
-            /// </summary>
-            Low = 4,
-            /// <summary>
-            /// Normal compression is applied.
-            /// </summary>
-            Medium = ExternalArchivingMethods.Cabinets.CompressionLevel.Normal,
-            /// <summary>
-            /// The files are compressed with a relatively high compression level , 65-75%.
-            /// </summary>
-            High = 8,
-            /// <summary>
-            /// Maximum compression level. For those who want to save space and do not take care of time.
-            /// </summary>
-            Ultra = ExternalArchivingMethods.Cabinets.CompressionLevel.Max
-        }
-
-    }
-
     /// <summary>
-    /// Calculates an estimated time required , for example , the time needed to execute a code excerpt.
+    /// Calculates an estimated time required , for example , the time needed to execute a code excerpt. <br />
+    /// This class cannot be inherited.
     /// </summary>
     public sealed class TimeCaculator : System.IDisposable
     {
@@ -1584,14 +55,9 @@ namespace ROOT
             {
                 _Init_ = false;
                 return (System.Int32)System.DateTime.Now.Subtract(_TimeEl_).TotalMilliseconds;
-            }
-            catch (System.ArgumentOutOfRangeException EX)
+            } catch (System.ArgumentOutOfRangeException EX)
             {
-#if NET7_0_OR_GREATER
-                System.Console.WriteLine(EX.Message);
-#else
-                    MAIN.WriteConsoleText(EX.Message);
-#endif
+                MAIN.ExceptionData = EX;
                 return -1;
             }
         }
@@ -1692,7 +158,7 @@ namespace ROOT
     }
 
     /// <summary>
-    /// This Class checks whether an class pass the declared custom attribute <see cref="AsInterfaceAttribute"/> requirements. 
+    /// This Class checks whether a class pass the declared custom attribute <see cref="AsInterfaceAttribute"/> requirements. 
     /// </summary>
     public class AsInterfaceChecker
     {
@@ -2661,6 +1127,7 @@ namespace ROOT
             Retry = 6,
             Abort = 7,
             Ignore = 8,
+            [NonSerialized]
             NotAnAnswer = Error | Cancel
         }
 #pragma warning restore CS1591
@@ -2687,7 +1154,7 @@ namespace ROOT
         {
             /// <summary>
             /// Inherited from the <see cref="System.IDisposable"/> interface.
-            /// The random instance must dispose the seed and the state instances.
+            /// The random instance must destroy the seed and the state instances.
             /// </summary>
             public new abstract void Dispose();
 
@@ -4050,15 +2517,15 @@ namespace ROOT
     /// <para> This <see langword="struct" /> implements the <see cref="IList{T}"/> interface. </para>
     /// <para> Note: &lt;T&gt; is <see cref="System.Byte"/>. </para>
     /// </remarks>
-    public struct ModifidableBuffer : System.Collections.Generic.IList<System.Byte>
+    public struct ModifidableBuffer : IList<System.Byte>
     {
-        private readonly System.Collections.Specialized.OrderedDictionary _dict = new();
-        private System.Int32 Iter = 0;
+        private readonly Dictionary<System.Int32, System.Byte> _dict;
+        private System.Int32 Iter;
 
         /// <summary>
         /// Initialise a new modifidable buffer with no data in it.
         /// </summary>
-        public ModifidableBuffer() { }
+        public ModifidableBuffer() { _dict = new(); Iter = 0; }
 
         /// <summary>
         /// Initialise a new modifidable buffer and populate it with data taken 
@@ -4066,7 +2533,7 @@ namespace ROOT
         /// </summary>
         /// <param name="Value">The <see cref="System.Byte"/>[] data.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ModifidableBuffer(System.Byte[] Value) { for (System.Int32 O = 0; O < Value.Length; O++) { Add(Value[O]); } }
+        public ModifidableBuffer(System.Byte[] Value) { _dict = new(); Iter = 0; for (System.Int32 O = 0; O < Value.Length; O++) { Add(Value[O]); } }
 
         /// <summary>
         /// Initialise a new modifidable buffer and populate it with data taken 
@@ -4082,6 +2549,8 @@ namespace ROOT
         public ModifidableBuffer(System.Byte[] Value, System.Int32 Index, System.Int32 Count)
         {
             if (Index >= Count) { throw new InvalidOperationException("Index parameter is not allowed to be more than Count parameter."); }
+            _dict = new();
+            Iter = 0;
             for (System.Int32 O = Index; O < Count; O++) { Add(Value[O]); }
         }
 
@@ -4140,11 +2609,7 @@ namespace ROOT
         }
 
         /// <inheritdoc />
-        public System.Byte this[System.Int32 Index]
-        {
-            get { return (System.Byte)_dict[Index]; }
-            set { Insert(Index, value); }
-        }
+        public System.Byte this[System.Int32 Index] { get => _dict[Index]; set => Insert(Index, value); }
 
         /// <summary>
         /// Adds empty entries specified by the <paramref name="Times"/> <see cref="System.Int32"/> .
@@ -4166,7 +2631,7 @@ namespace ROOT
         }
 
         /// <summary>
-        /// The <see cref="ToArray()"/> method gets all the data representing the current buffer , and returns them
+        /// The <see cref="ToArray()"/> method gets all the data representing this <see langword="struct"/> , and returns them
         /// as a one-dimensional and fixed <see cref="System.Byte"/>[] array.
         /// </summary>
         /// <returns>The data which this <see langword="struct"/> holds.</returns>
@@ -4210,20 +2675,15 @@ namespace ROOT
             {
                 _dict.Remove(IndexOf(item));
                 Iter--;
-            }
-            catch { return false; }
+            } catch { return false; }
             return true;
         }
 
-        IEnumerator<System.Byte> IEnumerable<System.Byte>.GetEnumerator()
-        {
-            System.Collections.Generic.IList<System.Byte> result = new System.Byte[_dict.Count];
-            for (System.Int32 I = 0; I < _dict.Count; I++) { result[I] = (System.Byte)_dict[I]; }
-            return result.GetEnumerator();
-        }
+        /// <inheritdoc />
+        public IEnumerator<System.Byte> GetEnumerator() { return _dict.Values.GetEnumerator(); }
 
         /// <inheritdoc />
-        public System.Collections.IEnumerator GetEnumerator() { return _dict.GetEnumerator(); }
+        System.Collections.IEnumerator System.Collections.IEnumerable.GetEnumerator() { return _dict.Values.GetEnumerator(); }
 
         /// <summary>
         /// Returns the byte data , but as an hexadecimal <see cref="System.String"/> , if it fits to one.
@@ -4238,13 +2698,9 @@ namespace ROOT
             System.String Thestring = null;
             try
             {
-                for (System.Int32 I = 0; I < Iter; I++)
-                {
-                    Thestring += this[I].ToString("x2" , default);
-                }
+                for (System.Int32 I = 0; I < Iter; I++) { Thestring += this[I].ToString("x2" , default); }
                 return Thestring;
-            }
-            catch { return GetType().ToString(); }
+            } catch (OutOfMemoryException) { return GetType().ToString(); }
         }
 
         /// <summary>
@@ -4532,7 +2988,7 @@ namespace ROOT
         System.Int32 POS = -1;
         STDContext _context;
 
-        public STDENUM() { throw new AggregateException("This constructor cannot build the enumerator correctly."); }
+        public STDENUM() { throw new ArgumentException("This constructor cannot build the enumerator correctly."); }
 
         public STDENUM(STDContext context) { _context = context; }
 
@@ -4686,51 +3142,51 @@ namespace ROOT
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static STDFrontColor ParseFrontColor(System.String C)
         {
-            switch (C.ToUpperInvariant())
+            return C.ToUpperInvariant() switch
             {
-                case "BLACK": return STDFrontColor.Black;
-                case "WHITE": return STDFrontColor.White;
-                case "BLUE": return STDFrontColor.Blue;
-                case "RED": return STDFrontColor.Red;
-                case "GREEN": return STDFrontColor.Green;
-                case "MAGENTA": return STDFrontColor.Magenta;
-                case "YELLOW": return STDFrontColor.Yellow;
-                case "CYAN": return STDFrontColor.Cyan;
-                case "DARK BLUE": return STDFrontColor.DarkBlue;
-                case "GRAY": return STDFrontColor.Gray;
-                case "DARK CYAN": return STDFrontColor.DarkCyan;
-                case "DARK GRAY": return STDFrontColor.DarkGray;
-                case "DARK GREEN": return STDFrontColor.DarkGreen;
-                case "DARK MAGENTA": return STDFrontColor.DarkMagenta;
-                case "DARK YELLOW": return STDFrontColor.DarkYellow;
-                case "DARK RED": return STDFrontColor.DarkRed;
-                default: return (STDFrontColor)(-2);
-            }
+                "BLACK" => STDFrontColor.Black,
+                "WHITE" => STDFrontColor.White,
+                "BLUE" => STDFrontColor.Blue,
+                "RED" => STDFrontColor.Red,
+                "GREEN" => STDFrontColor.Green,
+                "MAGENTA" => STDFrontColor.Magenta,
+                "YELLOW" => STDFrontColor.Yellow,
+                "CYAN" => STDFrontColor.Cyan,
+                "DARK BLUE" => STDFrontColor.DarkBlue,
+                "GRAY" => STDFrontColor.Gray,
+                "DARK CYAN" => STDFrontColor.DarkCyan,
+                "DARK GRAY" => STDFrontColor.DarkGray,
+                "DARK GREEN" => STDFrontColor.DarkGreen,
+                "DARK MAGENTA" => STDFrontColor.DarkMagenta,
+                "DARK YELLOW" => STDFrontColor.DarkYellow,
+                "DARK RED" => STDFrontColor.DarkRed,
+                _ => (STDFrontColor)(-2),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static STDBackColor ParseBackColor(System.String C)
         {
-            switch (C.ToUpperInvariant())
+            return C.ToUpperInvariant() switch
             {
-                case "BLACK": return STDBackColor.Black;
-                case "WHITE": return STDBackColor.White;
-                case "BLUE": return STDBackColor.Blue;
-                case "RED": return STDBackColor.Red;
-                case "GREEN": return STDBackColor.Green;
-                case "MAGENTA": return STDBackColor.Magenta;
-                case "YELLOW": return STDBackColor.Yellow;
-                case "CYAN": return STDBackColor.Cyan;
-                case "DARK BLUE": return STDBackColor.DarkBlue;
-                case "GRAY": return STDBackColor.Gray;
-                case "DARK CYAN": return STDBackColor.DarkCyan;
-                case "DARK GRAY": return STDBackColor.DarkGray;
-                case "DARK GREEN": return STDBackColor.DarkGreen;
-                case "DARK MAGENTA": return STDBackColor.DarkMagenta;
-                case "DARK YELLOW": return STDBackColor.DarkYellow;
-                case "DARK RED": return STDBackColor.DarkRed;
-                default: return (STDBackColor)(-2);
-            }
+                "BLACK" => STDBackColor.Black,
+                "WHITE" => STDBackColor.White,
+                "BLUE" => STDBackColor.Blue,
+                "RED" => STDBackColor.Red,
+                "GREEN" => STDBackColor.Green,
+                "MAGENTA" => STDBackColor.Magenta,
+                "YELLOW" => STDBackColor.Yellow,
+                "CYAN" => STDBackColor.Cyan,
+                "DARK BLUE" => STDBackColor.DarkBlue,
+                "GRAY" => STDBackColor.Gray,
+                "DARK CYAN" => STDBackColor.DarkCyan,
+                "DARK GRAY" => STDBackColor.DarkGray,
+                "DARK GREEN" => STDBackColor.DarkGreen,
+                "DARK MAGENTA" => STDBackColor.DarkMagenta,
+                "DARK YELLOW" => STDBackColor.DarkYellow,
+                "DARK RED" => STDBackColor.DarkRed,
+                _ => (STDBackColor)(-2),
+            };
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

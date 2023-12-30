@@ -15,8 +15,7 @@
 # Reports the expected Build Output directory , will be used to clear artifacts when instructed to.
 [ReportBuildOutputDirectory:bin]
 # The Wait action freezes the build continuation for the specified amount of seconds.
-# If not supplied , it is supposed to be then one second.
-[Wait:2]
+[Wait:2$LegacyMode=true]
 # The SetVariable action sets a new environment variable , given it's name and value.
 [SetVariable:G_Generated$True]
-[Wait:1]
+[Wait:1$LegacyMode=true]

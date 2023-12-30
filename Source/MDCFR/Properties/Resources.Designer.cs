@@ -133,6 +133,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Illegal characters in drive name &apos;{0}&apos;..
+        /// </summary>
+        internal static string Arg_InvalidDriveChars {
+            get {
+                return ResourceManager.GetString("Arg_InvalidDriveChars", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Invalid File or Directory attributes value..
         /// </summary>
         internal static string Arg_InvalidFileAttrs {
@@ -183,6 +192,15 @@ namespace MDCFR.Properties {
         internal static string Arg_MustBeEnum {
             get {
                 return ResourceManager.GetString("Arg_MustBeEnum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Drive name must not be empty..
+        /// </summary>
+        internal static string Arg_MustBeNonEmptyDriveName {
+            get {
+                return ResourceManager.GetString("Arg_MustBeNonEmptyDriveName", resourceCulture);
             }
         }
         
@@ -1528,6 +1546,15 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to {0} is an invalid handle..
+        /// </summary>
+        internal static string Cryptography_InvalidHandle {
+            get {
+                return ResourceManager.GetString("Cryptography_InvalidHandle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Data too big to fit in memory..
         /// </summary>
         internal static string DataTooBig {
@@ -1713,6 +1740,15 @@ namespace MDCFR.Properties {
         internal static string EndPositionNotReached {
             get {
                 return ResourceManager.GetString("EndPositionNotReached", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Enumeration value &apos;{0}&apos; specified in condition mapping is not valid..
+        /// </summary>
+        internal static string Enum_InvalidValue {
+            get {
+                return ResourceManager.GetString("Enum_InvalidValue", resourceCulture);
             }
         }
         
@@ -3872,6 +3908,33 @@ namespace MDCFR.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Volume labels can only be set for writable local volumes..
+        /// </summary>
+        internal static string InvalidOperation_SetVolumeLabelFailed {
+            get {
+                return ResourceManager.GetString("InvalidOperation_SetVolumeLabelFailed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The operation cannot be performed when TimeProvider.TimestampFrequency is zero or negative..
+        /// </summary>
+        internal static string InvalidOperation_TimeProviderInvalidTimestampFrequency {
+            get {
+                return ResourceManager.GetString("InvalidOperation_TimeProviderInvalidTimestampFrequency", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The operation cannot be performed when TimeProvider.LocalTimeZone is null..
+        /// </summary>
+        internal static string InvalidOperation_TimeProviderNullLocalTimeZone {
+            get {
+                return ResourceManager.GetString("InvalidOperation_TimeProviderNullLocalTimeZone", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to This operation cannot be performed on a default instance of ImmutableArray&lt;T&gt;.  Consider initializing the array, or checking the ImmutableArray&lt;T&gt;.IsDefault property..
         /// </summary>
         internal static string InvalidOperationOnDefaultArray {
@@ -3967,6 +4030,24 @@ namespace MDCFR.Properties {
         internal static string IO_CannotCreateDirectory {
             get {
                 return ResourceManager.GetString("IO_CannotCreateDirectory", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the drive. The drive might not be ready or might not be mapped..
+        /// </summary>
+        internal static string IO_DriveNotFound {
+            get {
+                return ResourceManager.GetString("IO_DriveNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not find the drive &apos;{0}&apos;. The drive might not be ready or might not be mapped..
+        /// </summary>
+        internal static string IO_DriveNotFound_Drive {
+            get {
+                return ResourceManager.GetString("IO_DriveNotFound_Drive", resourceCulture);
             }
         }
         

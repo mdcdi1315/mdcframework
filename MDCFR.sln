@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MDCFR-DEP_HTTPLIB", "Source
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MDCFR-RESGEN", "Tools\ResGen\MDCFR-RESGEN.csproj", "{AD482E5F-7240-4F3B-A3AB-0299A3C47C7D}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MDCFR-SYSRESEXT", "Source\MDCFR-SYSRESEXT\MDCFR-SYSRESEXT.csproj", "{AD7C6988-F1AA-4AB8-A115-E403CDE14B50}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{AD482E5F-7240-4F3B-A3AB-0299A3C47C7D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AD482E5F-7240-4F3B-A3AB-0299A3C47C7D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AD482E5F-7240-4F3B-A3AB-0299A3C47C7D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AD7C6988-F1AA-4AB8-A115-E403CDE14B50}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AD7C6988-F1AA-4AB8-A115-E403CDE14B50}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AD7C6988-F1AA-4AB8-A115-E403CDE14B50}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AD7C6988-F1AA-4AB8-A115-E403CDE14B50}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

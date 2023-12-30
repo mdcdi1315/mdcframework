@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-	  <TargetFrameworks>net70;net70-windows10.0.19041.0</TargetFrameworks>
+	  <TargetFrameworks>$(DotNetCoreIdentifier);$(DotNetCoreWindowsIdentifier)</TargetFrameworks>
 	  <RootNamespace>ROOT</RootNamespace>
 	  <!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->
 	  <GenerateAssemblyInfo>False</GenerateAssemblyInfo>

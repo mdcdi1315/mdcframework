@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current" Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Library</OutputType>
+		<TargetFramework>$(DotNetFrameworkIdentifier)</TargetFramework>
+		<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
+		<AssemblyName>System.Resources.Extensions</AssemblyName>
+		<AssemblyVersion>8.0.23.28008</AssemblyVersion>
+		<RootNamespace>MDCFR.SysResExt</RootNamespace>
+		<DebugType Condition="'$(Configuration)' == 'Release'">embedded</DebugType>
+		<DebugType Condition="'$(Configuration)' == 'Debug'">full</DebugType>
+		<!-- Sign your assembly using an Strong Name Key. Use "False" to disable signing. -->
+		<SignAssembly>True</SignAssembly>  
+		<!-- The Strong Key .snk file to sign the assembly with. -->
+		<AssemblyOriginatorKeyFile>..\msft-dotnetcore.snk</AssemblyOriginatorKeyFile>
+		<!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->  
+		<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
+		<!-- Allows to search and find XML documentation on source files and to generate it as a seperate file for usage in Visual Studio. -->  
+		<GenerateDocumentationFile>True</GenerateDocumentationFile>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
+		<LangVersion>10</LangVersion>
+		<DefaultItemExcludesInProjectFolder>*\**.*</DefaultItemExcludesInProjectFolder>
+		<BindingRedirectsFile>$(OutputPath)$(TargetFramework)\System.Resources.Extensions.targets</BindingRedirectsFile>
+		<!-- Nullability types are already correct , no need to report the error -->
+		<NoWarn>$(NoWarn);CS8767</NoWarn>
+	</PropertyGroup>
+	
+	<ItemGroup>
+		<ProjectReference Include="..\MDCFR\MDCFR.csproj" />
+		<Compile Include=".\MDCFR-SYSRESEXT.cs" />
+		<Compile Include=".\MDCFR-SYSRESEXT.Props.cs" />
+		<Compile Include="..\MDCFR\MDCFR-PROPS_INTERNAL.cs" />
+		<Compile Include="Properties\Resources.Designer.cs">
+		  <DesignTime>True</DesignTime>
+		  <AutoGen>True</AutoGen>
+		  <DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+		<Compile Include="SYSRESEXT-EXTERNALCODE.cs" />
+		<EmbeddedResource Update="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+	</ItemGroup>
+
+	<Target Name="Clean_Complete" AfterTargets="Clean">
+		<Delete Files="$(BindingRedirectsFile)" ContinueOnError="false" />
+	</Target>
+
+	<Target Name="Build_Complete" AfterTargets="Build">
+		<CallTarget Targets="GenerateTargetsFile" UseResultsCache="true" />
+	</Target>
+	
+  <Target Name="GenerateTargetsFile" 
+		  Inputs="$(MSBuildAllProjects)"
+          Outputs="$(BindingRedirectsFile)">
+	<Message Importance="high" Text="Building Targets file..." />
+    <PropertyGroup>
+	  <!-- 
+			Notes to public: The two below properties give the required Strong Name Token and
+			Assembly Version that is required. Auto-fill these properties depending on the
+			System.Resources.Extensions .NET version you build (This builds the .NET 8 one)
+			and take the Strong Name Token from the key you used to sign this assembly.
+			Most common way to get it is to load the assembly as:
+			
+			using System.Reflection;
+			Assembly D = Assembly.LoadFrom("Path-To-Assembly-Escaped");
+			D.FullName
+			
+			Running these commands in an C# Interactive window will return something like the following:
+			"System.Resources.Extensions, Version=8.0.0.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51"
+	  -->
+	  <AssemblyStrongNameToken>cc7b13ffcd2ddd51</AssemblyStrongNameToken>
+	  <DD_AssemblyDesiredVersion>8.0.0.0</DD_AssemblyDesiredVersion>
+      <SuggestedBindingRedirectsFileContent><![CDATA[<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current">
+  <!-- 
+	© MDCDI1315. Do NOT explicitly edit this file. 
+	Portions of this code belongs to .NET Foundation. 
+	For more information , see the GitHub Repository at https://github.com/dotnet/runtime .
+  -->
+  <!-- Set the GenerateResourceUsePreserializedResources property in case that is undefined by the user 
+  (Possibly because the user has not used preserialised resources , or does not use non-string resources) -->
+  <PropertyGroup>
+	<GenerateResourceUsePreserializedResources Condition="'%24%28GenerateResourceUsePreserializedResources%29' == ''">True</GenerateResourceUsePreserializedResources>
+	<_SYSRESEXT__FileHash>$([MSBuild]::StableStringHash(`$(BindingRedirectsFile)`))</_SYSRESEXT__FileHash>
+  </PropertyGroup>
+  <!-- ResolveAssemblyReferences will never see the assembly reference embedded in the resources type,
+       force a binding redirect ourselves so that we'll always unify to the System.Resources.Extensions
+       version provided by the project result  -->
+  <ItemGroup>
+    <SuggestedBindingRedirects Include="$(AssemblyName), Culture=neutral, PublicKeyToken=$(AssemblyStrongNameToken)" MaxVersion="$(DD_AssemblyDesiredVersion)" />
+  </ItemGroup>
+</Project>
+]]></SuggestedBindingRedirectsFileContent>
+    </PropertyGroup>
+	<Message Importance="high" Text="Generating Code..." />
+    <WriteLinesToFile File="$(BindingRedirectsFile)"
+                      Lines="$(SuggestedBindingRedirectsFileContent)"
+                      Overwrite="true" ContinueOnError="true" Encoding="UTF-8" />
+	  <Error Condition="'$([System.IO.File]::Exists(`$(BindingRedirectsFile)`))' == 'false'"
+			 Code="MDCDI3" ContinueOnError="false" Text="The result was NOT generated. Build failure detected." />
+	  <Message Importance="high" Text="$([System.IO.Path]::GetFileName(`$(BindingRedirectsFile)`)) -> $(BindingRedirectsFile)" />
+  </Target>
+	
+</Project>

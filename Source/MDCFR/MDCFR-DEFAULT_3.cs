@@ -7,17 +7,19 @@
 // Global namespaces
 using System;
 using System.Runtime.Versioning;
-using System.Runtime.InteropServices;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 namespace ROOT
 {
 
     /// <summary>
-    /// This class contains the internal console implementation extensions , which some of them are exposed publicly.
+    /// This class contains the internal console implementation extensions , which some of them are exposed publicly. <br />
+    /// This class cannot be inherited.
     /// </summary>
     public static class ConsoleExtensions
     {
+        [Serializable]
         internal enum ConsoleHandleOptions : System.UInt32 { Input = 0xFFFFFFF6, Output = 0xFFFFFFF5, Error = 0xFFFFFFF4 }
 
         // This value indicates whether the console is detached , and therefore 
@@ -33,6 +35,7 @@ namespace ROOT
         /// <summary>
         /// Define the Buffer Size when using the function <see cref="ROOT.MAIN.ReadConsoleText(ConsoleReadBufferOptions)"/> .
         /// </summary>
+        [Serializable]
         public enum ConsoleReadBufferOptions : System.Int32
         {
             /// <summary>
@@ -1837,7 +1840,6 @@ namespace ROOT
 #endif
     }
 
-
     /// <summary>
     /// Passes additional information to use when the process will be launched.
     /// </summary>
@@ -2059,6 +2061,29 @@ namespace ROOT
     }
 
     /// <summary>
+    /// Provides information about the status of the running process.
+    /// </summary>
+    [Serializable]
+    [RequiresPreviewFeatures]
+    public enum ProcessExecutionState
+    {
+        /// <summary>Reserved property.</summary>
+        None = 0,
+        /// <summary>
+        /// The instance is not attached to a process yet.
+        /// </summary>
+        NotAttached = 1,
+        /// <summary>
+        /// The process that this instance refers to is still running.
+        /// </summary>
+        Running = 2,
+        /// <summary>
+        /// The process was either terminated by this instance or by itself.
+        /// </summary>
+        Terminated = 3
+    }
+
+    /// <summary>
     /// Creates and launches a new process context. <br />
     /// This class cannot be inherited.
     /// </summary>
@@ -2076,6 +2101,7 @@ namespace ROOT
         private System.Boolean hasnotstartedyet = true;
         private System.Boolean isdisposed = false;
         private System.IO.FileInfo fileinfo = null;
+        private System.UInt32 ErrorCode = 0;
 
         /// <summary>
         /// Initialises a new instance of <see cref="ProcessCreator"/> class.
@@ -2160,7 +2186,7 @@ namespace ROOT
             { Data.WorkingDirectory = fileinfo.DirectoryName; }
             if (System.String.IsNullOrEmpty(Data.Title) && Data.X == 0 && Data.Y == 0)
             {
-                LaunchInternalCore(fileinfo.FullName, Data.Args, Data.WorkingDirectory, Data.Options);
+                LaunchInternalCore(fileinfo.FullName, " " + Data.Args, Data.WorkingDirectory, Data.Options);
             } else 
             {
                 startupInfo.cb = 500;
@@ -2180,7 +2206,7 @@ namespace ROOT
                     startupInfo.dwY = Data.Y;
                     startupInfo.dwFlags = ProcessInterop_PIFLAGS.STARTF_USEPOSITION;
                 }
-                LaunchInternalCore(fileinfo.FullName, Data.Args, Data.WorkingDirectory, Data.Options , startupInfo);
+                LaunchInternalCore(fileinfo.FullName, " " + Data.Args, Data.WorkingDirectory, Data.Options , startupInfo);
             }
         }
 
@@ -2188,6 +2214,7 @@ namespace ROOT
         {
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO , Dir , false);
+            ErrorCode = WindowsErrorCodes.LastErrorCode;
             result = PR;
             if (result.Success) { hasnotstartedyet = false; }
             return;
@@ -2197,6 +2224,7 @@ namespace ROOT
         {
             if (CO == ProcessCreationOptions.NoOptions) { CO = (ProcessCreationOptions)0x00000400; }
             ProcessInterop.ProcessResult PR = ProcessInterop.LaunchProcess(Path, Args, (ProcessInterop_ProcessFLAGS)CO, Dir, false , start);
+            ErrorCode = WindowsErrorCodes.LastErrorCode;
             result = PR;
             if (result.Success) { hasnotstartedyet = false; }
             return;
@@ -2209,6 +2237,27 @@ namespace ROOT
         private void EnsureNotStarted() { if (hasnotstartedyet == false && (result?.Success == true)) { throw new InvalidOperationException("This instance is already attached to a process."); } }
 
         /// <summary>
+        /// Gets an <see cref="NativeCallErrorException"/> if the process was not executed sucessfully. 
+        /// You can either throw the exception returned or do anything you need to get the error 
+        /// that prevents the application from starting.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their respective information.
+        /// </exception>
+        [CLSCompliant(false)]
+        public NativeCallErrorException GetExceptionForLaunch
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ErrorCode == 0 || ExecutedSucessfully) { return null; }
+                return new NativeCallErrorException(ErrorCode , $"Error detected while attempting to create the process:\n" +
+                    $"{ROOT.WindowsErrorCodes.GetErrorStringFromWin32Code(ErrorCode)}");
+            }
+        }
+
+        /// <summary>
         /// Determines whether two <see cref="ProcessCreator"/> instances are equal. <br />
         /// This is done by testing if the <see cref="PID"/> property is equal in both instances.
         /// </summary>
@@ -2217,6 +2266,24 @@ namespace ROOT
         /// <exception cref="InvalidOperationException">One of the instances compared is not bound to a process.</exception>
         /// <exception cref="ObjectDisposedException">One of the instances compared is disposed.</exception>
         public System.Boolean Equals(ProcessCreator other) { return PID == other.PID; }
+
+        /// <summary>
+        /// Gets the process execution state. <br />
+        /// Use this value so as to determine if the process is running.
+        /// </summary>
+        /// <exception cref="ObjectDisposedException">
+        /// Occurs when this instance is disposed. Disposed instances cannot 
+        /// create or get processes or get their respective information.
+        /// </exception>
+        public ProcessExecutionState State
+        {
+            [System.Security.SuppressUnmanagedCodeSecurity]
+            get {
+                EnsureNotDisposed();
+                if (hasnotstartedyet) { return ProcessExecutionState.NotAttached; }
+                if (ExitCode == 259) { return ProcessExecutionState.Running; } else { return ProcessExecutionState.Terminated; }
+            }
+        }
 
         /// <summary>
         /// Gets the opened process information.
@@ -2319,13 +2386,14 @@ namespace ROOT
                 unsafe {
                     ProcessInterop_Memory_Priority_Info temp = new()
                     {
-                        MemoryPriority = (ProcessInterop_Memory_Priority_Levels)value
+                        MemoryPriority = (ProcessInterop_Memory_Priority_Levels)((System.Int16)value)
                     };
                     if (ProcessInterop.SetProcInfo(result.ProcessH.ProcessHandle,
                         ProcessInterop_Process_Information_Class.ProcessMemoryPriority,
-                        &temp, (System.UInt32)Marshal.SizeOf(temp)) == 0)
+                        &temp, (System.UInt32)Marshal.SizeOf(typeof(ProcessInterop_Memory_Priority_Info))) == 0)
                     {
-                        throw new NativeCallErrorException($"Could not set new process memory priority value equal to {value}.");
+                        WindowsErrorCodes.ThrowException(WindowsErrorCodes.LastErrorCode, 
+                            $"Could not set new process memory priority value equal to {value}:");
                     }
                     result.MemPriorityInfo = temp;
                 }
@@ -2487,7 +2555,7 @@ namespace ROOT
         /// Attempting to terminate the current process handle is dangerous and therefore , prohibited. <br />
         /// Callers that want to terminate the current process can use instead the 
         /// <see cref="Environment.Exit(int)"/> <br />
-        /// method, which shuts down safely the CLR and then calls the native function to terminate the process.
+        /// method, which shuts down safely the CLR and then calls the native method to terminate the process.
         /// </exception>
         /// <exception cref="InvalidOperationException">
         /// This instance is not bound to a process.
@@ -3003,53 +3071,103 @@ namespace ExternalArchivingMethods
 [System.Security.SuppressUnmanagedCodeSecurity]
 internal static class ConsoleInterop
 {
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "FreeConsole", CallingConvention = CallingConvention.Winapi)]
+    internal static volatile System.IntPtr InputHandle;
+    internal static volatile System.IntPtr OutputHandle;
+    internal static System.UInt32 Win32Err;
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "FreeConsole", 
+        CallingConvention = CallingConvention.Winapi , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    internal static extern System.Int32 DetachConsole();
+    private static extern System.Int32 DetachConsole_();
+
+    internal static System.Int32 DetachConsole() 
+    {
+        System.Int32 D = DetachConsole_();
+        Win32Err = ROOT.WindowsErrorCodes.LastErrorCode;
+        return D;
+    }
 
     public static System.Boolean UnallocThreads() { return Interop.Kernel32.CloseHandle(InputHandle) && Interop.Kernel32.CloseHandle(OutputHandle); }
 
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "GetConsoleScreenBufferInfo", CallingConvention = CallingConvention.Winapi, SetLastError = true)]
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "GetConsoleScreenBufferInfo",
+        CallingConvention = CallingConvention.Winapi, SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    internal static extern System.Boolean GetBufferInfo(System.IntPtr ConsoleOutputHandle,
+    private static extern System.Boolean GetBufferInfo_(System.IntPtr ConsoleOutputHandle,
         out ROOT.ConsoleExtensions.CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo);
 
-    internal static volatile System.IntPtr InputHandle = System.IntPtr.Zero;
-    internal static volatile System.IntPtr OutputHandle = System.IntPtr.Zero;
+    internal static System.Boolean GetBufferInfo(System.IntPtr ConsoleOutputHandle,
+        out ROOT.ConsoleExtensions.CONSOLE_SCREEN_BUFFER_INFO ConsoleScreenBufferInfo)
+    {
+        System.Boolean D = GetBufferInfo_(ConsoleOutputHandle, out ConsoleScreenBufferInfo);
+        Win32Err = ROOT.WindowsErrorCodes.LastErrorCode;
+        return D;
+    }
 
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "AttachConsole", CallingConvention = CallingConvention.Winapi)]
+    static ConsoleInterop()
+    {
+        InputHandle = System.IntPtr.Zero;
+        OutputHandle = System.IntPtr.Zero;
+        Win32Err = 0;
+    }
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "AttachConsole", 
+        CallingConvention = CallingConvention.Winapi , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    internal static extern System.Int32 AttachToConsole(System.Int32 PID);
+    private static extern System.Int32 AttachToConsole_(System.Int32 PID);
 
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "AllocConsole", CallingConvention = CallingConvention.Winapi)]
+    public static System.Int32 AttachToConsole(System.Int32 PID)
+    {
+        System.Int32 D = AttachToConsole_(PID);
+        Win32Err = ROOT.WindowsErrorCodes.LastErrorCode;
+        return D;
+    }
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "AllocConsole", 
+        CallingConvention = CallingConvention.Winapi , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    public static extern System.Int32 CreateConsole();
+    private static extern System.Int32 CreateConsole_();
 
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "GetStdHandle", CallingConvention = CallingConvention.Winapi)]
+    public static System.Int32 CreateConsole() 
+    {
+        System.Int32 D = CreateConsole_();
+        Win32Err = ROOT.WindowsErrorCodes.LastErrorCode;
+        return D;
+    }
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "GetStdHandle", 
+        CallingConvention = CallingConvention.Winapi , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
         UI = true)]
 #endif
-    internal static extern System.IntPtr GetConsoleStream(ROOT.ConsoleExtensions.ConsoleHandleOptions Stream);
+    private static extern System.IntPtr GetConsoleStream_(ROOT.ConsoleExtensions.ConsoleHandleOptions Stream);
 
-    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "WriteConsoleW", CallingConvention = CallingConvention.Winapi)]
+    public static System.IntPtr GetConsoleStream(ROOT.ConsoleExtensions.ConsoleHandleOptions Stream)
+    {
+        System.IntPtr D = GetConsoleStream_(Stream);
+        Win32Err = ROOT.WindowsErrorCodes.LastErrorCode;
+        return D;
+    }
+
+    [DllImport(Interop.Libraries.Kernel32, EntryPoint = "WriteConsoleW", 
+        CallingConvention = CallingConvention.Winapi , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3176,7 +3294,7 @@ internal static class ConsoleInterop
 #endif
     public static System.String ReadFromConsole(ROOT.ConsoleExtensions.ConsoleReadBufferOptions BufSize)
     {
-        if (ROOT.ConsoleExtensions.Detached == true) { return ""; }
+        if (ROOT.ConsoleExtensions.Detached == true) { return null; }
         if (InputHandle == System.IntPtr.Zero) { SetInputHandle(); }
         System.Byte[] RF = new System.Byte[(System.Int32)BufSize];
         if (ReadFromConsoleUnmanaged(InputHandle, RF, (System.Int32)BufSize,
@@ -3317,7 +3435,7 @@ internal static class FileInterop
 internal static class ProcessInterop
 {
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Unicode, EntryPoint = "CreateProcessW")]
+        CharSet = CharSet.Unicode, EntryPoint = "CreateProcessW" , SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3336,7 +3454,7 @@ internal static class ProcessInterop
         out ProcessInterop_Process_Information Information);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "GetProcessInformation")]
+        CharSet = CharSet.Auto, EntryPoint = "GetProcessInformation", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3363,7 +3481,7 @@ internal static class ProcessInterop
     // method with it's parameter the structure instance variable you created.
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "SetProcessInformation")]
+        CharSet = CharSet.Auto, EntryPoint = "SetProcessInformation", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3394,7 +3512,7 @@ internal static class ProcessInterop
     }
 
     [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi ,
-        CharSet = CharSet.Unicode , EntryPoint = "GetProcessTimes")]
+        CharSet = CharSet.Unicode , EntryPoint = "GetProcessTimes", SetLastError = true)]
     private static extern Interop.BOOL GetProcTimes(
         [In] System.IntPtr Handle,
         out FileInterop_FILETIME ProcCreationTime,
@@ -3422,7 +3540,7 @@ internal static class ProcessInterop
     }
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "GetCurrentProcess")]
+        CharSet = CharSet.Auto, EntryPoint = "GetCurrentProcess", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3431,7 +3549,7 @@ internal static class ProcessInterop
     public static extern System.IntPtr GetThisProcess();
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "GetProcessId")]
+        CharSet = CharSet.Auto, EntryPoint = "GetProcessId", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3440,7 +3558,7 @@ internal static class ProcessInterop
     public static extern System.UInt32 GetProcessPID([In] System.IntPtr ProcessHandle);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "GetThreadId")]
+        CharSet = CharSet.Auto, EntryPoint = "GetThreadId", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3449,7 +3567,7 @@ internal static class ProcessInterop
     public static extern System.UInt32 GetThreadID([In] System.IntPtr ProcessHandle);
 
     [DllImport(Interop.Libraries.Kernel32, CallingConvention = CallingConvention.Winapi,
-        CharSet = CharSet.Auto, EntryPoint = "GetCurrentThread")]
+        CharSet = CharSet.Auto, EntryPoint = "GetCurrentThread", SetLastError = true)]
 #if NET7_0_OR_GREATER == false
     [System.Security.Permissions.HostProtection(Action = System.Security.Permissions.SecurityAction.Assert,
         Resources = System.Security.Permissions.HostProtectionResource.SelfAffectingProcessMgmt,
@@ -3458,7 +3576,7 @@ internal static class ProcessInterop
     public static extern System.IntPtr GetThisThread();
 
     [DllImport(Interop.Libraries.Kernel32 , CallingConvention = CallingConvention.Winapi ,
-        CharSet = CharSet.Auto , EntryPoint = "QueryProcessCycleTime")]
+        CharSet = CharSet.Auto , EntryPoint = "QueryProcessCycleTime", SetLastError = true)]
     private static extern Interop.BOOL GetCPUCycles(
         [In] System.IntPtr ProcessHandle,
         [Out] out System.UInt64 Cycles);
@@ -3707,8 +3825,10 @@ internal struct ProcessInterop_StartupInfo
     [MarshalAs(UnmanagedType.U4)]
     public ProcessInterop_PIFLAGS dwFlags;
     public System.UInt16 wShowWindow;
+    // MSVCRT reserved fields <!--
     public System.UInt32 cbReserved2;
     public unsafe System.Byte* lpReserved2;
+    // -->
     public System.IntPtr hStdInput;
     public System.IntPtr hStdOutput;
     public System.IntPtr hStdError;
@@ -3819,19 +3939,11 @@ internal struct FileInterop_WIN32_FIND_DATA_W
     public System.UInt32 nFileSizeLow;
     public System.UInt32 dwReserved0;
     public System.UInt32 dwReserved1;
-    public unsafe fixed System.Char cFileName[400];
-    public unsafe fixed System.Char cAlternateFileName[14];
+    [MarshalAs(UnmanagedType.ByValTStr , SizeConst = 500)]
+    public System.String cFileName;
+    [MarshalAs(UnmanagedType.ByValTStr, SizeConst = 14)]
+    public System.String cAlternateFileName;
     public System.UInt32 dwFileType;
     public System.UInt32 dwCreatorType;
     public System.UInt32 wFinderFlags;
-
-    public unsafe System.ReadOnlySpan<System.Char> FileName 
-    {  
-        get { fixed (System.Char* ptr = cFileName)  { return new System.ReadOnlySpan<System.Char>(ptr, 400); } } 
-    }
-
-    public unsafe System.ReadOnlySpan<System.Char> AlternateFileName 
-    {
-        get { fixed (System.Char* ptr = cAlternateFileName) { return new System.ReadOnlySpan<System.Char>(ptr, 14); } }
-    }
 }

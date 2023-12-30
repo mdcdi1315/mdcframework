@@ -5744,4 +5744,31 @@ IconFile={2}</value>
   <data name="ObjectDisposed_StreamClosed" xml:space="preserve">
 	  <value>Cannot access a closed Stream.</value>
   </data>
+  <data name="InvalidOperation_SetVolumeLabelFailed" xml:space="preserve">
+	  <value>Volume labels can only be set for writable local volumes.</value>
+  </data>
+  <data name="Arg_MustBeNonEmptyDriveName" xml:space="preserve">
+	 <value>Drive name must not be empty.</value>
+  </data>
+  <data name="IO_DriveNotFound" xml:space="preserve">
+	 <value>Could not find the drive. The drive might not be ready or might not be mapped.</value>
+  </data>
+  <data name="IO_DriveNotFound_Drive" xml:space="preserve">
+	  <value>Could not find the drive '{0}'. The drive might not be ready or might not be mapped.</value>
+  </data>
+  <data name="Arg_InvalidDriveChars" xml:space="preserve">
+	  <value>Illegal characters in drive name '{0}'.</value>
+  </data>
+  <data name="Cryptography_InvalidHandle" xml:space="preserve">
+    <value>{0} is an invalid handle.</value>
+  </data>
+  <data name="Enum_InvalidValue" xml:space="preserve">
+    <value>Enumeration value '{0}' specified in condition mapping is not valid.</value>
+  </data>
+  <data name="InvalidOperation_TimeProviderNullLocalTimeZone" xml:space="preserve">
+    <value>The operation cannot be performed when TimeProvider.LocalTimeZone is null.</value>
+  </data>
+  <data name="InvalidOperation_TimeProviderInvalidTimestampFrequency" xml:space="preserve">
+    <value>The operation cannot be performed when TimeProvider.TimestampFrequency is zero or negative.</value>
+  </data>
 </root>

@@ -17,9 +17,6 @@ using System.Runtime.CompilerServices;
 
 namespace ROOT
 {
-	// A Collection Namespace which includes Microsoft's Managed code.
-	// Many methods here , however , are controlled and built by me at all.
-
 	/// <summary>
 	/// Contains a lot and different static methods for different usages.
 	/// </summary>
@@ -30,6 +27,12 @@ namespace ROOT
 		/// This is done so as to be given more information about 'invisible exceptions'.
 		/// </summary>
 		public static System.Exception ExceptionData { get; set; }
+
+		/// <summary>
+		/// API's that utilise encoding operations will get the value of this property in several operations , like in 
+		/// <see cref="PassNewContentsToFile(string, System.IO.FileStream)"/> API.
+		/// </summary>
+		public static APIEncodingOptions Encoding { get { return MAINInternal.EncodingOPT; } set { MAINInternal.EncodingOPT = value; MAINInternal.SetNewEncoding(); } }
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private static System.String ToURL(SystemLinks link)
@@ -101,7 +104,8 @@ namespace ROOT
 		/// <exception cref="NotSupportedException"><paramref name="file"/> contains a colon (:) in the middle of the string.</exception>
         [RequiresPreviewFeatures]
         [SupportedOSPlatform("windows")]
-		public static System.IO.FileInfo ToFileInfo(this Microsoft.IO.FileInfo file) { return new(file.FullName); }
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.IO.FileInfo ToFileInfo(this Microsoft.IO.FileInfo file) { return new(file.FullName); }
 
         /// <summary>
         /// Translates a <see cref="Microsoft.IO.DirectoryInfo"/> object to a <see cref="System.IO.DirectoryInfo"/> object , 
@@ -116,7 +120,8 @@ namespace ROOT
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
         [RequiresPreviewFeatures]
         [SupportedOSPlatform("windows")]
-		public static System.IO.DirectoryInfo ToDirectoryInfo(this Microsoft.IO.DirectoryInfo dir) { return new(dir.FullName); }
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.IO.DirectoryInfo ToDirectoryInfo(this Microsoft.IO.DirectoryInfo dir) { return new(dir.FullName); }
 
         /// <summary>
 		///  Translates a <see cref="Microsoft.IO.DirectoryInfo"/> array to a <see cref="System.IO.DirectoryInfo"/> array ,
@@ -131,7 +136,8 @@ namespace ROOT
 		/// <exception cref="System.IO.PathTooLongException">The specified path, file name, or both exceed the system-defined maximum length.</exception>
         [RequiresPreviewFeatures]
         [SupportedOSPlatform("windows")]
-		public static System.IO.DirectoryInfo[] ToDirectoryInfo(this Microsoft.IO.DirectoryInfo[] dirs)
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.IO.DirectoryInfo[] ToDirectoryInfo(this Microsoft.IO.DirectoryInfo[] dirs)
 		{
 			System.IO.DirectoryInfo[] DR = new System.IO.DirectoryInfo[dirs.LongLength];
 			for (System.Int64 D = 0; D < dirs.LongLength; D++) { DR[D] = dirs[D].ToDirectoryInfo(); }
@@ -153,7 +159,8 @@ namespace ROOT
         /// <exception cref="NotSupportedException">One of the elements in <paramref name="files"/> contains a colon (:) in the middle of the string.</exception>
         [RequiresPreviewFeatures]
         [SupportedOSPlatform("windows")]
-		public static System.IO.FileInfo[] ToFileInfo(this Microsoft.IO.FileInfo[] files)
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.IO.FileInfo[] ToFileInfo(this Microsoft.IO.FileInfo[] files)
 		{
             System.IO.FileInfo[] DR = new System.IO.FileInfo[files.LongLength];
             for (System.Int64 D = 0; D < files.LongLength; D++) { DR[D] = files[D].ToFileInfo(); }
@@ -171,25 +178,27 @@ namespace ROOT
 		[SupportedOSPlatform("windows")]
 		public static System.Boolean OpenSystemApp(SystemLinks link) { return StartUWPApp(ToURL(link)); }
 
-		/// <summary>
-		/// Calculates the power of an interger.
-		/// </summary>
-		/// <param name="Base">The base value to be raised.</param>
-		/// <param name="exponent">The value that specifies the power.</param>
-		/// <returns>The number <paramref name="Base"/> raised to the <paramref name="exponent"/> power.</returns>
-		public static System.Int64 Power(System.Int64 Base, System.Int64 exponent)
+        /// <summary>
+        /// Calculates the power of an interger.
+        /// </summary>
+        /// <param name="Base">The base value to be raised.</param>
+        /// <param name="exponent">The value that specifies the power.</param>
+        /// <returns>The number <paramref name="Base"/> raised to the <paramref name="exponent"/> power.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Int64 Power(System.Int64 Base, System.Int64 exponent)
 		{
 			System.Int64 Result = 1;
 			for (System.Int64 I = 1; I < exponent; I++) { Result *= Base; }
 			return Result;
 		}
 
-		/// <summary>
-		/// Calculates the absolute value of an number.
-		/// </summary>
-		/// <param name="Number">The number to find the absolute value for.</param>
-		/// <returns>The absolute value of <paramref name="Number"/> .</returns>
-		public static System.Int64 Absolute(System.Int64 Number)
+        /// <summary>
+        /// Calculates the absolute value of an number.
+        /// </summary>
+        /// <param name="Number">The number to find the absolute value for.</param>
+        /// <returns>The absolute value of <paramref name="Number"/> .</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Int64 Absolute(System.Int64 Number)
 		{
 			System.Int64 Result;
 			if (Number < 0) { Result = Number * (-1); } else { Result = Number; }
@@ -197,26 +206,28 @@ namespace ROOT
 			return Result;
 		}
 
-		/// <summary>
-		/// Finds the larger number from two numbers.
-		/// </summary>
-		/// <param name="one">The first one number.</param>
-		/// <param name="two">The second one number.</param>
-		/// <returns>The larger number of the two numbers.</returns>
-		public static System.Int64 Max(System.Int64 one, System.Int64 two)
+        /// <summary>
+        /// Finds the larger number from two numbers.
+        /// </summary>
+        /// <param name="one">The first one number.</param>
+        /// <param name="two">The second one number.</param>
+        /// <returns>The larger number of the two numbers.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Int64 Max(System.Int64 one, System.Int64 two)
 		{
 			System.Int64 Result;
 			if (one > two) { Result = one; } else if (two > one) { Result = two; } else { Result = one; }
 			return Result;
 		}
 
-		/// <summary>
-		/// Finds the smaller number from two numbers.
-		/// </summary>
-		/// <param name="One">The first one number.</param>
-		/// <param name="Two">The second one number.</param>
-		/// <returns>The smaller number of the two numbers.</returns>
-		public static System.Int64 Min(System.Int64 One, System.Int64 Two)
+        /// <summary>
+        /// Finds the smaller number from two numbers.
+        /// </summary>
+        /// <param name="One">The first one number.</param>
+        /// <param name="Two">The second one number.</param>
+        /// <returns>The smaller number of the two numbers.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static System.Int64 Min(System.Int64 One, System.Int64 Two)
 		{
 			System.Int64 Result;
 			if (Two < One) { Result = Two; } else if (One < Two) { Result = One; } else { Result = One; }
@@ -229,35 +240,42 @@ namespace ROOT
 		/// <param name="One">The first number to divide.</param>
 		/// <param name="Two">The second number to divide.</param>
 		/// <returns>The remainder of the two divided numbers.</returns>
-		public static System.Int64 Mod(System.Double One, System.Double Two) { return System.Convert.ToInt64(One % Two); }
+		public static System.Int64 Mod(System.Double One, System.Double Two) { return Round(One % Two); }
 
-		/// <summary>
-		/// Rounds the specified double value to the nearest integer value.
-		/// </summary>
-		/// <param name="Num">The number to round.</param>
-		/// <returns>The rounded number as <see cref="System.Int64"/>.</returns>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        /// <summary>
+        /// Rounds the specified double value to the nearest integer value.
+        /// </summary>
+        /// <param name="Num">The number to round.</param>
+        /// <returns>The rounded number as <see cref="System.Int64"/>.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static System.Int64 Round(System.Double Num)
 		{
 			System.Int64 Result;
-			if (Num - IntegerPart(Num) > 0.5)
-			{ Result = IntegerPart(Num) + 1; } else
-			{ Result = IntegerPart(Num); }
+			System.Int64 Part = IntegerPart(Num);
+            if (Num - Part > 0.5) { Result = Part + 1; } else { Result = Part; }
 			return Result;
 		}
 
 		/// <summary>
-		/// Returns the integer part of a double value.
+		/// Returns the integer part of a <see cref="System.Double"/> value.
 		/// </summary>
 		/// <param name="Num">The number to return it's integer part.</param>
 		/// <returns>The integer part of <paramref name="Num"/> as <see cref="System.Int64"/>.</returns>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static System.Int64 IntegerPart(System.Double Num)
+		public static System.Int64 IntegerPart(System.Double Num) 
 		{
-			System.String Tmp = Num.ToString(default(IFormatProvider));
-			if (Tmp.IndexOf('.') != -1) { Tmp = Tmp.Remove(Tmp.IndexOf('.')); }
-			return System.Int64.Parse(Tmp, style: System.Globalization.NumberStyles.None, default(IFormatProvider));
-		}
+            // Uses a more optimized result for calculating integer parts
+            // Should only compile for .NET Core since doing the same for
+            // .NET Framework this code would make it slow.
+			// However , both practices give accurately the same results.
+#if NET7_0_OR_GREATER
+            System.Int64 Result = (System.Int64)Math.Floor(Math.Abs(Num));
+			if (Num < 0) { Result *= -1; }
+			return Result;
+#else
+			return (System.Int64)Num;
+#endif
+        }
 
 		/// <summary>
 		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
@@ -266,9 +284,12 @@ namespace ROOT
 		/// <param name="one">The <see cref="System.String"/> to check.</param>
 		/// <param name="two">The second <see cref="System.String"/> to check.</param>
 		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
+		/// <exception cref="OverflowException">
 		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
 		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+		/// </exception>
+		/// <exception cref="ArgumentNullException">
+		/// The parameter provided was <see langword="null"/>.
 		/// </exception>
 		public static System.Boolean StringIsLessThan(this System.String one, System.String two)
 		{
@@ -276,84 +297,92 @@ namespace ROOT
 			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
 			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
 			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
-			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] < Array2[I]) { return true; } }
+            System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
+            try {
+                for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] < Array2[I]) { return true; } }
+            } catch (IndexOutOfRangeException e) { throw new OverflowException("Result was undefined until this point of search." , e); }
 			return false;
 		}
 
-		/// <summary>
-		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-		/// before or is equal to the one tested.
-		/// </summary>
-		/// <param name="one">The <see cref="System.String"/> to check.</param>
-		/// <param name="two">The second <see cref="System.String"/> to check.</param>
-		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
-		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
-		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
-		/// </exception>
-		/// <exception cref="System.ArgumentNullException">
-		/// The arguments provided were null.
-		/// </exception>
-		public static System.Boolean StringIsLessOrEqualThan(this System.String one, System.String two)
+        /// <summary>
+        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+        /// before or is equal to the one tested.
+        /// </summary>
+        /// <param name="one">The <see cref="System.String"/> to check.</param>
+        /// <param name="two">The second <see cref="System.String"/> to check.</param>
+        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+        /// <exception cref="OverflowException">
+        /// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
+        /// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// The parameter provided was <see langword="null"/>.
+        /// </exception>
+        public static System.Boolean StringIsLessOrEqualThan(this System.String one, System.String two)
 		{
 			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
 			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
 			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
 			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
 			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] <= Array2[I]) { return true; } }
-			return false;
+            try {
+                for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] <= Array2[I]) { return true; } }
+            } catch (IndexOutOfRangeException e) { throw new OverflowException("Result was undefined until this point of search.", e); }
+            return false;
 		}
 
-		/// <summary>
-		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-		/// later the one tested.
-		/// </summary>
-		/// <param name="one">The <see cref="System.String"/> to check.</param>
-		/// <param name="two">The second <see cref="System.String"/> to check.</param>
-		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
-		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
-		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
-		/// </exception>
-		/// <exception cref="System.ArgumentNullException">
-		/// The arguments provided were null.
-		/// </exception>
-		public static System.Boolean StringIsGreaterThan(this System.String one, System.String two)
+        /// <summary>
+        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+        /// later the one tested.
+        /// </summary>
+        /// <param name="one">The <see cref="System.String"/> to check.</param>
+        /// <param name="two">The second <see cref="System.String"/> to check.</param>
+        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+        /// <exception cref="OverflowException">
+        /// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
+        /// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// The parameter provided was <see langword="null"/>.
+        /// </exception>
+        public static System.Boolean StringIsGreaterThan(this System.String one, System.String two)
 		{
 			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
 			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
 			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
 			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
 			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] > Array2[I]) { return true; } }
-			return false;
+            try {
+                for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] > Array2[I]) { return true; } }
+            } catch (IndexOutOfRangeException e) { throw new OverflowException("Result was undefined until this point of search.", e); }
+            return false;
 		}
 
-		/// <summary>
-		/// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
-		/// later or equal the one tested.
-		/// </summary>
-		/// <param name="one">The <see cref="System.String"/> to check.</param>
-		/// <param name="two">The second <see cref="System.String"/> to check.</param>
-		/// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
-		/// <exception cref="System.IndexOutOfRangeException">
-		/// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
-		/// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
-		/// </exception>
-		/// <exception cref="System.ArgumentNullException">
-		/// The arguments provided were null.
-		/// </exception>
-		public static System.Boolean StringIsGreaterOrEqualThan(this System.String one, System.String two)
+        /// <summary>
+        /// Tests whether a <see cref="System.String"/> has a character at the same position of the other <see cref="System.String"/>
+        /// later or equal the one tested.
+        /// </summary>
+        /// <param name="one">The <see cref="System.String"/> to check.</param>
+        /// <param name="two">The second <see cref="System.String"/> to check.</param>
+        /// <returns>If the above statement occurs , then it returns <see langword="true"/>; otherwise , <see langword="false"/>.</returns>
+        /// <exception cref="OverflowException">
+        /// If a <see cref="System.String"/> provided has more or less characters than the other one , and reaches the limit
+        /// either the first or the last , and no value has been returned yet , then the result cannot be defined in this case. 
+        /// </exception>
+        /// <exception cref="ArgumentNullException">
+        /// The parameter provided was <see langword="null"/>.
+        /// </exception>
+        public static System.Boolean StringIsGreaterOrEqualThan(this System.String one, System.String two)
 		{
 			if (System.String.IsNullOrEmpty(one)) { throw new ArgumentNullException(nameof(one)); }
 			if (System.String.IsNullOrEmpty(two)) { throw new ArgumentNullException(nameof(two)); }
 			System.Char[] Array1 = one.ToUpperInvariant().ToCharArray();
 			System.Char[] Array2 = two.ToUpperInvariant().ToCharArray();
 			System.Int64 Len = Max(Array1.LongLength, Array2.LongLength);
-			for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] >= Array2[I]) { return true; } }
-			return false;
+            try {
+                for (System.Int64 I = 0; I < Len; I++) { if (Array1[I] >= Array2[I]) { return true; } }
+            } catch (IndexOutOfRangeException e) { throw new OverflowException("Result was undefined until this point of search.", e); }
+            return false;
 		}
 
 		/// <summary>
@@ -362,7 +391,7 @@ namespace ROOT
 		/// <param name="One">The first number to divide.</param>
 		/// <param name="Two">The second number to divide.</param>
 		/// <returns>The quotient of the two divided numbers.</returns>
-		public static System.Int64 Div(System.Double One, System.Double Two) { return System.Convert.ToInt64(One / Two); }
+		public static System.Int64 Div(System.Double One, System.Double Two) { return Round(One / Two); }
 
 		/// <summary>
 		/// Opens a Windows UWP App.
@@ -375,13 +404,14 @@ namespace ROOT
 		public static System.Boolean OpenSystemApp(SystemLinks link, IWin32Window Window) { return StartUWPApp(ToURL(link), Window); }
 
 #if NEEDS_HTTPLIB == false
-		
+
 		/// <summary>
 		/// Creates a new Windows Internet Shortcut.
 		/// </summary>
 		/// <param name="URL">The URL that the shortcut will point to.</param>
 		/// <param name="Path">The path of the shortcut that will be saved.</param>
 		/// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+		[Obsolete("The method " + nameof(CreateInternetShortcut) + " and it's overloads has been moved to ROOT.HTTPLIB_MAIN." , DiagnosticId = "MDCFR002")]
 		public static System.Boolean CreateInternetShortcut(System.Uri URL, System.String Path)
 		{
 			return CreateInternetShortcut(URL, Path, false);
@@ -396,6 +426,7 @@ namespace ROOT
         /// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code", 
 			Justification = "The code described here is NOT dead code.")]
+        [Obsolete("The method " + nameof(CreateInternetShortcut) + " and it's overloads has been moved to ROOT.HTTPLIB_MAIN.", DiagnosticId = "MDCFR002")]
         public static System.Boolean CreateInternetShortcut(System.Uri URL, System.String Path, System.Boolean OverwriteIfExists)
 		{
 			System.IO.FileStream Out = null;
@@ -467,7 +498,8 @@ namespace ROOT
         /// <param name="OverwriteIfExists">If <see langword="true"/> , then it will delete the contents of the existing file , if exists.</param>
         /// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
-			"CA1508:Avoid dead conditional code", Justification = "Functions used in this class have still the possiblity to return null.")]
+			"CA1508:Avoid dead conditional code", Justification = "Methods used in this class have still the possiblity to return null.")]
+        [Obsolete("The method " + nameof(CreateInternetShortcut) + " and it's overloads has been moved to ROOT.HTTPLIB_MAIN.", DiagnosticId = "MDCFR002")]
         public static System.Boolean CreateInternetShortcut(
 			System.Uri URL, System.String Path,
 			System.String CustomIconFile, System.Int16 IconFileNumToUse,
@@ -540,14 +572,21 @@ namespace ROOT
         }
 #endif
 
-		/// <summary>
-		/// Opens a Windows UWP App from a custom link.
-		/// </summary>
-		/// <param name="link">The custom link that points to an UWP app that does 
-		/// not exist in the <see cref="SystemLinks"/> eumeration.</param>
-		/// <returns>A <see cref="System.Boolean"/> determining whether the 
-		/// specified UWP App was opened or restored.</returns>
-		[SupportedOSPlatform("windows")]
+        /// <summary>
+        /// The <see cref="ToArray"/> method gets all the data representing the current buffer , and returns them
+        /// as a one-dimensional and fixed <see cref="System.Byte"/>[] array.
+        /// </summary>
+        /// <returns>The data which the <see langword="struct"/> given holds.</returns>
+        public static System.Byte[] ToArray(this ModifidableBuffer str) { return str.ToArray(); }
+
+        /// <summary>
+        /// Opens a Windows UWP App from a custom link.
+        /// </summary>
+        /// <param name="link">The custom link that points to an UWP app that does 
+        /// not exist in the <see cref="SystemLinks"/> eumeration.</param>
+        /// <returns>A <see cref="System.Boolean"/> determining whether the 
+        /// specified UWP App was opened or restored.</returns>
+        [SupportedOSPlatform("windows")]
 		public static System.Boolean OpenSystemApp(System.String link)
 		{
 			if (link == null) { return false; }
@@ -584,7 +623,7 @@ namespace ROOT
 		/// <param name="DG">The <see cref="DialogsReturner"/> class instance to get data from.</param>
 		/// <returns>The full file path returned by the dialog.</returns>
 		[SupportedOSPlatform("windows")]
-		public static System.String GetFilePathFromInvokedDialog(DialogsReturner DG) { return DG.FileNameFullPath; }
+		public static System.String GetFilePathFromInvokedDialog(this DialogsReturner DG) { return DG.FileNameFullPath; }
 
 		/// <summary>
 		/// Gets from an instance of the <see cref="DialogsReturner"/> class if the dialog was executed sucessfully and a path was got.
@@ -593,7 +632,7 @@ namespace ROOT
 		/// <returns>A <see cref="System.Boolean"/> value indicating whether the dialog execution 
 		/// was sucessfull; <c>false</c> in the case of error or the user did not supplied a file path.</returns>
 		[SupportedOSPlatform("windows")]
-		public static System.Boolean GetLastErrorFromInvokedDialog(DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
+		public static System.Boolean GetLastErrorFromInvokedDialog(this DialogsReturner DG) { if (DG.ErrorCode == "Error") { return false; } else { return true; } }
 
 		/// <summary>
 		/// A static class which creates console colored messages to differentiate the types of errors or information given.
@@ -793,11 +832,12 @@ namespace ROOT
 		/// <param name="Opt">The Buffer Size to set. If left undefined , then it is <see cref="ConsoleExtensions.ConsoleReadBufferOptions.Default"/></param>
 		/// <returns>The data read from the console. If any error found , then it will return the <c>"Error"</c> <see cref="System.String"/> .</returns>
 		[SupportedOSPlatform("windows")]
-		public static System.String ReadConsoleText(ROOT.ConsoleExtensions.ConsoleReadBufferOptions Opt =
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.String ReadConsoleText(ROOT.ConsoleExtensions.ConsoleReadBufferOptions Opt =
 			ROOT.ConsoleExtensions.ConsoleReadBufferOptions.Default)
 		{
 #if IsWindows
-			return global::ConsoleInterop.ReadFromConsole(Opt);
+			return ConsoleInterop.ReadFromConsole(Opt);
 #else
 			return System.Console.ReadLine();	
 #endif
@@ -875,13 +915,14 @@ namespace ROOT
 		/// <returns>A <see cref="System.String"/> describing the OS .NET Runtime information.</returns>
 		public static System.String OSFramework() { return System.Runtime.InteropServices.RuntimeInformation.FrameworkDescription; }
 
-		/// <summary>
-		/// This method returns the computer's processor architecture.
-		/// </summary>
-		/// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit machines , 
-		/// <c>"AMD64"</c> for Unicode 64-Bit machines , <c>"ARM"</c> for ARM 32-Bit machines , and <c>"ARM64"</c> for ARM 64-Bit
-		/// machines. Otherwise , <c>"Error"</c>.</returns>
-		public static System.String OSProcessorArchitecture()
+        /// <summary>
+        /// This method returns the computer's processor architecture.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit machines , 
+        /// <c>"AMD64"</c> for Unicode 64-Bit machines , <c>"ARM"</c> for ARM 32-Bit machines , and <c>"ARM64"</c> for ARM 64-Bit
+        /// machines. Otherwise , <c>"Error"</c>.</returns>
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.String OSProcessorArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.OSArchitecture;
 #if DEBUG
@@ -893,13 +934,14 @@ namespace ROOT
 			else if (System.Runtime.InteropServices.Architecture.Arm64 == RRD) { return "ARM64"; } else { return "Error"; }
 		}
 
-		/// <summary>
-		/// This method returns the application's compiled platform.
-		/// </summary>
-		/// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit processes , 
-		/// <c>"AMD64"</c> for Unicode 64-Bit processes , <c>"ARM"</c> for ARM 32-Bit processes , and <c>"ARM64"</c> for ARM 64-Bit
-		/// processes. Otherwise , <c>"Error"</c>.</returns>
-		public static System.String ProcessArchitecture()
+        /// <summary>
+        /// This method returns the application's compiled platform.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> that can return the values: <c>"x86"</c> for Unicode 32-bit processes , 
+        /// <c>"AMD64"</c> for Unicode 64-Bit processes , <c>"ARM"</c> for ARM 32-Bit processes , and <c>"ARM64"</c> for ARM 64-Bit
+        /// processes. Otherwise , <c>"Error"</c>.</returns>
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.String ProcessArchitecture()
 		{
 			System.Runtime.InteropServices.Architecture RRD = System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture;
 #if DEBUG
@@ -957,7 +999,7 @@ namespace ROOT
 		/// <param name="Chartobechanged">The character that will replace the <paramref name="Chartochange"/> character.</param>
 		/// <returns>The <see cref="System.String"/> given to <paramref name="Stringtoreplacechar"/> ,
 		/// but with the defined character changed as specified by the <paramref name="Chartobechanged"/> parameter.</returns>
-		public static System.String ChangeDefinedChar(System.String Stringtoreplacechar,
+		public static System.String ChangeDefinedChar(this System.String Stringtoreplacechar,
 			System.Char Chartochange, System.Char Chartobechanged)
 		{
 			if (System.String.IsNullOrEmpty(Stringtoreplacechar)) { return "Error"; }
@@ -969,11 +1011,7 @@ namespace ROOT
 			System.String Result = null;
 			for (System.Int32 I = 0; I < array.Length; I++)
 			{
-				if (array[I] == Chartochange)
-				{
-					Result += Chartobechanged;
-				}
-				else { Result += array[I]; }
+				if (array[I] == Chartochange) { Result += Chartobechanged; } else { Result += array[I]; }
 			}
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.ChangeDefinedChar(... , {Chartochange} , {Chartobechanged})) RESULT: Success");
@@ -981,17 +1019,18 @@ namespace ROOT
 			return Result;
 		}
 
-		/// <summary>
-		/// The method returns a new <see cref="System.String"/> defined from the <paramref name="StringToClear"/> parameter , 
-		/// but it's characters removed defined by the <paramref name="CharToClear"/> parameter.
-		/// </summary>
-		/// <param name="StringToClear">The <see cref="System.String"/> which the characters will be removed from.</param>
-		/// <param name="CharToClear">The <see cref="System.Char"/>[] array which defines which characters will be removed.
-		/// The array can also have only one entry (character) to remove from the <see cref="System.String"/>.</param>
-		/// <returns>A new <see cref="System.String"/> which is the 
-		/// <paramref name="StringToClear"/> but with the defined characters removed.</returns>
-		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-		public static System.String RemoveDefinedChars(System.String StringToClear, params System.Char[] CharToClear)
+        /// <summary>
+        /// The method returns a new <see cref="System.String"/> defined from the <paramref name="StringToClear"/> parameter , 
+        /// but it's characters removed defined by the <paramref name="CharToClear"/> parameter.
+        /// </summary>
+        /// <param name="StringToClear">The <see cref="System.String"/> which the characters will be removed from.</param>
+        /// <param name="CharToClear">The <see cref="System.Char"/>[] array which defines which characters will be removed.
+        /// The array can also have only one entry (character) to remove from the <see cref="System.String"/>.</param>
+        /// <returns>A new <see cref="System.String"/> which is the 
+        /// <paramref name="StringToClear"/> but with the defined characters removed.</returns>
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
+		public static System.String RemoveDefinedChars(this System.String StringToClear, params System.Char[] CharToClear)
 		{
 			if (System.String.IsNullOrEmpty(StringToClear)) { return null; }
 			System.Char[] CharString = StringToClear.ToCharArray();
@@ -1247,6 +1286,7 @@ namespace ROOT
 		[System.Diagnostics.CodeAnalysis.SuppressMessage("Design",
 			"CA1031:Do not catch general exception types",
 			Justification = "The Internal Debugger depends on this general exception type.")]
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
 		public static System.IO.FileSystemInfo[] GetANewFileSystemInfo(System.String Path)
 		{
 			if (DirExists(Path) == false) { return null; }
@@ -1254,8 +1294,7 @@ namespace ROOT
 			{
 				System.IO.DirectoryInfo RFD = new System.IO.DirectoryInfo(Path);
 				return RFD.GetFileSystemInfos("*", System.IO.SearchOption.AllDirectories);
-			}
-			catch (System.Exception e) { ExceptionData = e; return null; }
+			} catch (System.Exception e) { ExceptionData = e; return null; }
 		}
 
 		/// <summary>
@@ -1366,13 +1405,19 @@ namespace ROOT
 			Justification = "The Internal Debugger depends of this general exception type.")]
 		public static void PassNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
-			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents + System.Environment.NewLine);
+            if (FileStreamObject == null)
+            {
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) ERROR: The FileStreamObject given was invalid.");
+#endif
+                return;
+            }
+            System.Byte[] EMDK = MAINInternal.CurrentEncoding.GetBytes(Contents + System.Environment.NewLine);
 			try
 			{
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.PassNewContentsToFile(...)) INFO: Attempting to write data to the target.");
 #endif
-				if (FileStreamObject == null) { return; }
 				FileStreamObject.Write(EMDK, 0, EMDK.Length);
 			}
 			catch (System.Exception E)
@@ -1400,14 +1445,21 @@ namespace ROOT
 			Justification = "The Internal Debugger depends of this general exception type.")]
 		public static void AppendNewContentsToFile(System.String Contents, System.IO.FileStream FileStreamObject)
 		{
-			System.Byte[] EMDK = new System.Text.UTF8Encoding(true).GetBytes(Contents);
+            if (FileStreamObject == null) 
+			{
+#if DEBUG
+                Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) ERROR: The FileStreamObject given was invalid.");
+#endif
+                return; 
+			}
+            System.Byte[] EMDK = MAINInternal.CurrentEncoding.GetBytes(Contents);
 			try
 			{
 #if DEBUG
                 Debugger.DebuggingInfo("(in ROOT.MAIN.AppendNewContentsToFile(...)) INFO: Attempting to write data to the target.");
 #endif
-				if (FileStreamObject == null) { return; }
-				FileStreamObject.Write(EMDK, System.Convert.ToInt32(FileStreamObject.Length), EMDK.Length);
+				FileStreamObject.Position = FileStreamObject.Length;
+                FileStreamObject.Write(EMDK, 0, EMDK.Length);
 			}
 			catch (System.Exception E)
 			{
@@ -1424,17 +1476,20 @@ namespace ROOT
 			return;
 		}
 
-		/// <summary>
-		/// This method gets all the file contents from the alive <see cref="System.IO.FileStream"/> object.
-		/// Be noted that the object must have at least Read permissions.
-		/// </summary>
-		/// <param name="FileStreamObject">The alive <see cref="System.IO.FileStream"/> object to get the file data from.</param>
-		/// <returns>The file contents to a <see cref="System.String"/> .</returns>
-		public static System.String GetContentsFromFile(System.IO.FileStream FileStreamObject)
+        /// <summary>
+        /// This method gets all the file contents from the alive <see cref="System.IO.FileStream"/> object.
+        /// Be noted that the object must have at least Read permissions.
+        /// </summary>
+        /// <param name="FileStreamObject">The alive <see cref="System.IO.FileStream"/> object to get the file data from.</param>
+        /// <param name="Length">If you specify this parameter , then instead of getting the whole file , it gets only until the limit specified.</param>
+        /// <returns>The file contents to a <see cref="System.String"/> .</returns>
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.String GetContentsFromFile(System.IO.FileStream FileStreamObject , System.Int64 Length = -3)
 		{
-			System.Byte[] EMS = new System.Byte[FileStreamObject.Length];
-			FileStreamObject.Read(EMS, 0, System.Convert.ToInt32(FileStreamObject.Length));
-			return new System.Text.UTF8Encoding(true).GetString(EMS);
+			if (Length == -3) { Length = FileStreamObject.Length; }
+			FileStreamObject.Position = 0;
+			System.Byte[] EMS = MAINInternal.D_ReadBufferedInternalTarget(FileStreamObject , Length);
+			return MAINInternal.CurrentEncoding.GetString(EMS);
 		}
 
 		/// <summary>
@@ -1449,43 +1504,27 @@ namespace ROOT
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 		public static System.String GetACryptographyHashForAFile(System.String PathOfFile, HashDigestSelection HashToSelect)
 		{
-			System.Byte[] Contents = null;
-			using System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
-			{
-				if (Initialiser == null) { return "Error"; } else { Contents = new System.Byte[Initialiser.Length]; }
-				if (Initialiser != null) { Initialiser.Read(Contents, 0, Contents.Length); }
-			}
-			System.Security.Cryptography.HashAlgorithm EDI;
-#if NET47_OR_GREATER
-			switch (HashToSelect)
-			{
-				case HashDigestSelection.SHA1: EDI = new System.Security.Cryptography.SHA1Managed(); break;
-				case HashDigestSelection.SHA256: EDI = new System.Security.Cryptography.SHA256Managed(); break;
-				case HashDigestSelection.SHA384: EDI = new System.Security.Cryptography.SHA384Managed(); break;
-				case HashDigestSelection.SHA512: EDI = new System.Security.Cryptography.SHA512Managed(); break;
-				case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
-				default:
-					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
-					return "Error";
-			}
-#else
-			switch (HashToSelect)
-			{
-				case HashDigestSelection.SHA1: EDI = System.Security.Cryptography.SHA1.Create(); break;
-				case HashDigestSelection.SHA256: EDI = System.Security.Cryptography.SHA256.Create(); break;
-				case HashDigestSelection.SHA384: EDI = System.Security.Cryptography.SHA384.Create(); break;
-				case HashDigestSelection.SHA512: EDI = System.Security.Cryptography.SHA512.Create(); break;
-				case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
-				default:
-					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
-					return "Error";
-			}
-#endif
+            System.Byte[] Contents = null;
+            System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
+            if (Initialiser == null) { return "Error"; }
+            else
+            {
+                Contents = MAINInternal.D_ReadBufferedInternalTarget(Initialiser, Initialiser.Length);
+                Initialiser.Close();
+                Initialiser.Dispose();
+            }
+            if (Contents == null) { return "Error"; }
+            System.Security.Cryptography.HashAlgorithm EDI = MAINInternal.D_GetACryptographyHashForAFile_1(HashToSelect);
+            if (EDI == null)
+            {
+                ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} is invalid.");
+                return "Error";
+            }
 
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
 #endif
-			System.Byte[] RSS = EDI.ComputeHash(Contents);
+            System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -1504,35 +1543,23 @@ namespace ROOT
 		{
 			System.Byte[] Contents = null;
 			System.IO.FileStream Initialiser = ReadAFileUsingFileStream(PathOfFile);
-			if (Initialiser == null) { return "Error"; } else { Contents = new System.Byte[Initialiser.Length]; }
-			if (Initialiser != null) { Initialiser.Read(Contents, 0, Contents.Length); }
-			if (Initialiser != null) { Initialiser.Close(); Initialiser.Dispose(); }
-			System.Security.Cryptography.HashAlgorithm EDI;
-			switch (HashToSelect)
-			{
-				case "SHA1":
-					EDI = System.Security.Cryptography.SHA1.Create();
-					break;
-				case "SHA256":
-					EDI = System.Security.Cryptography.SHA256.Create();
-					break;
-				case "SHA384":
-					EDI = System.Security.Cryptography.SHA384.Create();
-					break;
-				case "SHA512":
-					EDI = System.Security.Cryptography.SHA512.Create();
-					break;
-				case "MD5":
-					EDI = System.Security.Cryptography.MD5.Create();
-					break;
-				default:
-					ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} Is Invalid!!!");
-					return "Error";
-			}
+			if (Initialiser == null) { return "Error"; }
+			else {
+                Contents = MAINInternal.D_ReadBufferedInternalTarget(Initialiser, Initialiser.Length);
+				Initialiser.Close();
+                Initialiser.Dispose();
+            }
+			if (Contents == null) { return "Error"; }
+            System.Security.Cryptography.HashAlgorithm EDI = MAINInternal.D_GetACryptographyHashForAFile_2(HashToSelect);
+            if (EDI == null)
+            {
+                ExceptionData = new InvalidOperationException($"Error - Option {HashToSelect} is invalid.");
+                return "Error";
+            }
 #if DEBUG
             Debugger.DebuggingInfo($"(in ROOT.MAIN.GetACryptographyHashForAFile(...)) INFO: Computing hash of target.");
 #endif
-			System.Byte[] RSS = EDI.ComputeHash(Contents);
+            System.Byte[] RSS = EDI.ComputeHash(Contents);
 			EDI.Dispose();
 			System.String Result = null;
 			for (System.Int32 ITER = 0; ITER <= RSS.Length - 1; ITER++) { Result += RSS[ITER].ToString("x2"); }
@@ -1579,6 +1606,7 @@ namespace ROOT
         /// <remarks>Note: This uses the <see cref="ROOT.IntuitiveInteraction.GetAStringFromTheUser"/> class instead of the 
         /// Microsoft.VisualBasic.Interaction.InputBox() method.</remarks>
         [SupportedOSPlatform("windows")]
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
         [MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
         public static System.String GetAStringFromTheUserNew(System.String Prompt,
         System.String Title, System.String DefaultResponse) 
@@ -1929,6 +1957,7 @@ namespace ROOT
 		/// </summary>
 		/// <returns>The <see cref="System.String"/>[] of the directory paths found in the variable.</returns>
 		// Spliting can be a very consuming process , process the data as fast as possible.
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
 		public static System.String[] GetPathEnvironmentVar()
 		{
@@ -1936,8 +1965,7 @@ namespace ROOT
 			{
 				System.String[] RMF = (System.Environment.GetEnvironmentVariable("Path")).Split(';');
 				return RMF;
-			}
-			catch (System.Exception) { return null; }
+			} catch (System.Exception) { return null; }
 		}
 
 		/// <summary>
@@ -1955,7 +1983,7 @@ namespace ROOT
 			System.String[] strings = GetPathEnvironmentVar();
 			for (System.Int32 I = 0; I < strings.Length; I++)
 			{
-				if (FileExists($"{strings[I]}\\{FileName}") == true)
+				if (FileExists($"{strings[I]}\\{FileName}"))
 				{
 					FSR.Filepath = $"{strings[I]}\\{FileName}";
 					FSR.GetExtension();
@@ -1977,7 +2005,7 @@ namespace ROOT
 		/// <returns>A new <see cref="FileSearchResult"/> <see langword="struct"/> 
 		/// which contains the file path that was found.</returns>
 		[MethodImplAttribute(MethodImplOptions.AggressiveInlining)]
-		public static FileSearchResult FindFileFromPath(System.String FileName, System.String[] Extensions)
+		public static FileSearchResult FindFileFromPath(System.String FileName, params System.String[] Extensions)
 		{
 			FileSearchResult FSR = new FileSearchResult();
 			if (FileName == null) { FSR.success = false; return FSR; }
@@ -1989,7 +2017,7 @@ namespace ROOT
 			{
 				for (System.Int32 B = 0; B < strings.Length; B++)
 				{
-					if (FileExists($"{strings[B]}\\{FileName}.{Extensions[A]}") == true)
+					if (FileExists($"{strings[B]}\\{FileName}.{Extensions[A]}"))
 					{
 						FSR.Filepath = $"{strings[B]}\\{FileName}.{Extensions[A]}";
 						FSR.ext = Extensions[A];
@@ -2004,17 +2032,364 @@ namespace ROOT
 
 	}
 
-	[System.Runtime.CompilerServices.SpecialName]
+#if NEEDS_HTTPLIB == false
+	/// <summary>
+	/// Because HTTPLIB is deprecated after .NET 7 , any references from the <see cref="MAIN"/> class that bother HTTPLIB are located here. <br />
+	/// The <see cref="MAIN"/> signatures that use HTTPLIB are deprecated.
+	/// </summary>
+    public static class HTTPLIB_MAIN
+	{
+		/// <summary>
+		/// Creates a new Windows Internet Shortcut.
+		/// </summary>
+		/// <param name="URL">The URL that the shortcut will point to.</param>
+		/// <param name="Path">The path of the shortcut that will be saved.</param>
+		/// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+		[return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.Boolean CreateInternetShortcut(System.Uri URL, System.String Path)
+        {
+            return CreateInternetShortcut(URL, Path, false);
+        }
+
+        /// <summary>
+        /// Creates a new Windows Internet Shortcut.
+        /// </summary>
+        /// <param name="URL">The URL that the shortcut will point to.</param>
+        /// <param name="Path">The path of the shortcut that will be saved.</param>
+        /// <param name="OverwriteIfExists">If <see langword="true"/> , then it will delete the contents of the existing file , if exists.</param>
+        /// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability", "CA1508:Avoid dead conditional code",
+            Justification = "The code described here is NOT dead code.")]
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.Boolean CreateInternetShortcut(System.Uri URL, System.String Path, System.Boolean OverwriteIfExists)
+        {
+            System.IO.FileStream Out = null;
+            HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: {URL}");
+#endif
+            System.Boolean executed = false;
+            System.Net.WebException err = null;
+            req.OnSuccess(df => { executed = true; });
+            req.OnFail(dg => { executed = true; err = dg; });
+            req.Go();
+            while (executed == false)
+            {
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) WAITINGREP: {URL}: 130 ms");
+#endif
+                MAIN.HaltApplicationThread(130);
+            }
+            req = null;
+            if (err != null) { err = null; goto G_ExitErr; }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: true");
+#endif
+            err = null;
+            if (MAIN.FileExists(Path))
+            {
+                if (OverwriteIfExists)
+                {
+                    Out = MAIN.ClearAndWriteAFile(Path);
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: ClearAndWriteAFile()");
+#endif
+                    if (Out == null) { goto G_ExitErr; }
+                }
+                else { goto G_ExitErr; }
+            }
+            else
+            {
+                Out = MAIN.CreateANewFile(Path);
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: CreateANewFile()");
+#endif
+                if (Out == null) { goto G_ExitErr; }
+            }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) PROCESS_ACTION");
+#endif
+            MAIN.PassNewContentsToFile(String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE, URL.ToString()), Out);
+            Out.Close();
+            Out.Dispose();
+            Out = null;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) RESULT: Success");
+#endif
+            goto G_Succ;
+        G_ExitErr: { if (Out != null) { Out.Close(); Out.Dispose(); } return false; }
+        G_Succ: { if (Out != null) { Out.Close(); Out.Dispose(); } return true; }
+        }
+
+		/// <summary>
+		/// Creates a new Windows Internet Shortcut.
+		/// </summary>
+		/// <param name="URL">The URL that the shortcut will point to.</param>
+		/// <param name="Path">The path of the shortcut that will be saved.</param>
+		/// <param name="CustomIconFile">The custom icon file or Windows executable to use for the new shortcut.</param>
+		/// <param name="IconFileNumToUse">The icon index inside the icon file that contains the images to show. 
+		/// If you are not sure whether the icon file only has one image , then set this parameter to zero.</param>
+		/// <param name="OverwriteIfExists">If <see langword="true"/> , then it will delete the contents of the existing file , if exists.</param>
+		/// <returns>Returns <see langword="true"/> on success; <see langword="false"/> on error.</returns>
+		[System.Diagnostics.CodeAnalysis.SuppressMessage("Maintainability",
+			"CA1508:Avoid dead conditional code", Justification = "Methods used in this class have still the possiblity to return null.")]
+        [return: System.Diagnostics.CodeAnalysis.MaybeNull]
+        public static System.Boolean CreateInternetShortcut(
+			System.Uri URL, System.String Path,
+			System.String CustomIconFile, System.Int16 IconFileNumToUse,
+			System.Boolean OverwriteIfExists = false)
+		{
+			System.IO.FileStream Out = null;
+			if (MAIN.FileExists(CustomIconFile) == false) { goto G_ExitErr; }
+#if DEBUG
+            Debugger.DebuggingInfo("(in ROOT.MAIN.CreateInternetShortcut(... , ...)) ACTIVATION: Success");
+#endif
+			HTTPLIB.RequestBuilder req = HTTPLIB.Http.Get(URL.ToString());
+			System.Boolean executed = false;
+			System.Net.WebException err = null;
+			req.OnSuccess(df => { executed = true; });
+			req.OnFail(dg => { executed = true; err = dg; });
+			req.Go();
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: {URL}");
+#endif
+			while (executed == false)
+			{
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) WAITINGREP: {URL}: 130 ms");
+#endif
+				MAIN.HaltApplicationThread(130);
+			}
+			req = null;
+			if (err != null) { err = null; goto G_ExitErr; }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) URLFIND: true");
+#endif
+			err = null;
+			if (MAIN.FileExists(Path))
+			{
+				if (OverwriteIfExists)
+				{
+					Out = MAIN.ClearAndWriteAFile(Path);
+#if DEBUG
+                    Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: ClearAndWriteAFile()");
+#endif
+					if (Out == null) { goto G_ExitErr; }
+				}
+				else { goto G_ExitErr; }
+			}
+			else
+			{
+				Out = MAIN.CreateANewFile(Path);
+#if DEBUG
+                Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) CALL: CreateANewFile()");
+#endif
+				if (Out == null) { goto G_ExitErr; }
+			}
+			if (IconFileNumToUse < 0) { goto G_ExitErr; }
+			if (IconFileNumToUse > System.Byte.MaxValue) { goto G_ExitErr; }
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) PROCESS_ACTION");
+#endif
+			MAIN.PassNewContentsToFile(System.String.Format(MDCFR.Properties.Resources.MDCFR_INTS_CREATE2,
+				new System.String[] { URL.ToString(), $"{IconFileNumToUse}" ,
+					new System.IO.FileInfo(CustomIconFile).FullName}), Out);
+			Out.Close();
+			Out.Dispose();
+			Out = null;
+#if DEBUG
+            Debugger.DebuggingInfo($"(in ROOT.MAIN.CreateInternetShortcut(... , ...)) RESULT: Success");
+#endif
+			goto G_Succ;
+		G_ExitErr: { if (Out != null) { Out.Close(); Out.Dispose(); } return false; }
+		G_Succ: { if (Out != null) { Out.Close(); Out.Dispose(); } return true; }
+		}
+    }
+#endif
+
+    [SpecialName]
 	internal static class MAINInternal
 	{
-        private static NotSupportedException ThrowNotSupportedPlatform_WPFParts()
-        {
-            return new NotSupportedException(MDCFR.Properties.Resources.MDCFR_PlatformNotSupportedMsg);
+        // Internal implementation class provided to the MAIN class , mostly for assistive scenarios.
+		/// <summary>Internal constant which assists with setting and working around a buffer limit.</summary>
+        private const System.Int32 BUFSIZE = 4096;
+
+        // Internal session encoding keeper. Used in the API's in the MAIN class.
+        private static System.Text.Encoding encodingnow;
+
+		public static APIEncodingOptions EncodingOPT;
+
+		/// <summary>Gets the globally current set encoding.</summary>
+		public static System.Text.Encoding CurrentEncoding { get { return encodingnow; } }
+
+		public static void SetNewEncoding()
+		{
+			switch (EncodingOPT)
+			{
+				case APIEncodingOptions.UTF8:
+                    encodingnow = new System.Text.UTF8Encoding(false); break;
+                case APIEncodingOptions.UTF8BOM:
+					encodingnow = new System.Text.UTF8Encoding(true); break;
+				case APIEncodingOptions.UTF16:
+					encodingnow = new System.Text.UnicodeEncoding(bigEndian: true, byteOrderMark: false); break;
+				case APIEncodingOptions.UTF16LE:
+                    encodingnow = new System.Text.UnicodeEncoding(bigEndian: false, byteOrderMark: false); break;
+				case APIEncodingOptions.UTF16BOM:
+                    encodingnow = new System.Text.UnicodeEncoding(bigEndian: true, byteOrderMark: true); break;
+				case APIEncodingOptions.UTF16LEBOM:
+                    encodingnow = new System.Text.UnicodeEncoding(bigEndian: false, byteOrderMark: true); break;
+                case APIEncodingOptions.UTF32:
+					encodingnow = new System.Text.UTF32Encoding(bigEndian: true, byteOrderMark: false); break;
+				case APIEncodingOptions.UTF32LE:
+                    encodingnow = new System.Text.UTF32Encoding(bigEndian: false, byteOrderMark: false); break;
+				case APIEncodingOptions.UTF32BOM:
+                    encodingnow = new System.Text.UTF32Encoding(bigEndian: true, byteOrderMark: true); break;
+				case APIEncodingOptions.UTF32LEBOM:
+                    encodingnow = new System.Text.UTF32Encoding(bigEndian: false, byteOrderMark: true); break;
+                case APIEncodingOptions.ASCII:
+					encodingnow = new System.Text.ASCIIEncoding(); break;
+			};
+		}
+
+		static MAINInternal()
+		{
+			EncodingOPT = APIEncodingOptions.UTF8;
+			encodingnow = new System.Text.UTF8Encoding(false);
+		}
+
+		/// <summary>
+		/// Copies data from a <see cref="System.IO.Stream"/>-derived instance to another 
+		/// <see cref="System.IO.Stream"/>-derived instance.
+		/// </summary>
+		/// <param name="Input">The input stream.</param>
+		/// <param name="Output">The output stream.</param>
+		/// <param name="RequestedBytes">The bytes to read. This can be less than the length of <paramref name="Input"/>.</param>
+		public static void BufferedCopyStream(System.IO.Stream Input , System.IO.Stream Output , System.Int64 RequestedBytes)
+		{
+            if (RequestedBytes > Input.Length || RequestedBytes < 0)
+            {
+				throw new ArgumentException("RequestedBytes parameter cannot be larger than Input.Length and less than 0." , nameof(RequestedBytes));
+            } else if (Input == null || Input.CanRead == false)
+			{
+				throw new ArgumentException("The input stream must be an instance of a readable stream." , nameof(Input));
+			} else if (Output == null || Output.CanWrite == false)
+			{ throw new ArgumentException("The output stream must be an instance of a writeable stream.", nameof(Output)); }
+            System.Int64 I = 0;
+            System.Byte[] TempBuf;
+            for (; (I < RequestedBytes) && ((RequestedBytes - I) > BUFSIZE); I += BUFSIZE)
+            {
+                TempBuf = new System.Byte[BUFSIZE];
+                Input.Read(TempBuf, 0, BUFSIZE);
+                Output.Write(TempBuf, 0, TempBuf.Length);
+            }
+            if ((RequestedBytes - I) <= BUFSIZE) { for (; RequestedBytes > I; I++) { Output.WriteByte((System.Byte)Input.ReadByte()); } }
+        }
+
+		private static NotSupportedException ThrowNotSupportedPlatform_WPFParts()
+		{
+			return new NotSupportedException(MDCFR.Properties.Resources.MDCFR_PlatformNotSupportedMsg);
+		}
+
+        /// <summary>
+        /// Reads bytes from a <see cref="System.IO.Stream"/>-derived class , specifying the bytes to read 
+		/// by the <paramref name="RequestedBytes"/> parameter.
+        /// </summary>
+        /// <param name="Stream">The <see cref="System.IO.Stream"/>-derived class to read bytes from.</param>
+        /// <param name="RequestedBytes">The number of bytes to process. 
+		/// The bytes number given here can be less than the length of the stream.</param>
+        /// <returns>A new <see cref="System.Byte"/>[] if the method succeeds; otherwise , null.</returns>
+        public static System.Byte[] D_ReadBufferedInternalTarget(System.IO.Stream Stream , System.Int64 RequestedBytes)
+		{
+			// Check for null conditions or whether we can read from this stream
+			if (Stream == null) { return null; }
+			if (Stream.CanRead == false) { return null; }
+			// Create a new byte array with the requested size.
+			System.Byte[] Contents = new System.Byte[RequestedBytes];
+            if (RequestedBytes <= BUFSIZE)
+            {
+                // Read all bytes directly , if the requested bytes are less than the buffer limit.
+				// Otherwise we don't care here; we do not read thousands or millions of bytes.
+                Stream.Read(Contents, 0, Contents.Length);
+            } else
+            {
+                System.Int32 Count;
+                System.Int32 Offset = 0;
+                // Read all bytes with buffered mode.
+                do
+                {
+                    Count = Stream.Read(Contents, Offset, BUFSIZE);
+                    Offset += BUFSIZE;
+                    // Condition specifies that the loop will continue to run when the read bytes are
+                    // more or equal than the buffer limit , plus make sure that the next read will not
+                    // surpass the bytes that the final array can hold.
+                } while ((Count >= BUFSIZE) && (Offset + BUFSIZE <= Contents.Length));
+                // In case that the bytes were surpassed in the above condition , pass all the rest bytes again normally.
+                if (Contents.Length - Offset > 0) { Stream.Read(Contents, Offset, Contents.Length - Offset); }
+            }
+			return Contents;
+        }
+
+		/// <summary>
+		/// Internal adapter method that picks out the proper hash algorithm provided from a <see cref="System.String"/>. <br />
+		/// Used for <see cref="MAIN.GetACryptographyHashForAFile(string, string)"/> method.
+		/// </summary>
+		/// <param name="Alg">The alogrithm string that will be picked out. It is a case-insensitive <see cref="System.String"/>.</param>
+		/// <returns>A <see cref="System.Security.Cryptography.HashAlgorithm"/> that represents the requested algorithm.</returns>
+		public static System.Security.Cryptography.HashAlgorithm D_GetACryptographyHashForAFile_2(System.String Alg)
+		{
+			Alg = Alg.ToUpperInvariant();
+            System.Int32 I = 0;
+			System.Security.Cryptography.HashAlgorithm EDI = null;
+            System.String[] D = System.Enum.GetNames(typeof(HashDigestSelection));
+			System.Array D_T = System.Enum.GetValues(typeof(HashDigestSelection));
+			System.Int32[] D_1 = new System.Int32[D_T.Length];
+			for (; I < D_T.Length; I++) { D_1[I] = (System.Int32)D_T.GetValue(I); }
+			D_T = null;
+			I = 0;
+			System.Boolean Flag = true;
+			while (Flag && I < D.Length)
+			{
+				if (D[I] == Alg)
+				{
+					Flag = false;
+					EDI = D_GetACryptographyHashForAFile_1((HashDigestSelection)D_1[I]);
+				}
+				I++;
+			}
+			if (Flag) { return null; } else { return EDI; }
+        }
+
+        /// <summary>
+        /// Internal adapter method that picks out the proper hash algorithm provided from a <see cref="HashDigestSelection"/> field. <br />
+        /// Used for <see cref="MAIN.GetACryptographyHashForAFile(string, HashDigestSelection)"/> method.
+        /// </summary>
+        /// <param name="HDS">The algorithm to use , provided by the <see cref="HashDigestSelection"/> enumeration.</param>
+        /// <returns>A <see cref="System.Security.Cryptography.HashAlgorithm"/> that represents the requested algorithm.</returns>
+        public static System.Security.Cryptography.HashAlgorithm D_GetACryptographyHashForAFile_1(HashDigestSelection HDS) 
+		{
+            System.Security.Cryptography.HashAlgorithm EDI = null;
+			try
+			{
+				switch (HDS)
+				{
+					case HashDigestSelection.SHA1: EDI = System.Security.Cryptography.SHA1.Create(); break;
+					case HashDigestSelection.SHA256: EDI = System.Security.Cryptography.SHA256.Create(); break;
+					case HashDigestSelection.SHA384: EDI = System.Security.Cryptography.SHA384.Create(); break;
+					case HashDigestSelection.SHA512: EDI = System.Security.Cryptography.SHA512.Create(); break;
+					case HashDigestSelection.MD5: EDI = System.Security.Cryptography.MD5.Create(); break;
+					case HashDigestSelection.SHA224: EDI = CryptographicOperations.SHA224.Create(); break;
+					case HashDigestSelection.MD2: EDI = CryptographicOperations.MD2.Create(); break;
+					case HashDigestSelection.MD4: EDI = CryptographicOperations.MD4.Create(); break;
+					default:
+						return null;
+				}
+			} catch (System.Reflection.TargetInvocationException) { return null; }
+            return EDI;
         }
 
 #if (NET472_OR_GREATER || NET7_0_OR_GREATER) && WPFExists
 
-		public static System.String GetAStringFromTheUserNewInternal(System.String Prompt, System.String Title , System.String DefaultResponse)
+        public static System.String GetAStringFromTheUserNewInternal(System.String Prompt, System.String Title , System.String DefaultResponse)
 		{
 #if DEBUG
 			Debugger.DebuggingInfo($"(in ROOT.MAIN.GetAStringFromTheUserNew({Prompt} , {Title} , {DefaultResponse})) CREATE: Dialog");
@@ -2536,17 +2911,17 @@ namespace ROOT
 #endif
     }
 
-
-    /// <summary>
-    /// This enumeration has valid System links that exist across all Windows computers.
-    /// </summary>
-    [SupportedOSPlatform("windows")]
+	/// <summary>
+	/// This enumeration has valid System links that exist across all Windows computers.
+	/// </summary>
+	[Serializable]
+	[SupportedOSPlatform("windows")]
 	public enum SystemLinks
 	{
 		/// <summary>
 		/// Reserved for enumeration performance.
 		/// </summary>
-		None = 0,
+		[NonSerialized] None = 0,
 		/// <summary>
 		/// Open the Settings Menu.
 		/// </summary>
@@ -2724,13 +3099,13 @@ namespace ROOT
 	/// <summary>
 	/// A storage class used by the file/dir dialogs to access the paths given (Full and name only) , the dialog type ran and if there was an error.		
 	/// </summary>
-	/// <remarks>This class is used only by several functions in the MAIN class. It is not allowed to override this class.</remarks>
+	/// <remarks>This class is used only by several methods in the <see cref="MAIN"/> class. It is not allowed to override this class.</remarks>
 	[SupportedOSPlatform("windows")]
 	public struct DialogsReturner : System.IEquatable<DialogsReturner>
 	{
-		private string ERC;
-		private string FNM;
-		private string FNMFP;
+		private System.String ERC;
+		private System.String FNM;
+		private System.String FNMFP;
 		private FileDialogType FT;
 		private System.String FTD;
 
@@ -2811,7 +3186,7 @@ namespace ROOT
         /// <inheritdoc />
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", 
 			"CA1065:Do not raise exceptions in unexpected locations", 
-			Justification = "<Pending>")]
+			Justification = "This method is not supported in DialogsReturner.")]
         public override int GetHashCode()
         {
             throw new NotSupportedException("Hash codes for equality should be prohibited for this type.");
@@ -2829,40 +3204,69 @@ namespace ROOT
 	/// <summary>
 	/// An enumeration of values which help the function <see cref="MAIN.GetACryptographyHashForAFile(string, HashDigestSelection)"/> to properly select the algorithm requested.
 	/// </summary>
+	[Serializable]
 	public enum HashDigestSelection
 	{
 		/// <summary> RSVD </summary>
-		None = 0,
-		/// <summary> Reserved for future use. </summary>
-		RSVD0 = 1,
+		[NonSerialized] None = 0,
         /// <summary> Reserved for future use. </summary>
-        RSVD1 = 2,
+        [NonSerialized] RSVD0 = 1,
         /// <summary> Reserved for future use. </summary>
-        RSVD2 = 3,
+        [NonSerialized] RSVD1 = 2,
         /// <summary> Reserved for future use. </summary>
-        RSVD3 = 4,
-		/// <summary>
-		/// The SHA1 Digest will be used.
-		/// </summary>
+        [NonSerialized] RSVD2 = 3,
+        /// <summary> Reserved for future use. </summary>
+        [NonSerialized] RSVD3 = 4,
+		/// <summary>The SHA1 Digest will be used.</summary>
 		/// <remarks>Microsoft has detected that the algorithm produces the same result in slightly different files.
 		/// If your case is the integrity , you should use then the <see cref="HashDigestSelection.SHA256"/> or a better algorithm.</remarks>
 		SHA1 = 5,
-		/// <summary>
-		/// The SHA256 Digest will be used.
-		/// </summary>
+		/// <summary>The SHA256 Digest will be used.</summary>
 		SHA256 = 6,
-		/// <summary>
-		/// The SHA384 Digest will be used.
-		/// </summary>
+		/// <summary>The SHA384 Digest will be used.</summary>
 		SHA384 = 7,
-		/// <summary>
-		/// The SHA512 Digest will be used.
-		/// </summary>
+		/// <summary>The SHA512 Digest will be used.</summary>
 		SHA512 = 8,
-		/// <summary>
-		/// The MD5 Digest will be used.
-		/// </summary>
-		MD5 = 9
+		/// <summary>The MD5 Digest will be used.</summary>
+		MD5 = 9,
+        /// <summary>The internal SHA224 Digest will be used.</summary>
+        [RequiresPreviewFeatures] SHA224 = 10,
+        /// <summary>The internal MD2 Digest will be used.</summary>
+        [RequiresPreviewFeatures] MD2 = 11,
+        /// <summary>The internal MD4 Digest will be used.</summary>
+        [RequiresPreviewFeatures] MD4 = 12
 	}
+
+	/// <summary>
+	/// This enumeration defines constants to use for the <see cref="MAIN"/> API's that 
+	/// utilise the <see cref="System.Text.Encoding"/> class for encoding operations.
+	/// </summary>
+	[Serializable]
+	[RequiresPreviewFeatures]
+	public enum APIEncodingOptions
+	{
+		/// <summary>UTF-8 Encoding without byte-order mark will be used.</summary>
+		UTF8 = 1,
+        /// <summary>UTF-8 Encoding with byte-order mark will be used.</summary>
+        UTF8BOM,
+        /// <summary>UTF-16 Big-Endian Encoding without byte-order mark will be used.</summary>
+        UTF16,
+        /// <summary>UTF-32 Big-Endian Encoding without byte-order mark will be used.</summary>
+        UTF32,
+        /// <summary>ASCII Encoding will be used.</summary>
+        ASCII,
+        /// <summary>UTF-16 Little-Endian Encoding without byte-order mark will be used.</summary>
+        UTF16LE,
+        /// <summary>UTF-16 Little-Endian Encoding with byte-order mark will be used.</summary>
+        UTF16LEBOM,
+        /// <summary>UTF-16 Big-Endian Encoding with byte-order mark will be used.</summary>
+        UTF16BOM,
+        /// <summary>UTF-32 Little-Endian Encoding without byte-order mark will be used.</summary>
+        UTF32LE,
+        /// <summary>UTF-32 Little-Endian Encoding with byte-order mark will be used.</summary>
+        UTF32LEBOM,
+        /// <summary>UTF-32 Big-Endian Encoding with byte-order mark will be used.</summary>
+        UTF32BOM
+    }
 
 }

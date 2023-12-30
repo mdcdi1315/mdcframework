@@ -1,0 +1,118 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="Current">
+	
+	<!-- Provides common targets and properties that run during MDCFR build. -->
+	<!-- Actually , it provides build infrastracture targets that are used only by the MDCFR project itself.  -->
+
+    <!-- 
+		Builds out the custom System.Runtime.CompilerServices.Unsafe DLL , 
+		and puts it in the required directory so as the MDCFR can be built.
+	-->
+	<Target Name="CompServicesdotUnsafeBuild" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'">
+		<Message Importance="high" Text="Building Custom System.Runtime.CompilerServices.Unsafe DLL (needed for NET48)" />
+		<MakeDir Directories="./Imports/NETFR48" />
+		<MSBuild Projects="../MDCFR-SYSRUNUNS/System.Runtime.CompilerServices.Unsafe.ilproj" Properties="BuildingForMDCFR=True;Configuration=$(Configuration)" Targets="Restore;Build" StopOnFirstFailure="true" BuildInParallel="false" />
+		<Message Importance="high" Text="Done Building Custom System.Runtime.CompilerServices.Unsafe" />
+	</Target>
+
+	<!-- This property group will export a new preprocessor constant , "WPFExists". -->
+	<!-- That constant specifies that the WPF libraries is available to MDCFR. -->
+	<PropertyGroup Condition="'$(TargetFramework)' != '$(DotNetCoreIdentifier)'">
+		<!-- This property enables the usage of WPF in this library. -->
+		<UseWPF>True</UseWPF>
+		<!-- This property enables the usage of Windows Forms in this library. -->
+		<UseWindowsForms>True</UseWindowsForms>
+		<DefineConstants>$(DefineConstants);WPFExists</DefineConstants>
+	</PropertyGroup>
+
+	<!-- This property group will export a new preprocessor constant , "NEEDS_HTTPLIB". -->
+	<!-- That constant specifies that HTTPLIB-related code is missing. -->
+	<!-- 
+		Notes to the public: If you want to embed the HTTPLIB again , and calling obsolete API for .NET 7.0 , just copy the file  
+		to this project root so as to embed it back to MDCFR. Then , build out again for .NET 7.0 only.
+     -->
+	<PropertyGroup Condition="('$(TargetFramework)' != '$(DotNetFrameworkIdentifier)') AND '$([System.IO.File]::Exists(`$(MSBuildProjectDirectory)\MDCFR-HTTPLIB.cs`))' == 'false'">
+		<DefineConstants>$(DefineConstants);NEEDS_HTTPLIB</DefineConstants>
+	</PropertyGroup>
+
+	<!-- Copies unmanaged libraries. -->
+	<Target Name="CopyUnmanaged" AfterTargets="AfterBuild" Condition="'$(TargetFramework)' != '$(DotNetCoreIdentifier)'">
+		<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
+		<Copy SourceFiles=".\Imports\xxhash.dll;.\Imports\zstd.dll" SkipUnchangedFiles="true" DestinationFolder="$(MSBuildProjectDirectory)\$(OutputPath)" />
+		<Message Importance="High" Text="Successfull copying ..." />
+	</Target>
+
+	<!-- Proper overrides for building under dotnet build command. -->
+	<Target Name="DotnetCore0" AfterTargets="BeforeBuild" 
+			Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'">
+		<!-- Proper overrides for building MDCFR with dotnet build. -->
+		<Message Importance="high" Text="Build ResGen that will be used throughout the build process." />
+		<Message Importance="low" Text="Conditions considered for building ResGen:" />
+		<Message Importance="low" Text="===========================================================" />
+		<Message Importance="low" Text="MSBuildRuntimeType is Core , which means that the project is running on 'dotnet' command." />
+		<Message Importance="low" Text="TargetFramework is $(DotNetFrameworkIdentifier) , which means that we are building for .NET Framework , which is" />
+		<Message Importance="low" Text="needed because we can use the default ResGen to build and use non-string resources." />
+		<Message Importance="low" Text="===========================================================" />
+		<Message Importance="low" Text=" " />
+		<Message Importance="high" Text="ResGen will be built using $(Configuration) configuration and will be run the Restore and Build targets to it." />
+		<MSBuild Projects="..\..\Tools\ResGen\MDCFR-RESGEN.csproj" Properties="Configuration=$(Configuration)" Targets="Restore;Build" StopOnFirstFailure="true" BuildInParallel="false" />
+		<Message Importance="normal" Text="ResGen was seem to be built." />
+		<Message Importance="normal" Text="Checking whether ResGen exists." />
+		<Exec Command="If not exist &quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; (Exit 1)" IgnoreExitCode="false" />
+		<Message Importance="normal" Text="ResGen Arrived" />
+		<!-- Create a temporary directory. Will be deleted after finishing out. -->
+		<Message Importance="normal" Text="Create a temporary resource directory." />
+		<Message Importance="normal" Text="This one directory is a different one from the original Resources directory" />
+		<Message Importance="normal" Text="since that one uses the ResGen shipped with .NET 7." />
+		<MakeDir Directories="..\gen" />
+		<!-- Execute build target for Resources.resx -->
+		<Message Importance="normal" Text="Executing Build Target (1/3): Resources.resx" />
+		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\Resources.resx&quot; &quot;..\gen\MDCFR.GEN.resources&quot; /str:csharp,MDCFR.Properties,Resources,..\gen\MDCFR.GEN.cs" />
+		<Message Importance="normal" Text="Executing Build Target (2/3): NAudio.WinForms.Gui.PanSlider.resx" />
+		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\NAudio.WinForms.Gui.PanSlider.resx&quot; &quot;..\gen\MDCFR.NAD1.resources&quot; /str:csharp,MDCFR.Properties,NAudio_WinForms_Gui_PanSlider,..\gen\MDCFR.NAD1.cs" />
+		<Message Importance="normal" Text="Executing Build Target (3/3): NAudio.WinForms.Gui.VolumeSlider.resx" />
+		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\NAudio.WinForms.Gui.VolumeSlider.resx&quot; &quot;..\gen\MDCFR.NAD2.resources&quot; /str:csharp,MDCFR.Properties,NAudio_WinForms_Gui_VolumeSlider,..\gen\MDCFR.NAD2.cs" />
+		<Message Importance="normal" Text="All Build Targets were successfull (3 out of 3 items were successfully generated)." />
+		<PropertyGroup>
+			<GenerateResourceMSBuildRuntime></GenerateResourceMSBuildRuntime>
+			<EnableDefaultEmbeddedResourceItems>False</EnableDefaultEmbeddedResourceItems>
+			<GenerateResourceUsePreserializedResources>True</GenerateResourceUsePreserializedResources>
+		</PropertyGroup>
+		<Message Importance="normal" Text="Including generated resources to the build." />
+		<ItemGroup>
+			<EmbeddedResource Include="..\gen\MDCFR.NAD2.resources" LogicalName="NAudio.WinForms.Gui.VolumeSlider.resources" />
+			<EmbeddedResource Include="..\gen\MDCFR.NAD1.resources" LogicalName="NAudio.WinForms.Gui.PanSlider.resources" />
+			<EmbeddedResource Include="..\gen\MDCFR.GEN.resources" LogicalName="MDCFR.Properties.Resources.resources" />
+			<Compile Include="..\gen\MDCFR.GEN.cs" />
+			<Compile Include="..\gen\MDCFR.NAD2.cs" />
+			<Compile Include="..\gen\MDCFR.NAD1.cs" />
+		</ItemGroup>
+		<Message Importance="normal" Text="Ready to build for dotnet build command." />
+	</Target>
+
+	<Target Name="DotnetCore1" AfterTargets="AfterBuild" 
+			Condition="'$(MSBuildRuntimeType)' == 'Core'  AND '$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'">
+		<!-- Clearup tasks after building MDCFR with dotnet build. -->
+		<Message Importance="high" Text="Done using the custom-built resources. Destroying ResGen-generated information." />
+		<Message Importance="normal" Text="Clearing up resources generation directory..." />
+		<RemoveDir Directories="../gen" ContinueOnError="false" />
+		<Message Importance="normal" Text="Successfull clearup." />
+ 	</Target>
+
+	<!-- If the condition stands true , then build normally. Visual Studio does not request the System.Resources.Extensions in any way for net48. -->
+	<ItemGroup Label="Global Resource Items" Condition="('$(MSBuildRuntimeType)' != 'Core') OR ('$(TargetFramework)' != '$(DotNetFrameworkIdentifier)' AND '$(MSBuildRuntimeType)' == 'Core')">
+		<!-- AUTOGENERATED - DO NOT REMOVE -->
+		<EmbeddedResource Include="Properties\Resources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>Resources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<!-- AUTOGENERATED - DO NOT REMOVE -->
+		<Compile Include="Properties\Resources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>Resources.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
+
+</Project>
+

@@ -10,7 +10,7 @@
     <GenerateAssemblyInfo>False</GenerateAssemblyInfo>
     <OutputType>Exe</OutputType>
     <UseWindowsForms>True</UseWindowsForms>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>$(DotNetFrameworkIdentifier)</TargetFramework>
     <LangVersion>9.0</LangVersion>
     <AllowUnsafeBlocks>True</AllowUnsafeBlocks>
     <ApplicationManifest>ResGen.manifest</ApplicationManifest>

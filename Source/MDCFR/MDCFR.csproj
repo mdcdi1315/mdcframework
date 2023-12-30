@@ -1,13 +1,15 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
 
-	<ItemGroup Condition="'$(TargetFramework)' == 'net48'">
+	<Import Project="$(MSBuildProjectDirectory)\MDCFR-Infrastracture.targets" />
+	
+	<ItemGroup Condition="'$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'">
 		<Reference Include=".\Imports\NETFR48\System.Runtime.CompilerServices.Unsafe.dll" />
 	</ItemGroup>
 	
-	<ItemGroup Condition="'$(TargetFramework)' == 'net70' OR '$(TargetFramework)' == 'net70-windows10.0.19041.0'">
-		<Reference Include=".\Imports\NET70\System.Drawing.Common.dll" Condition="'$(TargetFramework)' == 'net70'" />
+	<ItemGroup Condition="'$(TargetFramework)' == '$(DotNetCoreIdentifier)' OR '$(TargetFramework)' == '$(DotNetCoreWindowsIdentifier)'">
 		<Reference Include=".\Imports\NET70\System.Resources.Extensions.dll" />
+		<Reference Remove="Microsoft.Windows.SDK.NET.Ref" Condition="'$(TargetFramework)' == '$(DotNetCoreWindowsIdentifier)'" />
 	</ItemGroup>
 	
   <PropertyGroup>
@@ -16,10 +18,10 @@
 	<PublishRelease>True</PublishRelease>
 	<!-- Instruct MSBUILD to force-copy all the None Update elements.-->
 	<!-- This Element is a division of EnableDefaultItems , which only controls the None elements.-->
-	<EnableDefaultNoneItems>True</EnableDefaultNoneItems>
+	<EnableDefaultNoneItems>False</EnableDefaultNoneItems>
 	<!-- Make sure to use all the None Update , Compile elements and generate them to the Output Directory.-->
-	<EnableDefaultItems>True</EnableDefaultItems>
-	<!-- Becuase we want multitargeting, we must exclude the items we don't require. Comment the below line to enable the default excludes. -->
+	<EnableDefaultItems>False</EnableDefaultItems>
+	<!-- Because we want multitargeting, we must exclude the items we don't require. Comment the below line to enable the default excludes. -->
 	<DefaultItemExcludesInProjectFolder>*\**.*</DefaultItemExcludesInProjectFolder>
 	<!-- Corrects dependency errors. -->
 	<EnableDefaultCompileItems>False</EnableDefaultCompileItems>
@@ -28,7 +30,7 @@
 	<!-- Pass the object namespace. Will be used as a helper.-->
     <RootNamespace>MDCFR</RootNamespace>
 	<!-- Provide multiple frameworks to build -->
-	<TargetFrameworks>net48;net70;net70-windows10.0.19041.0</TargetFrameworks>
+	<TargetFrameworks>$(DotNetFrameworkIdentifier);$(DotNetCoreIdentifier);$(DotNetCoreWindowsIdentifier)</TargetFrameworks>
 	<!-- Defines whether the assembly information is controlled by MSBuild or an external file is used. Use False to use an external file instead. -->  
 	<GenerateAssemblyInfo>False</GenerateAssemblyInfo>
 	<!-- Allows to search and find XML documentation on source files and to generate it as a seperate file for usage in Visual Studio. -->  
@@ -47,77 +49,27 @@
 	<!-- Supresses the RG0000 warning when generated from the custom ResGen. -->
 	<!-- The RG0000 warning is disabled because we already know that the resources are embedded correctly. -->
 	<NoWarn Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' == 'net48'">$(NoWarn);RG0000</NoWarn>
+	<!-- 
+		Supresses the obsoleted IntrinsicAttribute added for the needs for MDCFR. 
+		For 1.5.6.0 , this attribute will become deprecated , and when 1.5.7.0 releases out , 
+		it will become available only to the MDCFR assembly.
+	-->
+	<NoWarn>$(NoWarn);MDCFR001</NoWarn>
+	<!-- 
+		Just like in the case of double items in EnableDefaultCompileItems, this node corrects dependency errors ,
+		and avoids running the CoreResGen target. This is only needed for net48 target.
+	-->
+	<EnableDefaultEmbeddedResourceItems>False</EnableDefaultEmbeddedResourceItems>
   </PropertyGroup>
 
-	<!-- This property group will export a new preprocessor constant , "WPFExists". -->
-	<!-- That constant specifies that the WPF is available to MDCFR. -->
-	<PropertyGroup Condition="'$(TargetFramework)' == 'net48' OR '$(TargetFramework)' == 'net70-windows10.0.19041.0'">
-		<!-- This property enables the usage of WPF in this library. -->
-		<UseWPF>True</UseWPF>
-		<!-- This property enables the usage of Windows Forms in this library. -->
-		<UseWindowsForms>True</UseWindowsForms>
-		<DefineConstants>$(DefineConstants);WPFExists</DefineConstants>
-	</PropertyGroup>
-
-  <!-- This property group will export a new preprocessor constant , "NEEDS_HTTPLIB". -->
-  <!-- That constant specifies that HTTPLIB-related code is missing. -->
-  <!-- 
-		Notes to the public: If you want to embed the HTTPLIB again , and calling obsolete API for .NET 7.0 , just copy the file  
-		to this project root so as to embed it back to MDCFR. Then , build out again for .NET 7.0 only.
-   -->
-  <PropertyGroup Condition="('$(TargetFramework)' == 'net70-windows10.0.19041.0' OR '$(TargetFramework)' == 'net70') AND '$([System.IO.File]::Exists(`$(MSBuildProjectDirectory)\MDCFR-HTTPLIB.cs`))' == 'false'">
-	  <DefineConstants>$(DefineConstants);NEEDS_HTTPLIB</DefineConstants>
-  </PropertyGroup>
-
-  <ItemGroup Condition="'$(MSBuildRuntimeType)' != 'Core' AND '$(TargetFramework)' == 'net48'" Label=".NET 4.8. Resource Link Base Items For Visual Studio">
-	  <!-- AUTOGENERATED - DO NOT REMOVE -->
-	  <EmbeddedResource Update="Properties\Resources.resx">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update=".\Properties\NAudio.WinForms.Gui.VolumeSlider.resx" LogicalName="NAudio.WinForms.Gui.VolumeSlider.resources">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>NAudio.WinForms.Gui.VolumeSlider.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update=".\Properties\NAudio.WinForms.Gui.PanSlider.resx" LogicalName="NAudio.WinForms.Gui.PanSlider.resources">
-		  <Generator>ResXFileCodeGenerator</Generator>
-		  <LastGenOutput>NAudio.WinForms.Gui.PanSlider.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <!-- AUTOGENERATED - DO NOT REMOVE -->
-	  <Compile Include="Properties\NAudio.WinForms.Gui.PanSlider.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>NAudio.WinForms.Gui.PanSlider.resx</DependentUpon>
-	  </Compile>
-	  <!-- AUTOGENERATED - DO NOT REMOVE -->
-	  <Compile Include="Properties\NAudio.WinForms.Gui.VolumeSlider.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>NAudio.WinForms.Gui.VolumeSlider.resx</DependentUpon>
-	  </Compile>
-	  <!-- AUTOGENERATED - DO NOT REMOVE -->
-	  <Compile Include="Properties\Resources.Designer.cs">
-		  <DesignTime>True</DesignTime>
-		  <AutoGen>True</AutoGen>
-		  <DependentUpon>Resources.resx</DependentUpon>
-	  </Compile>
-  </ItemGroup>
-	
-  <ItemGroup Condition="'$(TargetFramework)' == 'net48'" Label=".NET Framework 4.8 project items">
-	<Compile Include=".\MDCFR-EXTERNALHASHESDIG.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_BROTLI.cs" />
-	<Compile Include=".\MDCFR-EXTERNALCODE.cs" />
+  <ItemGroup Condition="'$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'" Label=".NET Framework 4.8 project items">
 	<Compile Include=".\MDCFR-SYSBUFEXT.cs" />
 	<Compile Include=".\MDCFR-SYSMEMEXT.cs" />
-	<Compile Include=".\MDCFR-SYSRESEXT.cs" />
 	<Compile Include=".\MDCFR-SYSVECEXT.cs" />
 	<Compile Include="..\MDCFR-DEP_HTTPLIB\MDCFR-HTTPLIB.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_ZIP.cs" />
 	<Compile Include=".\MDCFR-SYSCOLIMUT.cs" />
 	<Compile Include=".\MDCFR-SYSCOPPG.cs" />
 	<Compile Include=".\MDCFR-SYSTTD.cs" />
-	<Compile Include=".\MDCFR-RCYMS.cs" />
 	<Compile Include=".\MDCFR-SYSTEN.cs" />
 	<Compile Include=".\MDCFR-NAUDIO.cs" />
 	<Compile Include=".\MDCFR-SYSTXTJSON.cs" />
@@ -128,71 +80,65 @@
 	<Compile Include=".\MDCFR-SYSREFMLC.cs" />
 	<Compile Include=".\MDCFR-MIORT.cs" />
 	<Compile Include=".\MDCFR-SYSMEMDAT.cs" />
+	<!-- The codepages.nlp file required only for System.Text.Encoding.CodePages package , built under net48. -->
 	<EmbeddedResource Include=".\Resources\codepages.nlp" LogicalName="codepages.nlp" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Fader.resources" LogicalName="NAudio.WinForms.Gui.Fader.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Pot.resources" LogicalName="NAudio.WinForms.Gui.Pot.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.ProgressLog.resources" LogicalName="NAudio.WinForms.Gui.ProgressLog.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.WaveViewer.resources" LogicalName="NAudio.WinForms.Gui.WaveViewer.resources" />
-	<Compile Remove="Properties\NAudio.WinForms.Gui.PanSlider.Designer.cs;Properties\NAudio.WinForms.Gui.VolumeSlider.Designer.cs;Properties\Resources.Designer.cs" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
-	<EmbeddedResource Remove="Properties\Resources.resx;.\Properties\NAudio.WinForms.Gui.VolumeSlider.resx;.\Properties\NAudio.WinForms.Gui.PanSlider.resx" Condition="'$(MSBuildRuntimeType)' == 'Core'" />
-	<None Remove="$(BaseIntermediateOutputPath)\**" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)' == 'net70-windows10.0.19041.0' OR '$(TargetFramework)' == 'net70'" Label=".NET 7.0 project items">
-	<Compile Include=".\MDCFR-EXTERNALHASHESDIG.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_BROTLI.cs" />
+  <ItemGroup Condition="'$(TargetFramework)' == '$(DotNetCoreWindowsIdentifier)' OR '$(TargetFramework)' == '$(DotNetCoreIdentifier)'" Label=".NET 7.0 project items">
 	<Compile Include=".\MDCFR-HTTPLIB.cs" Condition="'$([System.IO.File]::Exists(`$(MSBuildProjectDirectory)\MDCFR-HTTPLIB.cs`))' == 'true'" />
-	<Compile Include=".\MDCFR-EXTERNALCODE.cs" />
-	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_ZIP.cs" />
-	<Compile Include=".\MDCFR-RCYMS.cs" />
-	<Compile Include=".\MDCFR-NAUDIO.cs" Condition="'$(TargetFramework)' == 'net70-windows10.0.19041.0'" />
-	<!-- AUTOGENERATED - DO NOT REMOVE -->
-	<Compile Include="Properties\NAudio.WinForms.Gui.PanSlider.Designer.cs">
-		<DesignTime>True</DesignTime>
-		<AutoGen>True</AutoGen>
-		<DependentUpon>NAudio.WinForms.Gui.PanSlider.resx</DependentUpon>
-	</Compile>
-	<!-- AUTOGENERATED - DO NOT REMOVE -->
-	<Compile Include="Properties\NAudio.WinForms.Gui.VolumeSlider.Designer.cs">
-		<DesignTime>True</DesignTime>
-		<AutoGen>True</AutoGen>
-		<DependentUpon>NAudio.WinForms.Gui.VolumeSlider.resx</DependentUpon>
-	</Compile>
-	<!-- AUTOGENERATED - DO NOT REMOVE -->
-	<Compile Include="Properties\Resources.Designer.cs">
-		<DesignTime>True</DesignTime>
-		<AutoGen>True</AutoGen>
-		<DependentUpon>Resources.resx</DependentUpon>
-	</Compile>
-	<!-- AUTOGENERATED - DO NOT REMOVE -->
-	<EmbeddedResource Update="Properties\Resources.resx">
-		<Generator>ResXFileCodeGenerator</Generator>
-		<LastGenOutput>Resources.Designer.cs</LastGenOutput>
-	</EmbeddedResource>
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Fader.resources" LogicalName="NAudio.WinForms.Gui.Fader.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Pot.resources" LogicalName="NAudio.WinForms.Gui.Pot.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.ProgressLog.resources" LogicalName="NAudio.WinForms.Gui.ProgressLog.resources" />
-	<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.WaveViewer.resources" LogicalName="NAudio.WinForms.Gui.WaveViewer.resources" />
-	<EmbeddedResource Update=".\Properties\NAudio.WinForms.Gui.VolumeSlider.resx" LogicalName="NAudio.WinForms.Gui.VolumeSlider.resources">
-		<Generator>ResXFileCodeGenerator</Generator>
-		<LastGenOutput>NAudio.WinForms.Gui.VolumeSlider.Designer.cs</LastGenOutput>
-	</EmbeddedResource>
-	<EmbeddedResource Update=".\Properties\NAudio.WinForms.Gui.PanSlider.resx" LogicalName="NAudio.WinForms.Gui.PanSlider.resources">
-		<Generator>ResXFileCodeGenerator</Generator>
-		<LastGenOutput>NAudio.WinForms.Gui.PanSlider.Designer.cs</LastGenOutput>
-	</EmbeddedResource>
-	<None Remove="$(BaseIntermediateOutputPath)\**" />
+	<Compile Include=".\MDCFR-NAUDIO.cs" Condition="'$(TargetFramework)' == '$(DotNetCoreWindowsIdentifier)'" />
   </ItemGroup>
 
   <ItemGroup Label="Global Items that participate in build">
+	<Compile Include=".\MDCFR-PROPS.cs" />
+	<Compile Include=".\MDCFR-RCYMS.cs" />
 	<Compile Include=".\MDCFR-DEFAULT_1.cs" />
 	<Compile Include=".\MDCFR-DEFAULT_2.cs" />
 	<Compile Include=".\MDCFR-DEFAULT_3.cs" />
     <Compile Include=".\MDCFR-DEFAULT_4.cs" />
-	<Compile Include=".\MDCFR-PROPS.cs" />
+	<Compile Include=".\MDCFR-SYSDRVINFO.cs" />
+	<Compile Include=".\MDCFR-SYSWINEXTS.cs" />
+	<Compile Include=".\MDCFR-EXTERNALCODE.cs" />
 	<Compile Include=".\MDCFR-PROPS_INTERNAL.cs" />
+	<Compile Include=".\MDCFR-EXTERNALHASHESDIG.cs" />
+	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS.cs" />
+	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_ZIP.cs" />
+	<Compile Include=".\MDCFR-EXTERNALARCHMETHODS_BROTLI.cs" />
+	<None Remove="$(BaseIntermediateOutputPath)\**" />
+	<None Include=".\MDCFR-Infrastracture.targets" />
+	<None Include=".\Properties\*" />
   </ItemGroup>
+
+	<!-- NAudio-Specific resources. NAudio is NOT built under the classic .NET Core only. -->
+	<ItemGroup Label="NAudio Resources 1" Condition="'$(TargetFramework)' != '$(DotNetCoreIdentifier)'">
+		<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Fader.resources" LogicalName="NAudio.WinForms.Gui.Fader.resources" />
+		<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.Pot.resources" LogicalName="NAudio.WinForms.Gui.Pot.resources" />
+		<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.ProgressLog.resources" LogicalName="NAudio.WinForms.Gui.ProgressLog.resources" />
+		<EmbeddedResource Include=".\Resources\NAudio.WinForms.Gui.WaveViewer.resources" LogicalName="NAudio.WinForms.Gui.WaveViewer.resources" />
+	</ItemGroup>
+
+	<ItemGroup Label="NAudio Resources 2" Condition="('$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' != '$(DotNetFrameworkIdentifier)') OR '$(MSBuildRuntimeType)' != 'Core'">
+		<EmbeddedResource Include=".\Properties\NAudio.WinForms.Gui.VolumeSlider.resx" LogicalName="NAudio.WinForms.Gui.VolumeSlider.resources">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>NAudio.WinForms.Gui.VolumeSlider.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Include=".\Properties\NAudio.WinForms.Gui.PanSlider.resx" LogicalName="NAudio.WinForms.Gui.PanSlider.resources">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>NAudio.WinForms.Gui.PanSlider.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<!-- AUTOGENERATED - DO NOT REMOVE -->
+		<Compile Include="Properties\NAudio.WinForms.Gui.PanSlider.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>NAudio.WinForms.Gui.PanSlider.resx</DependentUpon>
+		</Compile>
+		<!-- AUTOGENERATED - DO NOT REMOVE -->
+		<Compile Include="Properties\NAudio.WinForms.Gui.VolumeSlider.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>NAudio.WinForms.Gui.VolumeSlider.resx</DependentUpon>
+		</Compile>
+	</ItemGroup>
 
   <PropertyGroup Condition="'$(GenerateAssemblyInfo)' == 'true'">
 	  <!-- This property group is used when the user does not use an external source file for assembly information compilation. -->
@@ -221,11 +167,11 @@
 	<LangVersion>11</LangVersion>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net48|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|$(DotNetFrameworkIdentifier)|AnyCPU'">
     <WarningLevel>7</WarningLevel>
   </PropertyGroup>
   
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net48|AnyCPU'">
+  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|$(DotNetFrameworkIdentifier)|AnyCPU'">
     <WarningLevel>7</WarningLevel>
   </PropertyGroup>
 
@@ -233,98 +179,18 @@
   <Target Name="Init_N" BeforeTargets="BeforeBuild">
 	<Message Importance="High" Text="Initiating Build..." />
 	<Message Importance="High" Text="Configuration Used: $(Configuration)" />
-	  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
-		  <DebugType>Full</DebugType>
-	  </PropertyGroup>
-	  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
-		  <DebugType>Embedded</DebugType>
+	<Message Importance="high" Text="Windows SDK Version to be used is $(WindowsSDKVersionBuild)" />
+	<Message Importance="high" Text="Building for .NET Framework 4.8: " 
+			 Condition="'$(TargetFramework)' == '$(DotNetFrameworkIdentifier)'" />
+	<Message Importance="high" Text="Building for .NET 7.0: " 
+			 Condition="'$(TargetFramework)' == '$(DotNetCoreIdentifier)'" />
+	<Message Importance="high" Text="Building for Windows .NET 7.0: " 
+			 Condition="'$(TargetFramework)' == '$(DotNetCoreWindowsIdentifier)'" />
+	  <PropertyGroup>
+		  <DebugType Condition="'$(Configuration)' == 'Debug'">Full</DebugType>
+		  <DebugType Condition="'$(Configuration)' == 'Release'">Embedded</DebugType>
 	  </PropertyGroup>
 	<Message Importance="High" Text="Will be built on platform: $(Platform)" />
   </Target>
-  
-  <Target Name="End_N1" AfterTargets="Publish" Condition="'$(OS)' == 'Windows_NT'">
-	<Message Importance="High" Text="Copying Project Unmanaged libraries... (For publishing)" />
-	<Exec Command="@&quot;.\macros.cmd&quot; &quot;$(OutputPath)&quot; -publish" />
-	<Message Importance="High" Text="Sucessfull copying ..." />
-  </Target>
-  
-  <Target Name="End_N2" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Windows_NT'">
-	<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
-	<Exec Command="@&quot;.\macros.cmd&quot; &quot;$(OutputPath)&quot;" />
-	<Message Importance="High" Text="Sucessfull copying ..." />
-  </Target>
-
-  <Target Name="End_N3" AfterTargets="Publish" Condition="'$(OS)' == 'Unix'">
-	<Message Importance="High" Text="Copying Project Unmanaged libraries... (For publishing)" />
-	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot; -publish" />
-	<Message Importance="High" Text="Sucessfull copying ..." />
-  </Target>
-
-  <Target Name="End_N4" AfterTargets="AfterBuild" Condition="'$(OS)' == 'Unix'">
-	<Message Importance="High" Text="Copying Project Unmanaged libraries..." />
-	<Exec Command="bash &quot;./macros.sh&quot; &quot;$(OutputPath)&quot;" />
-	<Message Importance="High" Text="Sucessfull copying ..." />
-  </Target>
-
-	<Target Name="CompServicesdotUnsafeBuild" BeforeTargets="BeforeBuild" Condition="'$(TargetFramework)' == 'net48'">
-		<Message Importance="high" Text="Building Custom System.Runtime.CompilerServices.Unsafe DLL (needed for NET48)" />
-		<MSBuild Projects="..\MDCFR-SYSRUNUNS\System.Runtime.CompilerServices.Unsafe.ilproj" Properties="BuildingForMDCFR=True;Configuration=$(Configuration)" Targets="Restore;Build" StopOnFirstFailure="true" BuildInParallel="false" />
-		<Message Importance="high" Text="Done Building Custom System.Runtime.CompilerServices.Unsafe" />
-	</Target>
-
-	<!-- Proper overrides for building under dotnet build command. -->
-	<Target Name="DotnetCore0" BeforeTargets="BeforeBuild" Condition="'$(MSBuildRuntimeType)' == 'Core' AND '$(TargetFramework)' == 'net48'">
-		<!-- Proper overrides for building MDCFR with dotnet build. -->
-		<Message Importance="high" Text="Build ResGen that will be used throughout the build process." />
-		<Message Importance="low" Text="Conditions considered for building ResGen:" />
-		<Message Importance="low" Text="===========================================================" />
-		<Message Importance="low" Text="MSBuildRuntimeType is Core , which means that the project is running on 'dotnet' command." />
-		<Message Importance="low" Text="TargetFramework is net48 , which means that we are building for .NET Framework , which is" />
-		<Message Importance="low" Text="needed because we can use the default ResGen to build and use non-string resources." />
-		<Message Importance="low" Text="===========================================================" />
-		<Message Importance="low" Text=" " />
-		<Message Importance="high" Text="ResGen will be built using $(Configuration) configuration and will be run the Restore and Build targets to it." />
-		<MSBuild Projects="..\..\Tools\ResGen\MDCFR-RESGEN.csproj" Properties="Configuration=$(Configuration)" Targets="Restore;Build" StopOnFirstFailure="true" BuildInParallel="false" />
-		<Message Importance="normal" Text="ResGen was seem to be built." />
-		<Message Importance="normal" Text="Checking whether ResGen exists." />
-		<Exec Command="If not exist &quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; (Exit 1)" IgnoreExitCode="false" />
-		<Message Importance="normal" Text="ResGen Arrived" />
-		<!-- Create a temporary directory. Will be deleted after finishing out. -->
-		<Message Importance="normal" Text="Create a temporary resource directory." />
-		<Message Importance="normal" Text="This one directory is a different one from the original Resources directory" />
-		<Message Importance="normal" Text="since that one uses the ResGen shipped with .NET 7." />
-		<Exec Command="If not exist &quot;..\gen&quot; (mkdir &quot;..\gen&quot;)" />
-		<!-- Execute build target for Resources.resx -->
-		<Message Importance="normal" Text="Executing Build Target (1/3): Resources.resx" />
-		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\Resources.resx&quot; &quot;..\gen\MDCFR.GEN.resources&quot; /str:csharp,MDCFR.Properties,Resources,..\gen\MDCFR.GEN.cs" />
-		<Message Importance="normal" Text="Executing Build Target (2/3): NAudio.WinForms.Gui.PanSlider.resx" />
-		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\NAudio.WinForms.Gui.PanSlider.resx&quot; &quot;..\gen\MDCFR.NAD1.resources&quot; /str:csharp,MDCFR.Properties,NAudio_WinForms_Gui_PanSlider,..\gen\MDCFR.NAD1.cs" />
-		<Message Importance="normal" Text="Executing Build Target (3/3): NAudio.WinForms.Gui.VolumeSlider.resx" />
-		<Exec Command="@&quot;..\..\Tools\ResGen\bin\$(Configuration)\ResGen.exe&quot; &quot;.\Properties\NAudio.WinForms.Gui.VolumeSlider.resx&quot; &quot;..\gen\MDCFR.NAD2.resources&quot; /str:csharp,MDCFR.Properties,NAudio_WinForms_Gui_VolumeSlider,..\gen\MDCFR.NAD2.cs" />
-		<Message Importance="normal" Text="All Build Targets were successfull (3 out of 3 items were successfully generated)." />
-		<PropertyGroup>
-			<GenerateResourceMSBuildRuntime></GenerateResourceMSBuildRuntime>
-			<EnableDefaultEmbeddedResourceItems>False</EnableDefaultEmbeddedResourceItems>
-			<GenerateResourceUsePreserializedResources>True</GenerateResourceUsePreserializedResources>
-		</PropertyGroup>
-		<Message Importance="normal" Text="Including generated resources to the build." />
-		<ItemGroup>
-			<EmbeddedResource Include="..\gen\MDCFR.NAD2.resources" LogicalName="NAudio.WinForms.Gui.VolumeSlider.resources" />
-			<EmbeddedResource Include="..\gen\MDCFR.NAD1.resources" LogicalName="NAudio.WinForms.Gui.PanSlider.resources" />
-			<EmbeddedResource Include="..\gen\MDCFR.GEN.resources" LogicalName="MDCFR.Properties.Resources.resources" />
-			<Compile Include="..\gen\MDCFR.GEN.cs" />
-			<Compile Include="..\gen\MDCFR.NAD2.cs" />
-			<Compile Include="..\gen\MDCFR.NAD1.cs" />
-		</ItemGroup>
-		<Message Importance="normal" Text="Ready to build for dotnet build command." />
-	</Target>
-
-	<Target Name="DotnetCore1" AfterTargets="AfterBuild" Condition="'$(MSBuildRuntimeType)' == 'Core'  AND '$(TargetFramework)' == 'net48'">
-		<!-- Clearup tasks after building MDCFR with dotnet build. -->
-		<Message Importance="normal" Text="Clearing up resources generation directory..." />
-		<Exec Command="rd /s /q ..\gen" />
-		<Message Importance="normal" Text="Successfull clearup." />
- 	</Target>
-	
 	
 </Project>

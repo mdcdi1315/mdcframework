@@ -129,6 +129,7 @@ namespace System.Numerics.Tensors
 
             private int _index;
 
+            /// <summary />
             public T Current { get; private set; }
 
             object? IEnumerator.Current => Current;
@@ -140,6 +141,7 @@ namespace System.Numerics.Tensors
                 Current = default(T);
             }
 
+            /// <summary />
             public bool MoveNext()
             {
                 if (_index < _tensor.Length)
@@ -391,8 +393,10 @@ namespace System.Numerics.Tensors
             }
         }
 
+        /// <summary />
         public bool IsFixedSize => true;
 
+        /// <summary />
         public bool IsReadOnly => false;
 
         int ICollection<T>.Count => (int)Length;
@@ -1131,6 +1135,7 @@ namespace System.Numerics.Tensors
             return compressedSparseTensor;
         }
 
+        /// <summary />
         public string GetArrayString(bool includeWhitespace = true)
         {
             StringBuilder stringBuilder = new StringBuilder();
@@ -1683,6 +1688,7 @@ namespace System.Numerics.Tensors
         }
     }
 
+    /// <summary />
     public static class ArrayTensorExtensions
     {
         /// <summary>
@@ -2095,6 +2101,7 @@ namespace System.Numerics.Tensors
             Buffer.Span[index] = value;
         }
 
+        /// <inheritdoc />
         protected override void CopyTo(T[] array, int arrayIndex)
         {
             if (array == null)
@@ -2108,6 +2115,7 @@ namespace System.Numerics.Tensors
             Buffer.Span.CopyTo(array.AsSpan(arrayIndex));
         }
 
+        /// <inheritdoc />
         protected override int IndexOf(T item)
         {
             if (MemoryMarshal.TryGetArray((ReadOnlyMemory<T>)Buffer, out ArraySegment<T> segment))

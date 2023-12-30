@@ -5815,68 +5815,12 @@ internal static partial class Interop
         /// WARNING: This method does not implicitly handle long paths. Use FindFirstFile.
         /// </summary>
         [DllImport(Libraries.Kernel32, CharSet = CharSet.Unicode, EntryPoint = "FindFirstFileExW", ExactSpelling = true, SetLastError = true)]
-        private static extern Microsoft.Win32.SafeHandles.SafeFindHandle FindFirstFileExPrivate(string lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, ref WIN32_FIND_DATA lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, IntPtr lpSearchFilter, int dwAdditionalFlags);
+        private static extern SafeFindHandle FindFirstFileExPrivate(string lpFileName, FINDEX_INFO_LEVELS fInfoLevelId, ref WIN32_FIND_DATA lpFindFileData, FINDEX_SEARCH_OPS fSearchOp, IntPtr lpSearchFilter, int dwAdditionalFlags);
 
-        internal static Microsoft.Win32.SafeHandles.SafeFindHandle FindFirstFile(string fileName, ref WIN32_FIND_DATA data)
+        internal static SafeFindHandle FindFirstFile(string fileName, ref WIN32_FIND_DATA data)
         {
             fileName = System.IO.PathInternal.EnsureExtendedPrefixIfNeeded(fileName);
             return FindFirstFileExPrivate(fileName, FINDEX_INFO_LEVELS.FindExInfoBasic, ref data, FINDEX_SEARCH_OPS.FindExSearchNameMatch, IntPtr.Zero, 0);
-        }
-
-        [DllImport(Libraries.Kernel32, BestFitMapping = true, CharSet = CharSet.Unicode, EntryPoint = "FormatMessageW", ExactSpelling = true, SetLastError = true)]
-        private unsafe static extern int FormatMessage(int dwFlags, IntPtr lpSource, uint dwMessageId, int dwLanguageId, void* lpBuffer, int nSize, IntPtr arguments);
-
-        /// <summary>
-        ///     Returns a string message for the specified Win32 error code.
-        /// </summary>
-        internal static string GetMessage(int errorCode)
-        {
-            return GetMessage(errorCode, IntPtr.Zero);
-        }
-
-        internal unsafe static string GetMessage(int errorCode, IntPtr moduleHandle)
-        {
-            int num = 12800;
-            if (moduleHandle != IntPtr.Zero)
-            {
-                num |= 0x800;
-            }
-            System.Span<char> span = stackalloc char[256];
-            fixed (char* lpBuffer = span)
-            {
-                int num2 = FormatMessage(num, moduleHandle, (uint)errorCode, 0, lpBuffer, span.Length, IntPtr.Zero);
-                if (num2 > 0)
-                {
-                    return GetAndTrimString(span.Slice(0, num2));
-                }
-            }
-            if (Marshal.GetLastWin32Error() == 122)
-            {
-                IntPtr intPtr = default(IntPtr);
-                try
-                {
-                    int num3 = FormatMessage(num | 0x100, moduleHandle, (uint)errorCode, 0, &intPtr, 0, IntPtr.Zero);
-                    if (num3 > 0)
-                    {
-                        return GetAndTrimString(new System.Span<char>((void*)intPtr, num3));
-                    }
-                }
-                finally
-                {
-                    Marshal.FreeHGlobal(intPtr);
-                }
-            }
-            return $"Unknown error (0x{errorCode:x})";
-        }
-
-        private static string GetAndTrimString(System.Span<char> buffer)
-        {
-            int num = buffer.Length;
-            while (num > 0 && buffer[num - 1] <= ' ')
-            {
-                num--;
-            }
-            return buffer.Slice(0, num).ToString();
         }
 
         /// <summary>

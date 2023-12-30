@@ -66,7 +66,7 @@ internal static class mdcdi1315
     /// <summary>
     /// The current version of this tool .
     /// </summary>
-    public const System.String VersionNumber = "1.0.0.1";
+    public const System.String VersionNumber = "1.0.0.2";
 
     /// <summary>
     /// This is the result of the bit-wise combination of <see cref="DllImportSearchPath.AssemblyDirectory"/> and <see cref="DllImportSearchPath.System32"/> enumeration values.

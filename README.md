@@ -4,7 +4,7 @@ all-in-one solution for your .NET Framework projects
 (It works on any app , even if it is written in C# , Visual Basic or F#).
 
 ## Detailed Description
-This .NET Framework Library (__MDCFR__ called) contains anything needed to start 
+This .NET Framework Library contains anything needed to start 
 and develop easily .NET Framework applications without
 learning , finding or implementing something very specific in .NET Framework . 
 It is a single library which allows someone to easily
@@ -35,7 +35,7 @@ This Project was developed for a need to develop easily .NET Framework Applicati
 The intention at the first place was not to post it on GitHub , but it is important to have some code 
 foundation to start your new .NET Framework project. 
 
-Additionally , .NET Framework support is starting now to wipe out of the map because .NET 6 , 7 and the upcoming 8
+Additionally , .NET Framework support is starting now to wipe out of the map because .NET 6 , 7 and 8
 have changed and added a lot of new sets of API's and libraries too. 
 This project aims , as most as possible , to bridge this created gap between .NET Framework 4.8 and
 .NET >= 6 in a single library.
@@ -48,7 +48,7 @@ to work for .NET 7.
 Additionally ,type forwards that were related to the embedded packages , which are not needed to be 
 embedded for .NET 7 , were added so as to notify the programmer to move to the real and existing assembly.
 
-So , this repository contains all of the source code developed
+This repository contains all of the source code developed
 or included until now. The Library will be also updated with new features and bug fixes as the months come.
 
 ## Avaliable Architectures
@@ -56,9 +56,7 @@ or included until now. The Library will be also updated with new features and bu
  
  You can compile it with the `dotnet build` command or using the bundled Visual Studio solution.
 
- See why again the `System.Resources.Extensions` caused for one last time a problem when the `dotnet build` command was used [here](http://github.com/mdcdi1315/mdcframework/blob/dev/BuildBehavior.md).
-
- __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit Unicode machines and cannot be used in any other machine architectures.
+ __NOTE!!!__ The xxhash.dll and zstd.dll can only work in 64-Bit Windows Unicode machines and cannot be used in any other machine architectures.
 
 ## What it includes?
 The project includes operations related to:
@@ -108,15 +106,8 @@ as of .NET 7.
 However , this was needed a lot of code refactoration , endless devoted hours for it
 and multiple testing times.
 
-During the process , an other regression was found that was evolving again the 
-`System.Resources.Extensions` package.
-
-This was fixed by adding a compilable .NET Framework ResGen for .NET 4.8.
-
-Learn more [here](http://github.com/mdcdi1315/mdcframework/blob/dev/BuildBehavior.md).
-
 #### Other Notes:
-The Project Directory Structure has been completely changed so as to make it more easy and accessibly
+The Project Directory Structure has been completely changed so as to make it more easy and accessible
 for the new developers to start using it.
 Read more about it in the Readme file located inside the Source folder.
 
@@ -141,7 +132,10 @@ for more information.
 
 #### Source code used in the Project (Licenses for all the used code , among with the Project's one , are located to LICENSE file):
 - Http Library by j6mes at http://github.com/j6mes/httplib 
-  (NOTE: The underlying API used for .NET 7 is deperecated and will be shipped as a seperate library).
+  
+	NOTE (1): The underlying API used is deprecated for .NET 7 and is shipped as a seperate library.
+
+	NOTE (2): This project will be removed from MDCFR after 1.5.7.0 because it is written crudely and not updated since 2012.
 - Zstandard archive format repository (Implemented on my own as a wrapper for the library) at http://github.com/facebook/zstd .
 - xxhash non-cryptographic hash algorithm (Implemented on my own as a wrapper for the library) at http://github.com/Cyan4973/xxhash .
 - CRC Implementation by nullfx at http://github.com/nullfx/NullFX.CRC .
